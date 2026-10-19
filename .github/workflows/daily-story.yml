@@ -6,6 +6,10 @@ on:
     - cron: "25 2 * * *"    # ~8:00 AM India time
     - cron: "25 7 * * *"    # ~1:00 PM India time
     - cron: "25 13 * * *"   # ~7:00 PM India time
+    # backups: GitHub sometimes skips a run. These only post if the run above did not.
+    - cron: "10 3 * * *"    # backup for 8 AM
+    - cron: "10 8 * * *"    # backup for 1 PM
+    - cron: "10 14 * * *"   # backup for 7 PM
   workflow_dispatch:        # lets you press "Run workflow" to test any time
     inputs:
       language:
@@ -26,6 +30,8 @@ jobs:
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}   # newest history.json
 
       - name: Install video tools and Hindi + Bengali fonts
         run: |
@@ -52,6 +58,7 @@ jobs:
           PAGE_NAME_HI: ${{ secrets.PAGE_NAME_HI }}
           PAGE_NAME_BN: ${{ secrets.PAGE_NAME_BN }}
           LANGUAGE: ${{ github.event.inputs.language }}
+          EVENT: ${{ github.event_name }}
           FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
           VOICE: ${{ secrets.VOICE }}
         run: python main.py

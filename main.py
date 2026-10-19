@@ -486,7 +486,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f.write(head + "\n".join(lines) + "\n")
 
 
-def scene_clip(img, audio, out, idx):
+def scene_clip_simple(img, audio, out, idx):
     dur = duration(audio) + 0.7
     frames = int(dur * FPS) + 1
     # alternate between slow zoom-in, zoom-out and gentle pans so it feels animated
@@ -505,6 +505,123 @@ def scene_clip(img, audio, out, idx):
          "-af", "apad", "-t", f"{dur:.2f}", "-r", str(FPS),
          "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
          "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2", out])
+    return dur
+
+
+# ----------------------------------------------------------------- 5a. free "2.5D" animation
+# The character is cut out of the picture (rembg, a free cartoon cut-out model), the hole
+# behind it is painted over, and then background and character move separately:
+# slow camera drift on the background, the character floats/breathes in front of it,
+# plus soft floating light specks. Falls back to the simple zoom if anything goes wrong.
+_REMBG = None
+
+
+def cutout_session():
+    global _REMBG
+    if _REMBG is None:
+        from rembg import new_session
+        try:
+            _REMBG = new_session("isnet-general-use")
+        except Exception as e:
+            log("  cut-out model unavailable, using small model:", str(e)[:120])
+            _REMBG = new_session("u2netp")
+    return _REMBG
+
+
+def split_layers(img_path):
+    """Returns (background RGB uint8, foreground RGBA uint8) or None if no clear character."""
+    import numpy as np
+    import cv2
+    from rembg import remove
+    pic = Image.open(img_path).convert("RGB").resize((W, H))
+    alpha = np.array(remove(pic, session=cutout_session(), only_mask=True).convert("L").resize((W, H)))
+    cover_part = (alpha > 128).mean()
+    if cover_part < 0.03 or cover_part > 0.60:      # nothing found, or "everything" is foreground
+        return None
+    rgb = np.array(pic)
+    hole = cv2.dilate((alpha > 40).astype("uint8") * 255, np.ones((25, 25), "uint8"))
+    small = cv2.inpaint(cv2.resize(rgb, (W // 2, H // 2)), cv2.resize(hole, (W // 2, H // 2)), 9,
+                        cv2.INPAINT_TELEA)
+    bg = cv2.resize(small, (W, H), interpolation=cv2.INTER_CUBIC)
+    bg = np.where(hole[..., None] > 0, cv2.GaussianBlur(bg, (0, 0), 3), rgb)  # keep real pixels away from the hole
+    fg = np.dstack([rgb, cv2.GaussianBlur(alpha, (0, 0), 1.2)])
+    return bg, fg
+
+
+def scene_clip(img, audio, out, idx):
+    if os.getenv("SIMPLE_MOTION") == "1" or MOCK and os.getenv("TEST_ANIM") != "1":
+        return scene_clip_simple(img, audio, out, idx)
+    try:
+        return scene_clip_animated(img, audio, out, idx)
+    except Exception as e:
+        log(f"  animation skipped for this scene ({str(e)[:150]}) - using simple motion")
+        return scene_clip_simple(img, audio, out, idx)
+
+
+def scene_clip_animated(img, audio, out, idx):
+    import math
+    import numpy as np
+    import cv2
+    layers = split_layers(img)
+    if layers is None:
+        raise RuntimeError("no character found to animate")
+    bg, fg = layers
+    dur = duration(audio) + 0.7
+    n = int(dur * FPS) + 1
+    rnd = random.Random(idx * 101 + 7)
+    direction = 1 if idx % 2 == 0 else -1
+    # floating light specks
+    specks = [(rnd.uniform(0, W), rnd.uniform(0, H), rnd.uniform(1.5, 4.0), rnd.uniform(6, 22),
+               rnd.uniform(0, 6.28)) for _ in range(26)]
+    fg_rgb = fg[..., :3].astype("float32")
+    fg_a = fg[..., 3].astype("float32") / 255.0
+    ys, xs = np.nonzero(fg_a > 0.5)
+    cx, cy = float(xs.mean()), float(ys.max())              # character's feet = pivot for "breathing"
+    ffmpeg = subprocess.Popen(
+        ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{W}x{H}",
+         "-r", str(FPS), "-i", "-", "-i", audio, "-af", "apad", "-t", f"{dur:.2f}",
+         "-vf", f"fade=t=in:st=0:d=0.35,fade=t=out:st={dur - 0.35:.2f}:d=0.35,format=yuv420p",
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
+         "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2", out],
+        stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    bg_bgr = cv2.cvtColor(bg, cv2.COLOR_RGB2BGR)
+    fg_bgr = cv2.cvtColor(fg_rgb.astype("uint8"), cv2.COLOR_RGB2BGR).astype("float32")
+    try:
+        for f in range(n):
+            t = f / max(n - 1, 1)                        # 0 -> 1 over the scene
+            ease = 0.5 - 0.5 * math.cos(math.pi * t)
+            sec = f / FPS
+            # background: slow zoom + drift (camera)
+            bz = 1.03 + 0.03 * ease
+            bdx = direction * (ease - 0.5) * 30
+            Mb = cv2.getRotationMatrix2D((W / 2, H / 2), 0, bz)
+            Mb[0, 2] += bdx
+            frame = cv2.warpAffine(bg_bgr, Mb, (W, H), borderMode=cv2.BORDER_REFLECT)
+            # character: moves more than background (depth), gentle bob + breathing
+            fz = 1.03 + 0.045 * ease + 0.008 * math.sin(sec * 2.4)
+            fdx = direction * (ease - 0.5) * 55
+            fdy = -4.0 * abs(math.sin(sec * 1.7))
+            Mf = cv2.getRotationMatrix2D((cx, cy), 0.6 * math.sin(sec * 1.3), fz)
+            Mf[0, 2] += fdx + (W / 2 - cx) * (bz - 1)
+            Mf[1, 2] += fdy
+            fgw = cv2.warpAffine(fg_bgr, Mf, (W, H))
+            aw = cv2.warpAffine(fg_a, Mf, (W, H))[..., None]
+            frame = (frame.astype("float32") * (1 - aw) + fgw * aw)
+            # soft light specks floating upward
+            glow = np.zeros((H, W), "float32")
+            for (x0, y0, r, speed, ph) in specks:
+                x = (x0 + 12 * math.sin(sec * 0.8 + ph)) % W
+                y = (y0 - speed * sec) % H
+                cv2.circle(glow, (int(x), int(y)), int(r), 0.5 + 0.5 * math.sin(sec * 2 + ph), -1, cv2.LINE_AA)
+            glow = cv2.GaussianBlur(glow, (0, 0), 2.2)[..., None]
+            frame = frame + glow * np.array([200, 240, 255], "float32") * 0.55
+            ffmpeg.stdin.write(np.clip(frame, 0, 255).astype("uint8").tobytes())
+        ffmpeg.stdin.close()
+    except Exception:
+        ffmpeg.kill()
+        raise
+    if ffmpeg.wait() != 0:
+        raise RuntimeError(ffmpeg.stderr.read().decode()[-500:])
     return dur
 
 

@@ -1,0 +1,68 @@
+name: Daily Hindi Story
+
+on:
+  schedule:
+    # Times are in UTC. GitHub usually starts 5-20 minutes late, so these land around:
+    - cron: "25 2 * * *"    # ~8:00 AM India time
+    - cron: "25 7 * * *"    # ~1:00 PM India time
+    - cron: "25 13 * * *"   # ~7:00 PM India time
+  workflow_dispatch:        # lets you press "Run workflow" to test any time
+
+permissions:
+  contents: write           # needed to save history.json (stops repeat stories)
+
+concurrency:
+  group: hindi-story
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install video tools and Hindi font
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-core libraqm0 libfribidi0 > /dev/null
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python packages
+        run: pip install -q requests pillow edge-tts gTTS
+
+      - name: Make the video and post it
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          PAGE_NAME: ${{ secrets.PAGE_NAME }}
+          VOICE: ${{ secrets.VOICE }}
+        run: python main.py
+
+      - name: Remember this story
+        if: success()
+        run: |
+          git config user.name "story-bot"
+          git config user.email "story-bot@users.noreply.github.com"
+          git add history.json
+          git commit -m "story posted $(date -u +%F_%H%M)" || exit 0
+          git pull --rebase -q || true
+          git push -q
+
+      - name: Keep a copy of the video (3 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-video
+          path: |
+            work/final.mp4
+            work/thumbnail.jpg
+            work/story.json
+          retention-days: 3
+          if-no-files-found: ignore

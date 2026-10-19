@@ -346,8 +346,43 @@ CF_QUOTA_OUT = False
 PIC_W, PIC_H = 1024, 576        # 16:9; scaled up to 1280x720 for the video
 
 
+def cf_accounts():
+    """All Cloudflare accounts given: CF_ACCOUNT_ID/CF_API_TOKEN, then ..._2, ..._3 (each has its own free limit)."""
+    out = []
+    for suf in ("", "_2", "_3", "_4"):
+        a, t = env("CF_ACCOUNT_ID" + suf), env("CF_API_TOKEN" + suf)
+        if a and t:
+            out.append((a, t))
+    if not out:
+        need_env("CF_ACCOUNT_ID")
+    return out
+
+
+CF_ACTIVE = 0
+
+
 def cf_request(model, prompt, ref_path=None, w=PIC_W, h=PIC_H, seed=None):
-    acct, token = need_env("CF_ACCOUNT_ID"), need_env("CF_API_TOKEN")
+    """Ask Cloudflare for a picture. When one account's free daily limit is used up,
+    move on to the next account automatically."""
+    global CF_ACTIVE, CF_QUOTA_OUT
+    accounts = cf_accounts()
+    while CF_ACTIVE < len(accounts):
+        try:
+            return _cf_request_one(accounts[CF_ACTIVE], model, prompt, ref_path, w, h, seed)
+        except RuntimeError as e:
+            if any(k in str(e).lower() for k in ("4006", "daily free allocation", "neurons")):
+                CF_ACTIVE += 1
+                if CF_ACTIVE < len(accounts):
+                    log(f"  Cloudflare account {CF_ACTIVE} free limit used up - switching to account {CF_ACTIVE + 1}")
+                    continue
+                CF_QUOTA_OUT = True
+            raise
+    CF_QUOTA_OUT = True
+    raise RuntimeError("all Cloudflare accounts used up their daily free allocation (4006)")
+
+
+def _cf_request_one(account, model, prompt, ref_path, w, h, seed):
+    acct, token = account
     url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/run/{model}"
     hdr = {"Authorization": f"Bearer {token}"}
     if model == CF_MODEL:
@@ -391,7 +426,9 @@ def make_cast_sheet(cast, path, seed):
             cast.ref = path
             return True
         except Exception as e:
-            log(f"  cast sheet attempt {attempt + 1} failed: {str(e)[:300]}")
+            log(f"  cast sheet attempt {attempt + 1} failed: {str(e)[:200]}")
+            if CF_QUOTA_OUT:
+                return False
             time.sleep(6 * (attempt + 1))
     return False
 
@@ -542,19 +579,34 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
     text = re.sub(r"[^\w\s\u0900-\u097F\u0980-\u09FF.,!?;:'\"\-()\u0964\u0965]", " ", text)
     text = re.sub(r"\s+", " ", text).strip() or "..."
     ok = False
-    # the free Microsoft voice sometimes says "No audio was received" when busy:
-    # wait a bit longer each time, and at the end try once with plain settings
-    tries = [(rate, pitch, volume)] * 4 + [("+0%", "+0Hz", "+0%")]
-    for attempt, (r_, p_, v_) in enumerate(tries):
+    # Microsoft's free voice sometimes returns "No audio was received" for some pitch/speed
+    # settings (seen with hi-IN-Madhur). So: ask with full settings once; if that fails, ask with
+    # plain settings and change pitch/speed ourselves afterwards (sounds the same, never fails).
+    def _num(x):
+        try:
+            return int(str(x).rstrip("%Hz").replace("+", "") or 0)
+        except ValueError:
+            return 0
+    post_pitch, post_tempo = 1.0, 1.0
+    tries = [(rate, pitch, volume, False), (rate, "+0Hz", volume, True), ("+0%", "+0Hz", "+0%", True),
+             ("+0%", "+0Hz", "+0%", True)]
+    for attempt, (r_, p_, v_, manual) in enumerate(tries):
         try:
             asyncio.run(_edge(text, voice, r_, p_, mp3, v_))
             ok = os.path.exists(mp3) and os.path.getsize(mp3) > 800
             if ok:
+                if manual:
+                    post_pitch = max(0.85, min(1.22, 1 + _num(pitch) / 150))
+                    if r_ == "+0%":
+                        post_tempo = max(0.7, min(1.4, 1 + _num(rate) / 100))
                 break
         except Exception as e:
-            log(f"  voice attempt {attempt + 1} failed ({voice}): {str(e)[:100]}")
-            time.sleep(min(30, 3 * 2 ** attempt))
+            log(f"  voice attempt {attempt + 1} failed ({voice}): {str(e)[:80]}")
+            time.sleep(2 + 3 * attempt)
     af = "aresample=44100"
+    if ok and (post_pitch != 1.0 or post_tempo != 1.0):
+        af = (f"asetrate=44100*{post_pitch:.3f},aresample=44100,"
+              f"atempo={max(0.5, min(2.0, post_tempo / post_pitch)):.3f}")
     if not ok:
         # backup (Google) has only one voice -> change its pitch so characters still differ
         from gtts import gTTS
@@ -1596,7 +1648,7 @@ def main():
         log("  no cast picture - using text descriptions only")
 
     # one picture per spoken line (a new "camera shot" every few seconds), within the free budget
-    budget = int(env("MAX_IMAGES") or 30)          # 3 videos a day must fit the free picture limit
+    budget = int(env("MAX_IMAGES") or 22)          # 3 videos a day must fit the free picture limit
     scene_lines = [[ln for ln in (s.get("lines") or []) if str(ln.get("text", "")).strip()] for s in scenes]
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0
@@ -1624,6 +1676,11 @@ def main():
         imgs.append(next((x for x in scene_shots if x), None))
     first_ok = next((p for p in imgs if p), None)
     if not first_ok:
+        if CF_QUOTA_OUT:
+            log("STOPPED: today's free Cloudflare picture limit is used up on every account. "
+                "Nothing was posted. It resets every day at 5:30 AM India time; the next run will work. "
+                "(Tip: add a 2nd free Cloudflare account as CF_ACCOUNT_ID_2 / CF_API_TOKEN_2.)")
+            sys.exit(0)
         raise RuntimeError("No pictures could be made (check CF_ACCOUNT_ID / CF_API_TOKEN).")
     imgs = [p or first_ok for p in imgs]
     shots_per_scene = [[x or imgs[i] for x in sh] for i, sh in enumerate(shots_per_scene)]

@@ -167,6 +167,8 @@ Story rules:
 - Strong hook in scene 1, a problem, a twist, and a happy or funny ending.
 - Warm storyteller tone, some dialogue. Suitable for children. No violence or scary content.
 - Total spoken length about 3 minutes.
+- 2 to 4 main characters only, each with a clearly different look. Every picture must show
+  exactly what that scene's narration says (same characters, same objects, same action).
 
 Return ONLY JSON with exactly these keys:
 {{
@@ -174,9 +176,10 @@ Return ONLY JSON with exactly these keys:
  "thumbnail_text": "2-4 big punchy Hindi words for the thumbnail",
  "description": "3-4 line engaging Hindi description that makes people want to watch, ending with a question to the viewer",
  "hashtags": ["10 to 14 popular hashtags mixing Hindi and English, e.g. #HindiKahani #MoralStories #CartoonStory"],
- "characters": "ENGLISH visual description of every main character (species/age, clothes, colors) so drawings stay consistent",
- "thumbnail_image": "ENGLISH description of the most exciting, emotional moment for the thumbnail picture",
- "scenes": [{{"narration": "Hindi narration", "image": "ENGLISH description of what to draw: which characters, action, place, expression"}}],
+ "setting": "ENGLISH description of the ONE main place where the story happens (landscape, buildings, plants, colors, time of day). Reused in every picture",
+ "characters": [{{"name": "the character's Hindi name written in English letters", "look": "ENGLISH, very specific, never-changing look: species/age, body size, exact colors of fur/skin/hair, clothes with exact colors, one special accessory. 20-35 words"}}],
+ "thumbnail_image": {{"characters": ["names shown"], "action": "ENGLISH: the most exciting, emotional moment, big expressive faces"}},
+ "scenes": [{{"narration": "Hindi narration", "characters": ["names of the characters VISIBLE in this picture, exactly as in the characters list"], "action": "ENGLISH: exactly what the narration of THIS scene describes happening: who does what, poses, facial expressions, important objects", "place": "ENGLISH: where in the setting, plus anything new in this scene"}}],
  "moral": "one short Hindi line: the lesson (or the joke's punchline for funny stories)"
 }}
 """
@@ -212,46 +215,138 @@ Return ONLY JSON with exactly these keys:
 
 
 # ----------------------------------------------------------------- 2. pictures (Cloudflare)
-CF_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+# Main model draws straight in 16:9 and can copy characters from a reference picture,
+# so every scene shows the SAME characters. The older model is only a backup.
+CF_MODEL = "@cf/black-forest-labs/flux-2-klein-4b"
+CF_BACKUP = "@cf/black-forest-labs/flux-1-schnell"
 
 
-def cover(img, w=W, h=H):
-    """Resize + center-crop to exactly w x h."""
+def ascii_text(s):
+    return re.sub(r"\s+", " ", re.sub(r"[^\x20-\x7E]", " ", str(s))).strip()
+
+
+def fit(img, w=W, h=H):
+    """Show the WHOLE picture in a w x h frame (nothing cut). Empty sides get a soft
+    blurred copy of the picture, like TV news does with phone videos."""
     img = img.convert("RGB")
+    if abs(img.width / img.height - w / h) < 0.03:
+        return img.resize((w, h), Image.LANCZOS)
     s = max(w / img.width, h / img.height)
-    img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
-    l, t = (img.width - w) // 2, (img.height - h) // 2
-    return img.crop((l, t, l + w, t + h))
+    bg = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
+    l, t = (bg.width - w) // 2, (bg.height - h) // 2
+    bg = bg.crop((l, t, l + w, t + h)).filter(ImageFilter.GaussianBlur(28))
+    bg = Image.blend(bg, Image.new("RGB", (w, h), (0, 0, 0)), 0.25)
+    s = min(w / img.width, h / img.height)
+    fg = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
+    bg.paste(fg, ((w - fg.width) // 2, (h - fg.height) // 2))
+    return bg
 
 
-def make_image(desc, characters, path, seed):
-    if MOCK:
-        return mock_image(desc, path, seed)
+class Cast:
+    """Fixed character descriptions + one reference picture shared by every scene."""
+
+    def __init__(self, story):
+        self.setting = ascii_text(story.get("setting", ""))
+        self.chars = {}
+        for c in story.get("characters", []) or []:
+            if isinstance(c, dict) and c.get("name"):
+                self.chars[ascii_text(c["name"]).lower()] = (ascii_text(c["name"]), ascii_text(c.get("look", "")))
+        self.ref = None  # path of the character sheet (small jpg)
+
+    def pick(self, names):
+        out = []
+        for n in names or []:
+            k = ascii_text(n).lower()
+            hit = self.chars.get(k) or next((v for kk, v in self.chars.items() if k and (k in kk or kk in k)), None)
+            if hit and hit not in out:
+                out.append(hit)
+        return out or list(self.chars.values())
+
+    def describe(self, chosen):
+        return " ".join(f"{name}: {look}." for name, look in chosen)
+
+    def scene_prompt(self, action, place, names, use_ref):
+        # also add anyone the action mentions by name, so nobody is left out of the picture
+        low = ascii_text(action).lower()
+        names = list(names or []) + [n for n, _ in self.chars.values() if n.lower() in low]
+        chosen = self.pick(names)
+        who = self.describe(chosen)
+        p = (f"{ART_STYLE}. Setting: {self.setting}. {ascii_text(place)}. "
+             f"Characters in this picture (draw ONLY these, each exactly as described): {who} "
+             f"What is happening: {ascii_text(action)}.")
+        if use_ref:
+            p = ("Image 0 is the character reference sheet. Draw the same characters with exactly the same "
+                 "faces, body shapes, colors and clothes as in image 0, but in a brand-new full scene "
+                 "with a complete background (not a reference sheet, no white background). " + p)
+        return p
+
+
+def cf_request(model, prompt, ref_path=None, w=1280, h=720, seed=None):
     acct, token = need_env("CF_ACCOUNT_ID"), need_env("CF_API_TOKEN")
-    clean = lambda s: re.sub(r"\s+", " ", re.sub(r"[^\x20-\x7E]", " ", str(s))).strip()
-    desc, characters = clean(desc), clean(characters)
-    # each retry gets simpler, in case the request itself is the problem
-    bodies = [
-        {"prompt": f"{ART_STYLE}. Scene: {desc}. Characters: {characters}"[:1500], "steps": 6},
-        {"prompt": f"{ART_STYLE}. Scene: {desc}"[:900], "steps": 4},
-        {"prompt": f"cute colorful cartoon for kids, {desc}"[:500]},
-        {"prompt": f"cute colorful cartoon for kids, {desc}"[:300]},
-    ]
-    url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/run/{CF_MODEL}"
-    for attempt, body in enumerate(bodies):
+    url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/run/{model}"
+    hdr = {"Authorization": f"Bearer {token}"}
+    if model == CF_MODEL:
+        fields = {"prompt": (None, prompt[:2000]), "width": (None, str(w)), "height": (None, str(h))}
+        if seed is not None:
+            fields["seed"] = (None, str(seed))
+        if ref_path:
+            fields["input_image_0"] = ("ref.jpg", open(ref_path, "rb"), "image/jpeg")
+        r = requests.post(url, headers=hdr, files=fields, timeout=150)
+    else:
+        r = requests.post(url, headers=hdr, json={"prompt": prompt[:2000], "steps": 6}, timeout=150)
+    if not r.ok:
+        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
+    js = r.json()
+    img = (js.get("result") or {}).get("image") or js.get("image")
+    if not img:
+        raise RuntimeError("no image in reply: " + r.text[:200])
+    return base64.b64decode(img)
+
+
+def save_picture(data, path):
+    with open(path + ".raw", "wb") as f:
+        f.write(data)
+    fit(Image.open(path + ".raw")).save(path, quality=93)
+
+
+def make_character_sheet(cast, path, seed):
+    """One picture with all main characters standing side by side. Used as reference."""
+    if MOCK:
+        return mock_image("sheet", path, seed)
+    prompt = (f"{ART_STYLE}. Character reference sheet: all main characters standing side by side, "
+              f"full body, facing the viewer, plain light background, evenly lit. "
+              f"{cast.describe(list(cast.chars.values()))}")
+    for attempt in range(3):
         try:
-            r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
-                              json=body, timeout=120)
-            if not r.ok:
-                raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
-            data = base64.b64decode(r.json()["result"]["image"])
+            data = cf_request(CF_MODEL, prompt, w=1024, h=576, seed=seed)
             with open(path + ".raw", "wb") as f:
                 f.write(data)
-            cover(Image.open(path + ".raw")).save(path, quality=93)
+            im = Image.open(path + ".raw").convert("RGB")
+            im.thumbnail((508, 508))          # model wants reference images under 512x512
+            im.save(path, quality=92)
+            cast.ref = path
             return True
         except Exception as e:
-            log(f"  picture attempt {attempt + 1} failed: {str(e)[:400]}")
-            time.sleep(8 * (attempt + 1))
+            log(f"  character sheet attempt {attempt + 1} failed: {str(e)[:300]}")
+            time.sleep(6 * (attempt + 1))
+    return False
+
+
+def make_image(cast, action, place, names, path, seed):
+    if MOCK:
+        return mock_image(action, path, seed)
+    tries = []
+    if cast.ref:
+        tries.append((CF_MODEL, cast.scene_prompt(action, place, names, True), cast.ref))
+    tries.append((CF_MODEL, cast.scene_prompt(action, place, names, False), None))
+    tries.append((CF_BACKUP, cast.scene_prompt(action, place, names, False)[:1500], None))
+    for attempt, (model, prompt, ref) in enumerate(tries):
+        try:
+            save_picture(cf_request(model, prompt, ref, seed=seed), path)
+            return True
+        except Exception as e:
+            log(f"  picture attempt {attempt + 1} ({model.split('/')[-1]}) failed: {str(e)[:300]}")
+            time.sleep(6 * (attempt + 1))
     return False
 
 
@@ -395,13 +490,13 @@ def scene_clip(img, audio, out, idx):
     dur = duration(audio) + 0.7
     frames = int(dur * FPS) + 1
     # alternate between slow zoom-in, zoom-out and gentle pans so it feels animated
-    z_in = "min(1+0.0009*on,1.18)"
-    z_out = f"max(1.18-0.0009*on,1)"
+    z_in = "min(1+0.0005*on,1.07)"
+    z_out = "max(1.07-0.0005*on,1)"
     moves = [
         (z_in, "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
-        ("1.15", f"(iw-iw/zoom)*on/{frames}", "ih/2-(ih/zoom/2)"),
+        ("1.06", f"(iw-iw/zoom)*on/{frames}", "ih/2-(ih/zoom/2)"),
         (z_out, "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
-        ("1.15", f"(iw-iw/zoom)*(1-on/{frames})", "ih/2-(ih/zoom/2)"),
+        ("1.06", f"(iw-iw/zoom)*(1-on/{frames})", "ih/2-(ih/zoom/2)"),
     ]
     z, x, y = moves[idx % len(moves)]
     vf = (f"scale={W * 2}:{H * 2},zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={W}x{H}:fps={FPS},"
@@ -497,16 +592,23 @@ def main():
     with open(os.path.join(WORK, "story.json"), "w", encoding="utf-8") as f:
         json.dump(story, f, ensure_ascii=False, indent=1)
 
-    chars = story.get("characters", "")
-    seed = random.randint(1, 10_000_000)
+    cast = Cast(story)
+    seed = random.randint(1, 1_000_000)   # same seed for every picture = steadier look
     scenes = story["scenes"][:12]
+    log("Characters:", "; ".join(n for n, _ in cast.chars.values()))
+
+    # one reference picture of all characters, reused for every scene
+    log("Character sheet")
+    if not make_character_sheet(cast, os.path.join(WORK, "characters.jpg"), seed):
+        log("  no character sheet - pictures will use text descriptions only")
 
     # pictures
     imgs, last_ok = [], None
     for i, s in enumerate(scenes):
         p = os.path.join(WORK, f"scene_{i:02d}.jpg")
         log(f"Picture {i + 1}/{len(scenes)}")
-        if make_image(s["image"], chars, p, seed + i * 7):
+        if make_image(cast, s.get("action") or s.get("image", ""), s.get("place", ""),
+                      s.get("characters"), p, seed):
             last_ok = p
         elif last_ok:
             shutil.copy(last_ok, p)  # reuse previous picture rather than fail
@@ -519,8 +621,12 @@ def main():
     imgs = [p or first_ok for p in imgs]
 
     thumb_base = os.path.join(WORK, "thumb_base.jpg")
-    if not make_image(story.get("thumbnail_image", scenes[0]["image"]) + ", dramatic, very expressive faces",
-                      chars, thumb_base, seed + 999):
+    ti = story.get("thumbnail_image") or {}
+    if isinstance(ti, str):
+        ti = {"action": ti}
+    if not make_image(cast, (ti.get("action") or scenes[0].get("action", "")) +
+                      ", dramatic, very expressive faces, characters large and close to the camera",
+                      "", ti.get("characters"), thumb_base, seed):
         shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
     make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, CATEGORY_HINDI[cat])
@@ -568,12 +674,13 @@ def mock_story():
         "thumbnail_text": "लालची बंदर का सबक",
         "description": "एक बंदर को मिला जादुई आम का पेड़! लेकिन उसकी लालच ने क्या कर दिया?\nपूरी कहानी देखिए। आप होते तो क्या करते?",
         "hashtags": ["#HindiKahani", "#MoralStories", "#CartoonStory", "#बच्चोंकीकहानी"],
-        "characters": "a small brown monkey with a red cap",
-        "thumbnail_image": "monkey holding a golden mango",
+        "setting": "green jungle by a river",
+        "characters": [{"name": "Chiku", "look": "a small brown monkey with a red cap"}],
+        "thumbnail_image": {"characters": ["Chiku"], "action": "monkey holding a golden mango"},
         "scenes": [
-            {"narration": "एक घने जंगल में चीकू नाम का एक छोटा सा बंदर रहता था। वह बहुत चंचल था, लेकिन थोड़ा लालची भी था।", "image": "monkey in jungle"},
-            {"narration": "एक दिन उसे नदी किनारे एक चमकता हुआ आम का पेड़ मिला। पेड़ बोला, रोज़ सिर्फ़ एक आम तोड़ना!", "image": "golden tree"},
-            {"narration": "चीकू ने सोचा, एक क्यों? मैं तो सारे आम तोड़ लूँगा! और फिर क्या हुआ, सुनिए।", "image": "monkey thinking"},
+            {"narration": "एक घने जंगल में चीकू नाम का एक छोटा सा बंदर रहता था। वह बहुत चंचल था, लेकिन थोड़ा लालची भी था।", "characters": ["Chiku"], "action": "monkey in jungle", "place": "tree"},
+            {"narration": "एक दिन उसे नदी किनारे एक चमकता हुआ आम का पेड़ मिला। पेड़ बोला, रोज़ सिर्फ़ एक आम तोड़ना!", "characters": ["Chiku"], "action": "golden tree", "place": "river"},
+            {"narration": "चीकू ने सोचा, एक क्यों? मैं तो सारे आम तोड़ लूँगा! और फिर क्या हुआ, सुनिए।", "characters": ["Chiku"], "action": "monkey thinking", "place": "tree"},
         ],
         "moral": "लालच बुरी बला है, जितना मिले उसमें खुश रहना चाहिए।",
     }

@@ -7,6 +7,11 @@ on:
     - cron: "25 7 * * *"    # ~1:00 PM India time
     - cron: "25 13 * * *"   # ~7:00 PM India time
   workflow_dispatch:        # lets you press "Run workflow" to test any time
+    inputs:
+      language:
+        description: "Force language (hi or bn). Leave empty to alternate."
+        required: false
+        default: ""
 
 permissions:
   contents: write           # needed to save history.json (stops repeat stories)
@@ -22,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install video tools and Hindi font
+      - name: Install video tools and Hindi + Bengali fonts
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-core libraqm0 libfribidi0 > /dev/null
@@ -42,6 +47,9 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           PAGE_NAME: ${{ secrets.PAGE_NAME }}
+          PAGE_NAME_HI: ${{ secrets.PAGE_NAME_HI }}
+          PAGE_NAME_BN: ${{ secrets.PAGE_NAME_BN }}
+          LANGUAGE: ${{ github.event.inputs.language }}
           FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
           VOICE: ${{ secrets.VOICE }}
         run: python main.py

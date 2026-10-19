@@ -1564,9 +1564,9 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
     hdr = {"Authorization": f"Bearer {r.json()['access_token']}"}
     meta = {
         "snippet": {"title": title[:100], "description": description[:4900],
-                    "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "24",
+                    "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "1",   # Film & Animation
                     "defaultLanguage": lang, "defaultAudioLanguage": lang},
-        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": False,
+        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") != "0",   # children's cartoons must be marked "made for kids"
                    "containsSyntheticMedia": True},
     }
     size = os.path.getsize(video)

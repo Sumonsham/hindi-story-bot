@@ -54,6 +54,9 @@ jobs:
           CF_API_TOKEN_2: ${{ secrets.CF_API_TOKEN_2 }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
           PAGE_NAME: ${{ secrets.PAGE_NAME }}
           PAGE_NAME_HI: ${{ secrets.PAGE_NAME_HI }}
           PAGE_NAME_BN: ${{ secrets.PAGE_NAME_BN }}

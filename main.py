@@ -228,21 +228,30 @@ def make_image(desc, characters, path, seed):
     if MOCK:
         return mock_image(desc, path, seed)
     acct, token = need_env("CF_ACCOUNT_ID"), need_env("CF_API_TOKEN")
-    prompt = f"{ART_STYLE}. Scene: {desc}. Characters: {characters}"[:2000]
+    clean = lambda s: re.sub(r"\s+", " ", re.sub(r"[^\x20-\x7E]", " ", str(s))).strip()
+    desc, characters = clean(desc), clean(characters)
+    # each retry gets simpler, in case the request itself is the problem
+    bodies = [
+        {"prompt": f"{ART_STYLE}. Scene: {desc}. Characters: {characters}"[:1500], "steps": 6,
+         "seed": seed % 1_000_000},
+        {"prompt": f"{ART_STYLE}. Scene: {desc}"[:900], "steps": 4},
+        {"prompt": f"cute colorful cartoon for kids, {desc}"[:500]},
+        {"prompt": f"cute colorful cartoon for kids, {desc}"[:300]},
+    ]
     url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/run/{CF_MODEL}"
-    for attempt in range(4):
+    for attempt, body in enumerate(bodies):
         try:
             r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
-                              json={"prompt": prompt, "steps": 6, "seed": seed + attempt},
-                              timeout=120)
-            r.raise_for_status()
+                              json=body, timeout=120)
+            if not r.ok:
+                raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
             data = base64.b64decode(r.json()["result"]["image"])
             with open(path + ".raw", "wb") as f:
                 f.write(data)
             cover(Image.open(path + ".raw")).save(path, quality=93)
             return True
         except Exception as e:
-            log(f"  picture attempt {attempt + 1} failed: {str(e)[:200]}")
+            log(f"  picture attempt {attempt + 1} failed: {str(e)[:400]}")
             time.sleep(8 * (attempt + 1))
     return False
 

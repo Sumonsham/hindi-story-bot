@@ -1637,7 +1637,8 @@ def main():
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
-    if env("EVENT") == "schedule" and recently_posted(history, hours=3):
+    # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
+    if (env("EVENT") == "schedule" or env("MODE") == "auto") and recently_posted(history, hours=4):
         log("A video for this time slot was already posted - this backup run has nothing to do.")
         return
     lang = pick_language(history)

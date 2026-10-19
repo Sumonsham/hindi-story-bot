@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Hindi Cartoon Story Bot
+Cartoon Story Bot (Hindi + Bengali, alternating)
 -----------------------
-Every run makes ONE brand-new, original Hindi kids' cartoon story video and posts it to
+Every run makes ONE brand-new, original Hindi or Bengali kids' cartoon story video and posts it to
 a Facebook Page:
 
   1. Google Gemini          -> story with dialogue, title, description, hashtags
@@ -54,6 +54,23 @@ LANGS = {
         "outro": "कहानी अच्छी लगी तो लाइक कीजिए, शेयर कीजिए, और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो ज़रूर कीजिए!",
         "page_default": "हमारे पेज",
         "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं।",
+        "moral_intro": "तो बच्चों, इस कहानी से हमें यह सीख मिलती है:",
+        "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी"},
+        "example_tags": "#HindiKahani #MoralStories #CartoonStory",
+    },
+    "bn": {
+        "name": "Bengali", "script": "Bengali",
+        "font_family": "Noto Sans Bengali", "font_glob": "NotoSansBengali",
+        "male": ["bn-IN-BashkarNeural", "bn-BD-PradeepNeural"],
+        "female": ["bn-BD-NabanitaNeural", "bn-IN-TanishaaNeural"],
+        "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
+        "intro": "আজকের গল্প... {title}।",
+        "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
+        "page_default": "আমাদের পেজ",
+        "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
+        "moral_intro": "তাহলে ছোট্ট বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
+        "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প"},
+        "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
     },
 }
 
@@ -68,7 +85,6 @@ CATEGORIES = {
               "a lazy servant", "a talking parrot", "a funny school day", "a mix-up at a wedding", "a clumsy thief",
               "a boastful wrestler", "a naughty goat", "a magical cooking pot gone wrong"],
 }
-CATEGORY_HINDI = {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी"}
 
 SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "birds", "water", "footsteps", "creak", "knock",
               "boing", "whoosh", "pop", "bell", "splash"]
@@ -126,7 +142,12 @@ def save_history(items):
 
 
 def pick_language(history):
-    return "hi"
+    """One video Hindi, the next Bengali, and so on."""
+    forced = env("LANGUAGE").lower()
+    if forced in LANGS:
+        return forced
+    last = history[-1].get("lang", "hi") if history else "bn"
+    return "bn" if last == "hi" else "hi"
 
 
 def pick_theme(history):
@@ -173,10 +194,11 @@ def make_story(lang, theme, history):
         return mock_story(lang)
     key = need_env("GEMINI_API_KEY")
     category, idea = theme
-    old_titles = [h["title"] for h in history[-60:]]
+    L = LANGS[lang]
+    old_titles = [h["title"] for h in history[-60:] if h.get("lang", "hi") == lang]
     prompt = f"""
-You are India's best Hindi children's storyteller, writing for a cartoon story video page.
-Write ONE brand-new, ORIGINAL Hindi story (Devanagari script, simple sweet everyday Hindi that kids and
+You are India's best {L['name']} children's storyteller, writing for a cartoon story video page.
+Write ONE brand-new, ORIGINAL {L['name']} story ({L['script']} script, simple sweet everyday {L['name']} that kids and
 families understand). Type: {category} story. Theme: {idea}.
 Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.
 Must be different from these earlier stories: {json.dumps(old_titles, ensure_ascii=False)}
@@ -195,10 +217,10 @@ Story rules:
 
 Return ONLY JSON with exactly these keys:
 {{
- "title": "catchy Hindi title (max 60 characters) with 1 emoji",
- "thumbnail_text": "2-4 big punchy Hindi words for the thumbnail",
- "description": "3-4 line engaging Hindi description, ending with a question to the viewer",
- "hashtags": ["10 to 14 popular hashtags mixing Hindi and English, e.g. #HindiKahani #MoralStories #CartoonStory"],
+ "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
+ "thumbnail_text": "2-4 big punchy {L['name']} words for the thumbnail",
+ "description": "3-4 line engaging {L['name']} description, ending with a question to the viewer",
+ "hashtags": ["10 to 14 popular hashtags mixing {L['name']} and English, e.g. {L['example_tags']}"],
  "setting": "ENGLISH: the ONE main place of the story (landscape, buildings, plants, colors, time of day). Reused in every picture",
  "characters": [{{"name": "name in English letters", "gender": "male or female",
                   "age": "child, young, adult or old", "kind": "human or animal",
@@ -210,14 +232,14 @@ Return ONLY JSON with exactly these keys:
     "place": "ENGLISH: where in the setting + light",
     "mood": "one of {MOODS}",
     "ambience": ["1-2 ENGLISH background sounds that fit this place, e.g. 'birds chirping in forest', 'village morning roosters', 'river stream', 'gentle wind in trees', 'busy village market'"],
-    "lines": [{{"speaker": "narrator or a character name", "text": "Hindi text",
+    "lines": [{{"speaker": "narrator or a character name", "text": "{L['name']} text",
                 "emotion": "one of {EMOTIONS}",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
                 "shot": "ENGLISH: what the camera shows WHILE this line is heard: who/what is in frame, close-up or wide, expression, action"}}]
  }}],
- "moral": "one short Hindi line: the lesson (or the punchline for funny stories)",
- "ending_line": "one short sweet Hindi closing line from the narrator"
+ "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
+ "ending_line": "one short sweet {L['name']} closing line from the narrator"
 }}
 """
     body = {"contents": [{"parts": [{"text": prompt}]}],
@@ -515,16 +537,23 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
     rate, pitch = _add(rate, er, "%"), _add(pitch, ep, "Hz")
     volume = f"{ev:+d}%"
     mp3 = out_wav + ".mp3"
+    # clean text: symbols/emoji can make the voice service return nothing
+    text = re.sub(r"[\u2026]", "...", text)
+    text = re.sub(r"[^\w\s\u0900-\u097F\u0980-\u09FF.,!?;:'\"\-()\u0964\u0965]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip() or "..."
     ok = False
-    for attempt in range(3):
+    # the free Microsoft voice sometimes says "No audio was received" when busy:
+    # wait a bit longer each time, and at the end try once with plain settings
+    tries = [(rate, pitch, volume)] * 4 + [("+0%", "+0Hz", "+0%")]
+    for attempt, (r_, p_, v_) in enumerate(tries):
         try:
-            asyncio.run(_edge(text, voice, rate, pitch, mp3, volume))
-            ok = os.path.getsize(mp3) > 800
+            asyncio.run(_edge(text, voice, r_, p_, mp3, v_))
+            ok = os.path.exists(mp3) and os.path.getsize(mp3) > 800
             if ok:
                 break
         except Exception as e:
-            log(f"  voice attempt {attempt + 1} failed ({voice}): {str(e)[:120]}")
-            time.sleep(4)
+            log(f"  voice attempt {attempt + 1} failed ({voice}): {str(e)[:100]}")
+            time.sleep(min(30, 3 * 2 ** attempt))
     af = "aresample=44100"
     if not ok:
         # backup (Google) has only one voice -> change its pitch so characters still differ
@@ -1547,7 +1576,7 @@ def main():
     FONT = find_font(lang)
     theme = pick_theme(history)
     category = theme[0]
-    log(f"Story type: {theme[0]} / {theme[1]}")
+    log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}")
 
     story = make_story(lang, theme, history)
     title = story["title"].strip()[:95]
@@ -1608,10 +1637,10 @@ def main():
                       thumb_base, seed):
         shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
-    make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, CATEGORY_HINDI[category])
+    make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
-    page = env("PAGE_NAME") or L["page_default"]
+    page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
     parts = [{"image": thumb_base, "lines": [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}],
               "sounds": ["birds"], "mood": "happy", "voices": voices}]
     for img, s, sh in zip(imgs, scenes, shots_per_scene):
@@ -1621,7 +1650,7 @@ def main():
     moral = str(story.get("moral", "")).strip()
     if moral:
         end_lines.append({"speaker": "narrator", "emotion": "calm",
-                          "text": (f"तो बच्चों, इस कहानी से हमें यह सीख मिलती है: {moral}" if category != "funny" else moral)})
+                          "text": (f"{L['moral_intro']} {moral}" if category != "funny" else moral)})
     elif story.get("ending_line"):
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
     end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
@@ -1656,7 +1685,7 @@ def main():
         if not results.get("facebook") and not results.get("youtube"):
             raise SystemExit("Posting failed everywhere - see messages above.")
 
-    history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"),
+    history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
                     "category": category, "title": title, **results})
     if not MOCK:
         save_history(history)

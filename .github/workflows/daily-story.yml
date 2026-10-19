@@ -2,18 +2,19 @@ name: Daily Hindi Story
 
 on:
   schedule:
-    # Times are in UTC. GitHub usually starts 5-20 minutes late, so these land around:
-    - cron: "25 2 * * *"    # ~8:00 AM India time
-    - cron: "25 7 * * *"    # ~1:00 PM India time
-    - cron: "25 13 * * *"   # ~7:00 PM India time
-    # backups: GitHub sometimes skips a run. These only post if the run above did not.
-    - cron: "10 3 * * *"    # backup for 8 AM
-    - cron: "10 8 * * *"    # backup for 1 PM
-    - cron: "10 14 * * *"   # backup for 7 PM
+    # The main start comes from cron-job.org at 7:55 AM, 12:55 PM and 6:55 PM India time (on time).
+    # These GitHub times are only a backup - they post nothing if the video is already out.
+    - cron: "10 3 * * *"    # backup ~8:40 AM India time
+    - cron: "10 8 * * *"    # backup ~1:40 PM India time
+    - cron: "10 14 * * *"   # backup ~7:40 PM India time
   workflow_dispatch:        # lets you press "Run workflow" to test any time
     inputs:
       language:
         description: "Force language (hi or bn). Leave empty to alternate."
+        required: false
+        default: ""
+      mode:
+        description: "Leave empty for a test. (cron-job.org sends 'auto'.)"
         required: false
         default: ""
 
@@ -62,6 +63,7 @@ jobs:
           PAGE_NAME_BN: ${{ secrets.PAGE_NAME_BN }}
           LANGUAGE: ${{ github.event.inputs.language }}
           EVENT: ${{ github.event_name }}
+          MODE: ${{ github.event.inputs.mode }}
           FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
           VOICE: ${{ secrets.VOICE }}
         run: python main.py

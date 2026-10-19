@@ -44,7 +44,7 @@ MUSIC_DIR = os.path.join(HERE, "music")
 
 MOCK = os.getenv("MOCK") == "1"
 DRY_RUN = MOCK or os.getenv("DRY_RUN") == "1"
-VOICE = os.getenv("VOICE", "hi-IN-SwaraNeural")
+VOICE = (os.getenv("VOICE") or "").strip() or "hi-IN-SwaraNeural"
 PAGE_NAME = os.getenv("PAGE_NAME", "").strip()
 
 CATEGORIES = {
@@ -232,8 +232,7 @@ def make_image(desc, characters, path, seed):
     desc, characters = clean(desc), clean(characters)
     # each retry gets simpler, in case the request itself is the problem
     bodies = [
-        {"prompt": f"{ART_STYLE}. Scene: {desc}. Characters: {characters}"[:1500], "steps": 6,
-         "seed": seed % 1_000_000},
+        {"prompt": f"{ART_STYLE}. Scene: {desc}. Characters: {characters}"[:1500], "steps": 6},
         {"prompt": f"{ART_STYLE}. Scene: {desc}"[:900], "steps": 4},
         {"prompt": f"cute colorful cartoon for kids, {desc}"[:500]},
         {"prompt": f"cute colorful cartoon for kids, {desc}"[:300]},

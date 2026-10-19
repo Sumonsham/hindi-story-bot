@@ -136,6 +136,20 @@ def load_history():
         return []
 
 
+def recently_posted(history, hours):
+    """True if a video was posted in the last few hours (so a backup run must not post a second one)."""
+    for h in history[-3:]:
+        try:
+            t = dt.datetime.fromisoformat(str(h.get("date", "")))
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=dt.timezone.utc)
+            if dt.datetime.now(dt.timezone.utc) - t < dt.timedelta(hours=hours):
+                return True
+        except Exception:
+            pass
+    return False
+
+
 def save_history(items):
     with open(HISTORY, "w", encoding="utf-8") as f:
         json.dump(items[-200:], f, ensure_ascii=False, indent=1)
@@ -1623,6 +1637,9 @@ def main():
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
+    if env("EVENT") == "schedule" and recently_posted(history, hours=3):
+        log("A video for this time slot was already posted - this backup run has nothing to do.")
+        return
     lang = pick_language(history)
     L = LANGS[lang]
     FONT = find_font(lang)

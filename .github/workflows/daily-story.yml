@@ -18,7 +18,7 @@ concurrency:
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +32,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python packages
-        run: pip install -q requests pillow edge-tts gTTS
+        run: pip install -q requests pillow edge-tts gTTS numpy scipy opencv-python-headless "rembg[cpu]"
 
       - name: Make the video and post it
         env:
@@ -42,6 +42,7 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           PAGE_NAME: ${{ secrets.PAGE_NAME }}
+          FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
           VOICE: ${{ secrets.VOICE }}
         run: python main.py
 

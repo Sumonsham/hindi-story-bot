@@ -56,7 +56,10 @@ LANGS = {
         "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं।",
         "moral_intro": "तो बच्चों, इस कहानी से हमें यह सीख मिलती है:",
         "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी",
-                   "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख"},
+                   "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख",
+                   "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
+                   "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
+                   "nature": "प्रकृति की कहानी"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
     },
     "bn": {
@@ -71,12 +74,40 @@ LANGS = {
         "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
         "moral_intro": "তাহলে ছোট্ট বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
         "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প",
-                   "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা"},
+                   "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা",
+                   "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
+                   "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
+                   "nature": "প্রকৃতির গল্প"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
     },
 }
 
 CATEGORIES = {
+    # clever-wit folk anecdotes (centuries-old, public domain) - retold in our own words
+    "witty": ["Gopal Bhar and the king's impossible challenge", "Gopal Bhar outsmarts a greedy moneylender",
+              "Birbal and the emperor's tricky question", "Birbal finds the real thief with sticks",
+              "Tenali Raman and the boastful scholar", "Tenali Raman saves the royal garden",
+              "a clever village girl solves the minister's riddle", "the wise judge and two mothers"],
+    "fairy": ["a little fairy who lost her wings", "the fairy of the lotus pond grants three wishes",
+              "a magic paintbrush that makes drawings real", "the moon fairy visits a poor girl",
+              "a rainbow bridge to the land of clouds", "the star that fell into a village garden",
+              "a talking tree that grants wishes only to kind children", "the fairy queen's lost crown"],
+    "adventure": ["two friends find a secret cave map", "a brave girl crosses the river to bring medicine",
+                  "the lost elephant calf and the search party", "a kite that flies to a strange island",
+                  "the treasure hidden under the old banyan tree", "a little boat's journey down the Ganga",
+                  "lost in the Sundarbans with a friendly tiger cub", "the mountain goat who climbed the highest peak"],
+    "festival": ["Durga Puja and the little drummer boy", "a Diwali lamp for the lonely grandmother",
+                 "Holi colours and a sad friend", "Eid sweets shared with the whole street",
+                 "Christmas gift for the poor shoeshine boy", "Raksha Bandhan and the brother far away",
+                 "Poila Baishakh new year at the village fair", "Makar Sankranti kite festival friendship"],
+    "bedtime": ["a sleepy little owl who could not sleep at night", "the moon tells a story to a child",
+                "a teddy bear's night adventure", "the cloud that wanted to be a pillow",
+                "counting stars with grandfather", "the lullaby of the river"],
+    "school": ["the new student who could not speak the language", "a lost tiffin box mystery",
+               "the class monitor learns fairness", "a sports day race where helping wins",
+               "a homework copied and the honest confession", "the school garden project"],
+    "nature": ["the last tree in the city", "a sparrow family and the plastic bag", "the river that got sick",
+               "saving rainwater in the village", "a bee teaches why flowers matter", "the honest woodcutter and the forest"],
     # old Bengali/Indian fairy tales (Thakurmar Jhuli style - public domain folk tales, retold in our own words)
     "folk": ["a brave prince and the demon (rakkhosh) kingdom", "Lalkamal and Neelkamal, two brother princes",
              "the magic birds Byangoma and Byangomi who give advice", "the flying horse Pakkhiraj",
@@ -260,13 +291,14 @@ Must be different from these earlier stories: {json.dumps(old_titles, ensure_asc
 Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the children).
 
 Story rules:
-- 10 to 12 scenes, about 3 minutes when spoken. The FIRST line must hook in 5 seconds (a surprise, a question
+- LENGTH: 14 to 18 scenes, 5-6 minutes when spoken - at least 750 spoken words in total. Never rush the
+  ending; the story must feel complete. The FIRST line must hook in 5 seconds (a surprise, a question
   or a funny moment). Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
 - Make it emotional and memorable so families want to share it: cute humour, a warm heart, a clear lesson.
 - Warm and cheerful, suitable for small children. No violence, nothing scary.
 - 2 to 4 characters (people or animals) plus a narrator, with real, lively dialogue between characters.
-- Each scene has 2 to 5 lines. The narrator describes; characters speak only their own words.
-  Narrator lines 12-35 words, dialogue lines 3-18 words.
+- Each scene has 4 to 7 lines. The narrator describes; characters speak only their own words.
+  Narrator lines 20-45 words, dialogue lines 4-20 words.
 - Think like a cartoon film director: every line gets its own PICTURE that shows exactly what that line says
   (who, doing what, where). The picture must match the words - if the line says the crow drops a stone in the
   pot, the picture shows the crow dropping a stone in the pot.
@@ -305,8 +337,10 @@ Return ONLY JSON with exactly these keys:
 }}
 """
     body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 1.0, "responseMimeType": "application/json"}}
+            "generationConfig": {"temperature": 1.0, "responseMimeType": "application/json",
+                                 "maxOutputTokens": 60000}}
     last_err = None
+    best, min_words = None, int(env("MIN_WORDS") or 650)       # ~650+ spoken words = 5+ minutes
     models = gemini_models(key)
     for round_no in range(3):
         if round_no:
@@ -316,7 +350,7 @@ Return ONLY JSON with exactly these keys:
             try:
                 log(f"Writing story with {model} ...")
                 r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent",
-                                  headers={"x-goog-api-key": key}, json=body, timeout=110)
+                                  headers={"x-goog-api-key": key}, json=body, timeout=300)
                 if r.status_code in (404, 400):
                     raise LookupError(r.text[:300])
                 if r.status_code in (429, 500, 502, 503, 504):
@@ -328,6 +362,15 @@ Return ONLY JSON with exactly these keys:
                 story = json.loads(text)
                 assert story.get("title") and len(story.get("scenes", [])) >= 6
                 assert all(s.get("lines") for s in story["scenes"])
+                words = sum(len(str(ln.get("text", "")).split()) for sc in story["scenes"] for ln in sc["lines"])
+                log(f"  story: {len(story['scenes'])} scenes, {words} spoken words")
+                if not best or words > best[0]:
+                    best = (words, story)
+                if words < min_words:
+                    body["contents"][0]["parts"][0]["text"] = prompt + (
+                        f"\n\nIMPORTANT: your last story had only {words} spoken words - far too short. "
+                        f"Write at least {min_words + 150} spoken words: more scenes and more lines per scene.")
+                    raise ValueError("story too short - asking for a longer one")
                 return story
             except LookupError as e:
                 last_err = e
@@ -336,6 +379,9 @@ Return ONLY JSON with exactly these keys:
                 last_err = e
                 log("  trying next model:", str(e)[:200])
                 time.sleep(5)
+    if best:
+        log(f"  using the longest story written ({best[0]} words)")
+        return best[1]
     raise RuntimeError(f"Gemini failed: {last_err}")
 
 
@@ -1546,11 +1592,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 def build_video(scene_parts, lang, out):
     """scene_parts: list of dict(image, lines, sounds, mood). Returns mp4 path."""
-    clips, segs, t = [], [], 0.0
+    clips, segs, t, wavs = [], [], 0.0, []
     voices = scene_parts[0]["voices"]
     for i, sp in enumerate(scene_parts):
         log(f"Voices + sound + clip {i + 1}/{len(scene_parts)}")
         a = os.path.join(WORK, f"audio_{i:02d}.wav")
+        wavs.append(a)
         d, subs = make_scene_audio(sp["lines"], voices, lang, i, sp.get("sounds"), sp.get("mood", "creepy"), a,
                                    sp.get("ambience"))
         c = os.path.join(WORK, f"clip_{i:02d}.mp4")
@@ -1569,10 +1616,16 @@ def build_video(scene_parts, lang, out):
     with open(lst, "w") as f:
         f.writelines(f"file '{os.path.basename(c)}'\n" for c in clips)
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", os.path.join(WORK, "joined.mp4")])
+    alst = os.path.join(WORK, "audio.txt")
+    with open(alst, "w") as f:
+        f.writelines(f"file '{os.path.basename(a)}'\n" for a in wavs)
+    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", alst, "-c", "pcm_s16le", os.path.join(WORK, "full.wav")])
     write_ass(segs, os.path.join(WORK, "subs.ass"), LANGS[lang]["font_family"])
-    vf = f"ass=subs.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex"
-    r = subprocess.run(["ffmpeg", "-y", "-i", "joined.mp4", "-vf", vf, "-c:v", "libx264", "-preset", "medium",
-                        "-crf", "23", "-maxrate", "3500k", "-bufsize", "7000k", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart",
+    vf = f"ass=subs.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex,tpad=stop_mode=clone:stop_duration=3"
+    total = duration(os.path.join(WORK, "full.wav"))
+    r = subprocess.run(["ffmpeg", "-y", "-i", "joined.mp4", "-i", "full.wav", "-map", "0:v", "-map", "1:a",
+                        "-t", f"{total:.2f}", "-vf", vf, "-c:v", "libx264", "-preset", "medium",
+                        "-crf", "23", "-maxrate", "3500k", "-bufsize", "7000k", "-c:a", "aac", "-b:a", "192k", "-ac", "2", "-movflags", "+faststart",
                         os.path.abspath(out)], capture_output=True, text=True, cwd=WORK)
     if r.returncode != 0:
         raise RuntimeError("final render failed:\n" + r.stderr[-2000:])
@@ -1747,14 +1800,14 @@ def main():
     for c in cast.chars.values():
         log(f"  {c['name']} ({c['gender']}, {c['age']}, {c['kind']}) -> voice {voices.map[c['name'].lower()][:3]}")
     seed = random.randint(1, 1_000_000)
-    scenes = story["scenes"][:13]
+    scenes = story["scenes"][:24]          # never cut the story short
 
     log("Cast reference picture")
     if not make_cast_sheet(cast, os.path.join(WORK, "cast.jpg"), seed):
         log("  no cast picture - using text descriptions only")
 
     # one picture per spoken line (a new "camera shot" every few seconds), within the free budget
-    budget = int(env("MAX_IMAGES") or 22)          # 3 videos a day must fit the free picture limit
+    budget = int(env("MAX_IMAGES") or 30)          # 3 videos a day must fit the free picture limit
     scene_lines = [[ln for ln in (s.get("lines") or []) if str(ln.get("text", "")).strip()] for s in scenes]
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0

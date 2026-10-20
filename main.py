@@ -50,12 +50,13 @@ LANGS = {
         "font_family": "Noto Sans Devanagari", "font_glob": "NotoSansDevanagari",
         "male": ["hi-IN-MadhurNeural"], "female": ["hi-IN-SwaraNeural"],
         "narrator": ("hi-IN-SwaraNeural", "-4%", "+2Hz"), "gtts": "hi",
-        "intro": "आज की कहानी है... {title}।",
+        "intro": "नमस्ते प्यारे बच्चों! मैं हूँ आपकी लूमी दीदी। आज की कहानी है... {title}।",
         "outro": "कहानी अच्छी लगी तो लाइक कीजिए, शेयर कीजिए, और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो ज़रूर कीजिए!",
         "page_default": "हमारे पेज",
         "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं।",
         "moral_intro": "तो बच्चों, इस कहानी से हमें यह सीख मिलती है:",
-        "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी"},
+        "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी",
+                   "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
     },
     "bn": {
@@ -64,17 +65,43 @@ LANGS = {
         "male": ["bn-IN-BashkarNeural", "bn-BD-PradeepNeural"],
         "female": ["bn-BD-NabanitaNeural", "bn-IN-TanishaaNeural"],
         "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
-        "intro": "আজকের গল্প... {title}।",
+        "intro": "নমস্কার ছোট্ট বন্ধুরা! আমি তোমাদের লুমি দিদি। আজকের গল্প... {title}।",
         "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
         "page_default": "আমাদের পেজ",
         "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
         "moral_intro": "তাহলে ছোট্ট বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
-        "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প"},
+        "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প",
+                   "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
     },
 }
 
 CATEGORIES = {
+    # old Bengali/Indian fairy tales (Thakurmar Jhuli style - public domain folk tales, retold in our own words)
+    "folk": ["a brave prince and the demon (rakkhosh) kingdom", "Lalkamal and Neelkamal, two brother princes",
+             "the magic birds Byangoma and Byangomi who give advice", "the flying horse Pakkhiraj",
+             "seven brothers turned into champa flowers and their sister", "Kiranmala, the brave princess",
+             "a poor farmer's son and the sleeping princess", "a magic golden stick and silver stick",
+             "the clever youngest daughter-in-law", "a kind girl and the witch of the forest",
+             "the king's lost ring and the honest fisherman", "a talking golden fish in the village pond",
+             "the giant's garden and the little shepherd", "a magic pitcher that never empties"],
+    # Panchatantra / Jataka / Hitopadesha fables (ancient, public domain, retold in our own words)
+    "panchatantra": ["the monkey and the crocodile", "the clever rabbit and the proud lion",
+                     "the blue jackal", "the talkative tortoise and the two geese", "the crows and the cobra",
+                     "the brahmin and the three thieves", "the mice that saved the elephants",
+                     "the lion, the mouse and the net", "the foolish lion and the jackal's cave",
+                     "the four friends: deer, crow, mouse and tortoise", "the heron and the crab",
+                     "the monkey king who saved his tribe (Jataka)", "the golden swan (Jataka)",
+                     "the loyal mongoose", "the greedy cat who judged two birds"],
+    # everyday stories about people that teach a life lesson
+    "life": ["a boy who wasted food learns where rice comes from", "a girl who helps a lonely old neighbour",
+             "the honest rickshaw puller who returns a lost bag", "a child too busy with the mobile phone",
+             "respecting the school teacher", "a piggy bank and the value of saving money",
+             "a rich boy and a poor boy become best friends", "telling the truth to mother after breaking a vase",
+             "keeping the village clean", "sharing lunch with a new classmate",
+             "a father's quiet sacrifice", "a grandmother's lesson about patience",
+             "a boy who made fun of others learns kindness", "never giving up after failing an exam",
+             "thanking the farmer, the postman and the sweeper"],
     "moral": ["honesty", "greed and its result", "kindness to others", "hard work", "true friendship", "patience",
               "sharing", "respecting elders", "telling lies", "helping the weak", "pride and humility",
               "saving water", "obeying parents", "courage", "gratitude"],
@@ -91,8 +118,8 @@ SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "birds", "water", "footstep
 MOODS = ["happy", "calm", "funny", "adventure", "sad"]
 EMOTIONS = ["normal", "happy", "excited", "laughing", "sad", "crying", "scared", "angry", "whisper", "calm", "proud"]
 
-ART_STYLE = ("colorful 2D cartoon illustration for kids, Indian village or jungle setting, bright cheerful colors, "
-             "soft lighting, clean outlines, cute expressive characters, storybook animation style, "
+ART_STYLE = ("high quality 2D cartoon animation still for kids, Indian storybook world, bright cheerful colors, "
+             "soft lighting, clean outlines, cute expressive characters with big eyes, Pixar-like charm, "
              "no text, no letters, no watermark")
 
 
@@ -210,20 +237,39 @@ def make_story(lang, theme, history):
     category, idea = theme
     L = LANGS[lang]
     old_titles = [h["title"] for h in history[-60:] if h.get("lang", "hi") == lang]
+    kind_rules = {
+        "folk": "This is a classic Indian/Bengali fairy tale in the style of Thakurmar Jhuli (grandmother's tales): "
+                "kings, princes, princesses, rakkhosh/demons, magic birds, flying horses, a village and a palace. "
+                "Retell the public-domain folk tale idea in your OWN words with new dialogue, vivid scenes and a "
+                "small fresh twist. Keep the magic gentle and child friendly (the demon is defeated by cleverness, "
+                "not violence).",
+        "panchatantra": "This is a Panchatantra / Jataka / Hitopadesha fable (ancient, public domain). Retell it in "
+                        "your OWN words with lively new dialogue, fun character voices and a fresh small twist, "
+                        "keeping the classic lesson.",
+        "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
+                "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
+                "It must teach a clear life lesson and gently touch the heart.",
+    }.get(category, "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
     prompt = f"""
 You are India's best {L['name']} children's storyteller, writing for a cartoon story video page.
-Write ONE brand-new, ORIGINAL {L['name']} story ({L['script']} script, simple sweet everyday {L['name']} that kids and
+Write ONE {L['name']} story ({L['script']} script, simple sweet everyday {L['name']} that kids and
 families understand). Type: {category} story. Theme: {idea}.
-Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.
+{kind_rules}
+Never use modern copyrighted characters (no Disney, Chhota Bheem, Motu Patlu etc.).
 Must be different from these earlier stories: {json.dumps(old_titles, ensure_ascii=False)}
+Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the children).
 
 Story rules:
-- 10 to 12 scenes, about 3 minutes when spoken. Strong hook, a problem, a twist, a happy or funny ending.
+- 10 to 12 scenes, about 3 minutes when spoken. The FIRST line must hook in 5 seconds (a surprise, a question
+  or a funny moment). Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
+- Make it emotional and memorable so families want to share it: cute humour, a warm heart, a clear lesson.
 - Warm and cheerful, suitable for small children. No violence, nothing scary.
 - 2 to 4 characters (people or animals) plus a narrator, with real, lively dialogue between characters.
 - Each scene has 2 to 5 lines. The narrator describes; characters speak only their own words.
   Narrator lines 12-35 words, dialogue lines 3-18 words.
-- Think like a cartoon film director: every line gets its own camera "shot" showing exactly what that line says.
+- Think like a cartoon film director: every line gets its own PICTURE that shows exactly what that line says
+  (who, doing what, where). The picture must match the words - if the line says the crow drops a stone in the
+  pot, the picture shows the crow dropping a stone in the pot.
 - SOUND DESIGN like a children's audio drama: when a line mentions an action or a thing that makes a sound
   (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
   put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
@@ -232,14 +278,15 @@ Story rules:
 Return ONLY JSON with exactly these keys:
 {{
  "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
- "thumbnail_text": "2-4 big punchy {L['name']} words for the thumbnail",
+ "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click (a question or surprise, e.g. 'लालच का फल?', 'বোকা সিংহ!')",
  "description": "3-4 line engaging {L['name']} description, ending with a question to the viewer",
  "hashtags": ["10 to 14 popular hashtags mixing {L['name']} and English, e.g. {L['example_tags']}"],
  "setting": "ENGLISH: the ONE main place of the story (landscape, buildings, plants, colors, time of day). Reused in every picture",
  "characters": [{{"name": "name in English letters", "gender": "male or female",
                   "age": "child, young, adult or old", "kind": "human or animal",
                   "look": "ENGLISH, very specific never-changing look: species/age, body size, exact colors of fur/skin/hair, clothes with exact colors, one special accessory. 20-35 words"}}],
- "thumbnail_image": {{"characters": ["names"], "action": "ENGLISH: the most exciting, emotional moment, big expressive faces"}},
+ "source": "ENGLISH: e.g. 'Inspired by Panchatantra' / 'Inspired by Thakurmar Jhuli' / 'Original story'",
+ "thumbnail_image": {{"characters": ["1-2 main names"], "action": "ENGLISH: the most surprising or emotional moment of the story, the main character with a BIG expressive face (shocked, laughing, crying) close to the camera"}},
  "scenes": [{{
     "characters": ["names VISIBLE in the picture"],
     "action": "ENGLISH: what happens in this scene",
@@ -250,7 +297,8 @@ Return ONLY JSON with exactly these keys:
                 "emotion": "one of {EMOTIONS}",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
-                "shot": "ENGLISH: what the camera shows WHILE this line is heard: who/what is in frame, close-up or wide, expression, action"}}]
+                "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a cartoon film still: WHO is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (close-up / medium / wide / low angle), light, important objects. Only things that can be SEEN",
+                           "characters": ["names VISIBLE in this picture; [] if only a place or object is shown"]}}}}]
  }}],
  "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
  "ending_line": "one short sweet {L['name']} closing line from the narrator"
@@ -343,16 +391,25 @@ class Cast:
         return " ".join(f"{c['name']}: {c['look']}." for c in chosen)
 
     def scene_prompt(self, action, place, names, use_ref):
+        """Picture prompt. The exact moment of the story comes FIRST (the picture model follows the start
+        of the prompt most), then who is in it, then the place, then the art style."""
         low = ascii_text(action).lower()
+        empty = isinstance(names, list) and not names           # [] = a shot with nobody in it
         names = list(names or []) + [c["name"] for c in self.chars.values() if c["name"].lower() in low]
-        who = self.describe(self.pick(names))
-        p = (f"{ART_STYLE}. Setting: {self.setting}. {ascii_text(place)}. "
-             f"People in this picture (show ONLY these, each exactly as described): {who} "
-             f"What is happening: {ascii_text(action)}.")
-        if use_ref:
-            p = ("Image 0 is the cast reference photo. Show the same people with exactly the same faces, "
-                 "hair, body and clothes as in image 0, but in a brand-new full scene with a complete "
-                 "background (not a reference sheet). " + p)
+        chosen = []
+        for n in names:
+            c = self.find(n)
+            if c and c not in chosen:
+                chosen.append(c)
+        if not chosen and not empty:
+            chosen = list(self.chars.values())
+        who = (f"Characters in the picture (ONLY these, each exactly as described): {self.describe(chosen)} "
+               if chosen else "No people in this picture, only the place and the objects described. ")
+        p = (f"{ascii_text(action)}. {who}"
+             f"Location: {ascii_text(place)}. {self.setting}. Style: {ART_STYLE}.")
+        if use_ref and chosen:
+            p = ("Same characters as in image 0 (same faces, hair, body and clothes), now acting out this NEW "
+                 "scene with a full background - not standing in a row, not a reference sheet: " + p)
         return p
 
 
@@ -1159,36 +1216,67 @@ def font(size):
 
 # ----------------------------------------------------------------- 5. thumbnail
 def make_thumbnail(base_img, text, out, label):
+    """Professional kids-channel thumbnail: bright punchy picture with the character big on the right,
+    huge 2-line text on the left (yellow + white on a colour banner) with thick outline and glow,
+    a story-type tag and a bright frame."""
+    from PIL import ImageEnhance
     img = Image.open(base_img).convert("RGB").resize((W, H))
-    img = img
+    img = ImageEnhance.Color(img).enhance(1.35)
+    img = ImageEnhance.Contrast(img).enhance(1.15)
+    img = ImageEnhance.Sharpness(img).enhance(1.6)
+    img = ImageEnhance.Brightness(img).enhance(1.05)
+    # soft colour fade on the left so the words stand out
     shade = Image.new("L", (W, H), 0)
     d = ImageDraw.Draw(shade)
-    for y in range(H // 2, H):
-        d.line([(0, y), (W, y)], fill=int(220 * (y - H / 2) / (H / 2)))
-    img = Image.composite(Image.new("RGB", (W, H), (0, 0, 0)), img, shade)
-    draw = ImageDraw.Draw(img)
+    for x in range(int(W * 0.6)):
+        d.line([(x, 0), (x, H)], fill=int(175 * (1 - x / (W * 0.6)) ** 1.4))
+    img = Image.composite(Image.new("RGB", (W, H), (40, 10, 90)), img, shade)
+
     words = text.strip().split()
-    half = len(words) // 2 + len(words) % 2
-    lines = [text.strip()] if len(words) <= 2 else [" ".join(words[:half]), " ".join(words[half:])]
-    size = 150
-    while size > 50:
+    if len(words) >= 2:
+        half = len(words) // 2 + len(words) % 2
+        lines = [" ".join(words[:half]), " ".join(words[half:])]
+    else:
+        lines = [text.strip()]
+    box_w = int(W * 0.6)
+    probe = ImageDraw.Draw(img)
+    size = 170
+    while size > 56:
         f = font(size)
-        if all(draw.textlength(l, font=f) <= W - 90 for l in lines) and size * 1.3 * len(lines) <= H * 0.55:
+        if all(probe.textlength(l, font=f) <= box_w - 70 for l in lines) and size * 1.35 * len(lines) <= H * 0.68:
             break
         size -= 6
     f = font(size)
-    lh = int(size * 1.3)
-    y = H - 40 - lh * len(lines)
-    colors = [(255, 230, 0), (255, 255, 255)]
+    lh = int(size * 1.38)
+    y0 = int((H - lh * len(lines)) / 2) + 20
+    x0 = 46
+
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))                      # white glow behind the words
+    gd = ImageDraw.Draw(glow)
     for i, l in enumerate(lines):
-        x = (W - draw.textlength(l, font=f)) / 2
-        draw.text((x, y + i * lh), l, font=f, fill=colors[i % 2],
-                  stroke_width=max(6, size // 13), stroke_fill=(0, 0, 0))
-    lf = font(38)
+        gd.text((x0, y0 + i * lh), l, font=f, fill=(255, 255, 255, 230), stroke_width=size // 6,
+                stroke_fill=(255, 255, 255, 230))
+    glow = glow.filter(ImageFilter.GaussianBlur(16))
+    img = Image.alpha_composite(img.convert("RGBA"), glow).convert("RGB")
+
+    draw = ImageDraw.Draw(img)
+    banner = (255, 70, 120)
+    for i, l in enumerate(lines):
+        y = y0 + i * lh
+        if i == len(lines) - 1 and len(lines) > 1:                     # last line on a pink banner
+            tw = draw.textlength(l, font=f)
+            draw.rounded_rectangle([x0 - 18, y - size * 0.02, x0 + tw + 18, y + size * 1.22], radius=22, fill=banner,
+                                   outline=(255, 255, 255), width=5)
+            draw.text((x0, y), l, font=f, fill=(255, 255, 255), stroke_width=max(5, size // 18), stroke_fill=(90, 0, 40))
+        else:
+            draw.text((x0, y), l, font=f, fill=(255, 225, 0), stroke_width=max(8, size // 10), stroke_fill=(20, 0, 60))
+
+    lf = font(40)                                                        # story-type tag
     tw = draw.textlength(label, font=lf)
-    draw.rounded_rectangle([28, 26, 28 + tw + 40, 26 + 70], radius=14, fill=(220, 20, 40))
-    draw.text((48, 30), label, font=lf, fill=(255, 255, 255))
-    img.save(out, quality=92)
+    draw.rounded_rectangle([30, 26, 30 + tw + 44, 26 + 72], radius=36, fill=(255, 200, 0), outline=(255, 255, 255), width=4)
+    draw.text((52, 30), label, font=lf, fill=(60, 0, 80))
+    draw.rectangle([0, 0, W - 1, H - 1], outline=(255, 200, 0), width=12)  # bright frame
+    img.save(out, quality=94)
 
 
 # ----------------------------------------------------------------- 6. video
@@ -1678,8 +1766,9 @@ def main():
             count += 1
             p = os.path.join(WORK, f"shot_{i:02d}_{g:02d}.jpg")
             first = grp[0] if grp else {}
-            action = first.get("shot") or s.get("action", "")
-            names = s.get("characters")
+            pic = first.get("image") if isinstance(first.get("image"), dict) else {}
+            action = pic.get("prompt") or first.get("shot") or s.get("action", "")
+            names = pic.get("characters") if isinstance(pic.get("characters"), list) else s.get("characters")
             log(f"Picture {count} (scene {i + 1}, shot {g + 1}/{len(groups)})")
             if make_image(cast, action, s.get("place", ""), names, p, seed):
                 last_ok = p
@@ -1708,8 +1797,10 @@ def main():
     if isinstance(ti, str):
         ti = {"action": ti}
     if not make_image(cast, (ti.get("action") or scenes[-1].get("action", "")) +
-                      ", big happy expressive faces close to the camera", "", ti.get("characters"),
-                      thumb_base, seed):
+                      ". Viral YouTube kids thumbnail: the main character very big and close to the camera on the "
+                      "RIGHT half, huge expressive face (shocked, laughing or teary eyes), simple bright soft "
+                      "background on the LEFT half, vivid saturated colors, strong rim light, very sharp",
+                      "", ti.get("characters"), thumb_base, seed):
         shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
     make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
@@ -1736,7 +1827,9 @@ def main():
     log(f"Video ready: {duration(video):.0f} seconds")
 
     tags = [t if t.startswith("#") else "#" + t.replace(" ", "") for t in story.get("hashtags", [])[:15]]
-    description = f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "") + f"{L['ai_note']}\n\n{' '.join(tags)}"
+    source = ascii_text(story.get("source", ""))
+    description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
+                   + (f"📖 {source}\n" if source else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
 
     results = {}
     if DRY_RUN:

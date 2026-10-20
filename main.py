@@ -59,7 +59,7 @@ LANGS = {
                    "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख",
                    "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
                    "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
-                   "nature": "प्रकृति की कहानी"},
+                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
     },
     "bn": {
@@ -77,12 +77,29 @@ LANGS = {
                    "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা",
                    "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
                    "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
-                   "nature": "প্রকৃতির গল্প"},
+                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
     },
 }
 
 CATEGORIES = {
+    # devotional stories of the gods and their devotees (Puranas, bhakti legends - ancient, public domain)
+    "divine": ["little Krishna the butter thief (Makhan Chor) and Mother Yashoda",
+               "Yashoda sees the whole universe in baby Krishna's mouth", "Krishna lifts Govardhan hill to save Vrindavan",
+               "Krishna and his poor friend Sudama's handful of rice", "Krishna calms the serpent Kaliya in the Yamuna",
+               "Meera Bai's love for Krishna", "Lord Shiva becomes Neelkanth to save the world from poison",
+               "Shiva protects the child devotee Markandeya", "the hunter Kannappa's devotion to Shiva",
+               "Shiva brings the river Ganga down to earth", "Ma Kali comes as a little girl to help Ramprasad mend his fence",
+               "Sri Ramakrishna and Ma Kali at Dakshineswar", "Lord Jagannath eats Karma Bai's morning khichdi",
+               "the devotee Salabega and Lord Jagannath's chariot", "King Indradyumna and the making of Jagannath",
+               "Ganesha goes around his parents to win the race", "Ganesha and Kubera's grand feast",
+               "Ganesha writes the Mahabharata with his broken tusk", "baby Hanuman tries to eat the sun",
+               "Hanuman carries the Sanjeevani mountain", "Shabari's sweet berries for Lord Rama",
+               "the little squirrel who helped build Rama's bridge", "young Prahlad's faith in Lord Vishnu",
+               "child Dhruva's prayer becomes the pole star", "Ma Durga comes home for Durga Puja",
+               "Ma Lakshmi visits the house that stays awake on Kojagari Purnima",
+               "Ma Saraswati blesses a poor student", "Behula's devotion and Ma Manasa",
+               "Chaitanya Mahaprabhu's kirtan in Nabadwip", "Lord Vishnu as Vamana and King Bali"],
     # clever-wit folk anecdotes (centuries-old, public domain) - retold in our own words
     "witty": ["Gopal Bhar and the king's impossible challenge", "Gopal Bhar outsmarts a greedy moneylender",
               "Birbal and the emperor's tricky question", "Birbal finds the real thief with sticks",
@@ -277,6 +294,15 @@ def make_story(lang, theme, history):
         "panchatantra": "This is a Panchatantra / Jataka / Hitopadesha fable (ancient, public domain). Retell it in "
                         "your OWN words with lively new dialogue, fun character voices and a fresh small twist, "
                         "keeping the classic lesson.",
+        "divine": "This is a devotional story (leela) of the gods and their devotees from the Puranas and bhakti "
+                  "tradition. Tell it faithfully and with deep respect and devotion - do NOT change the meaning of "
+                  "the traditional story or add silly jokes about the gods. Warm, loving, child friendly; show the "
+                  "god's love for the devotee and end with the devotional lesson (faith, love, humility, kindness). "
+                  "If the original has fights or demons, tell those parts gently, without violence or fear. "
+                  "In every picture and character 'look', show the gods in their traditional, beautiful, auspicious "
+                  "form (e.g. Krishna: blue skin, peacock feather, yellow dhoti, flute; Shiva: calm, blue throat, "
+                  "crescent moon, Ganga in his hair; Ma Kali: gentle loving mother form, no weapons, no heads; "
+                  "Jagannath: the traditional big round eyes and dark face) with a soft divine golden glow.",
         "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
                 "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
                 "It must teach a clear life lesson and gently touch the heart.",
@@ -317,7 +343,7 @@ Return ONLY JSON with exactly these keys:
  "characters": [{{"name": "name in English letters", "gender": "male or female",
                   "age": "child, young, adult or old", "kind": "human or animal",
                   "look": "ENGLISH, very specific never-changing look: species/age, body size, exact colors of fur/skin/hair, clothes with exact colors, one special accessory. 20-35 words"}}],
- "source": "ENGLISH: e.g. 'Inspired by Panchatantra' / 'Inspired by Thakurmar Jhuli' / 'Original story'",
+ "source": "ENGLISH: e.g. 'Inspired by Panchatantra' / 'Inspired by Thakurmar Jhuli' / 'From the Bhagavata Purana' / 'Original story'",
  "thumbnail_image": {{"characters": ["1-2 main names"], "action": "ENGLISH: the most surprising or emotional moment of the story, the main character with a BIG expressive face (shocked, laughing, crying) close to the camera"}},
  "scenes": [{{
     "characters": ["names VISIBLE in the picture"],

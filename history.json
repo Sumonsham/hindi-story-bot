@@ -134,7 +134,13 @@
   "category": "funny",
   "title": "পটল ছাগলের বুদ্ধি! 🐐",
   "facebook": "1894401138210742",
-  "youtube": "Oeo-vtXS3Qo"
+  "youtube": "Oeo-vtXS3Qo",
+  "stats": {
+   "likes": 2,
+   "comments": 0,
+   "views": 0,
+   "checked": "2026-10-21T13:06+00:00"
+  }
  },
  {
   "date": "2026-10-20T17:29+00:00",
@@ -161,5 +167,22 @@
   "youtube": "NfWJ_ntxHho",
   "fb_reel": "1812028326710816",
   "yt_short": "dgWalsX38eM"
+ },
+ {
+  "date": "2026-10-21T13:43+00:00",
+  "lang": "bn",
+  "slot": "2026-10-21@19",
+  "category": "divine",
+  "title": "মা দুর্গার আগমন ও ছোট্ট মিনুর শিউলি ফুল 🌸",
+  "festival": "Durga Puja",
+  "quiz": {
+   "label": "ক",
+   "text": "শিউলি ফুল"
+  },
+  "facebook": "1883091939342643",
+  "youtube": "1hMy8S6ZWhw",
+  "fb_reel": "2164138674449501",
+  "coloring": "122135384006735948",
+  "yt_short": "WESHPz6BUrg"
  }
 ]

@@ -1032,6 +1032,16 @@ def report_text(page_name, title, results, history):
 
 
 # ----------------------------------------------------------------- kids: English words card
+def latin_font():
+    import glob as _g
+    for pat in ("/usr/share/fonts/**/NotoSans-Bold.ttf", "/usr/share/fonts/**/DejaVuSans-Bold.ttf",
+                "/usr/share/fonts/**/LiberationSans-Bold.ttf", "/usr/share/fonts/**/NotoSans-Regular.ttf"):
+        f = _g.glob(pat, recursive=True)
+        if f:
+            return f[0]
+    return None
+
+
 def words_card(base_img, font_path, title, words, out, size=(1280, 720)):
     """words: [(english, meaning)]  ->  big friendly card."""
     W, H = size
@@ -1043,12 +1053,13 @@ def words_card(base_img, font_path, title, words, out, size=(1280, 720)):
     d.rounded_rectangle([(W - tw) / 2 - 30, 30, (W + tw) / 2 + 30, 30 + 90], radius=40, fill=(255, 200, 0))
     d.text(((W - tw) / 2, 38), title, font=tf, fill=(10, 50, 80))
     y = 170
-    ef = _font(font_path, 70)
+    ef = _font(latin_font() or font_path, 70)      # English letters need an English font (else boxes appear)
     for en, mean in words[:3]:
         d.rounded_rectangle([110, y, W - 110, y + 150], radius=40, fill=(255, 255, 255), outline=(255, 200, 0), width=6)
         d.text((150, y + 30), str(en), font=ef, fill=(220, 40, 90))
-        ml, mf, _ = _fit_text(d, f"= {mean}", font_path, W / 2 - 120, 62, lines_max=1)
-        d.text((W / 2 + 20, y + 38), ml[0], font=mf, fill=(20, 40, 90))
+        d.text((W / 2 + 20, y + 38), "=", font=_font(latin_font() or font_path, 62), fill=(20, 40, 90))
+        ml, mf, _ = _fit_text(d, str(mean), font_path, W / 2 - 190, 62, lines_max=1)
+        d.text((W / 2 + 85, y + 38), ml[0], font=mf, fill=(20, 40, 90))
         y += 175
     img.save(out, quality=93)
     return out

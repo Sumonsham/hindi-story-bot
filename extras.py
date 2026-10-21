@@ -1080,3 +1080,131 @@ def coloring_sheet(raw_path, out, font_path=None, caption=""):
         d.text(((W - tw) / 2, 60), caption, font=f, fill=0)
     page.convert("RGB").save(out, quality=95)
     return out
+
+
+# ================================================================= v5: viewers take part, and get named
+BN_DIGITS, HI_DIGITS = "০১২৩৪৫৬৭৮৯", "०१२३४५६७८९"
+
+
+def norm_digits(text):
+    t = str(text)
+    for i in range(10):
+        t = t.replace(BN_DIGITS[i], str(i)).replace(HI_DIGITS[i], str(i))
+    return t
+
+
+def first_name(name):
+    n = str(name or "").strip().lstrip("@").replace("_", " ").replace(".", " ")
+    n = n.split()[0] if n.split() else ""
+    return n[:20] if len(n) >= 2 and not n.isdigit() else ""
+
+
+def post_comments(fb_id=None, yt_id=None):
+    """All comments under one post: [{"id", "name", "text", "src"}] (Facebook + YouTube)."""
+    out = []
+    if fb_id and env("FB_PAGE_TOKEN"):
+        try:
+            url, params = f"{GRAPH}/{fb_id}/comments", {"fields": "id,message,from{name}", "limit": 100,
+                                                        "access_token": env("FB_PAGE_TOKEN")}
+            for _ in range(5):
+                r = requests.get(url, params=params, timeout=30).json()
+                for c in r.get("data", []):
+                    out.append({"id": c.get("id"), "name": first_name((c.get("from") or {}).get("name")),
+                                "text": c.get("message", ""), "src": "fb"})
+                nxt = (r.get("paging") or {}).get("next")
+                if not nxt:
+                    break
+                url, params = nxt, None
+        except Exception as e:
+            log("  Facebook comments:", str(e)[:120])
+    if yt_id and env("YT_REFRESH_TOKEN"):
+        try:
+            r = requests.get(f"{YT}/commentThreads", headers=yt_token(), params={
+                "part": "snippet", "videoId": yt_id, "maxResults": 100, "textFormat": "plainText"}, timeout=30)
+            for it in (r.json().get("items", []) if r.ok else []):
+                sn = it["snippet"]["topLevelComment"]["snippet"]
+                out.append({"id": it["id"], "name": first_name(sn.get("authorDisplayName")),
+                            "text": sn.get("textDisplay", ""), "src": "yt"})
+        except Exception as e:
+            log("  YouTube comments:", str(e)[:120])
+    return out
+
+
+def first_digit(text):
+    t = norm_digits(text)
+    return next((c for c in t if c.isdigit()), None)
+
+
+def winners(comments, digit=None, words=(), label=None):
+    """People whose comment has the right answer: the right number, the right word, or the right option label."""
+    import re as _re
+    names, fb_ids, seen = [], [], set()
+    for c in comments:
+        t = str(c["text"]).strip()
+        ok = False
+        if digit is not None and first_digit(t) == str(digit):
+            ok = True
+        if any(w and len(w) >= 2 and w.lower() in t.lower() for w in words):
+            ok = True
+        if label and _re.match(rf"^\(?{_re.escape(label)}\)?(\s|$|[.,!।)\-:])", t):
+            ok = True
+        if ok and c["name"] and c["name"].lower() not in seen:
+            seen.add(c["name"].lower())
+            names.append(c["name"])
+            if c["src"] == "fb" and c.get("id"):
+                fb_ids.append(c["id"])
+    return names, fb_ids
+
+
+def vote_count(comments):
+    """Votes 1 / 2 with the voters' names."""
+    v = {"1": [], "2": []}
+    for c in comments:
+        d = first_digit(c["text"])
+        if d in v:
+            v[d].append(c)
+    return v
+
+
+def name_list(names, lang, maxn=6):
+    names = [n for n in names if n][:50]
+    if not names:
+        return ""
+    shown = names[:maxn]
+    joiner = " আর " if lang == "bn" else " और "
+    txt = shown[0] if len(shown) == 1 else ", ".join(shown[:-1]) + joiner + shown[-1]
+    more = len(names) - len(shown)
+    if more > 0:
+        txt += (f" সহ আরও {more} জন" if lang == "bn" else f" और {more} लोग")
+    return txt
+
+
+def reply_to(comment_ids, text, limit=10):
+    """Reply (as the page) under people's own comments, so they get a notification."""
+    n = 0
+    for cid in comment_ids[:limit]:
+        try:
+            r = requests.post(f"{GRAPH}/{cid}/comments", data={"message": text, "access_token": env("FB_PAGE_TOKEN")},
+                              timeout=30).json()
+            n += 1 if r.get("id") else 0
+        except Exception:
+            pass
+    return n
+
+
+def last_post(history, key=None, min_hours=1.5):
+    """The previous normal video of this bot (with its answer data)."""
+    now = dt.datetime.now(dt.timezone.utc)
+    for h in reversed(history[-10:]):
+        if h.get("kind") == "compilation" or not (h.get("facebook") or h.get("youtube")):
+            continue
+        try:
+            t = dt.datetime.fromisoformat(str(h.get("date")))
+        except Exception:
+            continue
+        if (now - t.replace(tzinfo=t.tzinfo or dt.timezone.utc)).total_seconds() < min_hours * 3600:
+            continue
+        if key is None or h.get(key):
+            return h
+        return None
+    return None

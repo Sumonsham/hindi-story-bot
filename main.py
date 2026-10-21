@@ -69,6 +69,11 @@ LANGS = {
         "quiz_answer": "सही जवाब है... {lab}: {ans}! क्या तुमने सही बताया? कमेंट में लिखो!",
         "ann1": "नई प्यारी कहानी", "ann_msg": "🧸 {when} आ रही है लूमी दीदी की नई कहानी! बच्चों को ज़रूर दिखाइए 🔔",
         "comp_title": "{m} मिनट की प्यारी कहानियाँ 🧸 | हफ्ते की {n} कहानियाँ एक साथ", "comp_thumb": "{m} मिनट की कहानियाँ",
+        "how_to_join": "बच्चों, क्विज़ का जवाब कमेंट में लिखो, जैसे क, ख या ग। जिनका जवाब सही होगा, उनका नाम अगली कहानी में लूमी दीदी बोलेगी! और रंग भरा हुआ चित्र कमेंट में भेजना मत भूलना।",
+        "shout_line": "पिछली कहानी के क्विज़ का सही जवाब दिया था {names} ने। शाबाश! तालियाँ!",
+        "join_comment": "👇 कैसे हिस्सा लें:\n✅ क्विज़ का जवाब कमेंट में लिखिए (क / ख / ग) - सही जवाब देने वालों का नाम अगली कहानी में!\n🖍️ रंग भरा चित्र फोटो खींचकर कमेंट में भेजिए\n🔔 फॉलो कीजिए ताकि रोज़ की कहानी मिस न हो",
+        "shout_comment": "🏆 पिछली कहानी के क्विज़ के सही जवाब: {names} - शाबाश!",
+        "congrats_reply": "🏆 शाबाश! आपका जवाब सही था, आज की कहानी में लूमी दीदी ने आपका नाम लिया है 👉 {link}",
         "words_title": "आज के 3 अंग्रेज़ी शब्द", "words_line": "अब सीखते हैं आज की कहानी के तीन अंग्रेज़ी शब्द! {items}",
         "word_item": "{en} मतलब {m}।", "color_title": "रंग भरो!",
         "color_msg": "🖍️ आज का रंग भरने वाला पन्ना! प्रिंट कीजिए, बच्चों से रंग भरवाइए और फोटो कमेंट में भेजिए 🌈 सबसे सुंदर चित्र अगली कहानी में दिखाएँगे!",
@@ -97,6 +102,11 @@ LANGS = {
         "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! তুমি কি ঠিক বলেছিলে? কমেন্টে লেখো!",
         "ann1": "নতুন মিষ্টি গল্প", "ann_msg": "🧸 {when} আসছে লুমি দিদির নতুন গল্প! ছোটদের দেখাতে ভুলবেন না 🔔",
         "comp_title": "{m} মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের গল্প",
+        "how_to_join": "বন্ধুরা, কুইজের উত্তর কমেন্টে লেখো, যেমন ক, খ বা গ। যাদের উত্তর ঠিক হবে, পরের গল্পে লুমি দিদি তাদের নাম বলবে! আর রং করা ছবি কমেন্টে পাঠাতে ভুলো না।",
+        "shout_line": "আগের গল্পের কুইজে ঠিক উত্তর দিয়েছিল {names}। দারুণ! হাততালি!",
+        "join_comment": "👇 কীভাবে অংশ নেবেন:\n✅ কুইজের উত্তর কমেন্টে লিখুন (ক / খ / গ) - ঠিক উত্তরদাতাদের নাম পরের গল্পে!\n🖍️ রং করা ছবি তুলে কমেন্টে পাঠান\n🔔 ফলো করুন, রোজের গল্প যেন মিস না হয়",
+        "shout_comment": "🏆 আগের গল্পের কুইজে ঠিক উত্তর: {names} - দারুণ!",
+        "congrats_reply": "🏆 দারুণ! তোমার উত্তর ঠিক ছিল, আজকের গল্পে লুমি দিদি তোমার নাম বলেছে 👉 {link}",
         "words_title": "আজকের ৩টে ইংরেজি শব্দ", "words_line": "এবার শিখি আজকের গল্পের তিনটে ইংরেজি শব্দ! {items}",
         "word_item": "{en} মানে {m}।", "color_title": "রং করো!",
         "color_msg": "🖍️ আজকের রং করার পাতা! প্রিন্ট করুন, ছোটদের দিয়ে রং করান আর ছবি তুলে কমেন্টে দিন 🌈",
@@ -1901,6 +1911,16 @@ def main():
     lang = pick_language(history)
     L = LANGS[lang]
     FONT = find_font(lang)
+    shout_names, shout_ids = [], []
+    lastp = extras.last_post(history, key="quiz")
+    if lastp and not MOCK and lastp.get("facebook"):
+        try:
+            qa = lastp["quiz"]
+            shout_names, shout_ids = extras.winners(extras.post_comments(lastp.get("facebook")),
+                                                    words=(qa.get("text", ""),), label=qa.get("label"))
+            log(f"Right quiz answers last time: {len(shout_names)}")
+        except Exception as e:
+            log("  quiz-answer check skipped:", str(e)[:120])
     theme = pick_theme(history)
     festival = None
     fest = extras.festival_today("cartoon")
@@ -2019,7 +2039,9 @@ def main():
         qans = int(str(quiz.get("answer", 0)).strip()[0])
     except Exception:
         qans = 0
+    quiz_saved = None
     if quiz.get("question") and len(qopts) == 3 and 0 <= qans < 3:
+        quiz_saved = {"label": L["quiz_labels"][qans], "text": qopts[qans]}
         try:
             labs = L["quiz_labels"]
             qimg, aimg = extras.quiz_cards(shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], FONT,
@@ -2044,6 +2066,10 @@ def main():
                           "lines": [{"speaker": "narrator", "emotion": "happy", "text": L["words_line"].format(items=items)}]})
         except Exception as e:
             log("  English words skipped:", str(e)[:150])
+    if shout_names:
+        end_lines.append({"speaker": "narrator", "emotion": "happy",
+                          "text": L["shout_line"].format(names=extras.name_list(shout_names, lang))})
+    end_lines.append({"speaker": "narrator", "emotion": "happy", "text": L["how_to_join"]})
     if str(story.get("mithu_outro", "")).strip():
         end_lines.append({"speaker": "Mithu", "emotion": "laughing", "text": str(story["mithu_outro"]).strip()})
     end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
@@ -2084,10 +2110,19 @@ def main():
         if not results.get("facebook") and not results.get("youtube"):
             raise SystemExit("Posting failed everywhere - see messages above.")
 
+    first = [str(story.get("comment_question", "")).strip()]
+    if shout_names:
+        first.append(L["shout_comment"].format(names=extras.name_list(shout_names, lang, 10)))
+    first.append(L["join_comment"])
+    story["comment_question"] = "\n\n".join(x for x in first if x)
     results.update(grow(video, story, title, lang, L, category, tags, results, history, page))
+    if shout_ids and results.get("facebook") and not DRY_RUN:
+        n = extras.reply_to(shout_ids, L["congrats_reply"].format(link=f"https://www.facebook.com/{results['facebook']}"))
+        log(f"  congratulated {n} children/parents under their comments")
 
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
-                    "category": category, "title": title, "festival": festival, **results})
+                    "category": category, "title": title, "festival": festival,
+                    "quiz": quiz_saved, **results})
     if not MOCK:
         save_history(history)
     extras.telegram(extras.report_text(env(f"PAGE_NAME_{lang.upper()}") or "Little Lumi Stories", title, results, history))

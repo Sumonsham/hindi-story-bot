@@ -64,6 +64,11 @@ LANGS = {
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
         "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
         "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
+        "quiz_title": "क्विज़ टाइम!", "quiz_labels": ["क", "ख", "ग"],
+        "quiz_intro": "अब एक छोटा सा सवाल, बच्चों!", "quiz_count": "सोचो... तीन... दो... एक...",
+        "quiz_answer": "सही जवाब है... {lab}: {ans}! क्या तुमने सही बताया? कमेंट में लिखो!",
+        "ann1": "नई प्यारी कहानी", "ann_msg": "🧸 {when} आ रही है लूमी दीदी की नई कहानी! बच्चों को ज़रूर दिखाइए 🔔",
+        "comp_title": "{m} मिनट की प्यारी कहानियाँ 🧸 | हफ्ते की {n} कहानियाँ एक साथ", "comp_thumb": "{m} मिनट की कहानियाँ",
     },
     "bn": {
         "name": "Bengali", "script": "Bengali",
@@ -84,6 +89,11 @@ LANGS = {
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
         "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
         "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
+        "quiz_title": "কুইজ টাইম!", "quiz_labels": ["ক", "খ", "গ"],
+        "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবো... তিন... দুই... এক...",
+        "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! তুমি কি ঠিক বলেছিলে? কমেন্টে লেখো!",
+        "ann1": "নতুন মিষ্টি গল্প", "ann_msg": "🧸 {when} আসছে লুমি দিদির নতুন গল্প! ছোটদের দেখাতে ভুলবেন না 🔔",
+        "comp_title": "{m} মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের গল্প",
     },
 }
 
@@ -219,6 +229,8 @@ def load_history():
 def recently_posted(history, hours):
     """True if a video was posted in the last few hours (so a backup run must not post a second one)."""
     for h in history[-3:]:
+        if h.get("kind") == "compilation":
+            continue
         try:
             t = dt.datetime.fromisoformat(str(h.get("date", "")))
             if t.tzinfo is None:
@@ -242,6 +254,33 @@ def pick_language(history):
         return forced
     last = history[-1].get("lang", "hi") if history else "bn"
     return "bn" if last == "hi" else "hi"
+
+
+DIVINE_FESTIVALS = {"Durga Puja", "Kojagari Lakshmi Puja", "Kali Puja / Diwali", "Saraswati Puja", "Maha Shivaratri",
+                    "Sri Ramakrishna's birthday", "Holi / Dol Purnima", "Ram Navami", "Bhoot Chaturdashi"}
+MASCOT = os.path.join(HERE, "assets", "lumi_didi.jpg")
+MASCOT_PROMPT = ("Lumi Didi, a warm friendly young Indian storyteller woman in high quality 2D cartoon style, big kind "
+                 "sparkling eyes, gentle smile, long black braid with a small yellow flower, sky-blue saree with a "
+                 "golden border, small star-shaped bindi, holding an open glowing storybook in one hand and waving "
+                 "hello with the other, sitting on a cozy colorful cushion, soft magical sparkles, bright cheerful "
+                 "storybook background, Pixar-like charm, no text, no letters, no watermark")
+
+
+def ensure_mascot():
+    """Our host 'Lumi Didi' - made once, saved in the repo, the same in every video."""
+    if os.path.exists(MASCOT):
+        return MASCOT
+    if MOCK:
+        os.makedirs(os.path.dirname(MASCOT), exist_ok=True)
+        return mock_image(MASCOT, 7) and MASCOT
+    try:
+        os.makedirs(os.path.dirname(MASCOT), exist_ok=True)
+        save_picture(cf_request(CF_MODEL, MASCOT_PROMPT, seed=2024), MASCOT)
+        log("Lumi Didi picture created (saved for all future videos)")
+        return MASCOT
+    except Exception as e:
+        log("  Lumi Didi picture not made now:", str(e)[:150])
+        return None
 
 
 def pick_theme(history):
@@ -357,6 +396,7 @@ Return ONLY JSON with exactly these keys:
     "mood": "one of {MOODS}",
     "ambience": ["1-2 ENGLISH background sounds that fit this place, e.g. 'birds chirping in forest', 'village morning roosters', 'river stream', 'gentle wind in trees', 'busy village market'"],
     "lines": [{{"speaker": "narrator or a character name", "text": "{L['name']} text",
+                "en": "the same line translated to natural English (for subtitles)",
                 "emotion": "one of {EMOTIONS}",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
@@ -366,7 +406,9 @@ Return ONLY JSON with exactly these keys:
  "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
  "ending_line": "one short sweet {L['name']} closing line from the narrator",
  "comment_question": "one short friendly {L['name']} question to viewers that makes them comment (e.g. 'तुम होते तो क्या करते?'), with 1 emoji",
- "teaser_scene": "number: the scene (1 = first) where the most fun/exciting 50 seconds START - used for the Reel/Short teaser"
+ "teaser_scene": "number: the scene (1 = first) where the most fun/exciting 50 seconds START - used for the Reel/Short teaser",
+ "quiz": {{"question": "one easy {L['name']} question for children about THIS story (max 12 words)",
+           "options": ["3 short {L['name']} answers (2-4 words each), only one correct"], "answer": "0, 1 or 2: index of the correct option"}}
 }}
 Every scene object also has "chapter": "2-4 word {L['name']} chapter name for YouTube chapters".
 """
@@ -1828,6 +1870,8 @@ def main():
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
+    if env("MODE") == "compilation":
+        return make_compilation(history)
     # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
     if (env("EVENT") == "schedule" or env("MODE") == "auto") and recently_posted(history, hours=4):
         log("A video for this time slot was already posted - this backup run has nothing to do.")
@@ -1841,6 +1885,14 @@ def main():
     L = LANGS[lang]
     FONT = find_font(lang)
     theme = pick_theme(history)
+    festival = None
+    fest = extras.festival_today("cartoon")
+    if fest and not any(h.get("festival") == fest[0] and h.get("date") and
+                        (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(h["date"])).total_seconds() < 20 * 3600
+                        for h in history[-4:]):
+        festival = fest[0]
+        theme = ("divine" if fest[0] in DIVINE_FESTIVALS else "festival", fest[1])
+        log(f"Festival special: {festival}")
     category = theme[0]
     log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}")
 
@@ -1915,7 +1967,8 @@ def main():
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
-    parts = [{"image": thumb_base, "lines": [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}],
+    host = ensure_mascot() or thumb_base
+    parts = [{"image": host, "lines": [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}],
               "sounds": ["birds"], "mood": "happy", "voices": voices}]
     for img, s, sh in zip(imgs, scenes, shots_per_scene):
         parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []),
@@ -1927,8 +1980,33 @@ def main():
                           "text": (f"{L['moral_intro']} {moral}" if category != "funny" else moral)})
     elif story.get("ending_line"):
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
+    end_img = host if host != thumb_base else (shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1])
+    if end_lines:                                   # Lumi Didi tells the lesson, then the quiz, then goodbye
+        parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
+        end_lines = []
+    quiz = story.get("quiz") if isinstance(story.get("quiz"), dict) else {}
+    qopts = [str(o).strip() for o in (quiz.get("options") or []) if str(o).strip()][:3]
+    try:
+        qans = int(str(quiz.get("answer", 0)).strip()[0])
+    except Exception:
+        qans = 0
+    if quiz.get("question") and len(qopts) == 3 and 0 <= qans < 3:
+        try:
+            labs = L["quiz_labels"]
+            qimg, aimg = extras.quiz_cards(shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], FONT,
+                                           L["quiz_title"], str(quiz["question"]), qopts, qans, labs,
+                                           os.path.join(WORK, "quiz_q.jpg"), os.path.join(WORK, "quiz_a.jpg"))
+            read = " ".join(f"{labs[i]}, {o}." for i, o in enumerate(qopts))
+            parts.append({"image": qimg, "shots": [qimg, qimg, aimg], "mood": "happy", "voices": voices,
+                          "sounds": [], "lines": [
+                              {"speaker": "narrator", "emotion": "excited", "text": f"{L['quiz_intro']} {quiz['question']} {read}"},
+                              {"speaker": "narrator", "emotion": "calm", "text": L["quiz_count"]},
+                              {"speaker": "narrator", "emotion": "happy",
+                               "text": L["quiz_answer"].format(lab=labs[qans], ans=qopts[qans])}]})
+        except Exception as e:
+            log("  quiz skipped:", str(e)[:150])
     end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
-    parts.append({"image": shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
+    parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
 
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
@@ -1968,8 +2046,84 @@ def main():
     results.update(grow(video, story, title, lang, L, category, tags, results, history, page))
 
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
-                    "category": category, "title": title, **results})
+                    "category": category, "title": title, "festival": festival, **results})
     if not MOCK:
+        save_history(history)
+
+
+def make_compilation(history):
+    """Sunday special: this week's stories (one language) joined into one long video with chapters."""
+    global FONT
+    now = dt.datetime.now(dt.timezone.utc)
+    week = []
+    for h in history[-40:]:
+        try:
+            t = dt.datetime.fromisoformat(str(h.get("date")))
+        except Exception:
+            continue
+        if (now - t.replace(tzinfo=t.tzinfo or dt.timezone.utc)).days <= 7 and h.get("facebook") \
+                and h.get("kind") != "compilation":
+            week.append(h)
+    langs = [h.get("lang") for h in week]
+    lang = env("LANGUAGE") if env("LANGUAGE") in LANGS else (max(set(langs), key=langs.count) if langs else "bn")
+    items = [h for h in week if h.get("lang") == lang][-12:]
+    if len(items) < 3:
+        log(f"Weekly compilation: only {len(items)} stories this week - skipped")
+        return
+    L = LANGS[lang]
+    FONT = find_font(lang)
+    clips, chapters, frames, t = [], [], [], 0.0
+    for k, h in enumerate(items):
+        try:
+            src, _ = extras.fb_video_source(h["facebook"])
+            if not src:
+                raise RuntimeError("no video link")
+            raw = extras.download(src, os.path.join(WORK, f"raw_{k}.mp4"))
+            c = extras.normalize_clip(raw, os.path.join(WORK, f"c_{k:02d}.mp4"))
+            os.remove(raw)
+            d = duration(c)
+            fr = os.path.join(WORK, f"fr_{k}.jpg")
+            run(["ffmpeg", "-y", "-ss", f"{min(40, d / 3):.1f}", "-i", c, "-frames:v", "1", fr])
+            frames.append(fr)
+            chapters.append((t, h.get("title", f"{k + 1}")))
+            clips.append(c)
+            t += d
+            log(f"  added: {h.get('title', '')[:50]} ({d / 60:.1f} min)")
+        except Exception as e:
+            log(f"  skipped one story: {str(e)[:150]}")
+    if len(clips) < 3:
+        log("Weekly compilation: not enough videos could be downloaded - skipped")
+        return
+    lst = os.path.join(WORK, "comp.txt")
+    with open(lst, "w") as f:
+        f.writelines(f"file '{os.path.basename(c)}'\n" for c in clips)
+    video = os.path.join(WORK, "final.mp4")
+    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", "-movflags", "+faststart", video])
+    minutes = int(round(t / 60))
+    title = L["comp_title"].format(m=minutes, n=len(clips))[:95]
+    base = extras.collage(frames, os.path.join(WORK, "thumb_base.jpg"))
+    thumb = os.path.join(WORK, "thumbnail.jpg")
+    make_thumbnail(base, L["comp_thumb"].format(m=minutes), thumb, L["labels"]["bedtime"])
+    chap = L["chapters"] + "\n" + "\n".join(f"{extras.fmt_time(s)} {n[:60]}" for s, n in chapters)
+    tags = ["#KidsStories", "#MoralStories", "#BedtimeStories", "#StoryCompilation"]
+    description = f"{title}\n\n{chap}\n\n{L['ai_note']}\n\n{' '.join(tags)}"
+    log(f"Compilation ready: {minutes} minutes, {len(clips)} stories")
+    results = {}
+    if not DRY_RUN:
+        try:
+            results["facebook"] = post_to_facebook(video, thumb, title, description)
+            log("Posted compilation to Facebook:", results["facebook"])
+        except Exception as e:
+            log("FACEBOOK FAILED:", e)
+        if youtube_ready() and extras.yt_extra_ok():
+            try:
+                results["youtube"] = post_to_youtube(video, thumb, title, description, tags, lang)
+                log("Posted compilation to YouTube:", results["youtube"])
+                extras.yt_add_to_playlist(results["youtube"], f"{L['labels']['bedtime']} | {L['playlist_tail']}", lang)
+            except Exception as e:
+                log("YouTube compilation skipped:", str(e)[:200])
+        history.append({"date": now.isoformat(timespec="minutes"), "lang": lang, "kind": "compilation",
+                        "title": title, **results})
         save_history(history)
 
 
@@ -2003,13 +2157,37 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  added to YouTube playlist")
         except Exception as e:
             log("  playlist skipped:", str(e)[:200])
-        if teaser and env("YT_SHORTS") != "0" and extras.shorts_today(history) < int(env("YT_SHORTS_PER_DAY") or 2):
+        if (teaser and extras.yt_extra_ok() and env("YT_SHORTS") != "0"
+                and extras.shorts_today(history) < int(env("YT_SHORTS_PER_DAY") or 2)):
             try:
                 desc = f"{title}\n{L['full_link']} https://youtu.be/{results['youtube']}\n{' '.join(tags[:6])}"
                 out["yt_short"] = post_to_youtube(teaser, None, f"{title[:80]} #Shorts", desc, tags, lang)
                 log("Posted YouTube Short:", out["yt_short"])
             except Exception as e:
                 log("  YouTube Short skipped:", str(e)[:200])
+    if results.get("youtube") and extras.yt_extra_ok():
+        try:                                          # English subtitles: more families can follow
+            tr = {str(ln.get("text", "")).strip(): str(ln.get("en", "")).strip()
+                  for sc in story.get("scenes", []) for ln in sc.get("lines", []) if ln.get("en")}
+            srt = extras.write_srt(segs, tr, os.path.join(WORK, "subs_en.srt"))
+            if srt:
+                extras.yt_upload_captions(results["youtube"], srt)
+                log("  English subtitles added on YouTube")
+        except Exception as e:
+            log("  subtitles skipped:", str(e)[:160])
+    if results.get("facebook") and env("ANNOUNCE") != "0":
+        try:                                          # "coming soon" post 2 hours before the evening video
+            nxt = extras.next_slot([8, 13, 19], [19])
+            if nxt:
+                slot, when, day = nxt
+                words = f"{extras.DAY_WORDS[lang][day]} {extras.TIME_WORDS[lang][slot.hour]}"
+                card = extras.announcement_card(ensure_mascot() or os.path.join(WORK, "thumb_base.jpg"), FONT,
+                                                L["ann1"], words, os.path.join(WORK, "announce.jpg"),
+                                                colors=((255, 225, 0), (255, 60, 120)))
+                extras.fb_schedule_photo(card, L["ann_msg"].format(when=words), when)
+                log(f"  'coming soon' post scheduled for {when.strftime('%d %b %H:%M')} India time")
+        except Exception as e:
+            log("  announcement skipped:", str(e)[:160])
     if question and results.get("facebook"):
         try:
             extras.fb_comment(results["facebook"], question)

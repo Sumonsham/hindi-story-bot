@@ -363,3 +363,446 @@ def weights(history, key, options):
 def weighted_choice(options, w):
     opts = list(options)
     return random.choices(opts, weights=[w.get(o, 1.0) for o in opts], k=1)[0]
+
+
+# ================================================================= v3: deeper experience
+# ----------------------------------------------------------------- YouTube daily limit safety
+def yt_extra_ok():
+    """Shorts, subtitles and the weekly compilation cost a lot of YouTube 'quota'. They are only
+    switched on when this channel has its OWN Google Cloud project (secret YT_EXTRA = 1)."""
+    return env("YT_EXTRA") == "1"
+
+
+# ----------------------------------------------------------------- 3D sound for headphones
+def _np():
+    import numpy
+    return numpy
+
+
+def spatial_path(name, rnd):
+    """Where a sound comes from (degrees: 0 front, +90 right ear, -90 left ear, 180 behind)
+    and where it moves to. Returns (start_az, end_az, wetness)."""
+    n = str(name).lower()
+    side = 1 if rnd.uniform() < 0.5 else -1
+    if any(k in n for k in ("footstep", "steps", "walking", "running", "approach", "coming")):
+        return side * 150, side * 35, 0.35                 # from behind, coming closer
+    if any(k in n for k in ("whisper", "breath", "ghost_whisper", "sigh")):
+        return side * 85, side * 85, 0.15                  # right into one ear
+    if "ghost_swell" in n or "wind gust" in n:
+        return side * 170, -side * 60, 0.45                # sweeps around the head
+    if any(k in n for k in ("door", "knock", "creak", "gate", "window", "bang")):
+        return side * 60, side * 60, 0.4
+    if any(k in n for k in ("scream", "laugh", "howl", "dog", "distant", "far", "cry", "baby")):
+        return side * 40, side * 40, 0.6                   # far away, lots of room sound
+    if any(k in n for k in ("ghungroo", "anklet", "bell", "bangle", "chain")):
+        return side * 120, -side * 120, 0.4                # walks behind you
+    if any(k in n for k in ("scare_hit", "thunder", "lightning", "rain", "wind")):
+        return 0, 0, 0.3
+    a = float(rnd.uniform(-70, 70))
+    return a, a, 0.35
+
+
+def spatialize(mono, az0, az1, sr=44100):
+    """Mono -> stereo (L, R) with level + time difference between the ears; sounds behind are
+    a bit duller. Moves smoothly from az0 to az1."""
+    np = _np()
+    from scipy.signal import butter, sosfilt
+    n = len(mono)
+    if n == 0:
+        return mono, mono
+    az = np.radians(np.linspace(az0, az1, n))
+    pan = np.sin(az)                                      # -1 left .. +1 right
+    gl = np.cos((pan + 1) * np.pi / 4)
+    gr = np.sin((pan + 1) * np.pi / 4)
+    behind = np.clip(-np.cos(az), 0, 1)                   # 0 in front, 1 straight behind
+    dull = sosfilt(butter(2, 3500, "lowpass", fs=sr, output="sos"), mono)
+    src = mono * (1 - 0.6 * behind) + dull * (0.6 * behind)
+    itd = int(abs(np.sin(np.radians((az0 + az1) / 2))) * 0.00066 * sr)   # up to ~0.66 ms
+    left, right = src * gl * 1.25, src * gr * 1.25
+    if itd:
+        if (az0 + az1) / 2 > 0:                           # sound on the right: left ear hears it later
+            left = np.concatenate([np.zeros(itd), left[:-itd]])
+        else:
+            right = np.concatenate([np.zeros(itd), right[:-itd]])
+    return left, right
+
+
+def widen(mono, sr=44100):
+    """Background ambience made wide (fills both ears differently)."""
+    np = _np()
+    from scipy.signal import butter, sosfilt
+    hp = sosfilt(butter(2, 300, "highpass", fs=sr, output="sos"), mono)
+    side = np.roll(hp, int(0.009 * sr)) - np.roll(hp, int(0.017 * sr))
+    return mono + 0.45 * side, mono - 0.45 * side
+
+
+ROOM_WORDS = [
+    ("cave", ("cave", "well", "tunnel", "kuyo", "kuan", "stepwell", "baori", "basement", "cellar", "drain")),
+    ("hall", ("haveli", "palace", "bari", "mansion", "corridor", "hall", "temple", "church", "station",
+              "hospital", "school", "mill", "theatre", "cinema", "hostel", "factory", "staircase", "bungalow")),
+    ("room", ("room", "house", "hut", "kitchen", "bedroom", "flat", "office", "car", "bus", "train", "shop")),
+    ("outdoor", ("forest", "jungle", "field", "road", "highway", "river", "village", "garden", "ground",
+                 "shamshan", "cremation", "lake", "boat", "beach", "tree", "graveyard", "bridge")),
+]
+ROOM_SETTINGS = {"cave": (1.6, 0.12, 0.55), "hall": (1.1, 0.05, 0.45), "room": (0.35, 0.0, 0.3),
+                 "outdoor": (0.25, 0.0, 0.12)}   # (decay seconds, slap-echo seconds, wet level)
+
+
+def room_kind(place_text):
+    t = str(place_text).lower()
+    for kind, words in ROOM_WORDS:
+        if any(w in t for w in words):
+            return kind
+    return "room"
+
+
+def reverb_stereo(left, right, kind, sr=44100, seed=1):
+    """Room sound of the place (made-up impulse response, different for each ear)."""
+    np = _np()
+    from scipy.signal import fftconvolve
+    decay, slap, wet = ROOM_SETTINGS.get(kind, ROOM_SETTINGS["room"])
+    rnd = np.random.default_rng(seed)
+    m = int(sr * decay * 1.2)
+    t = np.arange(m) / sr
+    outs = []
+    for ch, sig in enumerate((left, right)):
+        ir = rnd.standard_normal(m) * np.exp(-6.9 * t / decay)
+        if slap:
+            k = int(slap * sr) + ch * int(0.013 * sr)
+            if k < m:
+                ir[k] += 6.0
+        ir /= np.sqrt((ir ** 2).sum()) + 1e-9
+        r = fftconvolve(sig, ir)[:len(sig)]
+        outs.append(sig + r * wet)
+    return outs[0], outs[1]
+
+
+def write_stereo_wav(path, left, right, sr=44100):
+    import wave
+    np = _np()
+    st = np.stack([np.clip(left, -1, 1), np.clip(right, -1, 1)], axis=1)
+    with wave.open(path, "w") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(sr)
+        w.writeframes((st * 32767).astype(np.int16).tobytes())
+
+
+# ----------------------------------------------------------------- small picture cards
+def headphone_hint(font_path, text, out):
+    """'(headphones) Listen with headphones' pill, drawn without emoji fonts."""
+    probe = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+    f = _font(font_path, 38)
+    tw = int(probe.textlength(text, font=f))
+    w, h = tw + 120, 76
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([0, 0, w - 1, h - 1], radius=38, fill=(0, 0, 0, 190), outline=(255, 255, 255, 220), width=3)
+    cx, cy = 52, 40                                        # headphones icon
+    d.arc([cx - 24, cy - 26, cx + 24, cy + 22], 180, 360, fill=(255, 255, 255, 255), width=6)
+    d.rounded_rectangle([cx - 30, cy - 4, cx - 16, cy + 22], radius=5, fill=(255, 255, 255, 255))
+    d.rounded_rectangle([cx + 16, cy - 4, cx + 30, cy + 22], radius=5, fill=(255, 255, 255, 255))
+    d.text((96, (h - 48) // 2), text, font=f, fill=(255, 255, 255, 255))
+    img.save(out)
+    return out
+
+
+def quiz_cards(base_img, font_path, title, question, options, answer, labels, out_q, out_a, size=(1280, 720)):
+    """Quiz screen (question + 3 options) and the answer screen (right option turns green)."""
+    W, H = size
+    bg = Image.open(base_img).convert("RGB").resize((W, H)).filter(ImageFilter.GaussianBlur(14))
+    bg = Image.blend(bg, Image.new("RGB", (W, H), (30, 10, 70)), 0.55)
+
+    def card(show):
+        img = bg.copy()
+        d = ImageDraw.Draw(img)
+        tf = _font(font_path, 64)
+        tw = d.textlength(title, font=tf)
+        d.rounded_rectangle([(W - tw) / 2 - 30, 26, (W + tw) / 2 + 30, 26 + 96], radius=40, fill=(255, 200, 0))
+        d.text(((W - tw) / 2, 34), title, font=tf, fill=(60, 0, 80))
+        lines, qf, qs = _fit_text(d, question, font_path, W - 140, 54)
+        y = 150
+        for l in lines:
+            lw = d.textlength(l, font=qf)
+            d.text(((W - lw) / 2, y), l, font=qf, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+            y += int(qs * 1.35)
+        of = _font(font_path, 46)
+        y = max(y + 20, 330)
+        for i, opt in enumerate(options[:3]):
+            right = show and i == answer
+            fill = (40, 170, 70) if right else (255, 255, 255)
+            d.rounded_rectangle([170, y, W - 170, y + 96], radius=48, fill=fill, outline=(255, 200, 0), width=5)
+            d.ellipse([186, y + 12, 258, y + 84], fill=(255, 200, 0))
+            lab = labels[i]
+            lw = d.textlength(lab, font=of)
+            d.text((222 - lw / 2, y + 16), lab, font=of, fill=(60, 0, 80))
+            ol, ofit, _ = _fit_text(d, str(opt), font_path, W - 520, 46, lines_max=1)
+            d.text((290, y + 18), ol[0], font=ofit, fill=(255, 255, 255) if right else (40, 20, 70))
+            if right:                                    # tick mark
+                d.line([(W - 250, y + 50), (W - 225, y + 75), (W - 185, y + 22)], fill=(255, 255, 255), width=10)
+            y += 116
+        return img
+    card(False).save(out_q, quality=93)
+    card(True).save(out_a, quality=93)
+    return out_q, out_a
+
+
+def hide_ghost(img_path, ghost_face_path, out, rnd, strength=0.17):
+    """Paste the ghost's face very faintly into a dark corner of a picture ('find the ghost')."""
+    np = _np()
+    base = Image.open(img_path).convert("RGB")
+    W, H = base.size
+    face = Image.open(ghost_face_path).convert("RGB")
+    s = int(H * rnd.uniform(0.22, 0.32))
+    face = face.resize((int(s * face.width / face.height), s))
+    gray = np.asarray(base.convert("L"), dtype="float32")
+    best, pos = 1e9, (0, 0)
+    for x in (int(W * 0.04), int(W * 0.5 - face.width / 2), int(W * 0.96 - face.width)):
+        for y in (int(H * 0.05), int(H * 0.3)):
+            v = gray[y:y + face.height, x:x + face.width].mean()
+            if v < best:
+                best, pos = v, (x, y)
+    region = base.crop((pos[0], pos[1], pos[0] + face.width, pos[1] + face.height))
+    a = np.asarray(region, dtype="float32")
+    b = np.asarray(face, dtype="float32")
+    screen = 255 - (255 - a) * (255 - b) / 255                  # black parts of the face vanish
+    hh, ww = a.shape[:2]                                         # soft oval edge: no visible box
+    yy, xx = np.mgrid[0:hh, 0:ww]
+    r = np.sqrt(((xx - ww / 2) / (ww / 2)) ** 2 + ((yy - hh / 2) / (hh / 2)) ** 2)
+    mask = (np.clip(1.0 - r, 0, 1) ** 0.8)[..., None] * strength
+    mix = a * (1 - mask) + screen * mask
+    base.paste(Image.fromarray(mix.clip(0, 255).astype("uint8")), pos)
+    base.save(out, quality=93)
+    return out
+
+
+def announcement_card(base_img, font_path, line1, line2, out, colors=((255, 230, 0), (200, 0, 20))):
+    W, H = 1080, 1080
+    img = Image.open(base_img).convert("RGB")
+    s = max(W / img.width, H / img.height)
+    img = img.resize((int(img.width * s), int(img.height * s)))
+    l, t = (img.width - W) // 2, (img.height - H) // 2
+    img = img.crop((l, t, l + W, t + H)).filter(ImageFilter.GaussianBlur(10))
+    img = Image.blend(img, Image.new("RGB", (W, H), (0, 0, 0)), 0.45)
+    d = ImageDraw.Draw(img)
+    lines, f, size = _fit_text(d, line1, font_path, W - 120, 120)
+    y = 330
+    for l1 in lines:
+        tw = d.textlength(l1, font=f)
+        d.text(((W - tw) / 2, y), l1, font=f, fill=colors[0], stroke_width=max(6, size // 12), stroke_fill=(0, 0, 0))
+        y += int(size * 1.3)
+    cl, cf, cs = _fit_text(d, line2, font_path, W - 200, 80, lines_max=1)
+    tw = d.textlength(cl[0], font=cf)
+    y += 40
+    d.rounded_rectangle([(W - tw) / 2 - 40, y - 16, (W + tw) / 2 + 40, y + cs * 1.35 + 10], radius=30,
+                        fill=colors[1], outline=(255, 255, 255), width=4)
+    d.text(((W - tw) / 2, y), cl[0], font=cf, fill=(255, 255, 255))
+    img.save(out, quality=92)
+    return out
+
+
+# ----------------------------------------------------------------- festivals
+# (start, end, name, cartoon story idea, horror story idea). Month-day rows repeat every year.
+FESTIVALS = [
+    ("2026-10-18", "2026-10-21", "Durga Puja", "Ma Durga comes home for Durga Puja and blesses a poor village girl", None),
+    ("2026-10-25", "2026-10-26", "Kojagari Lakshmi Puja", "Ma Lakshmi visits the house that stays awake on Kojagari Purnima", None),
+    ("2026-11-07", "2026-11-07", "Bhoot Chaturdashi", "the fourteen lamps of Bhoot Chaturdashi and the kind ancestor spirits",
+     "Bhoot Chaturdashi night: fourteen lamps, fourteen ghosts, and the one lamp that went out"),
+    ("2026-11-08", "2026-11-08", "Kali Puja / Diwali", "Ma Kali's blessing and the Diwali lamp for a lonely grandmother",
+     "Kali Puja amavasya night at an old cremation-ground temple"),
+    ("2027-02-11", "2027-02-11", "Saraswati Puja", "Ma Saraswati blesses a poor student who loves to learn", None),
+    ("2027-03-06", "2027-03-06", "Maha Shivaratri", "Lord Shiva and the hunter who kept awake all night on Shivaratri",
+     "Shivaratri night at a lonely forest Shiva temple"),
+    ("2027-03-10", "2027-03-10", "Sri Ramakrishna's birthday", "Sri Ramakrishna and Ma Kali at Dakshineswar", None),
+    ("2027-03-22", "2027-03-22", "Holi / Dol Purnima", "Krishna and Radha play Holi (Dol) in Vrindavan", None),
+    ("2027-04-15", "2027-04-15", "Ram Navami", "the birth of Lord Rama in Ayodhya", None),
+    ("--10-31", "--10-31", "Halloween", None, "Halloween night party in an old British bungalow"),
+    ("--11-14", "--11-14", "Children's Day", "Chacha Nehru's love for children and a school's Children's Day surprise", None),
+    ("--12-25", "--12-25", "Christmas", "Christmas gift for the poor shoeshine boy", None),
+    ("--01-01", "--01-01", "New Year", "a little girl's New Year promise to be kind every day", None),
+    ("--01-12", "--01-12", "Swami Vivekananda's birthday", "young Naren (Swami Vivekananda) and his fearless courage", None),
+    ("--01-23", "--01-23", "Netaji Jayanti", "little Subhas and his brave honest heart", None),
+    ("--01-26", "--01-26", "Republic Day", "the children who saved the village flag on Republic Day", None),
+    ("--04-14", "--04-15", "Poila Baishakh / Nobo Borsho", "Poila Baishakh new year at the village fair", None),
+    ("--05-09", "--05-09", "Rabindra Jayanti", "a little boy who loved poems like Rabindranath Tagore", None),
+    ("--08-15", "--08-15", "Independence Day", "the little freedom fighter of the village", None),
+    ("--09-05", "--09-05", "Teachers' Day", "the teacher who never gave up on the naughtiest student", None),
+    ("--10-02", "--10-02", "Gandhi Jayanti", "Bapu's lesson of truth and the honest little boy", None),
+]
+
+
+def festival_today(kind):
+    """Story idea for today's festival (kind = 'cartoon' or 'horror'), using India time."""
+    now = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).date()
+    for st, en, name, cartoon, horror in FESTIVALS:
+        if st.startswith("--"):
+            s = dt.date(now.year, int(st[2:4]), int(st[5:7]))
+            e = dt.date(now.year, int(en[2:4]), int(en[5:7]))
+        else:
+            s, e = dt.date.fromisoformat(st), dt.date.fromisoformat(en)
+        idea = cartoon if kind == "cartoon" else horror
+        if idea and s <= now <= e:
+            return name, idea
+    return None
+
+
+# ----------------------------------------------------------------- viewers vote for the ending
+def comment_texts(fb_id=None, yt_id=None):
+    texts = []
+    if fb_id and env("FB_PAGE_TOKEN"):
+        try:
+            url, params = f"{GRAPH}/{fb_id}/comments", {"fields": "message", "limit": 100,
+                                                        "access_token": env("FB_PAGE_TOKEN")}
+            for _ in range(5):
+                r = requests.get(url, params=params, timeout=30).json()
+                texts += [c.get("message", "") for c in r.get("data", [])]
+                nxt = (r.get("paging") or {}).get("next")
+                if not nxt:
+                    break
+                url, params = nxt, None
+        except Exception as e:
+            log("  Facebook comments:", str(e)[:120])
+    if yt_id and env("YT_REFRESH_TOKEN"):
+        try:
+            hdr = yt_token()
+            r = requests.get(f"{YT}/commentThreads", headers=hdr, params={
+                "part": "snippet", "videoId": yt_id, "maxResults": 100, "textFormat": "plainText"}, timeout=30)
+            if r.ok:
+                texts += [i["snippet"]["topLevelComment"]["snippet"].get("textDisplay", "")
+                          for i in r.json().get("items", [])]
+        except Exception as e:
+            log("  YouTube comments:", str(e)[:120])
+    return texts
+
+
+def count_votes(texts):
+    """Counts comments that answer 1 or 2 (also Bengali ১/২ and Hindi १/२)."""
+    one, two = set("1১१"), set("2২२")
+    v1 = v2 = 0
+    for t in texts:
+        s = str(t).strip()
+        digits = [c for c in s if c in one | two]
+        if not digits:
+            continue
+        if digits[0] in one:
+            v1 += 1
+        else:
+            v2 += 1
+    return v1, v2
+
+
+# ----------------------------------------------------------------- English subtitles (YouTube)
+def write_srt(segs, translations, path):
+    """segs: [(start, dur, is_narrator, text)]; translations: {original text: English}."""
+    rows, k = [], 0
+
+    def ts(x):
+        ms = int(round(x * 1000))
+        return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+    for st, du, _, text in segs:
+        en = translations.get(str(text).strip())
+        if not en:
+            continue
+        k += 1
+        rows.append(f"{k}\n{ts(st)} --> {ts(st + du)}\n{en}\n")
+    if k < 3:
+        return None
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(rows))
+    return path
+
+
+def yt_upload_captions(video_id, srt_path, language="en", name="English"):
+    hdr = yt_token()
+    meta = json.dumps({"snippet": {"videoId": video_id, "language": language, "name": name, "isDraft": False}})
+    with open(srt_path, "rb") as f:
+        body = f.read()
+    boundary = "story-bot-boundary"
+    data = (f"--{boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{meta}\r\n"
+            f"--{boundary}\r\nContent-Type: application/octet-stream\r\n\r\n").encode() + body + f"\r\n--{boundary}--".encode()
+    r = requests.post("https://www.googleapis.com/upload/youtube/v3/captions",
+                      params={"part": "snippet", "uploadType": "multipart"},
+                      headers={**hdr, "Content-Type": f"multipart/related; boundary={boundary}"}, data=data, timeout=120)
+    if not r.ok:
+        raise RuntimeError(_yt_err(r))
+    return r.json().get("id")
+
+
+# ----------------------------------------------------------------- "coming soon" post before a video
+IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
+TIME_WORDS = {"bn": {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়", 21: "রাত ৯টায়"},
+              "hi": {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे", 21: "रात 9 बजे"}}
+DAY_WORDS = {"bn": ("আজ", "কাল"), "hi": ("आज", "कल")}
+
+
+def next_slot(slots, announce_slots, lead_hours=2):
+    """Next video time (India time) that should be announced, and when to publish the announcement."""
+    now = dt.datetime.now(IST)
+    for add in range(0, 3):
+        day = (now + dt.timedelta(days=add)).date()
+        for h in sorted(slots):
+            slot = dt.datetime(day.year, day.month, day.day, h, 0, tzinfo=IST)
+            if slot <= now + dt.timedelta(minutes=90):
+                continue
+            if h not in announce_slots:
+                return None
+            when = slot - dt.timedelta(hours=lead_hours)
+            if when < now + dt.timedelta(minutes=20):
+                return None
+            return slot, when, (0 if slot.date() == now.date() else 1)
+    return None
+
+
+def fb_schedule_photo(image, message, when):
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    with open(image, "rb") as f:
+        r = requests.post(f"{GRAPH}/{page}/photos", data={
+            "message": message, "published": "false", "scheduled_publish_time": str(int(when.timestamp())),
+            "access_token": token}, files={"source": ("card.jpg", f, "image/jpeg")}, timeout=120).json()
+    if not r.get("id"):
+        raise RuntimeError(str(r)[:300])
+    return r["id"]
+
+
+# ----------------------------------------------------------------- weekly compilation
+def fb_video_source(video_id):
+    r = requests.get(f"{GRAPH}/{video_id}", params={"fields": "source,length,title",
+                                                     "access_token": env("FB_PAGE_TOKEN")}, timeout=30).json()
+    return r.get("source"), float(r.get("length") or 0)
+
+
+def download(url, path):
+    with requests.get(url, stream=True, timeout=600) as r:
+        r.raise_for_status()
+        with open(path, "wb") as f:
+            for chunk in r.iter_content(1 << 20):
+                f.write(chunk)
+    return path
+
+
+def normalize_clip(src, dst, w=1280, h=720, fps=25):
+    _run(["ffmpeg", "-y", "-i", src, "-vf", f"scale={w}:{h}:force_original_aspect_ratio=decrease,"
+          f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,fps={fps},format=yuv420p", "-c:v", "libx264", "-preset", "veryfast",
+          "-crf", "24", "-maxrate", "3000k", "-bufsize", "6000k", "-c:a", "aac", "-b:a", "160k", "-ar", "44100",
+          "-ac", "2", dst])
+    return dst
+
+
+def collage(frames, out, size=(1280, 720)):
+    W, H = size
+    img = Image.new("RGB", (W, H), (0, 0, 0))
+    frames = frames[:4] or []
+    if not frames:
+        img.save(out)
+        return out
+    cols = 2 if len(frames) > 1 else 1
+    rows = 2 if len(frames) > 2 else 1
+    cw, ch = W // cols, H // rows
+    for i, fp in enumerate(frames[:cols * rows]):
+        im = Image.open(fp).convert("RGB")
+        s = max(cw / im.width, ch / im.height)
+        im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1))
+        l, t = (im.width - cw) // 2, (im.height - ch) // 2
+        img.paste(im.crop((l, t, l + cw, t + ch)), ((i % cols) * cw, (i // cols) * ch))
+    img.save(out, quality=92)
+    return out

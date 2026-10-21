@@ -1,0 +1,43 @@
+name: Animation demo (posts nothing)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install video tools and fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-core libraqm0 libfribidi0 > /dev/null
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python packages
+        run: pip install -q requests pillow edge-tts gTTS numpy scipy opencv-python-headless "rembg[cpu]" "mediapipe==0.10.14"
+
+      - name: Make the demo video
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID_2: ${{ secrets.CF_ACCOUNT_ID_2 }}
+          CF_API_TOKEN_2: ${{ secrets.CF_API_TOKEN_2 }}
+          GEMINI_TTS_KEY: ${{ secrets.GEMINI_TTS_KEY }}
+          GEMINI_TTS_KEY_2: ${{ secrets.GEMINI_TTS_KEY_2 }}
+          GEMINI_TTS_KEY_3: ${{ secrets.GEMINI_TTS_KEY_3 }}
+        run: python demo_walk.py
+
+      - name: Save the demo video for download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: animation-demo
+          path: |
+            work/demo_walk.mp4
+            work/pic_*.jpg

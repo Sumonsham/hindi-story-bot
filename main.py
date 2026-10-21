@@ -60,7 +60,7 @@ LANGS = {
                    "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख",
                    "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
                    "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
-                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला"},
+                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला", "gopal": "गोपाल भांड की कहानी"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
         "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
         "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
@@ -93,7 +93,7 @@ LANGS = {
                    "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা",
                    "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
                    "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
-                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা"},
+                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা", "gopal": "গোপাল ভাঁড়ের গল্প"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
         "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
         "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
@@ -132,8 +132,17 @@ CATEGORIES = {
                "Ma Saraswati blesses a poor student", "Behula's devotion and Ma Manasa",
                "Chaitanya Mahaprabhu's kirtan in Nabadwip", "Lord Vishnu as Vamana and King Bali"],
     # clever-wit folk anecdotes (centuries-old, public domain) - retold in our own words
-    "witty": ["Gopal Bhar and the king's impossible challenge", "Gopal Bhar outsmarts a greedy moneylender",
-              "Birbal and the emperor's tricky question", "Birbal finds the real thief with sticks",
+    # Gopal Bhar of Krishnanagar - centuries-old Bengali folk anecdotes (public domain), told in our own words
+    "gopal": ["the king's impossible challenge: bring milk from a bull", "Gopal outsmarts a greedy moneylender",
+              "Gopal counts all the crows of Krishnanagar", "how many stars are in the sky? Gopal's clever answer",
+              "Gopal and the jealous courtiers' trap", "Gopal sells 'magic' sweets to a boastful merchant",
+              "Gopal teaches the miser zamindar to share", "the king's elephant that would not eat",
+              "Gopal wins the riddle contest against a proud visiting pandit", "Gopal finds the middle of the earth",
+              "Gopal saves a poor farmer's land", "the hot rasgulla eating race at court",
+              "Gopal and the king's lost golden ring", "Gopal cures the king's laziness",
+              "Gopal and the 'talking' parrot that told the truth", "Gopal's wife and the missing fish curry",
+              "Gopal and the king's dream of a golden mango tree", "Gopal turns the king's punishment into a reward"],
+    "witty": ["Birbal and the emperor's tricky question", "Birbal finds the real thief with sticks",
               "Tenali Raman and the boastful scholar", "Tenali Raman saves the royal garden",
               "a clever village girl solves the minister's riddle", "the wise judge and two mothers"],
     "fairy": ["a little fairy who lost her wings", "the fairy of the lotus pond grants three wishes",
@@ -377,6 +386,19 @@ def make_story(lang, theme, history, extra_rules=""):
                   "form (e.g. Krishna: blue skin, peacock feather, yellow dhoti, flute; Shiva: calm, blue throat, "
                   "crescent moon, Ganga in his hair; Ma Kali: gentle loving mother form, no weapons, no heads; "
                   "Jagannath: the traditional big round eyes and dark face) with a soft divine golden glow.",
+        "gopal": "This is a Gopal Bhar story: the witty, kind-hearted jester at the 18th-century court of Raja "
+                 "Krishnachandra of Krishnanagar, Bengal (a centuries-old folk character - retell the anecdote idea "
+                 "in your OWN words with new dialogue and a fresh twist). Clean, clever, laugh-out-loud humour; "
+                 "Gopal wins with wit, never by being mean; the poor and the honest are never mocked; the king "
+                 "laughs and rewards him in the end. Use EXACTLY these two characters (same names and looks every "
+                 "time) plus 1-2 others if needed: {\"name\": \"Gopal\", \"gender\": \"male\", \"age\": \"adult\", "
+                 "\"kind\": \"human\", \"look\": \"round, plump, cheerful Bengali man, clean-shaven round face, big "
+                 "bright eyes, small black tuft of hair (tiki) on a shaved head, short yellow kurta, white dhoti, red "
+                 "gamchha scarf on the shoulder, barefoot\"} and {\"name\": \"Raja\", \"gender\": \"male\", "
+                 "\"age\": \"adult\", \"kind\": \"human\", \"look\": \"kind plump king, small curled moustache, "
+                 "golden turban with a pearl, maroon royal robe with gold border, pearl necklace\"}. "
+                 "Not the TV cartoon design - our own look as described. Gopal walks into the court or the village "
+                 "2-3 times (say 'Gopal walks in from the left' in that picture prompt).",
         "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
                 "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
                 "It must teach a clear life lesson and gently touch the heart.",

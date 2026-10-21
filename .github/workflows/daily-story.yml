@@ -2,11 +2,11 @@ name: Daily Hindi Story
 
 on:
   schedule:
-    # The main start comes from cron-job.org at 7:55 AM, 12:55 PM and 6:55 PM India time (on time).
+    # The main start comes from cron-job.org at 6:55 AM, 11:55 AM and 5:55 PM India time (videos out ~8, ~1, ~7).
     # These GitHub times are only a backup - they post nothing if the video is already out.
-    - cron: "10 3 * * *"    # backup ~8:40 AM India time
-    - cron: "10 8 * * *"    # backup ~1:40 PM India time
-    - cron: "10 14 * * *"   # backup ~7:40 PM India time
+    - cron: "10 2 * * *"    # backup ~7:40 AM India time
+    - cron: "10 7 * * *"    # backup ~12:40 PM India time
+    - cron: "10 13 * * *"   # backup ~6:40 PM India time
     - cron: "30 4 * * 0"    # Sunday 10:00 AM India time: weekly long compilation video
   workflow_dispatch:        # lets you press "Run workflow" to test any time
     inputs:

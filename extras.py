@@ -1326,6 +1326,8 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
                         kind, wait = _429_kind(r)
                         if kind == "minute" and waits < 4:
                             waits += 1
+                            if waits == 1:
+                                log(f"    per-minute voice limit - waiting {min(wait, 65):.0f}s")
                             time.sleep(min(wait, 65) + 1)
                             continue
                         break                                    # daily limit of this model -> next model

@@ -851,6 +851,11 @@ def _voice_all(todo, make, label, max_minutes):
             log(f"  {label} stopped at line {k + 1}/{len(todo)}")
             break
         GEMINI_CACHE[(i, j)] = p
+        if k == 0 or (k + 1) % 5 == 0:
+            log(f"  {label}: {k + 1}/{len(todo)} lines done ({(time.time() - t0) / 60:.1f} min)")
+        if k >= 2 and (time.time() - t0) / (k + 1) * len(todo) > max_minutes * 60:
+            log(f"  {label} too slow to finish the whole video today")
+            break
     else:
         GEMINI_READY = True
         log(f"  all {len(todo)} lines voiced by {label} in {(time.time() - t0) / 60:.1f} min")

@@ -58,8 +58,10 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -n "$HF_TOKEN" ]; then
-            pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+            # torch + torchaudio must be the SAME matching CPU versions, installed together first
+            pip install -q torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cpu
             pip install -q git+https://github.com/huggingface/parler-tts.git soundfile
+            python -c "import torch, torchaudio; from parler_tts import ParlerTTSForConditionalGeneration; print('free voice model ready', torch.__version__)"
           else
             echo "HF_TOKEN not set - free voice model skipped"
           fi

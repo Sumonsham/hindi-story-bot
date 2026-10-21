@@ -32,6 +32,7 @@ import time
 import wave
 
 import requests
+import extras
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 # ----------------------------------------------------------------- settings
@@ -61,6 +62,8 @@ LANGS = {
                    "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
                    "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
+        "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
+        "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
     },
     "bn": {
         "name": "Bengali", "script": "Bengali",
@@ -79,6 +82,8 @@ LANGS = {
                    "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
                    "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
+        "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
+        "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
     },
 }
 
@@ -243,7 +248,7 @@ def pick_theme(history):
     """Rotate story types so posts in a day are usually different kinds."""
     recent = [h.get("category") for h in history[-2:]]
     options = [c for c in CATEGORIES if c not in recent] or list(CATEGORIES)
-    cat = random.choice(options)
+    cat = extras.weighted_choice(options, extras.weights(history, "category", options))
     return cat, random.choice(CATEGORIES[cat])
 
 
@@ -359,8 +364,11 @@ Return ONLY JSON with exactly these keys:
                            "characters": ["names VISIBLE in this picture; [] if only a place or object is shown"]}}}}]
  }}],
  "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
- "ending_line": "one short sweet {L['name']} closing line from the narrator"
+ "ending_line": "one short sweet {L['name']} closing line from the narrator",
+ "comment_question": "one short friendly {L['name']} question to viewers that makes them comment (e.g. 'तुम होते तो क्या करते?'), with 1 emoji",
+ "teaser_scene": "number: the scene (1 = first) where the most fun/exciting 50 seconds START - used for the Reel/Short teaser"
 }}
+Every scene object also has "chapter": "2-4 word {L['name']} chapter name for YouTube chapters".
 """
     body = {"contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 1.0, "responseMimeType": "application/json",
@@ -1616,12 +1624,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f.write(head + "\n".join(rows) + "\n")
 
 
+TIMELINE = ([], [])          # (start second of every part, every spoken line) of the last video
+BADGE_COLORS = ((255, 60, 120), (255, 255, 255))
+
+
 def build_video(scene_parts, lang, out):
     """scene_parts: list of dict(image, lines, sounds, mood). Returns mp4 path."""
-    clips, segs, t, wavs = [], [], 0.0, []
+    global TIMELINE
+    clips, segs, t, wavs, part_times = [], [], 0.0, [], []
     voices = scene_parts[0]["voices"]
     for i, sp in enumerate(scene_parts):
         log(f"Voices + sound + clip {i + 1}/{len(scene_parts)}")
+        part_times.append(t)
         a = os.path.join(WORK, f"audio_{i:02d}.wav")
         wavs.append(a)
         d, subs = make_scene_audio(sp["lines"], voices, lang, i, sp.get("sounds"), sp.get("mood", "creepy"), a,
@@ -1649,8 +1663,16 @@ def build_video(scene_parts, lang, out):
     write_ass(segs, os.path.join(WORK, "subs.ass"), LANGS[lang]["font_family"])
     vf = f"ass=subs.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex,tpad=stop_mode=clone:stop_duration=3"
     total = duration(os.path.join(WORK, "full.wav"))
-    r = subprocess.run(["ffmpeg", "-y", "-i", "joined.mp4", "-i", "full.wav", "-map", "0:v", "-map", "1:a",
-                        "-t", f"{total:.2f}", "-vf", vf, "-c:v", "libx264", "-preset", "medium",
+    TIMELINE = (part_times, segs)
+    try:                                   # small "Like - Share - Follow" pill, top right, at the start and the end
+        extras.make_badge(FONT, LANGS[lang]["badge"], os.path.join(WORK, "badge.png"), BADGE_COLORS)
+        pic = ["-i", "badge.png", "-filter_complex",
+               f"[0:v]{vf}[b];[b][2:v]overlay=W-w-24:22:enable='{extras.badge_filter(total)}'[v]", "-map", "[v]"]
+    except Exception as e:
+        log("  badge skipped:", str(e)[:120])
+        pic = ["-vf", vf, "-map", "0:v"]
+    r = subprocess.run(["ffmpeg", "-y", "-i", "joined.mp4", "-i", "full.wav"] + pic + ["-map", "1:a",
+                        "-t", f"{total:.2f}", "-c:v", "libx264", "-preset", "medium",
                         "-crf", "23", "-maxrate", "3500k", "-bufsize", "7000k", "-c:a", "aac", "-b:a", "192k", "-ac", "2", "-movflags", "+faststart",
                         os.path.abspath(out)], capture_output=True, text=True, cwd=WORK)
     if r.returncode != 0:
@@ -1748,6 +1770,8 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
     if not up.ok:
         raise RuntimeError("YouTube upload failed: " + up.text[:400])
     vid = up.json()["id"]
+    if not thumb:
+        return vid
     try:
         with open(thumb, "rb") as f:
             t = requests.post(f"https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={vid}",
@@ -1808,6 +1832,11 @@ def main():
     if (env("EVENT") == "schedule" or env("MODE") == "auto") and recently_posted(history, hours=4):
         log("A video for this time slot was already posted - this backup run has nothing to do.")
         return
+    if not MOCK:
+        try:
+            extras.refresh_stats(history)            # learn which kinds of stories people liked
+        except Exception as e:
+            log("  stats skipped:", str(e)[:150])
     lang = pick_language(history)
     L = LANGS[lang]
     FONT = find_font(lang)
@@ -1909,6 +1938,10 @@ def main():
     source = ascii_text(story.get("source", ""))
     description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
                    + (f"📖 {source}\n" if source else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
+    part_times, segs = TIMELINE
+    chap = extras.chapters_text(part_times, [L["ch_intro"]] + [sc.get("chapter") or f"{k + 1}" for k, sc in
+                                                                 enumerate(scenes)] + [L["ch_end"]], L["chapters"])
+    yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
 
     results = {}
     if DRY_RUN:
@@ -1922,7 +1955,7 @@ def main():
             results["facebook_error"] = str(e)[:200]
         if youtube_ready():
             try:
-                results["youtube"] = post_to_youtube(video, thumb, title, description, tags, lang)
+                results["youtube"] = post_to_youtube(video, thumb, title, yt_description, tags, lang)
                 log("Posted to YouTube:", results["youtube"])
             except Exception as e:
                 log("YOUTUBE FAILED:", e)
@@ -1932,10 +1965,58 @@ def main():
         if not results.get("facebook") and not results.get("youtube"):
             raise SystemExit("Posting failed everywhere - see messages above.")
 
+    results.update(grow(video, story, title, lang, L, category, tags, results, history, page))
+
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
                     "category": category, "title": title, **results})
     if not MOCK:
         save_history(history)
+
+
+def grow(video, story, title, lang, L, category, tags, results, history, page):
+    """Extra reach after the main post: Reel + Short teaser, first comment, playlist. Never stops the run.
+    (Kids videos on YouTube have comments switched off by YouTube, so the question goes only to Facebook.)"""
+    out = {}
+    part_times, segs = TIMELINE
+    teaser = os.path.join(WORK, "teaser.mp4")
+    try:
+        st, en = extras.pick_window(segs, part_times, story.get("teaser_scene") or 2)
+        extras.make_teaser(video, st, en, teaser, FONT, story.get("thumbnail_text") or title, L["cta"], WORK,
+                           colors=((255, 225, 0), (255, 60, 120)))
+        log(f"Teaser ready ({en - st:.0f} s, from {st:.0f} s)")
+    except Exception as e:
+        log("  teaser skipped:", str(e)[:200])
+        teaser = None
+    if DRY_RUN:
+        return out
+    question = str(story.get("comment_question", "")).strip()
+    short_desc = f"{title}\n{L['full_link']} {page}\n{' '.join(tags[:6])}"
+    if teaser and env("FB_REELS") != "0":
+        try:
+            out["fb_reel"] = extras.fb_post_reel(teaser, short_desc)
+            log("Posted Facebook Reel:", out["fb_reel"])
+        except Exception as e:
+            log("  Facebook Reel skipped:", str(e)[:200])
+    if results.get("youtube"):
+        try:
+            extras.yt_add_to_playlist(results["youtube"], f"{L['labels'][category]} | {L['playlist_tail']}", lang)
+            log("  added to YouTube playlist")
+        except Exception as e:
+            log("  playlist skipped:", str(e)[:200])
+        if teaser and env("YT_SHORTS") != "0" and extras.shorts_today(history) < int(env("YT_SHORTS_PER_DAY") or 2):
+            try:
+                desc = f"{title}\n{L['full_link']} https://youtu.be/{results['youtube']}\n{' '.join(tags[:6])}"
+                out["yt_short"] = post_to_youtube(teaser, None, f"{title[:80]} #Shorts", desc, tags, lang)
+                log("Posted YouTube Short:", out["yt_short"])
+            except Exception as e:
+                log("  YouTube Short skipped:", str(e)[:200])
+    if question and results.get("facebook"):
+        try:
+            extras.fb_comment(results["facebook"], question)
+            log("  first comment posted on Facebook")
+        except Exception as e:
+            log("  Facebook comment skipped (needs pages_manage_engagement):", str(e)[:160])
+    return out
 
 
 # ----------------------------------------------------------------- offline test helpers

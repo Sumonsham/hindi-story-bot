@@ -259,8 +259,12 @@ def yt_add_to_playlist(video_id, playlist_title, lang):
             raise RuntimeError(_yt_err(r))
         pid = r.json()["id"]
         log(f"  new YouTube playlist: {playlist_title}")
-    r = requests.post(f"{YT}/playlistItems", headers=hdr, params={"part": "snippet"}, json={
-        "snippet": {"playlistId": pid, "resourceId": {"kind": "youtube#video", "videoId": video_id}}}, timeout=30)
+    for attempt in range(4):        # a brand-new playlist needs a few seconds before videos can be added
+        r = requests.post(f"{YT}/playlistItems", headers=hdr, params={"part": "snippet"}, json={
+            "snippet": {"playlistId": pid, "resourceId": {"kind": "youtube#video", "videoId": video_id}}}, timeout=30)
+        if r.ok or r.status_code not in (409, 500, 503):
+            break
+        time.sleep(10 * (attempt + 1))
     if not r.ok:
         raise RuntimeError(_yt_err(r))
     return pid

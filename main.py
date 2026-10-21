@@ -402,6 +402,8 @@ Story rules:
 - Think like a cartoon film director: every line gets its own PICTURE that shows exactly what that line says
   (who, doing what, where). The picture must match the words - if the line says the crow drops a stone in the
   pot, the picture shows the crow dropping a stone in the pot.
+  When a character arrives somewhere, say it in that line's picture prompt, e.g. "Gopal walks in from the left"
+  (the video then shows them walking in). Do this 2-4 times in the story, at natural moments.
 - SOUND DESIGN like a children's audio drama: when a line mentions an action or a thing that makes a sound
   (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
   put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
@@ -1646,6 +1648,20 @@ def _layers_for(img):
         bg, fg = layers
         d["fg_a"] = fg[..., 3].astype("float32") / 255.0
         d["fg"] = cv2.cvtColor(fg[..., :3], cv2.COLOR_RGB2BGR).astype("float32")
+        d["fg_rgb"] = fg[..., :3].astype("float32")
+        ys_, xs_ = np.nonzero(d["fg_a"] > 0.5)
+        bw_, bh_ = xs_.max() - xs_.min() + 1, ys_.max() - ys_.min() + 1
+        # only a standing, full-body figure may walk (never someone sitting on a chair or a cushion)
+        d["can_walk"] = bool(bh_ > 1.15 * bw_ and ys_.max() > 0.82 * H and bh_ > 0.45 * H)
+        d["foot"], d["fig_h"] = (float(xs_.mean()), float(ys_.max())), float(bh_)
+        d["faces"] = []
+        if env("FACE_ANIM") != "0":
+            try:                                      # eyes + mouth for blinking and talking
+                import animate
+                d["faces"] = sorted(animate.find_faces(np.ascontiguousarray(fg[..., :3])),
+                                    key=lambda f_: -f_["mouth"][2])
+            except Exception as e:
+                log(f"  face animation skipped: {str(e)[:100]}")
         ys, xs = np.nonzero(d["fg_a"] > 0.5)
         d["cx"], d["cy"] = float(xs.mean()), float(ys.max())
         d["head"] = float(ys.min() + 0.28 * (ys.max() - ys.min()))
@@ -1676,10 +1692,34 @@ def plan_shots(segments, total):
     return out
 
 
-def scene_clip_animated(segments, audio, out, idx, mood):
+def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
+    """talk: [(start, end, silent, emotion, text)] - when characters speak (mouth moves in sync with the words)."""
     np = _np()
     import cv2
     dur = duration(audio)
+    talk = talk or []
+    try:
+        import animate
+        voice_env = animate.voice_envelope(audio, FPS)
+    except Exception:
+        animate, voice_env = None, None
+    brnd = np.random.default_rng(idx + 900)
+    blinks, bt = [], brnd.uniform(0.8, 2.5)
+    while bt < dur:                                # a blink every 2.5-5 seconds ...
+        blinks.append(bt)
+        bt += brnd.uniform(2.5, 5.0)
+    blinks += [tl[0] + 0.05 for tl in talk]        # ... and when someone starts to speak
+    looks, lt = [], 0.0                            # small natural eye movements
+    while lt < dur:
+        looks.append((lt, brnd.uniform(-0.35, 0.35), brnd.uniform(-0.2, 0.2)))
+        lt += brnd.uniform(1.2, 3.0)
+    gaze_now = [0.0, 0.0]
+    walks = walks or {}
+    first_start = {}
+    for (im_, st_, en_, cl_) in plan_shots(segments, dur):
+        first_start.setdefault(im_, (st_, en_, cl_))
+    sparks = np.c_[brnd.uniform(0, W, 28), brnd.uniform(0, H, 28), brnd.uniform(1.5, 3.5, 28),
+                   brnd.uniform(8, 22, 28), brnd.uniform(0, 6.28, 28)]
     n = int(dur * FPS) + 1
     shots = plan_shots(segments, dur)
     rnd = np.random.default_rng(idx + 50)
@@ -1715,15 +1755,88 @@ def scene_clip_animated(segments, audio, out, idx, mood):
             Mb = cv2.getRotationMatrix2D((fx, fy), 0, bz)
             Mb[0, 2] += (W / 2 - fx) * (bz - 1) / bz * (1 if close else 0) + direction * (ease - 0.5) * 22 + shake
             Mb[1, 2] += (H / 2 - fy) * (bz - 1) / bz * (1 if close else 0) + shake * 0.6
-            frame = cv2.warpAffine(L["bg"], Mb, (W, H), borderMode=cv2.BORDER_REFLECT).astype("float32")
+            bg_src = _clean_bg(WALK_BG[img]) if img in WALK_BG and L.get("can_walk") else L["bg"]
+            frame = cv2.warpAffine(bg_src, Mb, (W, H), borderMode=cv2.BORDER_REFLECT).astype("float32")
             if "fg" in L:
+                mouth, emo, shape, speaking = 0.0, "", "a", False
+                for (ta, tb, nar, em, tx) in talk:
+                    if ta <= sec < tb:
+                        emo = str(em or "").lower()
+                        if not nar and voice_env is not None and f < len(voice_env):
+                            mouth, speaking = float(voice_env[f]), True
+                            if animate is not None:
+                                shape = animate.viseme_at(tx, sec - ta, tb - ta)
+                                if shape == "m":
+                                    mouth = 0.0
+                        break
+                # where the eyes look: at the camera while speaking, otherwise towards the middle of the
+                # picture (the other character), with small glances; down when sad, darting when scared
+                lx, ly = 0.0, 0.0
+                for (t0_, gx_, gy_) in looks:
+                    if t0_ <= sec:
+                        lx, ly = gx_, gy_
+                if not speaking and L.get("faces"):
+                    lx += 0.45 if L["faces"][0]["mouth"][0] < W / 2 else -0.45
+                if emo in ("sad", "crying"):
+                    ly = 0.6
+                elif emo == "scared":
+                    lx = 0.6 * math.sin(sec * 9)
+                gaze_now[0] += (lx - gaze_now[0]) * 0.35
+                gaze_now[1] += (ly - gaze_now[1]) * 0.35
+                blink = 0.0
+                for b0 in blinks:
+                    if 0 <= sec - b0 < 0.2:
+                        blink = math.sin(math.pi * (sec - b0) / 0.2)
+                hop = tremble = 0.0
+                if emo in ("excited", "laughing", "happy", "proud"):
+                    hop = abs(math.sin(sec * math.pi * 2.6)) * (7 if emo != "proud" else 3)
+                elif emo in ("scared",):
+                    tremble = math.sin(sec * 55) * 1.6
+                elif emo in ("sad", "crying"):
+                    hop = -3.0
+                # walking in: two pictures (left foot / right foot) swapped while the character comes in
+                # from the side, then it stops and talks; puppet bounce if there is no second picture
+                wdx = wb = wt = 0.0
+                LL, align = L, None
+                if (img in walks and L.get("can_walk") and first_start.get(img, (None,))[0] == st and not close
+                        and "lumi_mithu" not in str(img)):
+                    T = min(2.6, max(0.9, (en - st) * 0.55))
+                    u_ = (sec - st) / T
+                    if u_ < 1:
+                        e_ = 1 - (1 - u_) ** 2
+                        wdx = walks[img] * (1 - e_) * W * 0.62
+                        pair = WALK_PAIRS.get(img)
+                        LB = _layers_for(pair) if pair else None
+                        if LB is not None and LB.get("can_walk"):
+                            wb = 3 * abs(math.sin((sec - st) * math.pi * 4.0))
+                            if int((sec - st) * 4) % 2 == 1:            # the other foot
+                                LL = LB
+                                sc = L["fig_h"] / max(1.0, LB["fig_h"])
+                                (ax_, ay_), (bx_, by_) = L["foot"], LB["foot"]
+                                align = np.float32([[sc, 0, ax_ - sc * bx_], [0, sc, ay_ - sc * by_]])
+                        else:
+                            wb = 14 * abs(math.sin((sec - st) * math.pi * 2.0)) * (1 - 0.5 * u_)
+                            wt = 3.0 * math.sin((sec - st) * math.pi * 2.0) * (1 - u_)
+                src = LL["fg"]
+                if animate is not None and LL.get("faces"):
+                    pic = animate.draw_face(LL["fg_rgb"], LL["faces"], blink, 0.0, "a", tuple(gaze_now))
+                    pic = animate.draw_face(pic, LL["faces"][:1], 0.0, mouth, shape)
+                    src = cv2.cvtColor(np.clip(pic, 0, 255).astype("float32"), cv2.COLOR_RGB2BGR)
                 fz = bz * (1.0 + 0.03 * ease) + 0.004 * math.sin(sec * 1.6)
-                Mf = cv2.getRotationMatrix2D((fx, fy), 0.3 * math.sin(sec * 0.9), fz)
-                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * 26 - (fz - bz) * fx
-                Mf[1, 2] = Mb[1, 2] - 2.0 * math.sin(sec * 1.1) - (fz - bz) * fy
-                fgw = cv2.warpAffine(L["fg"], Mf, (W, H))
-                aw = cv2.warpAffine(L["fg_a"], Mf, (W, H))[..., None]
+                Mf = cv2.getRotationMatrix2D((fx, fy), 0.3 * math.sin(sec * 0.9) + wt, fz)
+                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * 26 - (fz - bz) * fx + tremble + wdx
+                Mf[1, 2] = Mb[1, 2] - 2.0 * math.sin(sec * 1.1) - (fz - bz) * fy - hop - 3.0 * mouth - wb
+                if align is not None:                               # put picture B's feet where A's are
+                    Mf = (np.vstack([Mf, [0, 0, 1]]) @ np.vstack([align, [0, 0, 1]]))[:2].astype("float64")
+                fgw = cv2.warpAffine(src, Mf, (W, H))
+                aw = cv2.warpAffine(LL["fg_a"], Mf, (W, H))[..., None]
                 frame = frame * (1 - aw) + fgw * aw
+            if mood in ("happy", "funny") and env("SPARKLES") != "0":   # a few soft floating sparkles
+                glow = np.zeros((H, W), "float32")
+                for x_, y_, r_, sp_, ph_ in sparks:
+                    cv2.circle(glow, (int(x_ + 10 * math.sin(sec * 0.8 + ph_)), int((y_ - sp_ * sec) % H)), int(r_),
+                               float(0.5 + 0.5 * math.sin(sec * 4 + ph_)), -1)
+                frame = frame + cv2.GaussianBlur(glow, (0, 0), 3)[..., None] * np.array([160, 230, 255], "float32") * 0.55
             frame = grade(frame, f, sec, mood, flicker)
             if prev_last is not None and k > 0 and frame_in_shot < XF:
                 a_ = (frame_in_shot + 1) / (XF + 1)
@@ -1768,11 +1881,25 @@ def scene_clip_simple(segments, audio, out, idx, mood):
     return dur
 
 
-def scene_clip(segments, audio, out, idx, mood):
+WALK_PAIRS = {}       # walking picture A (left foot) -> picture B (right foot)
+WALK_BG = {}          # walking picture A -> the same place with nobody in it (the character walks over it)
+_BG_CACHE = {}
+
+
+def _clean_bg(path):
+    if path not in _BG_CACHE:
+        import cv2
+        _BG_CACHE[path] = cv2.cvtColor(_np().array(Image.open(path).convert("RGB").resize((W, H))), cv2.COLOR_RGB2BGR)
+    return _BG_CACHE[path]
+WALK_RE = re.compile(r"\b(walk|walks|walking|walked|enter|enters|entering|arriv\w*|comes|coming|came|runs|running|"
+                     r"ran|approach\w*|hurr\w*|marches|marching|strolls|strolling|steps in|wanders)\b")
+
+
+def scene_clip(segments, audio, out, idx, mood, talk=None, walks=None):
     if env("SIMPLE_MOTION") == "1" or (MOCK and env("TEST_ANIM") != "1"):
         return scene_clip_simple(segments, audio, out, idx, mood)
     try:
-        return scene_clip_animated(segments, audio, out, idx, mood)
+        return scene_clip_animated(segments, audio, out, idx, mood, talk, walks)
     except Exception as e:
         log(f"  animation skipped ({str(e)[:150]}) - simple motion")
         return scene_clip_simple(segments, audio, out, idx, mood)
@@ -1855,7 +1982,22 @@ def build_video(scene_parts, lang, out):
             segments.append((img, 0.0 if k == 0 else max(0.0, st - 0.2)))
         if not segments:
             segments = [(sp["image"], 0.0)]
-        d = scene_clip(segments, a, c, i, sp.get("mood", "creepy"))
+        spoken = [ln for ln in sp["lines"] if str(ln.get("text", "")).strip()]
+        host_part = "lumi_mithu" in str(sp.get("image", ""))      # Lumi Didi's own picture: she is the narrator
+        talk = []
+        for k, (st, du, nar, tx) in enumerate(subs):
+            ln = spoken[k] if k < len(spoken) else {}
+            is_lumi = str(ln.get("speaker", "narrator")).lower().startswith("narrat")
+            silent = (not is_lumi) if host_part else nar          # True = no mouth movement for this line
+            talk.append((st, st + du, silent, ln.get("emotion", ""), tx))
+        walks = {}
+        for k, ln in enumerate(spoken):          # a line whose picture shows someone walking / coming in
+            img_k = shots[k] if k < len(shots) and shots[k] else None
+            pr = ln.get("image") if isinstance(ln.get("image"), dict) else {}
+            words = f"{pr.get('prompt', '')} {ln.get('en', '')}".lower()
+            if img_k and img_k not in walks and WALK_RE.search(words):
+                walks[img_k] = 1 if re.search(r"from (the )?right|to the left", words) else -1
+        d = scene_clip(segments, a, c, i, sp.get("mood", "creepy"), talk, walks)
         segs += [(t + s, du, nar, tx) for s, du, nar, tx in subs]
         clips.append(c)
         t += d
@@ -2114,8 +2256,24 @@ def main():
             action = pic.get("prompt") or first.get("shot") or s.get("action", "")
             names = pic.get("characters") if isinstance(pic.get("characters"), list) else s.get("characters")
             log(f"Picture {count} (scene {i + 1}, shot {g + 1}/{len(groups)})")
+            walking = bool(WALK_RE.search(f"{action} {first.get('en', '')}".lower())) and len(WALK_PAIRS) < int(
+                env("MAX_WALKS") or 2)
+            if walking:
+                action = (f"{action}. Full body, side view, walking, mid-stride with the LEFT leg forward and the "
+                          "right arm forward, feet visible")
             if make_image(cast, action, s.get("place", ""), names, p, seed):
                 last_ok = p
+                if walking:                              # the same moment with the other foot forward
+                    pb = p.replace(".jpg", "_b.jpg")
+                    act_b = action.replace("LEFT leg forward and the right arm", "RIGHT leg forward and the left arm")
+                    log("  second walking picture (other foot)")
+                    if make_image(cast, act_b, s.get("place", ""), names, pb, seed):
+                        WALK_PAIRS[p] = pb
+                        pg = p.replace(".jpg", "_bg.jpg")
+                        log("  empty background for the walk")
+                        if make_image(cast, f"{s.get('place', '')}. Empty place, nobody in the picture, wide shot",
+                                      s.get("place", ""), [], pg, seed):
+                            WALK_BG[p] = pg
             elif scene_shots:
                 p = scene_shots[-1]                      # reuse; the camera move makes it look different
             elif last_ok:

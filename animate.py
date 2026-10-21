@@ -36,15 +36,51 @@ def find_faces(rgb):
                 eyes.append(_eye_parts(img, m))
         (lx, ly), (rx, ry) = P(61), P(291)
         mw = math.hypot(rx - lx, ry - ly)
-        cx, cy = (P(0)[0] + P(13)[0]) / 2, (P(0)[1] + P(13)[1]) / 2
-        lum = img.mean(2)
-        y0 = int(max(0, cy - 8))
-        col = lum[y0:int(cy) + 8, int(min(W - 1, cx))]
-        if col.size:
-            cy = y0 + int(np.argmin(col))                 # sit exactly on the smile line
+        pts = [P(i) for i in (61, 291, 0, 13, 14, 17)]
+        mx, my = float(np.mean([p[0] for p in pts])), float(np.mean([p[1] for p in pts]))
         if mw > 6:
-            out.append({"eyes": eyes, "mouth": (cx, cy, mw)})
+            face = {"eyes": eyes, "mouth": (mx, my, mw), "open": None, "nose_y": P(2)[1]}
+            _find_mouth(img, face)
+            out.append(face)
     return out
+
+
+def _find_mouth(img, face):
+    """Find the REAL mouth drawn in the picture. If it is already open (dark inside / teeth), remember its box -
+    then the picture's own mouth is stretched open and closed (looks natural). If it is a closed smile line,
+    find that line so a mouth opening is drawn exactly on it."""
+    H, W = img.shape[:2]
+    mx, my, mw = face["mouth"]
+    x0, x1 = int(max(0, mx - 1.0 * mw)), int(min(W, mx + 1.0 * mw))
+    y0, y1 = int(max(0, my - 0.7 * mw, face.get("nose_y", 0) + 0.12 * mw)), int(min(H, my + 0.7 * mw))  # below the nose
+    reg = img[y0:y1, x0:x1]
+    if reg.size == 0:
+        return
+    lum = reg.mean(2)
+    skin = float(np.median(lum))
+    r, g, b = reg[..., 0], reg[..., 1], reg[..., 2]
+    inside = (lum < 0.55 * skin) | ((r > g * 1.35) & (lum < 0.8 * skin))      # dark mouth / red-pink tongue
+    n, lab, st, cen = cv2.connectedComponentsWithStats(inside.astype(np.uint8))
+    best, bd = None, 1e9
+    for i in range(1, n):
+        if st[i, 4] < 0.03 * mw * mw:
+            continue
+        ccx, ccy = cen[i]
+        d = math.hypot(ccx + x0 - mx, ccy + y0 - my)
+        if d < bd and d < 0.9 * mw:
+            best, bd = i, d
+    fill = st[best, 4] / max(1, st[best, 2] * st[best, 3]) if best is not None else 0
+    face["_fill"] = fill
+    thick = st[best, 4] / max(1, st[best, 2]) if best is not None else 0     # average height of the dark part
+    if best is not None and st[best, 2] > 0.3 * mw and thick > 0.15 * mw:   # an OPEN mouth (not a thin smile line)
+        bx, by, bw, bh = st[best, :4]
+        face["open"] = (x0 + bx, y0 + by, x0 + bx + bw, y0 + by + bh)
+        face["mouth"] = (x0 + bx + bw / 2, y0 + by, max(mw, bw))
+        return
+    # a closed smile line: keep the middle of the mouth, sit exactly on the darkest point of the line there
+    col = img[int(max(0, my - 0.25 * mw)):int(min(H, my + 0.25 * mw)), int(min(W - 1, mx))].mean(1)
+    if col.size:
+        face["mouth"] = (mx, int(max(0, my - 0.25 * mw)) + int(np.argmin(col)), mw)
 
 
 def _eye_mask(img, e):
@@ -87,14 +123,61 @@ def _eye_parts(img, m):
     feather = cv2.GaussianBlur(m.astype(np.float32) / 255, (0, 0), 1.5)
     y0, y1 = int(max(0, ys.min() - 4)), int(ys.max() + 6)
     x0, x1 = int(X[0]), int(X[-1]) + 1
-    return {"X": X, "top": top, "bot": bot, "box": (x0, y0, x1, y1),
-            "skin": skin[y0:y1, x0:x1], "feather": feather[y0:y1, x0:x1]}
+    d = {"X": X, "top": top, "bot": bot, "box": (x0, y0, x1, y1),
+         "skin": skin[y0:y1, x0:x1], "feather": feather[y0:y1, x0:x1]}
+    # the iris (dark part) separately, so the eyes can look around
+    reg = img[y0:y1, x0:x1]
+    mm = m[y0:y1, x0:x1] > 0
+    lum = reg.mean(2)
+    n, lab, st, cen = cv2.connectedComponentsWithStats(((lum < 90) & mm).astype(np.uint8))
+    if n > 1:
+        k = 1 + int(np.argmax(st[1:, 4]))
+        pcx, pcy = cen[k]
+        r = min(math.sqrt(st[k, 4] / math.pi) * 1.3,           # dark pupil -> iris with its coloured ring
+                0.45 * min(reg.shape[0], reg.shape[1]))
+        yy_, xx_ = np.mgrid[0:reg.shape[0], 0:reg.shape[1]]
+        disk = ((xx_ - pcx) ** 2 + (yy_ - pcy) ** 2) < r * r
+        sat = reg.max(2) - reg.min(2)
+        core = cv2.erode(mm.astype(np.uint8), np.ones((9, 9), np.uint8)) > 0     # stay inside the lash line
+        wm = ((lum > 185) & (sat < 80) & core).astype(np.uint8)
+        ball = np.zeros_like(wm)
+        pts = cv2.findNonZero(wm | (disk & core).astype(np.uint8))
+        if pts is not None:
+            cv2.drawContours(ball, [cv2.convexHull(pts)], -1, 1, -1)   # the eyeball (white + iris), no lashes
+        ball = cv2.erode(ball, np.ones((3, 3), np.uint8)) > 0
+        ia = cv2.GaussianBlur((disk & ball).astype(np.float32), (0, 0), 1.0)
+        mm = ball
+        whites = reg[mm & (lum > 185)]
+        sclera = np.median(whites, 0) if len(whites) > 10 else np.array([236, 236, 236], np.float32)
+        inner = mm.astype(np.float32)
+        dist = cv2.distanceTransform(mm.astype(np.uint8), cv2.DIST_L2, 3)
+        shade = (0.62 + 0.33 * np.clip(dist / 5.0, 0, 1))[..., None]      # eyelid shadow near the edge
+        d.update(iris=reg.copy(), iris_a=ia, blank=reg * (1 - ia[..., None]) + sclera * shade * ia[..., None],
+                 inner=cv2.GaussianBlur(inner, (0, 0), 1.2), ew=float(x1 - x0), eh=float(y1 - y0))
+    return d
 
 
-def draw_face(frame, faces, blink, mouth):
-    """frame: float32 RGB (changed copy returned). blink 0..1 (1 = closed), mouth 0..1 (1 = wide open)."""
+MOUTH_SHAPES = {   # half width, opening depth (x mouth width)
+    "a": (0.30, 0.38), "e": (0.36, 0.20), "i": (0.38, 0.13), "o": (0.21, 0.32), "u": (0.15, 0.24), "m": (0.0, 0.0)}
+
+
+def draw_face(frame, faces, blink, mouth, shape="a", gaze=(0.0, 0.0)):
+    """frame: float32 RGB (changed copy returned). blink 0..1 (1 = closed), mouth 0..1 (1 = wide open),
+    shape = mouth shape for the sound being spoken (a/e/i/o/u/m), gaze = where the eyes look (-1..1, -1..1)."""
     out = frame.copy()
     for f in faces:
+        if abs(gaze[0]) + abs(gaze[1]) > 0.02:
+            for e in f["eyes"]:
+                if "iris" not in e:
+                    continue
+                x0, y0, x1, y1 = e["box"]
+                Mt = np.float32([[1, 0, gaze[0] * e["ew"] * 0.08], [0, 1, gaze[1] * e["eh"] * 0.06]])
+                hgt, wid = e["iris_a"].shape
+                ir = cv2.warpAffine(e["iris"], Mt, (wid, hgt), borderMode=cv2.BORDER_REPLICATE)
+                ia = cv2.warpAffine(e["iris_a"], Mt, (wid, hgt)) * e["inner"]
+                reg = e["blank"] * (1 - ia[..., None]) + ir * ia[..., None]
+                ea = (np.maximum(e["iris_a"], ia) * e["inner"])[..., None]   # only where the iris was / goes
+                out[y0:y1, x0:x1] = out[y0:y1, x0:x1] * (1 - ea) + reg * ea
         if blink > 0.02:
             for e in f["eyes"]:
                 x0, y0, x1, y1 = e["box"]
@@ -115,9 +198,15 @@ def draw_face(frame, faces, blink, mouth):
                     sub = np.clip(out[y0:y1, x0:x1], 0, 255).astype(np.uint8).copy()
                     cv2.polylines(sub, [pts - np.array([x0, y0])], False, (50, 30, 28), 3, cv2.LINE_AA)
                     out[y0:y1, x0:x1] = sub
-        if mouth > 0.05:
+        hw, dp = MOUTH_SHAPES.get(shape, MOUTH_SHAPES["a"])
+        if f.get("open"):
+            out = _warp_open_mouth(out, f, mouth if dp > 0 else 0.0, shape)
+            continue
+        if mouth > 0.05 and dp > 0:
             cx, cy, mw = f["mouth"]
-            half, h = mw * 0.30, mw * 0.36 * mouth
+            half, h = mw * hw, mw * dp * mouth
+            round_ = shape in ("o", "u")
+            teeth = shape in ("a", "e", "i") and h > 4
             for x in range(int(cx - half), int(cx + half) + 1):
                 u = (x - cx) / half
                 depth = h * math.sqrt(max(0.0, 1 - u * u))
@@ -125,10 +214,43 @@ def draw_face(frame, faces, blink, mouth):
                 yb = int(y0 + depth)
                 if yb <= y0 or not (0 <= x < out.shape[1]) or yb + 2 >= out.shape[0]:
                     continue
+                if round_:                                  # round lips: opening sits a bit lower, centred
+                    y0 = int(cy - depth * 0.25)
+                    yb = int(cy + depth * 0.75)
                 col = np.linspace(0, 1, yb - y0)[:, None]
                 tongue = np.clip((col - 0.55) / 0.3, 0, 1) * (mouth > 0.35)
-                out[y0:yb, x] = np.array([62, 14, 24]) * (1 - tongue) + np.array([195, 85, 95]) * tongue
+                px = np.array([62, 14, 24]) * (1 - tongue) + np.array([195, 85, 95]) * tongue
+                if teeth:
+                    px[:max(1, int((yb - y0) * 0.24))] = (238, 236, 230)
+                out[y0:yb, x] = px
                 out[yb:yb + 2, x] = (225, 120, 120)
+    return out
+
+
+def _warp_open_mouth(out, f, mouth, shape):
+    """Open / close the picture's own mouth: only the lower lip moves (the upper lip, nose and cheeks
+    stay still), inside a small area around the mouth."""
+    bx0, by0, bx1, by1 = f["open"]
+    bw, bh = bx1 - bx0, by1 - by0
+    s = 0.65 + 0.7 * float(mouth)                       # 0.65 = nearly closed, 1.35 = wide open
+    sx = 0.85 if shape in ("o", "u") else 1.0
+    if shape in ("e", "i"):
+        s = min(s, 0.85)
+    H, W = out.shape[:2]
+    mx0, mx1 = int(max(0, bx0 - 0.12 * bw)), int(min(W, bx1 + 0.12 * bw))
+    my0, my1 = int(max(0, by0 + 0.15 * bh)), int(min(H, by1 + 0.9 * bh))
+    if mx1 - mx0 < 4 or my1 - my0 < 4:
+        return out
+    yy, xx = np.mgrid[my0:my1, mx0:mx1].astype(np.float32)
+    cxm = (bx0 + bx1) / 2
+    wx = np.clip((0.5 * bw + 0.12 * bw - np.abs(xx - cxm)) / (0.25 * bw + 1), 0, 1)
+    wy = np.clip((yy - my0) / (0.15 * bh + 1), 0, 1) * np.clip((my1 - yy) / (0.6 * bh + 1), 0, 1)
+    w = wx * wy
+    piv = by0 + 0.3 * bh
+    map_y = yy + w * (np.minimum(piv + (yy - piv) / s, my1 - 1) - yy)
+    map_x = xx + w * ((cxm + (xx - cxm) / sx) - xx)
+    out[my0:my1, mx0:mx1] = cv2.remap(out, map_x.astype(np.float32), map_y.astype(np.float32), cv2.INTER_LINEAR,
+                                      borderMode=cv2.BORDER_REFLECT)
     return out
 
 
@@ -176,3 +298,55 @@ def voice_envelope(wav_path, fps):
     # syllable feel: open-close instead of staying open
     wob = 0.65 + 0.35 * np.abs(np.sin(np.arange(len(env)) * math.pi * 5.5 / fps))
     return np.clip(env * wob, 0, 1)
+
+
+# ---------- lip sync: which mouth shape for which sound (Bengali + Hindi letters)
+_V = {}
+for ch in "আা": _V[ch] = "a"
+for ch in "ইঈিীএঐেৈइईिीएऐेै": _V[ch] = "i" if ch in "ইঈিীइईिी" else "e"
+for ch in "উঊুূউঊুূ": _V[ch] = "u"
+for ch in "ওঔোৌঅओऔोौ": _V[ch] = "o"
+for ch in "आा": _V[ch] = "a"
+for ch in "अ": _V[ch] = "a"
+_LABIAL = set("পফবভমपफबभम")
+_CONS_BN = set(chr(c) for c in range(0x0995, 0x09B9 + 1)) | set("ড়ঢ়য়")
+_CONS_HI = set(chr(c) for c in range(0x0915, 0x0939 + 1))
+_SYL = {}
+
+
+def syllables(text):
+    """Text -> list of (mouth shape, starts with lips closed?) per syllable; ' ' = short pause."""
+    if text in _SYL:
+        return _SYL[text]
+    out, i, t = [], 0, str(text)
+    while i < len(t):
+        ch = t[i]
+        if ch in _CONS_BN or ch in _CONS_HI:
+            nxt = t[i + 1] if i + 1 < len(t) else ""
+            lab = ch in _LABIAL
+            if nxt in ("্", "्"):                      # joined letters: no vowel here
+                i += 2
+                continue
+            if nxt in _V:
+                out.append((_V[nxt], lab))
+                i += 2
+                continue
+            out.append(("o" if ch in _CONS_BN else "a", lab))   # Bengali inherent vowel sounds like 'o'
+        elif ch in _V:
+            out.append((_V[ch], False))
+        elif ch in ",।!?." and out and out[-1][0] != " ":
+            out.append((" ", False))
+        i += 1
+    _SYL[text] = out or [("a", False)]
+    return _SYL[text]
+
+
+def viseme_at(text, t, dur):
+    """Mouth shape at time t (seconds) inside a line of length dur: a/e/i/o/u, or 'm' = lips closed."""
+    syl = syllables(text)
+    u = max(0.0, min(0.999, t / max(0.2, dur * 0.94)))
+    pos = u * len(syl)
+    v, lab = syl[int(pos)]
+    if v == " " or (lab and pos - int(pos) < 0.35):
+        return "m"
+    return v

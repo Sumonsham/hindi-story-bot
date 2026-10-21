@@ -245,6 +245,12 @@ def load_history():
         return []
 
 
+# cron-job.org starts each video about 1 hour before it should be online (India time):
+# (start hour, start minute, the hour the video should be out)
+TRIGGERS = [(6, 55, 8), (11, 55, 13), (17, 55, 19)]
+SLOT = None
+
+
 def recently_posted(history, hours):
     """True if a video was posted in the last few hours (so a backup run must not post a second one)."""
     for h in history[-3:]:
@@ -1897,10 +1903,12 @@ def main():
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
+    global SLOT
+    SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
     if env("MODE") == "compilation":
         return make_compilation(history)
     # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
-    if (env("EVENT") == "schedule" or env("MODE") == "auto") and recently_posted(history, hours=4):
+    if (env("EVENT") == "schedule" or env("MODE") == "auto") and (extras.slot_done(history, SLOT) or recently_posted(history, hours=2)):
         log("A video for this time slot was already posted - this backup run has nothing to do.")
         return
     if not MOCK:
@@ -2120,7 +2128,7 @@ def main():
         n = extras.reply_to(shout_ids, L["congrats_reply"].format(link=f"https://www.facebook.com/{results['facebook']}"))
         log(f"  congratulated {n} children/parents under their comments")
 
-    history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
+    history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang, "slot": SLOT,
                     "category": category, "title": title, "festival": festival,
                     "quiz": quiz_saved, **results})
     if not MOCK:

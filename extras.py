@@ -1208,3 +1208,23 @@ def last_post(history, key=None, min_hours=1.5):
             return h
         return None
     return None
+
+
+# ----------------------------------------------------------------- which time slot is this run for?
+def current_slot(triggers, now=None):
+    """triggers: [(start_hour, start_minute, post_hour)] in India time, e.g. [(11, 55, 13), (19, 55, 21)].
+    A run belongs to the LAST slot that has already started (10 minutes early allowed), so a late
+    backup run still knows which slot it is for. Returns e.g. '2026-10-22@13'."""
+    now = now or dt.datetime.now(IST)
+    best = None
+    for add in (0, -1):
+        day = (now + dt.timedelta(days=add)).date()
+        for h, m, post in triggers:
+            start = dt.datetime(day.year, day.month, day.day, h, m, tzinfo=IST) - dt.timedelta(minutes=10)
+            if start <= now and (best is None or start > best[0]):
+                best = (start, f"{day.isoformat()}@{post}")
+    return best[1] if best else None
+
+
+def slot_done(history, slot):
+    return bool(slot) and any(h.get("slot") == slot for h in history[-12:])

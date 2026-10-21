@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 """
-Cartoon Story Bot (Hindi + Bengali, alternating)
------------------------
-Every run makes ONE brand-new, original Hindi or Bengali kids' cartoon story video and posts it to
-a Facebook Page:
+Horror Story Bot (Hindi + Bengali)
+----------------------------------
+Every run makes ONE brand-new, original horror story video and posts it to a
+Facebook Page (and YouTube, if YouTube secrets are set):
 
   1. Google Gemini          -> story with dialogue, title, description, hashtags
-  2. Cloudflare Workers AI  -> cartoon pictures, a new picture for every line, same characters
-  3. Microsoft Edge voices  -> sweet narrator + a different voice for every character (gTTS backup)
-  4. Sound engine           -> real sound effects from freesound.org (CC0) timed to the story,
-                               nature ambience and soft cheerful music
-  5. FFmpeg + OpenCV        -> moving picture layers, close-ups, subtitles
-  6. Facebook Graph API
+  2. Cloudflare Workers AI  -> realistic, cinematic pictures (same characters in every scene)
+  3. Microsoft Edge voices  -> narrator + a different voice for every character (gTTS backup)
+  4. Built-in sound engine  -> wind, rain, thunder, heartbeat, footsteps, creaks... (no copyright)
+  5. FFmpeg + OpenCV        -> moving picture layers, fog, grain, flicker, subtitles
+  6. Facebook / YouTube APIs
 
-Secrets: GEMINI_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN, FB_PAGE_ID, FB_PAGE_TOKEN
-Optional: PAGE_NAME, FREESOUND_API_KEY, MAX_IMAGES, DRY_RUN=1, MOCK=1
+Languages alternate: Hindi, Bengali, Hindi, ...
+
+Secrets (GitHub > Settings > Secrets > Actions):
+  GEMINI_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN, FB_PAGE_ID, FB_PAGE_TOKEN
+Optional:
+  PAGE_NAME_HI, PAGE_NAME_BN        page/channel name said at the end
+  YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN   -> also upload to YouTube
+  LANGUAGE=hi|bn (force), DRY_RUN=1 (don't post), MOCK=1 (offline test)
 """
 import asyncio
 import base64
@@ -32,6 +37,7 @@ import time
 import wave
 
 import requests
+import numpy as np
 import extras
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -50,139 +56,94 @@ LANGS = {
         "name": "Hindi", "script": "Devanagari",
         "font_family": "Noto Sans Devanagari", "font_glob": "NotoSansDevanagari",
         "male": ["hi-IN-MadhurNeural"], "female": ["hi-IN-SwaraNeural"],
-        "narrator": ("hi-IN-SwaraNeural", "-4%", "+2Hz"), "gtts": "hi",
-        "intro": "नमस्ते प्यारे बच्चों! मैं हूँ आपकी लूमी दीदी। आज की कहानी है... {title}।",
-        "outro": "कहानी अच्छी लगी तो लाइक कीजिए, शेयर कीजिए, और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो ज़रूर कीजिए!",
+        "narrator": ("hi-IN-MadhurNeural", "+2%", "-6Hz"), "gtts": "hi",
+        "label": "भूतिया कहानी",
+        "intro": "आज की डरावनी कहानी है... {title}।",
+        "outro": "कहानी कैसी लगी, कमेंट में ज़रूर बताइए। और ऐसी ही डरावनी कहानियों के लिए {page} को फॉलो कीजिए।",
         "page_default": "हमारे पेज",
-        "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं।",
-        "moral_intro": "तो बच्चों, इस कहानी से हमें यह सीख मिलती है:",
-        "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी",
-                   "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख",
-                   "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
-                   "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
-                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला"},
-        "example_tags": "#HindiKahani #MoralStories #CartoonStory",
-        "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
-        "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
-        "quiz_title": "क्विज़ टाइम!", "quiz_labels": ["क", "ख", "ग"],
-        "quiz_intro": "अब एक छोटा सा सवाल, बच्चों!", "quiz_count": "सोचो... तीन... दो... एक...",
-        "quiz_answer": "सही जवाब है... {lab}: {ans}! क्या तुमने सही बताया? कमेंट में लिखो!",
-        "ann1": "नई प्यारी कहानी", "ann_msg": "🧸 {when} आ रही है लूमी दीदी की नई कहानी! बच्चों को ज़रूर दिखाइए 🔔",
-        "comp_title": "{m} मिनट की प्यारी कहानियाँ 🧸 | हफ्ते की {n} कहानियाँ एक साथ", "comp_thumb": "{m} मिनट की कहानियाँ",
+        "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं। सब काल्पनिक है।",
+        "badge": "लाइक • शेयर • फॉलो", "part": "भाग {n}",
+        "outro_part1": "कहानी का अगला भाग जल्द ही आएगा... उसे मिस मत कीजिए, अभी {page} को फॉलो कीजिए।",
+        "ch_intro": "शुरुआत", "ch_end": "अंत", "chapters": "⏱️ अध्याय",
+        "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist": "भूतिया कहानियाँ - Hindi Horror Stories",
+        "full_link": "पूरी कहानी देखें:",
+        "hp": "हेडफ़ोन लगाकर सुनिए",
+        "find_ghost": "🔍 वीडियो की तस्वीरों में भूत कितनी बार छिपा था? ध्यान दिया? कमेंट में लिखिए!",
+        "find_ghost_line": "और हाँ... इस वीडियो की तस्वीरों में वो भूत कुछ बार छिपा हुआ था। आपने कितनी बार देखा? कमेंट में ज़रूर बताइए।",
+        "vote_line": "{q} अगर आप चाहते हैं {o1}, तो कमेंट में 1 लिखिए। और अगर {o2}, तो 2 लिखिए। आपके वोट से तय होगा कि अगले भाग में क्या होगा!",
+        "ann1": "नई भूतिया कहानी", "ann_msg": "👻 {when} आ रही है नई भूतिया कहानी... हेडफ़ोन तैयार रखिए! 🎧🔔",
+        "comp_title": "{m} मिनट की भूतिया कहानियाँ 👻 | हफ्ते की {n} कहानियाँ एक साथ", "comp_thumb": "{m} मिनट का डर",
     },
     "bn": {
         "name": "Bengali", "script": "Bengali",
         "font_family": "Noto Sans Bengali", "font_glob": "NotoSansBengali",
         "male": ["bn-IN-BashkarNeural", "bn-BD-PradeepNeural"],
-        "female": ["bn-BD-NabanitaNeural", "bn-IN-TanishaaNeural"],
-        "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
-        "intro": "নমস্কার ছোট্ট বন্ধুরা! আমি তোমাদের লুমি দিদি। আজকের গল্প... {title}।",
-        "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
+        "female": ["bn-IN-TanishaaNeural", "bn-BD-NabanitaNeural"],
+        "narrator": ("bn-IN-BashkarNeural", "+2%", "-6Hz"), "gtts": "bn",
+        "label": "ভৌতিক গল্প",
+        "intro": "আজকের ভৌতিক গল্প... {title}।",
+        "outro": "গল্পটা কেমন লাগল কমেন্টে জানাবেন। আর এরকম আরও ভৌতিক গল্পের জন্য {page} ফলো করুন।",
         "page_default": "আমাদের পেজ",
-        "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
-        "moral_intro": "তাহলে ছোট্ট বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
-        "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প",
-                   "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা",
-                   "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
-                   "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
-                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা"},
-        "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
-        "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
-        "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
-        "quiz_title": "কুইজ টাইম!", "quiz_labels": ["ক", "খ", "গ"],
-        "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবো... তিন... দুই... এক...",
-        "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! তুমি কি ঠিক বলেছিলে? কমেন্টে লেখো!",
-        "ann1": "নতুন মিষ্টি গল্প", "ann_msg": "🧸 {when} আসছে লুমি দিদির নতুন গল্প! ছোটদের দেখাতে ভুলবেন না 🔔",
-        "comp_title": "{m} মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের গল্প",
+        "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি। সবকিছু কাল্পনিক।",
+        "badge": "লাইক • শেয়ার • ফলো", "part": "পর্ব {n}",
+        "outro_part1": "গল্পের বাকি অংশ আসছে পরের পর্বে... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন।",
+        "ch_intro": "শুরু", "ch_end": "শেষ", "chapters": "⏱️ অধ্যায়",
+        "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist": "ভৌতিক গল্প - Bengali Horror Stories",
+        "full_link": "পুরো গল্প দেখুন:",
+        "hp": "হেডফোন পরে শুনুন",
+        "find_ghost": "🔍 ভিডিওর ছবিগুলোতে ভূতটা কতবার লুকিয়ে ছিল? খেয়াল করেছেন? কমেন্টে লিখুন!",
+        "find_ghost_line": "আর হ্যাঁ... এই ভিডিওর ছবিগুলোর মধ্যে সেই ভূত কয়েকবার লুকিয়ে ছিল। আপনি কতবার দেখেছেন? কমেন্টে অবশ্যই জানাবেন।",
+        "vote_line": "{q} যদি চান {o1}, কমেন্টে লিখুন ১। আর যদি চান {o2}, লিখুন ২। আপনাদের ভোটেই ঠিক হবে পরের পর্বে কী হবে!",
+        "ann1": "নতুন ভৌতিক গল্প", "ann_msg": "👻 {when} আসছে নতুন ভৌতিক গল্প... হেডফোন রেডি রাখুন! 🎧🔔",
+        "comp_title": "{m} মিনিটের ভূতের গল্প 👻 | সপ্তাহের সেরা {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের ভয়",
     },
 }
 
-CATEGORIES = {
-    # devotional stories of the gods and their devotees (Puranas, bhakti legends - ancient, public domain)
-    "divine": ["little Krishna the butter thief (Makhan Chor) and Mother Yashoda",
-               "Yashoda sees the whole universe in baby Krishna's mouth", "Krishna lifts Govardhan hill to save Vrindavan",
-               "Krishna and his poor friend Sudama's handful of rice", "Krishna calms the serpent Kaliya in the Yamuna",
-               "Meera Bai's love for Krishna", "Lord Shiva becomes Neelkanth to save the world from poison",
-               "Shiva protects the child devotee Markandeya", "the hunter Kannappa's devotion to Shiva",
-               "Shiva brings the river Ganga down to earth", "Ma Kali comes as a little girl to help Ramprasad mend his fence",
-               "Sri Ramakrishna and Ma Kali at Dakshineswar", "Lord Jagannath eats Karma Bai's morning khichdi",
-               "the devotee Salabega and Lord Jagannath's chariot", "King Indradyumna and the making of Jagannath",
-               "Ganesha goes around his parents to win the race", "Ganesha and Kubera's grand feast",
-               "Ganesha writes the Mahabharata with his broken tusk", "baby Hanuman tries to eat the sun",
-               "Hanuman carries the Sanjeevani mountain", "Shabari's sweet berries for Lord Rama",
-               "the little squirrel who helped build Rama's bridge", "young Prahlad's faith in Lord Vishnu",
-               "child Dhruva's prayer becomes the pole star", "Ma Durga comes home for Durga Puja",
-               "Ma Lakshmi visits the house that stays awake on Kojagari Purnima",
-               "Ma Saraswati blesses a poor student", "Behula's devotion and Ma Manasa",
-               "Chaitanya Mahaprabhu's kirtan in Nabadwip", "Lord Vishnu as Vamana and King Bali"],
-    # clever-wit folk anecdotes (centuries-old, public domain) - retold in our own words
-    "witty": ["Gopal Bhar and the king's impossible challenge", "Gopal Bhar outsmarts a greedy moneylender",
-              "Birbal and the emperor's tricky question", "Birbal finds the real thief with sticks",
-              "Tenali Raman and the boastful scholar", "Tenali Raman saves the royal garden",
-              "a clever village girl solves the minister's riddle", "the wise judge and two mothers"],
-    "fairy": ["a little fairy who lost her wings", "the fairy of the lotus pond grants three wishes",
-              "a magic paintbrush that makes drawings real", "the moon fairy visits a poor girl",
-              "a rainbow bridge to the land of clouds", "the star that fell into a village garden",
-              "a talking tree that grants wishes only to kind children", "the fairy queen's lost crown"],
-    "adventure": ["two friends find a secret cave map", "a brave girl crosses the river to bring medicine",
-                  "the lost elephant calf and the search party", "a kite that flies to a strange island",
-                  "the treasure hidden under the old banyan tree", "a little boat's journey down the Ganga",
-                  "lost in the Sundarbans with a friendly tiger cub", "the mountain goat who climbed the highest peak"],
-    "festival": ["Durga Puja and the little drummer boy", "a Diwali lamp for the lonely grandmother",
-                 "Holi colours and a sad friend", "Eid sweets shared with the whole street",
-                 "Christmas gift for the poor shoeshine boy", "Raksha Bandhan and the brother far away",
-                 "Poila Baishakh new year at the village fair", "Makar Sankranti kite festival friendship"],
-    "bedtime": ["a sleepy little owl who could not sleep at night", "the moon tells a story to a child",
-                "a teddy bear's night adventure", "the cloud that wanted to be a pillow",
-                "counting stars with grandfather", "the lullaby of the river"],
-    "school": ["the new student who could not speak the language", "a lost tiffin box mystery",
-               "the class monitor learns fairness", "a sports day race where helping wins",
-               "a homework copied and the honest confession", "the school garden project"],
-    "nature": ["the last tree in the city", "a sparrow family and the plastic bag", "the river that got sick",
-               "saving rainwater in the village", "a bee teaches why flowers matter", "the honest woodcutter and the forest"],
-    # old Bengali/Indian fairy tales (Thakurmar Jhuli style - public domain folk tales, retold in our own words)
-    "folk": ["a brave prince and the demon (rakkhosh) kingdom", "Lalkamal and Neelkamal, two brother princes",
-             "the magic birds Byangoma and Byangomi who give advice", "the flying horse Pakkhiraj",
-             "seven brothers turned into champa flowers and their sister", "Kiranmala, the brave princess",
-             "a poor farmer's son and the sleeping princess", "a magic golden stick and silver stick",
-             "the clever youngest daughter-in-law", "a kind girl and the witch of the forest",
-             "the king's lost ring and the honest fisherman", "a talking golden fish in the village pond",
-             "the giant's garden and the little shepherd", "a magic pitcher that never empties"],
-    # Panchatantra / Jataka / Hitopadesha fables (ancient, public domain, retold in our own words)
-    "panchatantra": ["the monkey and the crocodile", "the clever rabbit and the proud lion",
-                     "the blue jackal", "the talkative tortoise and the two geese", "the crows and the cobra",
-                     "the brahmin and the three thieves", "the mice that saved the elephants",
-                     "the lion, the mouse and the net", "the foolish lion and the jackal's cave",
-                     "the four friends: deer, crow, mouse and tortoise", "the heron and the crab",
-                     "the monkey king who saved his tribe (Jataka)", "the golden swan (Jataka)",
-                     "the loyal mongoose", "the greedy cat who judged two birds"],
-    # everyday stories about people that teach a life lesson
-    "life": ["a boy who wasted food learns where rice comes from", "a girl who helps a lonely old neighbour",
-             "the honest rickshaw puller who returns a lost bag", "a child too busy with the mobile phone",
-             "respecting the school teacher", "a piggy bank and the value of saving money",
-             "a rich boy and a poor boy become best friends", "telling the truth to mother after breaking a vase",
-             "keeping the village clean", "sharing lunch with a new classmate",
-             "a father's quiet sacrifice", "a grandmother's lesson about patience",
-             "a boy who made fun of others learns kindness", "never giving up after failing an exam",
-             "thanking the farmer, the postman and the sweeper"],
-    "moral": ["honesty", "greed and its result", "kindness to others", "hard work", "true friendship", "patience",
-              "sharing", "respecting elders", "telling lies", "helping the weak", "pride and humility",
-              "saving water", "obeying parents", "courage", "gratitude"],
-    "animal": ["jungle animals", "a clever fox", "a brave little rabbit", "an elephant family", "birds in a big tree",
-               "a lazy lion", "a monkey and a crocodile", "farm animals", "a thirsty crow", "ants and a grasshopper",
-               "a peacock and a crow", "sea creatures", "a lost puppy", "a wise owl"],
-    "funny": ["a forgetful village man", "a silly king and a clever minister", "a greedy shopkeeper tricked",
-              "a lazy servant", "a talking parrot", "a funny school day", "a mix-up at a wedding", "a clumsy thief",
-              "a boastful wrestler", "a naughty goat", "a magical cooking pot gone wrong"],
-}
+THEMES = [
+    # haunted places
+    "a closed cinema hall that still shows a film at midnight", "a hill-station hotel room number 13",
+    "an IT office on the 14th floor during the night shift", "an old lighthouse on the Odisha coast",
+    "a tea-garden bungalow in Darjeeling fog", "a jute mill closed for 30 years", "a burnt village theatre stage",
+    "a hospital morgue during a power cut", "a girls' hostel and the room no one takes",
+    # objects and curses
+    "a cursed silver anklet bought at a village fair", "an old harmonium that plays by itself",
+    "a photo album with one face that keeps moving", "a wedding saree from a dead bride's trunk",
+    "a pocket watch that stops at the time of a death", "a well-water mirror that shows the future",
+    # people and spirits
+    "a tantrik's revenge on a greedy landlord", "a ghost that comes back every Amavasya",
+    "twin sisters, one of them died years ago", "a postman delivering letters from the dead",
+    "a taxi driver's strangest passenger in heavy rain", "a child's imaginary friend who is not imaginary",
+    "the possessed doll of a zamindar's daughter", "a cremation-ground caretaker's last night",
+    "a wedding procession of ghosts on a lonely road", "a fisherman and the woman who walks on water",
+    "a chudail with backward feet on the village road at night", "a brahmadaitya living in an old bel tree",
+    "a shakchunni who wants to become a married woman", "nishi daak - a voice at midnight calling your name",
+    "a mechho bhoot who steals fish from the fishermen", "a pishach in the cremation ground (shamshan)",
+    "a vetal hanging from a tree in the forest", "a headless ghost (skandhakata) near the railway line",
+    "a daayan who takes children's shadows", "a ghost bride in a red saree on the highway",
+    "a haunted zamindar bari in a Bengal village", "an old British-era dak bungalow in the hills",
+    "a Kolkata tram depot after the last tram", "a Rajasthan stepwell (baori) at night",
+    "a Kuldhara-like deserted village", "a Purulia forest guest house",
+    "a Sundarbans boat trip and the jungle spirit", "a ghost who asks for a lift at midnight",
+    "an old haveli where a lamp lights itself every night", "an abandoned railway station and the last train",
+    "a village well that whispers names", "a lonely highway dhaba after midnight",
+    "a hostel room that is always cold", "a huge banyan tree at the edge of the village",
+    "a boat ride across the river on a moonless night", "an ancestral house during the monsoon",
+    "a school after everyone has gone home", "a forest bungalow with a locked room",
+    "an old photo studio and a photograph that changes", "a night bus with one extra passenger",
+    "a wedding house where one guest has no shadow", "a hospital night shift",
+    "a doll found in an old trunk", "a radio that plays a station that closed years ago",
+    "a fisherman's village and a voice from the water", "a temple bell that rings at 3 am",
+    "a new flat in an old building", "a mirror bought from a house auction",
+]
 
-SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "birds", "water", "footsteps", "creak", "knock",
-              "boing", "whoosh", "pop", "bell", "splash"]
-MOODS = ["happy", "calm", "funny", "adventure", "sad"]
-EMOTIONS = ["normal", "happy", "excited", "laughing", "sad", "crying", "scared", "angry", "whisper", "calm", "proud"]
+SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "owl", "heartbeat", "footsteps", "creak",
+              "whisper", "clock", "howl", "drip", "knock", "scare_hit"]
+MOODS = ["calm", "creepy", "tense", "scare", "sad"]
+EMOTIONS = ["normal", "whisper", "scared", "shout", "angry", "sad", "crying", "eerie", "calm"]
 
-ART_STYLE = ("high quality 2D cartoon animation still for kids, Indian storybook world, bright cheerful colors, "
-             "soft lighting, clean outlines, cute expressive characters with big eyes, Pixar-like charm, "
+ART_STYLE = ("cinematic photorealistic film still, horror movie atmosphere, dark moody low-key lighting, "
+             "cold blue and green tones with warm lamp light, light fog, realistic Indian people and places, "
+             "35mm photo, shallow depth of field, highly detailed, eerie but not gory, no blood, no gore, "
              "no text, no letters, no watermark")
 
 
@@ -248,47 +209,41 @@ def save_history(items):
 
 
 def pick_language(history):
-    """One video Hindi, the next Bengali, and so on."""
     forced = env("LANGUAGE").lower()
     if forced in LANGS:
         return forced
-    last = history[-1].get("lang", "hi") if history else "bn"
+    last = history[-1].get("lang") if history else "bn"
     return "bn" if last == "hi" else "hi"
 
 
-DIVINE_FESTIVALS = {"Durga Puja", "Kojagari Lakshmi Puja", "Kali Puja / Diwali", "Saraswati Puja", "Maha Shivaratri",
-                    "Sri Ramakrishna's birthday", "Holi / Dol Purnima", "Ram Navami", "Bhoot Chaturdashi"}
-MASCOT = os.path.join(HERE, "assets", "lumi_didi.jpg")
-MASCOT_PROMPT = ("Lumi Didi, a warm friendly young Indian storyteller woman in high quality 2D cartoon style, big kind "
-                 "sparkling eyes, gentle smile, long black braid with a small yellow flower, sky-blue saree with a "
-                 "golden border, small star-shaped bindi, holding an open glowing storybook in one hand and waving "
-                 "hello with the other, sitting on a cozy colorful cushion, soft magical sparkles, bright cheerful "
-                 "storybook background, Pixar-like charm, no text, no letters, no watermark")
+FORMATS = [
+    "classic third-person radio-drama narration",
+    "told in first person by someone who lived through it ('that night I...'), as if sharing a true experience",
+    "a listener's letter read out by the narrator, then the events play out",
+    "two friends telling ghost stories at night, and one story becomes real",
+]
 
 
-def ensure_mascot():
-    """Our host 'Lumi Didi' - made once, saved in the repo, the same in every video."""
-    if os.path.exists(MASCOT):
-        return MASCOT
-    if MOCK:
-        os.makedirs(os.path.dirname(MASCOT), exist_ok=True)
-        return mock_image(MASCOT, 7) and MASCOT
+NEXT_PART = os.path.join(HERE, "next_part.json")
+
+
+def load_next_part():
+    """Part 1 of a series saves what part 2 needs; the next horror run makes part 2."""
     try:
-        os.makedirs(os.path.dirname(MASCOT), exist_ok=True)
-        save_picture(cf_request(CF_MODEL, MASCOT_PROMPT, seed=2024), MASCOT)
-        log("Lumi Didi picture created (saved for all future videos)")
-        return MASCOT
-    except Exception as e:
-        log("  Lumi Didi picture not made now:", str(e)[:150])
-        return None
+        with open(NEXT_PART, encoding="utf-8") as f:
+            nxt = json.load(f)
+        made = dt.datetime.fromisoformat(nxt["created"])
+        if (dt.datetime.now(dt.timezone.utc) - made).total_seconds() < 4 * 86400:
+            return nxt
+    except Exception:
+        pass
+    return None
 
 
 def pick_theme(history):
-    """Rotate story types so posts in a day are usually different kinds."""
-    recent = [h.get("category") for h in history[-2:]]
-    options = [c for c in CATEGORIES if c not in recent] or list(CATEGORIES)
-    cat = extras.weighted_choice(options, extras.weights(history, "category", options))
-    return cat, random.choice(CATEGORIES[cat])
+    used = [h.get("theme") for h in history[-12:]]
+    options = [t for t in THEMES if t not in used] or THEMES
+    return random.choice(options)
 
 
 # ----------------------------------------------------------------- 1. story (Gemini)
@@ -322,93 +277,104 @@ def gemini_models(key):
     return out
 
 
-def make_story(lang, theme, history):
+def make_story(lang, theme, history, fmt=None, part=0, prev=None):
+    """part=0: one complete story; part=1: first half of a 2-part series (ends on a cliffhanger);
+    part=2: the final part, continuing `prev` (saved from part 1)."""
     if MOCK:
         return mock_story(lang)
     key = need_env("GEMINI_API_KEY")
-    category, idea = theme
     L = LANGS[lang]
-    old_titles = [h["title"] for h in history[-60:] if h.get("lang", "hi") == lang]
-    kind_rules = {
-        "folk": "This is a classic Indian/Bengali fairy tale in the style of Thakurmar Jhuli (grandmother's tales): "
-                "kings, princes, princesses, rakkhosh/demons, magic birds, flying horses, a village and a palace. "
-                "Retell the public-domain folk tale idea in your OWN words with new dialogue, vivid scenes and a "
-                "small fresh twist. Keep the magic gentle and child friendly (the demon is defeated by cleverness, "
-                "not violence).",
-        "panchatantra": "This is a Panchatantra / Jataka / Hitopadesha fable (ancient, public domain). Retell it in "
-                        "your OWN words with lively new dialogue, fun character voices and a fresh small twist, "
-                        "keeping the classic lesson.",
-        "divine": "This is a devotional story (leela) of the gods and their devotees from the Puranas and bhakti "
-                  "tradition. Tell it faithfully and with deep respect and devotion - do NOT change the meaning of "
-                  "the traditional story or add silly jokes about the gods. Warm, loving, child friendly; show the "
-                  "god's love for the devotee and end with the devotional lesson (faith, love, humility, kindness). "
-                  "If the original has fights or demons, tell those parts gently, without violence or fear. "
-                  "In every picture and character 'look', show the gods in their traditional, beautiful, auspicious "
-                  "form (e.g. Krishna: blue skin, peacock feather, yellow dhoti, flute; Shiva: calm, blue throat, "
-                  "crescent moon, Ganga in his hair; Ma Kali: gentle loving mother form, no weapons, no heads; "
-                  "Jagannath: the traditional big round eyes and dark face) with a soft divine golden glow.",
-        "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
-                "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
-                "It must teach a clear life lesson and gently touch the heart.",
-    }.get(category, "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
+    old_titles = [h["title"] for h in history[-60:] if h.get("lang") == lang]
+    fmt = fmt or random.choice(FORMATS)
+    if part == 1:
+        series_rule = ("\nSERIES: this is PART 1 of a 2-part story. Build the fear and STOP at the most frightening "
+                       "cliffhanger, unresolved (the twist comes in part 2). Also add two extra JSON keys: "
+                       "\"summary\" (ENGLISH, 4-6 sentences: what happened in part 1) and \"part2_plan\" "
+                       "(ENGLISH, 4-6 sentences: how part 2 continues and the shocking ending). "
+                       "And a key \"choice\": the big decision the main character faces at the cliffhanger, which "
+                       "the VIEWERS will vote on: {{\"question\": short question in the story language, "
+                       "\"option1\": 2-5 word choice in the story language, \"option2\": 2-5 word choice in the "
+                       "story language, \"plan1\": ENGLISH how part 2 goes if option 1 wins, \"plan2\": ENGLISH "
+                       "how part 2 goes if option 2 wins}}.\n")
+    elif part == 2 and prev:
+        series_rule = (f"\nSERIES: this is PART 2 (the FINAL part) of a 2-part story. Part 1 title: {prev.get('title')}. "
+                       f"What happened in part 1: {prev.get('summary')} Planned continuation: {prev.get('part2_plan')} "
+                       f"Use EXACTLY these characters (same names, same looks): "
+                       f"{json.dumps(prev.get('characters'), ensure_ascii=False)} and this setting: {prev.get('setting')}. "
+                       "Begin with a short gripping recap by the narrator (2-3 lines), then continue, and end with a "
+                       "shocking twist that answers the mystery.\n")
+        vote = prev.get("vote")
+        if vote:
+            series_rule += (f"VIEWERS VOTED: {vote['v1']} chose '{vote['option1']}', {vote['v2']} chose "
+                            f"'{vote['option2']}'. Part 2 MUST follow the winning choice: {vote['plan']} "
+                            "The narrator's FIRST line thanks the viewers and says most of them chose "
+                            f"'{vote['winner_text']}' - and that is exactly what happened next...\n")
+    else:
+        series_rule = ""
     prompt = f"""
-You are India's best {L['name']} children's storyteller, writing for a cartoon story video page.
-Write ONE {L['name']} story ({L['script']} script, simple sweet everyday {L['name']} that kids and
-families understand). Type: {category} story. Theme: {idea}.
-{kind_rules}
-Never use modern copyrighted characters (no Disney, Chhota Bheem, Motu Patlu etc.).
+You are India's best {L['name']} horror storyteller, writing for a horror story video page.
+Write ONE brand-new horror story in {L['name']} ({L['script']} script; simple, natural,
+spoken {L['name']} that ordinary people use). Idea to build on: {theme}.
+You may use classic Indian folk ghosts (chudail, brahmadaitya, shakchunni, nishi, pishach, vetal, daayan...)
+but the plot, people and events must be your OWN. Do not copy films or real incidents; no real people.
 Must be different from these earlier stories: {json.dumps(old_titles, ensure_ascii=False)}
-Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the children).
 
 Story rules:
-- LENGTH: 14 to 18 scenes, 5-6 minutes when spoken - at least 750 spoken words in total. Never rush the
-  ending; the story must feel complete. The FIRST line must hook in 5 seconds (a surprise, a question
-  or a funny moment). Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
-- Make it emotional and memorable so families want to share it: cute humour, a warm heart, a clear lesson.
-- Warm and cheerful, suitable for small children. No violence, nothing scary.
-- 2 to 4 characters (people or animals) plus a narrator, with real, lively dialogue between characters.
-- Each scene has 4 to 7 lines. The narrator describes; characters speak only their own words.
-  Narrator lines 20-45 words, dialogue lines 4-20 words.
-- Think like a cartoon film director: every line gets its own PICTURE that shows exactly what that line says
-  (who, doing what, where). The picture must match the words - if the line says the crow drops a stone in the
-  pot, the picture shows the crow dropping a stone in the pot.
-- SOUND DESIGN like a children's audio drama: when a line mentions an action or a thing that makes a sound
-  (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
-  put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
-- Give every line an emotion so the voice acts it.
+- LENGTH: 14 to 18 scenes, 5-6 minutes when spoken - at least 800 spoken words in total. Never rush the
+  ending; the story must feel complete. It must be GENUINELY SCARY and impossible to stop listening:
+  * the FIRST line is a chilling hook (a strange fact, a warning, or a scream) - no slow introduction;
+  * every scene ends with a small cliffhanger, the fear grows scene by scene;
+  * use the five senses: cold air, a smell of burning flowers or wet earth, a sound behind you, a touch in the dark;
+  * the ghost is shown little by little (a shadow, then a voice, then a face) - the full reveal comes late;
+  * 2-3 real jump scares, and a shocking twist ending that makes people comment.
+  Keep the narration moving at a natural pace - short punchy sentences in tense moments.
+- Spooky and suspenseful, NOT gory: no blood, no violence details, no harm to children, nothing sexual.
+- 2 to 4 characters plus a narrator. Real dialogue between characters (short, natural lines).
+- Each scene has 4 to 7 lines. The narrator describes; characters speak only their own words
+  (no "he said" inside dialogue). Narrator lines 25-50 words, dialogue lines 4-20 words.
+- Telling style for this story: {fmt}
+{series_rule}
+- Every picture must show exactly what that scene's lines describe.
+- SOUND DESIGN like a radio horror drama: for every line think what the listener should HEAR.
+  When a line mentions a door, footsteps, knocking, wind, rain, a scream, bells, a phone, breaking glass,
+  put that exact sound in that line's "sfx" with the right timing. 0-3 sfx per line, only real story events.
+  Be very specific so a real recording can be found ('rusty iron gate creaks open', 'barefoot steps on wet floor',
+  'anklet bells (ghungroo) jingling slowly', 'woman laughing in the distance', 'heavy breathing close to ear').
+  Every time the ghost comes near, add a ghost sound (cold wind gust, whisper, ghungroo, low growl, slow breathing).
+- Think like a film director: every line gets its own camera "shot" showing exactly what that line says
+  (close-up of a frightened face, a hand on the door handle, the lamp flickering, a shadow in the corridor...).
+- Give every line an emotion so the voice acts it (whisper when hiding, scared when afraid, shout when screaming).
+- Mark "jump_scare": true on 1-3 lines in the whole story where the big scare lands (a sudden sound/reveal).
 
 Return ONLY JSON with exactly these keys:
 {{
- "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
- "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click (a question or surprise, e.g. 'लालच का फल?', 'বোকা সিংহ!')",
- "description": "3-4 line engaging {L['name']} description, ending with a question to the viewer",
- "hashtags": ["10 to 14 popular hashtags mixing {L['name']} and English, e.g. {L['example_tags']}"],
- "setting": "ENGLISH: the ONE main place of the story (landscape, buildings, plants, colors, time of day). Reused in every picture",
+ "title": "chilling {L['name']} title, max 60 characters, 1 emoji",
+ "thumbnail_text": "2-4 scary punchy {L['name']} words for the thumbnail",
+ "description": "3-4 line suspenseful {L['name']} description that makes people want to watch, ending with a question",
+ "hashtags": ["10-14 popular hashtags mixing {L['name']} and English, e.g. #HorrorStory #BhootKiKahani"],
+ "setting": "ENGLISH: the ONE main place of the story (architecture, objects, era, weather, time of night, colors). Reused in every picture",
  "characters": [{{"name": "name in English letters", "gender": "male or female",
-                  "age": "child, young, adult or old", "kind": "human or animal",
-                  "look": "ENGLISH, very specific never-changing look: species/age, body size, exact colors of fur/skin/hair, clothes with exact colors, one special accessory. 20-35 words"}}],
- "source": "ENGLISH: e.g. 'Inspired by Panchatantra' / 'Inspired by Thakurmar Jhuli' / 'From the Bhagavata Purana' / 'Original story'",
- "thumbnail_image": {{"characters": ["1-2 main names"], "action": "ENGLISH: the most surprising or emotional moment of the story, the main character with a BIG expressive face (shocked, laughing, crying) close to the camera"}},
+                  "age": "child, young, adult or old", "kind": "human or ghost",
+                  "look": "ENGLISH, very specific never-changing look: age, face, hair, skin, clothes with exact colors, one special detail. 20-35 words"}}],
+ "thumbnail_image": {{"characters": ["the ghost's name + 1 victim name"], "ghost": "ENGLISH: exactly how THIS story's ghost looks at its scariest (face, eyes, hair, clothes, skin, special detail like backward feet or red saree) - 25-40 words", "action": "ENGLISH: ONE shocking moment from the story for a viral thumbnail: the ghost's terrifying face big and close on the RIGHT, the frightened victim smaller beside it"}},
  "scenes": [{{
     "characters": ["names VISIBLE in the picture"],
-    "action": "ENGLISH: what happens in this scene",
-    "place": "ENGLISH: where in the setting + light",
+    "action": "ENGLISH: exactly what happens in this scene: who does what, poses, expressions, key objects",
+    "place": "ENGLISH: where in the setting + lighting",
     "mood": "one of {MOODS}",
-    "ambience": ["1-2 ENGLISH background sounds that fit this place, e.g. 'birds chirping in forest', 'village morning roosters', 'river stream', 'gentle wind in trees', 'busy village market'"],
+    "ambience": ["1-2 ENGLISH continuous background sounds that fit THIS place and moment, e.g. 'heavy rain on tin roof', 'night crickets in fields', 'wind howling through broken windows', 'old wall clock ticking', 'river flowing at night', 'distant temple bells'"],
     "lines": [{{"speaker": "narrator or a character name", "text": "{L['name']} text",
                 "en": "the same line translated to natural English (for subtitles)",
                 "emotion": "one of {EMOTIONS}",
-                "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
+                "sfx": [{{"sound": "ENGLISH short sound name of what HAPPENS in this line, e.g. 'old wooden door creaks open', 'slow footsteps on wooden floor', 'glass shatters', 'three knocks on door', 'woman screams far away', 'dog howls', 'match strike', 'thunder crack', 'bangles jingling', 'heavy breathing'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
-                "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a cartoon film still: WHO is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (close-up / medium / wide / low angle), light, important objects. Only things that can be SEEN",
+                "jump_scare": false,
+                "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a horror film still: WHO/WHAT is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (extreme close-up / close-up / wide / over-the-shoulder / low angle), light source (lantern, moonlight, lightning), key objects. Only things that can be SEEN. Every line gets a different picture that matches its words exactly",
                            "characters": ["names VISIBLE in this picture; [] if only a place or object is shown"]}}}}]
  }}],
- "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
- "ending_line": "one short sweet {L['name']} closing line from the narrator",
- "comment_question": "one short friendly {L['name']} question to viewers that makes them comment (e.g. 'तुम होते तो क्या करते?'), with 1 emoji",
- "teaser_scene": "number: the scene (1 = first) where the most fun/exciting 50 seconds START - used for the Reel/Short teaser",
- "quiz": {{"question": "one easy {L['name']} question for children about THIS story (max 12 words)",
-           "options": ["3 short {L['name']} answers (2-4 words each), only one correct"], "answer": "0, 1 or 2: index of the correct option"}}
+ "ending_line": "one short {L['name']} line from the narrator that leaves a chill",
+ "comment_question": "one short {L['name']} question to viewers that makes them comment (e.g. 'आप होते तो क्या करते?'), with 1 emoji",
+ "teaser_scene": "number: the scene (1 = first) where the most gripping 50 seconds START - used for the Reel/Short teaser"
 }}
 Every scene object also has "chapter": "2-4 word {L['name']} chapter name for YouTube chapters".
 """
@@ -709,9 +675,7 @@ class Voices:
             dup[k] = n + 1
             pitch, rate = AGE_VOICE[ag]
             pitch += [0, -8, 8, -14, 14][n % 5]
-            if voice == nar_voice and ag in ("adult", "young"):
-                pitch += 9                     # keep characters clearly different from the narrator
-            ghost = False
+            ghost = c["kind"].startswith("ghost")
             if ghost:
                 rate -= 10
             self.map[c["name"].lower()] = (voice, f"{rate:+d}%", f"{pitch:+d}Hz", ghost)
@@ -729,6 +693,173 @@ class Voices:
         return v, r, p, False
 
 
+# ---------- Gemini voices: real-sounding, acted from written directions
+GEMINI_TTS_OFF = False
+GEMINI_VOICES = {   # prebuilt Gemini voices picked for each kind of character
+    ("male", "child"): "Puck", ("male", "young"): "Fenrir", ("male", "adult"): "Orus", ("male", "old"): "Algenib",
+    ("female", "child"): "Leda", ("female", "young"): "Zephyr", ("female", "adult"): "Kore", ("female", "old"): "Gacrux",
+}
+AGE_WORDS = {"child": "a small child of about eight", "young": "a young person in their early twenties",
+             "adult": "an adult of about forty", "old": "a very old person in their late seventies, with a tired, slightly shaky, aged voice"}
+EMOTION_WORDS = {
+    "normal": "naturally", "calm": "calmly and softly", "whisper": "in a frightened whisper, very quietly",
+    "scared": "terrified, breathing fast, voice trembling", "shout": "screaming in panic, very loud",
+    "angry": "angrily, sharply", "sad": "sadly, slowly, with a heavy heart", "crying": "while crying and sobbing",
+    "eerie": "in a low, mysterious voice", "happy": "happily", "excited": "excitedly", "laughing": "laughing",
+}
+NARRATOR_GEMINI = ("Charon", "the narrator of a famous late-night radio horror drama: a deep, rich, resonant, "
+                   "dramatic male baritone voice, at a normal steady storytelling pace (not slow), gripping, with short suspenseful pauses, every word clear")
+GHOST_GEMINI = ("Enceladus", "a ghost: a hollow, breathy, cold, slow, otherworldly whispering voice")
+
+
+def gemini_persona(voices, speaker):
+    s = ascii_text(speaker).lower()
+    c = voices.cast.find(s) if s and not s.startswith("narrat") else None
+    if not c:
+        return NARRATOR_GEMINI
+    if c["kind"].startswith("ghost"):
+        return GHOST_GEMINI
+    g = "female" if c["gender"].startswith("f") else "male"
+    ag = age_group(c["age"])
+    return GEMINI_VOICES[(g, ag)], f"{AGE_WORDS[ag]} ({'woman' if g == 'female' else 'man'} named {c['name']}), a real person, natural and believable"
+
+
+def gemini_keys():
+    """Voice keys: GEMINI_TTS_KEY, GEMINI_TTS_KEY_2, _3, _4 - each from a different free Google account
+    (each account has its own daily limit)."""
+    return [k for k in (env("GEMINI_TTS_KEY" + suf) for suf in ("", "_2", "_3", "_4")) if k]
+
+
+GEMINI_KEY_NOW = 0
+GEMINI_CACHE = {}          # (scene, line) -> finished Gemini wav, made before the video is put together
+GEMINI_READY = False       # True once the whole story was voiced by Gemini
+
+
+def _gemini_429(r):
+    """Read a 'limit reached' answer: returns ('day' | 'minute', seconds to wait)."""
+    txt = r.text
+    wait = 30.0
+    m = re.search(r'"retryDelay"\s*:\s*"([\d.]+)s"', txt)
+    if m:
+        wait = float(m.group(1))
+    kind = "day" if re.search(r"PerDay|per_day|daily", txt, re.I) else "minute"
+    return kind, wait
+
+
+def gemini_line(text, persona, emotion, lang, out_wav):
+    """One line spoken by Gemini's voice model, acted as described. Returns True if it worked.
+    If a key's limit is used up it moves on to the next key (GEMINI_TTS_KEY_2, _3 ...)."""
+    global GEMINI_TTS_OFF, GEMINI_KEY_NOW
+    if MOCK or GEMINI_TTS_OFF or env("USE_GEMINI_VOICE") == "0":
+        return False
+    keys = gemini_keys()                  # only keys given specially for voices (so no surprise bills)
+    if not keys:
+        return False
+    voice, who = persona
+    how = EMOTION_WORDS.get(str(emotion).lower(), "naturally")
+    prompt = (f"You are a voice actor in a {LANGS[lang]['name']} audio drama. Speak as {who}, {how}. "
+              f"Use natural {LANGS[lang]['name']} pronunciation. Say only this line, nothing else:\n{text}")
+    body = {"contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"responseModalities": ["AUDIO"],
+                                 "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}}}
+    models = [env("GEMINI_TTS_MODEL")] if env("GEMINI_TTS_MODEL") else []
+    models += ["gemini-2.5-flash-preview-tts", "gemini-3.1-flash-tts-preview"]
+    bad = 0
+    while GEMINI_KEY_NOW < len(keys):
+        key = keys[GEMINI_KEY_NOW]
+        next_key = False
+        for model in models:
+            minute_waits = 0
+            attempt = 0
+            while attempt < 2:
+                try:
+                    r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent",
+                                      headers={"x-goog-api-key": key}, json=body, timeout=120)
+                    if r.status_code == 404:
+                        break                                 # model name not available -> next one
+                    if r.status_code == 429:
+                        kind, wait = _gemini_429(r)
+                        if kind == "minute" and minute_waits < 4:
+                            minute_waits += 1
+                            log(f"  Gemini voice: per-minute limit - waiting {min(wait, 65):.0f}s")
+                            time.sleep(min(wait, 65) + 1)
+                            continue
+                        break                                 # this model's daily limit -> try other model
+                    if r.status_code in (401, 403):
+                        log(f"  Gemini voice key {GEMINI_KEY_NOW + 1} not accepted (HTTP {r.status_code})")
+                        next_key = True
+                        break
+                    if not r.ok:
+                        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:150]}")
+                    part = r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]
+                    pcm = base64.b64decode(part["data"])
+                    raw = out_wav + ".pcm"
+                    with open(raw, "wb") as f:
+                        f.write(pcm)
+                    # cut silence at the start/end, and shorten any long silent gap inside the line
+                    run(["ffmpeg", "-y", "-f", "s16le", "-ar", "24000", "-ac", "1", "-i", raw,
+                         "-af", "silenceremove=start_periods=1:start_threshold=-50dB:"
+                                "stop_periods=-1:stop_duration=1.2:stop_silence=0.6:stop_threshold=-50dB,"
+                                "areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
+                                "aresample=44100",
+                         "-ac", "1", "-ar", str(SR), out_wav])
+                    d, n = duration(out_wav), len(text)
+                    # a line that was cut off half-way (too short) or that rambles on (too long) is not used
+                    if d < max(0.4, n / 40) or d > n / 3 + 4:
+                        bad += 1
+                        log(f"  Gemini voice gave a broken line ({d:.1f}s for {n} letters) - asking again")
+                        if bad >= 3:
+                            return False
+                        attempt += 1
+                        continue
+                    return True
+                except Exception as e:
+                    log(f"  Gemini voice attempt failed ({model}): {str(e)[:120]}")
+                    time.sleep(3)
+                    attempt += 1
+            if next_key:
+                break
+        # every model on this key is used up (or the key is bad) -> next key
+        GEMINI_KEY_NOW += 1
+        if GEMINI_KEY_NOW < len(keys):
+            log(f"  Gemini voice: key {GEMINI_KEY_NOW} used up - switching to key {GEMINI_KEY_NOW + 1}")
+    log("  Gemini voice: all keys used up for today")
+    GEMINI_TTS_OFF = True
+    return False
+
+
+def prepare_gemini_voices(scenes, voices, lang, max_minutes=25):
+    """Voice the WHOLE story with Gemini before the video is made. If Gemini cannot finish every line
+    (limit reached), none of it is used - the whole video then uses Microsoft voices, so a character's
+    voice never changes and the sound never breaks in the middle of the video."""
+    global GEMINI_READY, GEMINI_TTS_OFF
+    if MOCK or not gemini_keys() or env("USE_GEMINI_VOICE") == "0":
+        return False
+    todo = [(i, j, ln) for i, s in enumerate(scenes) for j, ln in enumerate(s.get("lines") or [])
+            if str(ln.get("text", "")).strip()]
+    log(f"Gemini voices for all {len(todo)} lines (keys: {len(gemini_keys())})")
+    t0 = time.time()
+    for k, (i, j, ln) in enumerate(todo):
+        if time.time() - t0 > max_minutes * 60:
+            log("  Gemini voices too slow today - using Microsoft voices for the whole video")
+            break
+        p = os.path.join(WORK, f"g_{i:02d}_{j:02d}.wav")
+        if not gemini_line(str(ln["text"]).strip(),
+                           gemini_persona(voices, ln.get("speaker", "narrator")),
+                           ln.get("emotion", "normal"), lang, p):
+            log(f"  Gemini voice stopped at line {k + 1}/{len(todo)} - using Microsoft voices for the whole video "
+                "(same voice all through)")
+            break
+        GEMINI_CACHE[(i, j)] = p
+    else:
+        GEMINI_READY = True
+        log("  all lines voiced by Gemini")
+        return True
+    GEMINI_CACHE.clear()
+    GEMINI_TTS_OFF = True
+    return False
+
+
 async def _edge(text, voice, rate, pitch, out, volume="+0%"):
     import edge_tts
     await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch, volume=volume).save(out)
@@ -737,16 +868,14 @@ async def _edge(text, voice, rate, pitch, out, volume="+0%"):
 # how each emotion changes the voice: (speed %, pitch Hz, volume %, extra sound filter)
 EMOTION_VOICE = {
     "normal": (0, 0, 0, ""),
-    "calm": (-6, -2, -5, ""),
-    "happy": (4, 6, 5, ""),
-    "excited": (12, 12, 10, ""),
-    "laughing": (8, 10, 5, ""),
-    "proud": (-2, 2, 10, ""),
+    "calm": (-2, -2, -5, ""),
     "whisper": (-10, -6, -35, "highpass=f=180"),
     "scared": (12, 12, 5, ""),
-    "angry": (5, -6, 20, ""),
+    "shout": (8, 22, 25, "acompressor=threshold=0.2:ratio=4,volume=1.3"),
+    "angry": (5, -6, 20, "acompressor=threshold=0.25:ratio=3"),
     "sad": (-14, -10, -10, ""),
     "crying": (-10, 6, -5, ""),
+    "eerie": (-6, -8, -5, ""),
 }
 
 
@@ -789,7 +918,7 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
             ok = os.path.exists(mp3) and os.path.getsize(mp3) > 800
             if ok:
                 if manual:
-                    post_pitch = max(0.85, min(1.22, 1 + _num(pitch) / 150))
+                    post_pitch = max(0.9, min(1.15, 1 + _num(pitch) / 200))
                     if r_ == "+0%":
                         post_tempo = max(0.7, min(1.4, 1 + _num(rate) / 100))
                 break
@@ -798,8 +927,8 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
             time.sleep(2 + 3 * attempt)
     af = "aresample=44100"
     if ok and (post_pitch != 1.0 or post_tempo != 1.0):
-        af = (f"asetrate=44100*{post_pitch:.3f},aresample=44100,"
-              f"atempo={max(0.5, min(2.0, post_tempo / post_pitch)):.3f}")
+        af = (f"rubberband=pitch={post_pitch:.3f}:tempo={post_tempo:.3f}:formant=preserved,"
+              f"aresample=44100")
     if not ok:
         # backup (Google) has only one voice -> change its pitch so characters still differ
         from gtts import gTTS
@@ -821,7 +950,7 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
              "[b]asetrate=44100*1.08,aresample=44100,atempo=0.83,highpass=f=1800,volume=0.45,adelay=70[air];"
              "[c]asetrate=44100*0.62,aresample=44100,atempo=1.445,lowpass=f=700,volume=0.55,adelay=20[growl];"
              "[deep][air][growl]amix=inputs=3:normalize=0,"
-             "aecho=0.8:0.8:120|260:0.3|0.15,lowpass=f=7000,"
+             "aecho=0.8:0.8:120:0.2,lowpass=f=7000,"
              "dynaudnorm=f=150:g=7,volume=1.1[out]")
         run(["ffmpeg", "-y", "-i", mp3, "-filter_complex", g, "-map", "[out]", "-ac", "1", "-ar", str(SR), out_wav])
         return duration(out_wav)
@@ -993,39 +1122,6 @@ def synth(tag, n, rnd):
             m = int(SR * 0.15)
             kn = _filt(_noise(m, rnd), "bandpass", [100, 900]) * _env_decay(m, 0.02)
             _place(out, kn * 1.1, x + k * 0.38)
-    elif tag == "birds":
-        x = rnd.uniform(0.1, 0.8)
-        while x < n / SR - 0.5:
-            m = int(SR * rnd.uniform(0.08, 0.18))
-            tt = np.arange(m) / SR
-            f0 = rnd.uniform(2500, 4200)
-            ch = np.sin(2 * np.pi * (f0 + 1500 * np.sin(np.pi * tt / tt[-1])) * tt) * np.hanning(m)
-            for r in range(int(rnd.integers(1, 4))):
-                _place(out, ch * 0.08, x + r * 0.12)
-            x += rnd.uniform(0.6, 2.2)
-    elif tag == "water":
-        w = _filt(_noise(n, rnd), "bandpass", [400, 3000])
-        out = w * (0.5 + 0.5 * _smooth_lfo(n, rnd, 2.0)) * 0.08
-    elif tag == "boing":
-        m = int(SR * 0.6)
-        tt = np.arange(m) / SR
-        out[:m] += np.sin(2 * np.pi * (180 + 250 * np.exp(-tt * 6) * np.cos(2 * np.pi * 9 * tt)) * tt) * np.exp(-tt * 5) * 0.6
-    elif tag == "whoosh":
-        m = int(SR * 0.7)
-        w = _filt(_noise(m, rnd), "bandpass", [500, 4000]) * np.hanning(m)
-        out[:m] += w * 0.35
-    elif tag == "pop":
-        m = int(SR * 0.08)
-        tt = np.arange(m) / SR
-        out[:m] += np.sin(2 * np.pi * (900 - 5000 * tt) * tt) * np.exp(-tt * 60) * 0.7
-    elif tag == "bell":
-        m = int(SR * 2.0)
-        tt = np.arange(m) / SR
-        out[:m] += sum(np.sin(2 * np.pi * 880 * r * tt) / r for r in (1, 2.4, 3.9)) * np.exp(-tt * 2.2) * 0.25
-    elif tag == "splash":
-        m = int(SR * 0.9)
-        w = _filt(_noise(m, rnd), "bandpass", [300, 6000]) * np.exp(-np.arange(m) / (SR * 0.25))
-        out[:m] += w * 0.5
     elif tag == "scare_hit":
         m = int(SR * 2.5)
         tt = np.arange(m) / SR
@@ -1036,13 +1132,6 @@ def synth(tag, n, rnd):
 
 
 SFX_KEYWORDS = [  # words in a sound name -> built-in sound used when no real recording is available
-    (("bird", "chirp", "crow", "cuckoo", "sparrow", "parrot", "rooster", "peacock"), "birds"),
-    (("river", "stream", "pond", "flowing"), "water"),
-    (("splash", "jump into water", "fell in water"), "splash"),
-    (("bounce", "boing", "spring", "jump"), "boing"),
-    (("whoosh", "swish", "fly", "zoom", "swing"), "whoosh"),
-    (("pop", "bubble", "click"), "pop"),
-    (("bell", "temple", "ring", "chime"), "bell"),
     (("door", "creak", "hinge", "gate", "floorboard", "chair"), "creak"),
     (("knock", "bang on", "tap"), "knock"),
     (("step", "walk", "footstep", "running"), "footsteps"),
@@ -1054,9 +1143,9 @@ SFX_KEYWORDS = [  # words in a sound name -> built-in sound used when no real re
     (("owl",), "owl"),
     (("howl", "dog", "wolf", "jackal"), "howl"),
     (("drip", "drop", "tap water"), "drip"),
-    (("whisper", "murmur"), "whisper"),
+    (("whisper", "murmur", "breath", "giggle", "laugh"), "whisper"),
     (("cricket", "insect", "night", "field"), "crickets"),
-    (("crash", "bang", "boom", "thud", "fall"), "knock"),
+    (("scream", "slam", "crash", "shatter", "glass", "hit", "bang", "jump", "sudden", "boom"), "scare_hit"),
 ]
 _SFX_CACHE = {}
 
@@ -1093,7 +1182,12 @@ def freesound(query, loop):
         stop = {"a", "an", "the", "on", "of", "in", "at", "slowly", "suddenly", "old", "far", "away", "three", "two"}
         core = [w for w in words if w not in stop]
         pairs = [" ".join(core[i:i + 2]) for i in range(len(core) - 1)]
-        tries = [" ".join(words), " ".join(core)] + pairs + core[:2]
+        generic = {"creak": "door creak", "knock": "knocking door", "footsteps": "footsteps wood floor",
+                   "thunder": "thunder", "rain": "rain", "wind": "wind howling", "heartbeat": "heartbeat",
+                   "clock": "clock ticking", "owl": "owl hoot", "howl": "dog howling night", "drip": "water drip",
+                   "whisper": "whisper", "crickets": "crickets night", "scare_hit": "horror impact"}
+        g = generic.get(_keyword_tag(query) or "", "")
+        tries = [" ".join(words), " ".join(core)] + pairs + core[:2] + ([g] if g else [])
         res = []
         for q in dict.fromkeys(t for t in tries if t):
             r = requests.get("https://freesound.org/apiv2/search/", timeout=30, params={
@@ -1162,48 +1256,21 @@ def get_ambience(name, n, rnd):
 
 
 def drone(n, rnd, mood):
-    """Soft, cheerful background music: warm chords + a gentle music-box melody (made here, no copyright)."""
+    """Background horror music bed made from slow detuned tones."""
     np = _np()
     t = np.arange(n) / SR
-    root = rnd.choice([261.63, 293.66, 329.63, 349.23])         # C, D, E, F
-    if mood == "sad":
-        prog = [(0, 3, 7), (-4, 0, 3), (-2, 2, 5), (-5, -1, 2)]   # minor, slow
-        tempo = 70
-    else:
-        prog = [(0, 4, 7), (5, 9, 12), (-3, 0, 4), (7, 11, 14)]   # I - IV - vi - V
-        tempo = {"funny": 118, "adventure": 112, "happy": 104}.get(mood, 90)
-    beat = 60 / tempo
-    bar = beat * 4
+    base = rnd.choice([49.0, 55.0, 58.27, 61.74])
+    level = {"calm": 0.07, "sad": 0.08, "creepy": 0.10, "tense": 0.12, "scare": 0.14}.get(mood, 0.09)
     out = np.zeros(n)
-    # warm pad chords
-    for k in range(int(t[-1] / bar) + 1 if n else 0):
-        chord = prog[k % len(prog)]
-        a0, a1 = int(k * bar * SR), min(n, int((k + 1) * bar * SR))
-        if a0 >= n:
-            break
-        tt = t[a0:a1] - t[a0]
-        env = np.minimum(1, tt / 0.4) * np.minimum(1, (bar - tt) / 0.4)
-        for semi in chord:
-            f = root / 2 * 2 ** (semi / 12)
-            out[a0:a1] += 0.06 * env * (np.sin(2 * np.pi * f * tt) + 0.3 * np.sin(4 * np.pi * f * tt))
-    # music-box melody on the beat (pentatonic, so it always sounds sweet)
-    scale = [0, 2, 4, 7, 9, 12, 14, 16]
-    step = beat / (2 if mood in ("funny", "adventure") else 1)
-    note_len = int(SR * min(0.9, step * 1.6))
-    nt = np.arange(note_len) / SR
-    pos, prev = 0.0, 4
-    while pos < t[-1] if n else False:
-        if rnd.uniform() < 0.8:
-            prev = int(np.clip(prev + rnd.choice([-2, -1, 1, 2]), 0, len(scale) - 1))
-            f = root * 2 ** (scale[prev] / 12)
-            note = (np.sin(2 * np.pi * f * nt) + 0.25 * np.sin(2 * np.pi * 3 * f * nt)) * np.exp(-nt * 4.5)
-            _place(out, note * 0.05, pos)
-        pos += step
+    for mult, amp in ((1, 1.0), (1.5, 0.45), (2.02, 0.35), (2.38, 0.18 if mood in ("tense", "scare") else 0.0)):
+        f = base * mult * (1 + 0.003 * np.sin(2 * np.pi * rnd.uniform(0.05, 0.15) * t))
+        out += amp * np.sin(2 * np.pi * np.cumsum(f) / SR)
+    air = _filt(_noise(n, rnd), "bandpass", [300, 1400]) * 0.12
+    out = (out / 2.0 + air) * (0.6 + 0.4 * _smooth_lfo(n, rnd, 0.15))
     fade = min(n // 4, int(SR * 1.5))
-    if fade:
-        out[:fade] *= np.linspace(0, 1, fade)
-        out[-fade:] *= np.linspace(1, 0, fade)
-    return out * (0.8 if mood == "calm" else 1.0)
+    out[:fade] *= np.linspace(0, 1, fade)
+    out[-fade:] *= np.linspace(1, 0, fade)
+    return out * level
 
 
 def read_wav(path):
@@ -1223,7 +1290,10 @@ def write_wav(path, a):
         w.writeframes((a * 32767).astype(np.int16).tobytes())
 
 
-def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=None):
+SCENE_FX = {}          # scene index -> {"jump": [seconds], "flash": [seconds]} for the camera effects
+
+
+def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=None, place=""):
     """Like a radio drama: every line is spoken with its own voice + emotion, and each sound
     effect is placed exactly where the story says it happens (before / during / after the line).
     Ambience (rain, crickets...) and music run underneath and get quieter while people talk.
@@ -1241,19 +1311,23 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         during = [x for x in sfx if str(x.get("when", "")).startswith("during")]
         after = [x for x in sfx if str(x.get("when", "")).startswith("after")]
         # sounds that happen first, e.g. "the door creaked..." -> creak, then the words
-        for x in before[:2]:
+        for x in before[:3]:
             snd = get_oneshot(x["sound"], rnd)
             if snd is not None:
-                cues.append((t, snd, 0.85))
+                cues.append((t, snd, 0.85, x["sound"]))
                 t += min(len(snd) / SR, 2.2) * 0.75 + 0.15
         if ln.get("jump_scare"):
             # classic jump scare: everything goes almost silent, then a sudden hit
             silences.append((max(0.0, t - 0.9), t))
-            cues.append((t, synth("scare_hit", int(SR * 2.5), rnd), 1.0))
+            cues.append((t, synth("scare_hit", int(SR * 2.5), rnd), 1.0, "scare_hit"))
             t += 0.45
         spec = voices.for_speaker(ln.get("speaker", "narrator"))
         p = os.path.join(WORK, f"v_{idx:02d}_{j:02d}.wav")
-        tts_line(text, spec, LANGS[lang]["gtts"], p, ln.get("emotion", "normal"))
+        if (idx, j) in GEMINI_CACHE:
+            shutil.copy(GEMINI_CACHE[(idx, j)], p)
+        elif not gemini_line(text, gemini_persona(voices, ln.get("speaker", "narrator")), ln.get("emotion", "normal"),
+                             lang, p):
+            tts_line(text, spec, LANGS[lang]["gtts"], p, ln.get("emotion", "normal"))
         a = read_wav(p)
         pk = np.abs(a).max()
         if pk > 0:                                    # every voice equally clear; whispers softer
@@ -1262,32 +1336,40 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         if spec[3]:                                   # ghost speaking: cold swell + whispers
             m = int(SR * 1.2)
             swell = _filt(_noise(m, rnd), "bandpass", [300, 3000]) * np.linspace(0, 1, m) ** 2 * 0.35
-            cues.append((max(0.0, t - 1.1), swell, 1.0))
-            cues.append((t, synth("whisper", len(a) + int(SR * 0.8), rnd) * 1.4, 0.8))
-        pieces.append((t, a))
+            cues.append((max(0.0, t - 1.1), swell, 1.0, "ghost_swell"))
+            cues.append((t, synth("whisper", len(a) + int(SR * 0.8), rnd) * 1.4, 0.8, "ghost_whisper"))
+        pieces.append((t, a, bool(spec[3])))
         sp = ascii_text(ln.get("speaker", "")).lower()
         is_nar = (not sp) or sp.startswith("narrat") or voices.cast.find(sp) is None
         subs.append((t, len(a) / SR, is_nar, text))
-        for x in during[:2]:
+        for x in during[:3]:
             snd = get_oneshot(x["sound"], rnd, max_sec=min(6.0, len(a) / SR + 1))
             if snd is not None:
-                cues.append((t + 0.25, snd, 0.55))
+                cues.append((t + 0.25, snd, 0.55, x["sound"]))
         t += len(a) / SR + gap
-        for x in after[:2]:
+        for x in after[:3]:
             snd = get_oneshot(x["sound"], rnd)
             if snd is not None:
-                cues.append((t - gap + 0.1, snd, 0.85))
+                cues.append((t - gap + 0.1, snd, 0.85, x["sound"]))
                 t += min(len(snd) / SR, 2.0) * 0.7
     total = t - gap + tail
     n = int(total * SR)
 
-    voice = np.zeros(n)
-    for start, a in pieces:
-        _place(voice, a, start)
+    # voices: people in the middle; a ghost's voice drifts around the listener's head
+    vL, vR = np.zeros(n), np.zeros(n)
+    for start, a, is_ghost in pieces:
+        if is_ghost and SPATIAL:
+            side = 1 if rnd.uniform() < 0.5 else -1
+            l, r = extras.spatialize(a, side * 70, -side * 40, SR)
+            l, r = extras.reverb_stereo(l, r, "hall", SR, seed=idx + 7)
+        else:
+            l, r = a, a
+        _place(vL, l, start)
+        _place(vR, r, start)
 
     # background: music + place ambience (from the story) + any old-style tags
     bed = drone(n, rnd, mood)
-    for name in (ambience or [])[:2]:
+    for name in (ambience or [])[:3]:
         amb = get_ambience(str(name), n, rnd)
         if amb is not None:
             bed += amb * 0.5
@@ -1295,24 +1377,40 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         if tag in SOUND_TAGS and tag != "scare_hit":
             bed += synth(tag, n, rnd) * 0.5
 
-    fx = np.zeros(n)
-    for start, snd, vol in cues:
-        _place(fx, snd * vol, start)
+    # sound effects come from a direction (3D for headphones), with the echo of the place
+    fxL, fxR = np.zeros(n), np.zeros(n)
+    fxinfo = {"jump": [], "flash": []}
+    for start, snd, vol, name in cues:
+        low = str(name).lower()
+        if low == "scare_hit":
+            fxinfo["jump"].append(start)
+        if any(k in low for k in ("thunder", "lightning", "storm")):
+            fxinfo["flash"].append(start + 0.05)
+        a0, a1, _ = extras.spatial_path(name, rnd) if SPATIAL else (0, 0, 0)
+        l, r = extras.spatialize(snd * vol, a0, a1, SR)
+        _place(fxL, l, start)
+        _place(fxR, r, start)
+    SCENE_FX[idx] = fxinfo
+    if SPATIAL:
+        fxL, fxR = extras.reverb_stereo(fxL, fxR, extras.room_kind(f"{place} {' '.join(ambience or [])}"), SR, seed=idx)
+    bedL, bedR = extras.widen(bed, SR) if SPATIAL else (bed, bed)
 
     # quieter background while someone talks; near silence before a jump scare
     talk = np.zeros(n)
-    for start, a in pieces:
+    for start, a, _g in pieces:
         talk[int(start * SR):int(start * SR) + len(a)] = 1
     talk = np.clip(_filt(talk, "lowpass", 3, 1), 0, 1)
     quiet = np.ones(n)
     for s0, s1 in silences:
         quiet[int(s0 * SR):int(s1 * SR)] = 0.08
     quiet = _filt(quiet, "lowpass", 6, 1)
-    mix = voice * 0.95 + bed * (1 - 0.6 * talk) * quiet + fx * (1 - 0.3 * talk)
-    peak = np.abs(mix).max()
+    duck = (1 - 0.6 * talk) * quiet
+    mixL = vL * 0.95 + bedL * duck + fxL * (1 - 0.3 * talk)
+    mixR = vR * 0.95 + bedR * duck + fxR * (1 - 0.3 * talk)
+    peak = max(np.abs(mixL).max(), np.abs(mixR).max())
     if peak > 0.98:
-        mix *= 0.98 / peak
-    write_wav(out_wav, mix)
+        mixL, mixR = mixL * 0.98 / peak, mixR * 0.98 / peak
+    extras.write_stereo_wav(out_wav, mixL, mixR, SR)
     return total, subs
 
 
@@ -1338,21 +1436,22 @@ def font(size):
 
 # ----------------------------------------------------------------- 5. thumbnail
 def make_thumbnail(base_img, text, out, label):
-    """Professional kids-channel thumbnail: bright punchy picture with the character big on the right,
-    huge 2-line text on the left (yellow + white on a colour banner) with thick outline and glow,
-    a story-type tag and a bright frame."""
+    """Viral YouTube-style thumbnail: punchy, high-contrast picture with the scary face on the
+    right, huge 2-line text on the left (white + red banner), glow, red frame and a label tag."""
     from PIL import ImageEnhance
     img = Image.open(base_img).convert("RGB").resize((W, H))
-    img = ImageEnhance.Color(img).enhance(1.35)
-    img = ImageEnhance.Contrast(img).enhance(1.15)
-    img = ImageEnhance.Sharpness(img).enhance(1.6)
-    img = ImageEnhance.Brightness(img).enhance(1.05)
-    # soft colour fade on the left so the words stand out
+    img = ImageEnhance.Contrast(img).enhance(1.3)
+    img = ImageEnhance.Color(img).enhance(1.25)
+    img = ImageEnhance.Sharpness(img).enhance(1.8)
+    img = ImageEnhance.Brightness(img).enhance(1.08)
+    # dark fade on the left half so the text pops
     shade = Image.new("L", (W, H), 0)
     d = ImageDraw.Draw(shade)
-    for x in range(int(W * 0.6)):
-        d.line([(x, 0), (x, H)], fill=int(175 * (1 - x / (W * 0.6)) ** 1.4))
-    img = Image.composite(Image.new("RGB", (W, H), (40, 10, 90)), img, shade)
+    for x in range(int(W * 0.62)):
+        d.line([(x, 0), (x, H)], fill=int(215 * (1 - x / (W * 0.62)) ** 1.3))
+    for y in range(int(H * 0.7), H):                                   # and a bit at the bottom
+        d.line([(0, y), (W, y)], fill=max(0, min(255, int(160 * (y - H * 0.7) / (H * 0.3)))))
+    img = Image.composite(Image.new("RGB", (W, H), (0, 0, 0)), img, shade)
 
     words = text.strip().split()
     if len(words) >= 2:
@@ -1360,44 +1459,44 @@ def make_thumbnail(base_img, text, out, label):
         lines = [" ".join(words[:half]), " ".join(words[half:])]
     else:
         lines = [text.strip()]
-    box_w = int(W * 0.6)
+    box_w = int(W * 0.62)
     probe = ImageDraw.Draw(img)
     size = 170
     while size > 56:
         f = font(size)
-        if all(probe.textlength(l, font=f) <= box_w - 70 for l in lines) and size * 1.35 * len(lines) <= H * 0.68:
+        if all(probe.textlength(l, font=f) <= box_w - 70 for l in lines) and size * 1.35 * len(lines) <= H * 0.7:
             break
         size -= 6
     f = font(size)
     lh = int(size * 1.38)
-    y0 = int((H - lh * len(lines)) / 2) + 20
+    y0 = int((H - lh * len(lines)) / 2) + 10
     x0 = 46
 
-    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))                      # white glow behind the words
+    # red glow behind the text
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     gd = ImageDraw.Draw(glow)
     for i, l in enumerate(lines):
-        gd.text((x0, y0 + i * lh), l, font=f, fill=(255, 255, 255, 230), stroke_width=size // 6,
-                stroke_fill=(255, 255, 255, 230))
-    glow = glow.filter(ImageFilter.GaussianBlur(16))
+        gd.text((x0, y0 + i * lh), l, font=f, fill=(255, 0, 0, 255), stroke_width=size // 6, stroke_fill=(255, 0, 0, 255))
+    glow = glow.filter(ImageFilter.GaussianBlur(18))
     img = Image.alpha_composite(img.convert("RGBA"), glow).convert("RGB")
 
     draw = ImageDraw.Draw(img)
-    banner = (255, 70, 120)
     for i, l in enumerate(lines):
         y = y0 + i * lh
-        if i == len(lines) - 1 and len(lines) > 1:                     # last line on a pink banner
+        if i == len(lines) - 1 and len(lines) > 1:                    # last line on a red banner
             tw = draw.textlength(l, font=f)
-            draw.rounded_rectangle([x0 - 18, y - size * 0.02, x0 + tw + 18, y + size * 1.22], radius=22, fill=banner,
-                                   outline=(255, 255, 255), width=5)
-            draw.text((x0, y), l, font=f, fill=(255, 255, 255), stroke_width=max(5, size // 18), stroke_fill=(90, 0, 40))
+            draw.rounded_rectangle([x0 - 18, y - size * 0.02, x0 + tw + 18, y + size * 1.22], radius=18,
+                                   fill=(210, 0, 0))
+            draw.text((x0, y), l, font=f, fill=(255, 255, 255), stroke_width=max(4, size // 22), stroke_fill=(70, 0, 0))
         else:
-            draw.text((x0, y), l, font=f, fill=(255, 225, 0), stroke_width=max(8, size // 10), stroke_fill=(20, 0, 60))
+            draw.text((x0, y), l, font=f, fill=(255, 238, 0), stroke_width=max(6, size // 12), stroke_fill=(0, 0, 0))
 
-    lf = font(40)                                                        # story-type tag
+    # label tag + red frame
+    lf = font(40)
     tw = draw.textlength(label, font=lf)
-    draw.rounded_rectangle([30, 26, 30 + tw + 44, 26 + 72], radius=36, fill=(255, 200, 0), outline=(255, 255, 255), width=4)
-    draw.text((52, 30), label, font=lf, fill=(60, 0, 80))
-    draw.rectangle([0, 0, W - 1, H - 1], outline=(255, 200, 0), width=12)  # bright frame
+    draw.rounded_rectangle([30, 26, 30 + tw + 44, 26 + 72], radius=14, fill=(0, 0, 0), outline=(255, 30, 30), width=4)
+    draw.text((52, 30), label, font=lf, fill=(255, 255, 255))
+    draw.rectangle([0, 0, W - 1, H - 1], outline=(220, 0, 0), width=12)
     img.save(out, quality=94)
 
 
@@ -1455,12 +1554,22 @@ def horror_look():
 
 
 def grade(frame_f32, f, sec, mood, rnd_flicker):
-    """Bright, clean cartoon look: a touch more colour and a very soft vignette."""
+    """Cold colors, vignette, drifting fog, grain and a little light flicker."""
     np = _np()
     look = horror_look()
     gray = frame_f32.mean(axis=2, keepdims=True)
-    frame = gray + (frame_f32 - gray) * 1.08                    # slightly richer colours
-    frame *= 0.88 + 0.12 * look["vignette"]
+    frame = frame_f32 * 0.78 + gray * 0.22                       # slightly desaturated
+    frame *= np.array([1.06, 0.98, 0.90], "float32")             # BGR: cooler
+    off = int((sec * 18) % W)
+    fog = look["fog"][:, off:off + W]
+    if fog.shape[1] < W:
+        fog = np.concatenate([fog, look["fog"][:, :W - fog.shape[1]]], axis=1)
+    frame = frame + fog[..., None] * np.array([38, 36, 32], "float32")
+    frame *= look["vignette"]
+    flick = 1.0
+    if mood in ("creepy", "tense", "scare"):
+        flick = 1 - 0.10 * rnd_flicker[f % len(rnd_flicker)]
+    frame = frame * flick + look["grain"][f % 6]
     return frame
 
 
@@ -1513,6 +1622,29 @@ def plan_shots(segments, total):
     return out
 
 
+SPATIAL = os.getenv("SPATIAL_AUDIO", "1") != "0"
+GHOST_FACE = None      # BGR picture of this story's ghost, flashed for a split second on jump scares
+VHS = False            # "found footage" look for first-person stories
+
+
+def _vhs(img_u8, f, sec):
+    import cv2
+    np = _np()
+    out = img_u8.copy()
+    out[::2] = (out[::2] * 0.82).astype("uint8")                     # scan lines
+    out[..., 2] = np.roll(out[..., 2], 3, axis=1)                    # colour bleeding
+    band = int((sec * 140) % (H + 60)) - 30                          # rolling tracking noise
+    if 0 <= band < H - 12:
+        noise = np.random.default_rng(f).integers(0, 255, (12, W, 3), dtype="uint8")
+        out[band:band + 12] = (out[band:band + 12] * 0.4 + noise * 0.6).astype("uint8")
+    cv2.putText(out, "REC", (48, 64), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (255, 255, 255), 2, cv2.LINE_AA)
+    if int(sec * 2) % 2 == 0:
+        cv2.circle(out, (28, 53), 10, (0, 0, 230), -1)
+    stamp = f"PLAY  00:{int(sec) // 60:02d}:{int(sec) % 60:02d}"
+    cv2.putText(out, stamp, (W - 330, H - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+    return out
+
+
 def scene_clip_animated(segments, audio, out, idx, mood):
     np = _np()
     import cv2
@@ -1530,6 +1662,7 @@ def scene_clip_animated(segments, audio, out, idx, mood):
         stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     XF = 8                                                  # cross-fade frames between shots
     prev_last, cur_k, frame_in_shot = None, -1, 0
+    fxi = SCENE_FX.get(idx, {})
     try:
         for f in range(n):
             sec = f / FPS
@@ -1542,7 +1675,13 @@ def scene_clip_animated(segments, audio, out, idx, mood):
             ease = 0.5 - 0.5 * math.cos(math.pi * t)
             direction = 1 if (idx + k) % 2 == 0 else -1
             shake = 0.0
-            pass
+            if mood == "scare" and sec < 0.6:
+                shake = 7 * math.sin(sec * 90) * (1 - sec / 0.6)
+            if mood in ("tense", "scare"):                  # hand-held camera
+                shake += 2.2 * math.sin(sec * 6.1) + 1.4 * math.sin(sec * 11.3 + 1)
+            for jt in fxi.get("jump", []):                  # camera jolts on a jump scare
+                if 0 <= sec - jt < 0.7:
+                    shake += 10 * math.sin((sec - jt) * 70) * (1 - (sec - jt) / 0.7)
             if close:                                       # slow push towards the face
                 fx, fy = L["cx"], L["head"]
                 bz = 1.32 + 0.08 * ease
@@ -1562,6 +1701,15 @@ def scene_clip_animated(segments, audio, out, idx, mood):
                 aw = cv2.warpAffine(L["fg_a"], Mf, (W, H))[..., None]
                 frame = frame * (1 - aw) + fgw * aw
             frame = grade(frame, f, sec, mood, flicker)
+            for jt in fxi.get("jump", []):                  # the ghost's face flashes for a split second
+                d_ = sec - jt
+                if GHOST_FACE is not None and -0.04 <= d_ < 0.34:
+                    a_ = 0.9 if d_ < 0.2 else 0.9 * (0.34 - d_) / 0.14
+                    frame = frame * (1 - a_) + GHOST_FACE * a_
+            for lt in fxi.get("flash", []):                 # lightning
+                d_ = sec - lt
+                if 0 <= d_ < 0.1 or 0.22 <= d_ < 0.3:
+                    frame = frame * 0.35 + np.array([255, 245, 235], "float32") * 0.65
             if prev_last is not None and k > 0 and frame_in_shot < XF:
                 a_ = (frame_in_shot + 1) / (XF + 1)
                 frame = prev_last * (1 - a_) + frame * a_
@@ -1570,7 +1718,10 @@ def scene_clip_animated(segments, audio, out, idx, mood):
                 nk = next((i for i, s in enumerate(shots) if s[1] <= (f + 1) / FPS < s[2]), len(shots) - 1)
                 if nk != k:
                     prev_last = frame.copy()
-            ff.stdin.write(np.clip(frame, 0, 255).astype("uint8").tobytes())
+            u8 = np.clip(frame, 0, 255).astype("uint8")
+            if VHS:
+                u8 = _vhs(u8, f, sec)
+            ff.stdin.write(u8.tobytes())
         ff.stdin.close()
     except Exception:
         ff.kill()
@@ -1592,7 +1743,7 @@ def scene_clip_simple(segments, audio, out, idx, mood):
         p = os.path.join(WORK, f"seg_{idx:02d}_{k:02d}.mp4")
         run(["ffmpeg", "-y", "-loop", "1", "-i", img, "-t", f"{d:.3f}", "-vf",
              f"scale={W * 2}:{H * 2},zoompan=z='{z}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={W}x{H}:fps={FPS},"
-             f"eq=saturation=1.08,format=yuv420p",
+             f"eq=saturation=0.8:brightness=-0.03,vignette=PI/4,noise=alls=5:allf=t,format=yuv420p",
              "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", p])
         parts.append(p)
     lst = os.path.join(WORK, f"seg_{idx:02d}.txt")
@@ -1667,7 +1818,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 
 TIMELINE = ([], [])          # (start second of every part, every spoken line) of the last video
-BADGE_COLORS = ((255, 60, 120), (255, 255, 255))
+BADGE_COLORS = ((200, 0, 20), (255, 255, 255))
 
 
 def build_video(scene_parts, lang, out):
@@ -1675,13 +1826,14 @@ def build_video(scene_parts, lang, out):
     global TIMELINE
     clips, segs, t, wavs, part_times = [], [], 0.0, [], []
     voices = scene_parts[0]["voices"]
+    prepare_gemini_voices(scene_parts, voices, lang)       # all lines (intro + story + ending) or none
     for i, sp in enumerate(scene_parts):
         log(f"Voices + sound + clip {i + 1}/{len(scene_parts)}")
         part_times.append(t)
         a = os.path.join(WORK, f"audio_{i:02d}.wav")
         wavs.append(a)
         d, subs = make_scene_audio(sp["lines"], voices, lang, i, sp.get("sounds"), sp.get("mood", "creepy"), a,
-                                   sp.get("ambience"))
+                                   sp.get("ambience"), sp.get("place", ""))
         c = os.path.join(WORK, f"clip_{i:02d}.mp4")
         shots = sp.get("shots") or []
         segments = []
@@ -1708,8 +1860,10 @@ def build_video(scene_parts, lang, out):
     TIMELINE = (part_times, segs)
     try:                                   # small "Like - Share - Follow" pill, top right, at the start and the end
         extras.make_badge(FONT, LANGS[lang]["badge"], os.path.join(WORK, "badge.png"), BADGE_COLORS)
-        pic = ["-i", "badge.png", "-filter_complex",
-               f"[0:v]{vf}[b];[b][2:v]overlay=W-w-24:22:enable='{extras.badge_filter(total)}'[v]", "-map", "[v]"]
+        extras.headphone_hint(FONT, LANGS[lang]["hp"], os.path.join(WORK, "hp.png"))
+        pic = ["-i", "badge.png", "-i", "hp.png", "-filter_complex",
+               f"[0:v]{vf}[b];[b][2:v]overlay=W-w-24:22:enable='{extras.badge_filter(total)}'[c];"
+               f"[c][3:v]overlay=(W-w)/2:H-h-110:enable='between(t,0.5,7)'[v]", "-map", "[v]"]
     except Exception as e:
         log("  badge skipped:", str(e)[:120])
         pic = ["-vf", vf, "-map", "0:v"]
@@ -1795,9 +1949,9 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
     hdr = {"Authorization": f"Bearer {r.json()['access_token']}"}
     meta = {
         "snippet": {"title": title[:100], "description": description[:4900],
-                    "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "1",   # Film & Animation
+                    "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "24",
                     "defaultLanguage": lang, "defaultAudioLanguage": lang},
-        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") != "0",   # children's cartoons must be marked "made for kids"
+        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": False,
                    "containsSyntheticMedia": True},
     }
     size = os.path.getsize(video)
@@ -1866,7 +2020,8 @@ def voice_demo():
 # ----------------------------------------------------------------- main
 def main():
     global FONT
-    pass
+    if env("MODE") == "voice_demo":
+        return voice_demo()
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
@@ -1878,26 +2033,45 @@ def main():
         return
     if not MOCK:
         try:
-            extras.refresh_stats(history)            # learn which kinds of stories people liked
+            extras.refresh_stats(history)            # learn which stories people liked
         except Exception as e:
             log("  stats skipped:", str(e)[:150])
-    lang = pick_language(history)
+    prev = load_next_part()
+    festival = None
+    if prev:                                         # finish the series that was started last time
+        part, lang, theme, fmt = 2, prev["lang"], prev["theme"], prev.get("fmt")
+        ch = prev.get("choice") or {}
+        if ch.get("plan1") and ch.get("plan2"):      # count the viewers' votes (1 / 2) in the comments
+            v1, v2 = extras.count_votes(extras.comment_texts(prev.get("fb"), prev.get("yt")))
+            log(f"Viewers' vote: option 1 = {v1}, option 2 = {v2}")
+            if v1 + v2 > 0:
+                win = 1 if v1 >= v2 else 2
+                prev["vote"] = {"v1": v1, "v2": v2, "option1": ch.get("option1"), "option2": ch.get("option2"),
+                                "plan": ch[f"plan{win}"], "winner_text": ch.get(f"option{win}")}
+            else:
+                prev["part2_plan"] = ch.get("plan1") or prev.get("part2_plan")
+    else:
+        lang, theme = pick_language(history), pick_theme(history)
+        fmt = extras.weighted_choice(FORMATS, extras.weights(history, "format", FORMATS))
+        part = 1 if random.random() < float(env("SERIES_CHANCE") or 0.3) else 0
+        fest = extras.festival_today("horror")
+        if fest and not any(h.get("festival") == fest[0] and
+                            (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(h["date"])).total_seconds() < 20 * 3600
+                            for h in history[-3:] if h.get("date")):
+            festival, theme, part = fest[0], fest[1], 0
+            log(f"Festival special: {festival}")
+    global VHS
     L = LANGS[lang]
     FONT = find_font(lang)
-    theme = pick_theme(history)
-    festival = None
-    fest = extras.festival_today("cartoon")
-    if fest and not any(h.get("festival") == fest[0] and h.get("date") and
-                        (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(h["date"])).total_seconds() < 20 * 3600
-                        for h in history[-4:]):
-        festival = fest[0]
-        theme = ("divine" if fest[0] in DIVINE_FESTIVALS else "festival", fest[1])
-        log(f"Festival special: {festival}")
-    category = theme[0]
-    log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}")
+    VHS = "first person" in str(fmt)               # found-footage camera look for "I lived it" stories
+    log(f"Language: {L['name']} | Idea: {theme} | Style: {fmt}" + (f" | SERIES part {part}" if part else ""))
 
-    story = make_story(lang, theme, history)
-    title = story["title"].strip()[:95]
+    story = make_story(lang, theme, history, fmt=fmt, part=part, prev=prev)
+    if part == 2:                                    # same people and place as part 1
+        story["characters"], story["setting"] = prev["characters"], prev["setting"]
+    title = story["title"].strip()[:85]
+    if part:
+        title = f"{title} | {L['part'].format(n=part)}"
     log("Title:", title)
     with open(os.path.join(WORK, "story.json"), "w", encoding="utf-8") as f:
         json.dump(story, f, ensure_ascii=False, indent=1)
@@ -1914,7 +2088,7 @@ def main():
         log("  no cast picture - using text descriptions only")
 
     # one picture per spoken line (a new "camera shot" every few seconds), within the free budget
-    budget = int(env("MAX_IMAGES") or 30)          # 3 videos a day must fit the free picture limit
+    budget = int(env("MAX_IMAGES") or 48)
     scene_lines = [[ln for ln in (s.get("lines") or []) if str(ln.get("text", "")).strip()] for s in scenes]
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0
@@ -1952,74 +2126,81 @@ def main():
     imgs = [p or first_ok for p in imgs]
     shots_per_scene = [[x or imgs[i] for x in sh] for i, sh in enumerate(shots_per_scene)]
 
+    global GHOST_FACE
+    hidden = 0
+    gchar = next((c for c in cast.chars.values() if c["kind"].startswith("ghost")), None)
+    gface = os.path.join(WORK, "ghost_face.jpg")
+    if gchar and make_image(cast, f"extreme close-up of {gchar['name']}'s terrifying face staring straight into the "
+                            "camera, wide glowing eyes, emerging from pure black darkness, plain pitch-black background",
+                            "", [gchar["name"]], gface, seed + 1):
+        import cv2
+        gf = cv2.imread(gface)
+        gf = cv2.resize(gf, (W, H)).astype("float32") * np.array([0.75, 0.75, 1.2], "float32")
+        GHOST_FACE = np.clip(gf, 0, 255)
+        # "find the ghost": hide the face faintly in 3-4 pictures that are shown only once
+        rnd_h = np.random.default_rng(seed)
+        flat = [p for sh in shots_per_scene[2:] for p in dict.fromkeys(sh)]
+        once = [p for p in flat if sum(sh.count(p) for sh in shots_per_scene) == 1]
+        for p in list(rnd_h.permutation(once))[:int(rnd_h.integers(3, 5))] if once else []:
+            hp = p.replace(".jpg", "_h.jpg")
+            try:
+                extras.hide_ghost(p, gface, hp, rnd_h)
+                shots_per_scene = [[hp if x == p else x for x in sh] for sh in shots_per_scene]
+                hidden += 1
+            except Exception as e:
+                log("  hide ghost:", str(e)[:100])
+        log(f"Ghost face ready; hidden in {hidden} pictures")
+
     thumb_base = os.path.join(WORK, "thumb_base.jpg")
     ti = story.get("thumbnail_image") or {}
     if isinstance(ti, str):
         ti = {"action": ti}
+    ghost = ascii_text(ti.get("ghost", ""))
+    ghost_names = [c["name"] for c in cast.chars.values() if c["kind"].startswith("ghost")]
+    t_names = list(ti.get("characters") or []) + [n for n in ghost_names[:1] if n not in (ti.get("characters") or [])]
     if not make_image(cast, (ti.get("action") or scenes[-1].get("action", "")) +
-                      ". Viral YouTube kids thumbnail: the main character very big and close to the camera on the "
-                      "RIGHT half, huge expressive face (shocked, laughing or teary eyes), simple bright soft "
-                      "background on the LEFT half, vivid saturated colors, strong rim light, very sharp",
-                      "", ti.get("characters"), thumb_base, seed):
+                      (f". The ghost: {ghost}" if ghost else "") +
+                      ". Viral YouTube horror thumbnail photo: the ghost's terrifying face very big and close on the RIGHT "
+                      "half, glowing eyes staring at the viewer, the frightened person smaller in front, dark empty space "
+                      "on the LEFT half, dramatic red and teal rim light, fog, high contrast, very sharp, cinematic, no gore",
+                      "", t_names, thumb_base, seed):
         shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
-    make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
+    make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["label"])
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
-    host = ensure_mascot() or thumb_base
-    parts = [{"image": host, "lines": [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}],
-              "sounds": ["birds"], "mood": "happy", "voices": voices}]
+    parts = [{"image": thumb_base, "lines": [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}],
+              "sounds": ["wind"], "mood": "creepy", "voices": voices}]
     for img, s, sh in zip(imgs, scenes, shots_per_scene):
         parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []),
-                      "ambience": s.get("ambience", []), "mood": s.get("mood", "happy"), "voices": voices})
+                      "ambience": s.get("ambience", []), "mood": s.get("mood", "creepy"), "voices": voices,
+                      "place": f"{s.get('place', '')} {story.get('setting', '')}"})
     end_lines = []
-    moral = str(story.get("moral", "")).strip()
-    if moral:
-        end_lines.append({"speaker": "narrator", "emotion": "calm",
-                          "text": (f"{L['moral_intro']} {moral}" if category != "funny" else moral)})
-    elif story.get("ending_line"):
+    choice = story.get("choice") if part == 1 and isinstance(story.get("choice"), dict) else None
+    vote_text = ""
+    if choice and choice.get("question") and choice.get("option1") and choice.get("option2"):
+        vote_text = L["vote_line"].format(q=choice["question"], o1=choice["option1"], o2=choice["option2"])
+    if story.get("ending_line"):
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
-    end_img = host if host != thumb_base else (shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1])
-    if end_lines:                                   # Lumi Didi tells the lesson, then the quiz, then goodbye
-        parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
-        end_lines = []
-    quiz = story.get("quiz") if isinstance(story.get("quiz"), dict) else {}
-    qopts = [str(o).strip() for o in (quiz.get("options") or []) if str(o).strip()][:3]
-    try:
-        qans = int(str(quiz.get("answer", 0)).strip()[0])
-    except Exception:
-        qans = 0
-    if quiz.get("question") and len(qopts) == 3 and 0 <= qans < 3:
-        try:
-            labs = L["quiz_labels"]
-            qimg, aimg = extras.quiz_cards(shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], FONT,
-                                           L["quiz_title"], str(quiz["question"]), qopts, qans, labs,
-                                           os.path.join(WORK, "quiz_q.jpg"), os.path.join(WORK, "quiz_a.jpg"))
-            read = " ".join(f"{labs[i]}, {o}." for i, o in enumerate(qopts))
-            parts.append({"image": qimg, "shots": [qimg, qimg, aimg], "mood": "happy", "voices": voices,
-                          "sounds": [], "lines": [
-                              {"speaker": "narrator", "emotion": "excited", "text": f"{L['quiz_intro']} {quiz['question']} {read}"},
-                              {"speaker": "narrator", "emotion": "calm", "text": L["quiz_count"]},
-                              {"speaker": "narrator", "emotion": "happy",
-                               "text": L["quiz_answer"].format(lab=labs[qans], ans=qopts[qans])}]})
-        except Exception as e:
-            log("  quiz skipped:", str(e)[:150])
-    end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
-    parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
+    if vote_text:
+        end_lines.append({"speaker": "narrator", "text": vote_text})
+    if hidden:
+        end_lines.append({"speaker": "narrator", "text": L["find_ghost_line"]})
+    end_lines.append({"speaker": "narrator", "text": (L["outro_part1"] if part == 1 else L["outro"]).format(page=page)})
+    parts.append({"image": shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], "lines": end_lines, "sounds": ["wind"], "mood": "creepy", "voices": voices})
 
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
     log(f"Video ready: {duration(video):.0f} seconds")
 
     tags = [t if t.startswith("#") else "#" + t.replace(" ", "") for t in story.get("hashtags", [])[:15]]
-    source = ascii_text(story.get("source", ""))
-    description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
-                   + (f"📖 {source}\n" if source else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
+    description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"🗳️ {vote_text}\n\n" if vote_text else "")
+                   + (f"{L['find_ghost']}\n\n" if hidden else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
     part_times, segs = TIMELINE
     chap = extras.chapters_text(part_times, [L["ch_intro"]] + [sc.get("chapter") or f"{k + 1}" for k, sc in
                                                                  enumerate(scenes)] + [L["ch_end"]], L["chapters"])
-    yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
+    yt_description = description.replace(f"\n\n{L['ai_note']}", (f"\n\n{chap}" if chap else "") + f"\n\n{L['ai_note']}")
 
     results = {}
     if DRY_RUN:
@@ -2043,12 +2224,24 @@ def main():
         if not results.get("facebook") and not results.get("youtube"):
             raise SystemExit("Posting failed everywhere - see messages above.")
 
-    results.update(grow(video, story, title, lang, L, category, tags, results, history, page))
+    if vote_text:
+        story["comment_question"] = vote_text           # the first comment asks people to vote
+    results.update(grow(video, story, title, lang, L, tags, results, history, page))
 
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang,
-                    "category": category, "title": title, "festival": festival, **results})
+                    "theme": theme, "format": fmt, "part": part, "title": title, "festival": festival, **results})
     if not MOCK:
         save_history(history)
+        if part == 1:
+            with open(NEXT_PART, "w", encoding="utf-8") as f:
+                json.dump({"created": dt.datetime.now(dt.timezone.utc).isoformat(), "lang": lang, "theme": theme,
+                           "fmt": fmt, "title": story["title"], "summary": story.get("summary", ""),
+                           "part2_plan": story.get("part2_plan", ""), "characters": story.get("characters"),
+                           "setting": story.get("setting", ""), "choice": choice,
+                           "fb": results.get("facebook"), "yt": results.get("youtube")}, f, ensure_ascii=False, indent=1)
+            log("Series: part 2 will be made in the next horror run")
+        elif part == 2 and os.path.exists(NEXT_PART):
+            os.remove(NEXT_PART)
 
 
 def make_compilation(history):
@@ -2103,9 +2296,9 @@ def make_compilation(history):
     title = L["comp_title"].format(m=minutes, n=len(clips))[:95]
     base = extras.collage(frames, os.path.join(WORK, "thumb_base.jpg"))
     thumb = os.path.join(WORK, "thumbnail.jpg")
-    make_thumbnail(base, L["comp_thumb"].format(m=minutes), thumb, L["labels"]["bedtime"])
+    make_thumbnail(base, L["comp_thumb"].format(m=minutes), thumb, L["label"])
     chap = L["chapters"] + "\n" + "\n".join(f"{extras.fmt_time(s)} {n[:60]}" for s, n in chapters)
-    tags = ["#KidsStories", "#MoralStories", "#BedtimeStories", "#StoryCompilation"]
+    tags = ["#HorrorStories", "#BhootKiKahani", "#BhooterGolpo", "#HorrorCompilation"]
     description = f"{title}\n\n{chap}\n\n{L['ai_note']}\n\n{' '.join(tags)}"
     log(f"Compilation ready: {minutes} minutes, {len(clips)} stories")
     results = {}
@@ -2119,7 +2312,7 @@ def make_compilation(history):
             try:
                 results["youtube"] = post_to_youtube(video, thumb, title, description, tags, lang)
                 log("Posted compilation to YouTube:", results["youtube"])
-                extras.yt_add_to_playlist(results["youtube"], f"{L['labels']['bedtime']} | {L['playlist_tail']}", lang)
+                extras.yt_add_to_playlist(results["youtube"], L["playlist"], lang)
             except Exception as e:
                 log("YouTube compilation skipped:", str(e)[:200])
         history.append({"date": now.isoformat(timespec="minutes"), "lang": lang, "kind": "compilation",
@@ -2127,16 +2320,15 @@ def make_compilation(history):
         save_history(history)
 
 
-def grow(video, story, title, lang, L, category, tags, results, history, page):
-    """Extra reach after the main post: Reel + Short teaser, first comment, playlist. Never stops the run.
-    (Kids videos on YouTube have comments switched off by YouTube, so the question goes only to Facebook.)"""
+def grow(video, story, title, lang, L, tags, results, history, page):
+    """Extra reach after the main post: Reel + Short teaser, first comment, playlist. Never stops the run."""
     out = {}
     part_times, segs = TIMELINE
     teaser = os.path.join(WORK, "teaser.mp4")
     try:
         st, en = extras.pick_window(segs, part_times, story.get("teaser_scene") or 2)
         extras.make_teaser(video, st, en, teaser, FONT, story.get("thumbnail_text") or title, L["cta"], WORK,
-                           colors=((255, 225, 0), (255, 60, 120)))
+                           colors=((255, 230, 0), (200, 0, 20)))
         log(f"Teaser ready ({en - st:.0f} s, from {st:.0f} s)")
     except Exception as e:
         log("  teaser skipped:", str(e)[:200])
@@ -2153,7 +2345,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  Facebook Reel skipped:", str(e)[:200])
     if results.get("youtube"):
         try:
-            extras.yt_add_to_playlist(results["youtube"], f"{L['labels'][category]} | {L['playlist_tail']}", lang)
+            extras.yt_add_to_playlist(results["youtube"], L["playlist"], lang)
             log("  added to YouTube playlist")
         except Exception as e:
             log("  playlist skipped:", str(e)[:200])
@@ -2166,7 +2358,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             except Exception as e:
                 log("  YouTube Short skipped:", str(e)[:200])
     if results.get("youtube") and extras.yt_extra_ok():
-        try:                                          # English subtitles: more families can follow
+        try:                                          # English subtitles: more people can follow, better search
             tr = {str(ln.get("text", "")).strip(): str(ln.get("en", "")).strip()
                   for sc in story.get("scenes", []) for ln in sc.get("lines", []) if ln.get("en")}
             srt = extras.write_srt(segs, tr, os.path.join(WORK, "subs_en.srt"))
@@ -2176,14 +2368,13 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
         except Exception as e:
             log("  subtitles skipped:", str(e)[:160])
     if results.get("facebook") and env("ANNOUNCE") != "0":
-        try:                                          # "coming soon" post 2 hours before the evening video
-            nxt = extras.next_slot([8, 13, 19], [19])
+        try:                                          # "coming soon" post 2 hours before the next video
+            nxt = extras.next_slot([13, 21], [13, 21])
             if nxt:
                 slot, when, day = nxt
                 words = f"{extras.DAY_WORDS[lang][day]} {extras.TIME_WORDS[lang][slot.hour]}"
-                card = extras.announcement_card(ensure_mascot() or os.path.join(WORK, "thumb_base.jpg"), FONT,
-                                                L["ann1"], words, os.path.join(WORK, "announce.jpg"),
-                                                colors=((255, 225, 0), (255, 60, 120)))
+                card = extras.announcement_card(os.path.join(WORK, "thumb_base.jpg"), FONT, L["ann1"], words,
+                                                os.path.join(WORK, "announce.jpg"))
                 extras.fb_schedule_photo(card, L["ann_msg"].format(when=words), when)
                 log(f"  'coming soon' post scheduled for {when.strftime('%d %b %H:%M')} India time")
         except Exception as e:
@@ -2194,33 +2385,59 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  first comment posted on Facebook")
         except Exception as e:
             log("  Facebook comment skipped (needs pages_manage_engagement):", str(e)[:160])
+    if question and results.get("youtube"):
+        try:
+            extras.yt_comment(results["youtube"], question)
+            log("  first comment posted on YouTube")
+        except Exception as e:
+            log("  YouTube comment skipped:", str(e)[:160])
     return out
 
 
 # ----------------------------------------------------------------- offline test helpers
 def mock_story(lang):
+    if lang == "bn":
+        return {
+            "title": "পুরনো বাড়ির শেষ প্রদীপ 🕯️", "thumbnail_text": "প্রদীপ নিজে জ্বলে!",
+            "description": "রাত বারোটায় প্রদীপটা নিজে থেকে জ্বলে ওঠে...\nআপনি হলে কী করতেন?",
+            "hashtags": ["#ভৌতিকগল্প", "#HorrorStory"], "setting": "old crumbling haveli at night",
+            "characters": [{"name": "Rana", "gender": "male", "age": "adult", "kind": "human", "look": "man, grey shawl"},
+                           {"name": "Mitali", "gender": "female", "age": "adult", "kind": "human", "look": "woman, red saree"},
+                           {"name": "Chhaya", "gender": "female", "age": "old", "kind": "ghost", "look": "pale old woman in white"}],
+            "thumbnail_image": {"characters": ["Chhaya"], "action": "ghost at window"},
+            "scenes": [
+                {"characters": ["Rana", "Mitali"], "action": "arrive", "place": "gate", "mood": "creepy",
+                 "ambience": ["night crickets", "wind through trees"], "lines": [
+                    {"speaker": "narrator", "text": "অনেক বছর পর রানা আর মিতালি তাদের পুরনো বাড়িতে ফিরল। চারদিক নিস্তব্ধ।", "emotion": "eerie",
+                     "sfx": [{"sound": "old iron gate creaks open", "when": "after"}]},
+                    {"speaker": "Mitali", "text": "এত অন্ধকার কেন? আলো জ্বালাও না!", "emotion": "scared", "sfx": []},
+                    {"speaker": "Rana", "text": "দাঁড়াও, প্রদীপটা খুঁজছি।", "emotion": "whisper",
+                     "sfx": [{"sound": "slow footsteps on wooden floor", "when": "during"}]}]},
+                {"characters": ["Chhaya"], "action": "ghost", "place": "hall", "mood": "scare",
+                 "ambience": ["wind howling"], "lines": [
+                    {"speaker": "narrator", "text": "হঠাৎ দরজায় তিনবার টোকা পড়ল।", "emotion": "normal",
+                     "sfx": [{"sound": "three knocks on door", "when": "after"}]},
+                    {"speaker": "Chhaya", "text": "এতদিন পরে এলে?", "emotion": "eerie", "jump_scare": True, "sfx": []}]},
+            ], "ending_line": "আর সেই প্রদীপ আজও জ্বলে।"}
     return {
-        "title": "लालची बंदर और जादुई आम 🥭", "thumbnail_text": "लालची बंदर का सबक",
-        "description": "एक बंदर को मिला जादुई आम का पेड़!\nआप होते तो क्या करते?",
-        "hashtags": ["#HindiKahani", "#MoralStories"], "setting": "green jungle by a river, sunny morning",
-        "characters": [{"name": "Chiku", "gender": "male", "age": "child", "kind": "animal", "look": "small brown monkey, red cap"},
-                       {"name": "Meenu", "gender": "female", "age": "young", "kind": "animal", "look": "white rabbit, pink scarf"},
-                       {"name": "Dadi", "gender": "female", "age": "old", "kind": "animal", "look": "old grey elephant, glasses"}],
-        "thumbnail_image": {"characters": ["Chiku"], "action": "monkey holding a golden mango"},
+        "title": "हवेली का आख़िरी दीया 🕯️", "thumbnail_text": "दीया खुद जलता है!",
+        "description": "रात बारह बजे दीया अपने आप जल उठता है...\nआप होते तो क्या करते?",
+        "hashtags": ["#BhootKiKahani", "#HorrorStory"], "setting": "old crumbling haveli at night",
+        "characters": [{"name": "Raghav", "gender": "male", "age": "adult", "kind": "human", "look": "man, grey shawl"},
+                       {"name": "Meera", "gender": "female", "age": "adult", "kind": "human", "look": "woman, red saree"},
+                       {"name": "Chhaya", "gender": "female", "age": "old", "kind": "ghost", "look": "pale old woman in white"}],
+        "thumbnail_image": {"characters": ["Chhaya"], "action": "ghost at window"},
         "scenes": [
-            {"characters": ["Chiku", "Meenu"], "action": "play", "place": "river bank", "mood": "happy",
-             "ambience": ["birds chirping in forest", "river stream"], "lines": [
-                {"speaker": "narrator", "text": "एक घने जंगल में चीकू नाम का एक छोटा सा बंदर रहता था।", "emotion": "happy",
-                 "sfx": [{"sound": "monkey chattering", "when": "after"}], "shot": "monkey on a tree"},
-                {"speaker": "Meenu", "text": "चीकू! चलो नदी में खेलते हैं!", "emotion": "excited",
-                 "sfx": [{"sound": "small footsteps running on grass", "when": "during"}], "shot": "rabbit running"},
-                {"speaker": "Chiku", "text": "हाँ हाँ, मैं आ रहा हूँ!", "emotion": "laughing",
-                 "sfx": [{"sound": "water splash", "when": "after"}], "shot": "monkey jumps in river"}]},
-            {"characters": ["Dadi"], "action": "advice", "place": "big tree", "mood": "calm",
-             "ambience": ["gentle wind in trees"], "lines": [
-                {"speaker": "Dadi", "text": "बच्चों, लालच बुरी बला है।", "emotion": "calm", "sfx": [], "shot": "elephant smiling"}]},
-        ],
-        "moral": "लालच बुरी बला है।"}
+            {"characters": ["Raghav", "Meera"], "action": "arrive", "place": "gate", "mood": "creepy",
+             "sounds": ["wind", "crickets"], "lines": [
+                {"speaker": "narrator", "text": "बरसों बाद राघव और मीरा अपनी पुरानी हवेली लौटे। चारों तरफ़ सन्नाटा था।"},
+                {"speaker": "Meera", "text": "इतना अँधेरा क्यों है? रोशनी करो ना!"},
+                {"speaker": "Raghav", "text": "रुको, दीया ढूँढ रहा हूँ।"}]},
+            {"characters": ["Chhaya"], "action": "ghost", "place": "hall", "mood": "scare",
+             "sounds": ["heartbeat", "creak"], "lines": [
+                {"speaker": "narrator", "text": "अचानक दीया अपने आप जल उठा।"},
+                {"speaker": "Chhaya", "text": "इतने साल बाद आए हो?"}]},
+        ], "ending_line": "और वो दीया आज भी जलता है।"}
 
 
 def mock_image(path, seed):

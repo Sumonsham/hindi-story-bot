@@ -806,3 +806,277 @@ def collage(frames, out, size=(1280, 720)):
         img.paste(im.crop((l, t, l + cw, t + ch)), ((i % cols) * cw, (i // cols) * ch))
     img.save(out, quality=92)
     return out
+
+
+# ================================================================= v4: community, characters, world
+# ----------------------------------------------------------------- notes for the daily report
+ISSUES = []           # things that were skipped or failed in this run (sent in the Telegram report)
+DONE = []             # things that worked (links)
+
+
+def note_issue(text):
+    ISSUES.append(str(text)[:200])
+
+
+# ----------------------------------------------------------------- moon (Amavasya)
+def new_moon_utc(k):
+    """Time of new moon number k (k=0 near 6 Jan 2000), Meeus 'Astronomical Algorithms' ch.49
+    with the main correction terms - accurate to a few minutes."""
+    import math
+    T = k / 1236.85
+    jde = (2451550.09766 + 29.530588861 * k + 0.00015437 * T ** 2 - 0.00000015 * T ** 3 + 0.00000000073 * T ** 4)
+    E = 1 - 0.002516 * T - 0.0000074 * T ** 2
+    r = math.radians
+    M = r(2.5534 + 29.10535670 * k - 0.0000014 * T ** 2)
+    Mp = r(201.5643 + 385.81693528 * k + 0.0107582 * T ** 2)
+    F = r(160.7108 + 390.67050284 * k - 0.0016118 * T ** 2)
+    Om = r(124.7746 - 1.56375588 * k + 0.0020672 * T ** 2)
+    corr = (-0.40720 * math.sin(Mp) + 0.17241 * E * math.sin(M) + 0.01608 * math.sin(2 * Mp)
+            + 0.01039 * math.sin(2 * F) + 0.00739 * E * math.sin(Mp - M) - 0.00514 * E * math.sin(Mp + M)
+            + 0.00208 * E * E * math.sin(2 * M) - 0.00111 * math.sin(Mp - 2 * F) - 0.00057 * math.sin(Mp + 2 * F)
+            + 0.00056 * E * math.sin(2 * Mp + M) - 0.00042 * math.sin(3 * Mp) + 0.00042 * E * math.sin(M + 2 * F)
+            + 0.00038 * E * math.sin(M - 2 * F) - 0.00024 * E * math.sin(2 * Mp - M) - 0.00017 * math.sin(Om))
+    jde += corr
+    return dt.datetime(2000, 1, 1, 12, tzinfo=dt.timezone.utc) + dt.timedelta(days=jde - 2451545.0)
+
+
+def moon_age_days(when_utc):
+    """Days since the last new moon (0 = new moon)."""
+    k = int((when_utc - dt.datetime(2000, 1, 6, tzinfo=dt.timezone.utc)).days / 29.530588861)
+    for kk in (k + 1, k, k - 1, k - 2):
+        nm = new_moon_utc(kk)
+        if nm <= when_utc:
+            return (when_utc - nm).total_seconds() / 86400.0
+    return 15.0
+
+
+def is_amavasya_night(now=None):
+    """True on the Amavasya night: tonight's midnight (India time) falls between 18 hours before
+    and 6 hours after the exact new moon (one night per month)."""
+    now = now or dt.datetime.now(IST)
+    midnight = (now + dt.timedelta(hours=2)).replace(hour=0, minute=0, second=0, microsecond=0)
+    mu = midnight.astimezone(dt.timezone.utc)
+    k = int((mu - dt.datetime(2000, 1, 6, tzinfo=dt.timezone.utc)).days / 29.530588861)
+    for kk in (k - 1, k, k + 1, k + 2):
+        hours = (new_moon_utc(kk) - mu).total_seconds() / 3600     # + means new moon after midnight
+        if -6 <= hours <= 18:
+            return True
+    return False
+
+
+# ----------------------------------------------------------------- today's weather
+CITIES = {"bn": ("Kolkata", 22.57, 88.36), "hi": ("Delhi", 28.61, 77.21)}
+
+
+def weather_now(lang):
+    """Short English description of the weather right now (free Open-Meteo, no key). None if unknown."""
+    city, lat, lon = CITIES.get(lang, CITIES["bn"])
+    try:
+        r = requests.get("https://api.open-meteo.com/v1/forecast", params={
+            "latitude": lat, "longitude": lon, "current": "weather_code,temperature_2m,precipitation,is_day",
+            "timezone": "Asia/Kolkata"}, timeout=20).json()["current"]
+    except Exception:
+        return None
+    code, temp = int(r.get("weather_code", 0)), float(r.get("temperature_2m", 25))
+    if code >= 95:
+        w = "a violent thunderstorm with lightning"
+    elif code in (61, 63, 65, 80, 81, 82, 66, 67):
+        w = "heavy rain"
+    elif code in (51, 53, 55, 56, 57):
+        w = "drizzle and wet streets"
+    elif code in (45, 48):
+        w = "thick fog"
+    elif temp < 16:
+        w = "a cold, misty winter night"
+    elif temp > 33:
+        w = "a hot, humid, airless night with a power cut"
+    else:
+        return None
+    return f"{w} in and around {city} today (about {round(temp)} C)"
+
+
+# ----------------------------------------------------------------- viewers' own stories
+STORY_TAGS = ("#আমার_গল্প", "#আমারগল্প", "#मेरी_कहानी", "#मेरीकहानी", "#mystory", "#my_story")
+
+
+def viewer_stories(history, used_ids, max_posts=20):
+    """Comments (with the hashtag) where viewers tell their own ghost experience."""
+    out = []
+    posts = [h for h in history[-max_posts:] if h.get("facebook") or h.get("youtube")]
+    token = env("FB_PAGE_TOKEN")
+    for h in posts:
+        if h.get("facebook") and token:
+            try:
+                r = requests.get(f"{GRAPH}/{h['facebook']}/comments", params={
+                    "fields": "id,message,from{name},like_count", "limit": 100, "access_token": token},
+                    timeout=30).json()
+                for c in r.get("data", []):
+                    out.append({"id": "fb_" + c["id"], "text": c.get("message", ""), "likes": c.get("like_count", 0),
+                                "name": ((c.get("from") or {}).get("name") or "").split(" ")[0]})
+            except Exception:
+                pass
+        if h.get("youtube") and env("YT_REFRESH_TOKEN"):
+            try:
+                r = requests.get(f"{YT}/commentThreads", headers=yt_token(), params={
+                    "part": "snippet", "videoId": h["youtube"], "maxResults": 100, "textFormat": "plainText"},
+                    timeout=30)
+                for it in r.json().get("items", []) if r.ok else []:
+                    sn = it["snippet"]["topLevelComment"]["snippet"]
+                    name = str(sn.get("authorDisplayName", "")).lstrip("@").split(" ")[0]
+                    out.append({"id": "yt_" + it["id"], "text": sn.get("textDisplay", ""),
+                                "likes": sn.get("likeCount", 0), "name": name})
+            except Exception:
+                pass
+    good = [c for c in out if c["id"] not in used_ids and len(c["text"]) >= 120
+            and any(t in c["text"].lower() for t in STORY_TAGS)]
+    good.sort(key=lambda c: (c["likes"], len(c["text"])), reverse=True)
+    return good
+
+
+# ----------------------------------------------------------------- Instagram Reels (from the same page)
+def ig_account():
+    r = requests.get(f"{GRAPH}/{env('FB_PAGE_ID')}", params={
+        "fields": "instagram_business_account", "access_token": env("FB_PAGE_TOKEN")}, timeout=30).json()
+    return (r.get("instagram_business_account") or {}).get("id")
+
+
+def ig_post_reel(video, caption):
+    """Publishes the teaser as an Instagram Reel (needs a linked Instagram professional account and the
+    instagram_basic + instagram_content_publish permissions in the page token)."""
+    ig = ig_account()
+    if not ig:
+        raise RuntimeError("no Instagram professional account linked to this Facebook page")
+    token = env("FB_PAGE_TOKEN")
+    c = requests.post(f"{GRAPH}/{ig}/media", data={"media_type": "REELS", "upload_type": "resumable",
+                                                   "caption": caption[:2100], "share_to_feed": "true",
+                                                   "access_token": token}, timeout=60).json()
+    if "id" not in c:
+        raise RuntimeError(f"instagram start: {str(c)[:250]}")
+    cid = c["id"]
+    with open(video, "rb") as f:
+        data = f.read()
+    up = requests.post(f"https://rupload.facebook.com/ig-api-upload/v21.0/{cid}", headers={
+        "Authorization": f"OAuth {token}", "offset": "0", "file_size": str(len(data))}, data=data, timeout=600).json()
+    if not up.get("success"):
+        raise RuntimeError(f"instagram upload: {str(up)[:250]}")
+    for _ in range(40):                       # Instagram needs a little time to process the video
+        time.sleep(15)
+        st = requests.get(f"{GRAPH}/{cid}", params={"fields": "status_code", "access_token": token}, timeout=30).json()
+        if st.get("status_code") == "FINISHED":
+            break
+        if st.get("status_code") == "ERROR":
+            raise RuntimeError(f"instagram processing error: {st}")
+    pub = requests.post(f"{GRAPH}/{ig}/media_publish", data={"creation_id": cid, "access_token": token},
+                        timeout=60).json()
+    if "id" not in pub:
+        raise RuntimeError(f"instagram publish: {str(pub)[:250]}")
+    return pub["id"]
+
+
+# ----------------------------------------------------------------- Telegram report to your phone
+def tg_chat_id(token):
+    cid = env("TELEGRAM_CHAT_ID")
+    if cid:
+        return cid
+    try:                                      # no chat id given: use the last person who wrote to the bot
+        r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates", timeout=20).json()
+        for u in reversed(r.get("result", [])):
+            m = u.get("message") or u.get("channel_post") or {}
+            if m.get("chat", {}).get("id"):
+                return str(m["chat"]["id"])
+    except Exception:
+        pass
+    return None
+
+
+def telegram(text):
+    token = env("TELEGRAM_BOT_TOKEN")
+    if not token:
+        return False
+    cid = tg_chat_id(token)
+    if not cid:
+        log("  Telegram: send any message to your bot once, so it knows where to write")
+        return False
+    try:
+        r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage", data={
+            "chat_id": cid, "text": text[:4000], "disable_web_page_preview": "true"}, timeout=20).json()
+        return bool(r.get("ok"))
+    except Exception:
+        return False
+
+
+def report_text(page_name, title, results, history):
+    lines = [f"📺 {page_name}", f"🎬 {title}"]
+    if results.get("facebook"):
+        lines.append(f"Facebook: https://www.facebook.com/{results['facebook']}")
+    if results.get("youtube"):
+        lines.append(f"YouTube: https://youtu.be/{results['youtube']}")
+    extra = [k for k in ("fb_reel", "ig_reel", "yt_short", "coloring") if results.get(k)]
+    if extra:
+        lines.append("➕ " + ", ".join(extra))
+    best = max((h for h in history[-30:] if h.get("stats")), key=lambda h: score(h["stats"]), default=None)
+    if best:
+        st = best["stats"]
+        lines.append(f"🏆 Best recent: {best.get('title', '')[:60]} "
+                     f"(👁 {st.get('views', 0)}  👍 {st.get('likes', 0)}  💬 {st.get('comments', 0)})")
+    if ISSUES:
+        lines.append("⚠️ Skipped / problems:")
+        lines += [f"• {i}" for i in ISSUES[:8]]
+    else:
+        lines.append("✅ Everything worked")
+    return "\n".join(lines)
+
+
+# ----------------------------------------------------------------- kids: English words card
+def words_card(base_img, font_path, title, words, out, size=(1280, 720)):
+    """words: [(english, meaning)]  ->  big friendly card."""
+    W, H = size
+    bg = Image.open(base_img).convert("RGB").resize((W, H)).filter(ImageFilter.GaussianBlur(14))
+    img = Image.blend(bg, Image.new("RGB", (W, H), (10, 60, 90)), 0.55)
+    d = ImageDraw.Draw(img)
+    tf = _font(font_path, 58)
+    tw = d.textlength(title, font=tf)
+    d.rounded_rectangle([(W - tw) / 2 - 30, 30, (W + tw) / 2 + 30, 30 + 90], radius=40, fill=(255, 200, 0))
+    d.text(((W - tw) / 2, 38), title, font=tf, fill=(10, 50, 80))
+    y = 170
+    ef = _font(font_path, 70)
+    for en, mean in words[:3]:
+        d.rounded_rectangle([110, y, W - 110, y + 150], radius=40, fill=(255, 255, 255), outline=(255, 200, 0), width=6)
+        d.text((150, y + 30), str(en), font=ef, fill=(220, 40, 90))
+        ml, mf, _ = _fit_text(d, f"= {mean}", font_path, W / 2 - 120, 62, lines_max=1)
+        d.text((W / 2 + 20, y + 38), ml[0], font=mf, fill=(20, 40, 90))
+        y += 175
+    img.save(out, quality=93)
+    return out
+
+
+def fb_photo(image, message):
+    """Publishes a photo post on the page right now."""
+    with open(image, "rb") as f:
+        r = requests.post(f"{GRAPH}/{env('FB_PAGE_ID')}/photos", data={
+            "message": message, "access_token": env("FB_PAGE_TOKEN")},
+            files={"source": ("page.jpg", f, "image/jpeg")}, timeout=120).json()
+    if not r.get("id"):
+        raise RuntimeError(str(r)[:300])
+    return r["id"]
+
+
+def coloring_sheet(raw_path, out, font_path=None, caption=""):
+    """Turns a line drawing into a clean printable black-and-white page (A4-like, white margins)."""
+    from PIL import ImageOps
+    im = Image.open(raw_path).convert("L")
+    im = ImageOps.autocontrast(im)
+    im = im.point(lambda v: 255 if v > 165 else 0)                 # pure black lines on white
+    W, H = 1240, 1754
+    page = Image.new("L", (W, H), 255)
+    s = min((W - 140) / im.width, (H - 300) / im.height)
+    im = im.resize((int(im.width * s), int(im.height * s)))
+    page.paste(im, ((W - im.width) // 2, 170))
+    d = ImageDraw.Draw(page)
+    d.rectangle([30, 30, W - 30, H - 30], outline=0, width=6)
+    if font_path and caption:
+        f = _font(font_path, 64)
+        tw = d.textlength(caption, font=f)
+        d.text(((W - tw) / 2, 60), caption, font=f, fill=0)
+    page.convert("RGB").save(out, quality=95)
+    return out

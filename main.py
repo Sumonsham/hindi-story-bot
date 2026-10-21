@@ -2193,7 +2193,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("Posted Facebook Reel:", out["fb_reel"])
         except Exception as e:
             log("  Facebook Reel skipped:", str(e)[:200])
-    if teaser and env("INSTAGRAM") != "0":
+    if teaser and env("INSTAGRAM") == "1":           # only if you switch Instagram on (secret INSTAGRAM = 1)
         try:
             out["ig_reel"] = extras.ig_post_reel(teaser, short_desc)
             log("Posted Instagram Reel:", out["ig_reel"])

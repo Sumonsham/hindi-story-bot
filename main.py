@@ -435,7 +435,7 @@ Return ONLY JSON with exactly these keys:
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
                 "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a cartoon film still: WHO is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (close-up / medium / wide / low angle), light, important objects. Only things that can be SEEN",
-                           "characters": ["names VISIBLE in this picture; [] if only a place or object is shown"]}}}}]
+                           "characters": ["names VISIBLE in this picture, in order from LEFT to RIGHT as they stand; [] if only a place or object is shown"]}}}}]
  }}],
  "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
  "ending_line": "one short sweet {L['name']} closing line from the narrator",
@@ -564,6 +564,10 @@ class Cast:
             chosen = [c for c in self.chars.values() if not c.get("host")]
         who = (f"Characters in the picture (ONLY these, each exactly as described): {self.describe(chosen)} "
                if chosen else "No people in this picture, only the place and the objects described. ")
+        if len(chosen) >= 2:                  # fixed positions so the video knows whose mouth to move
+            spots = ["on the LEFT", "in the MIDDLE", "on the RIGHT"] if len(chosen) == 3 else ["on the LEFT", "on the RIGHT"]
+            who += ("Positions, standing a little apart from each other, faces clearly visible: " +
+                    ", ".join(f"{c['name']} {spots[min(k, len(spots) - 1)]}" for k, c in enumerate(chosen[:3])) + ". ")
         p = (f"{ascii_text(action)}. {who}"
              f"Location: {ascii_text(place)}. {self.setting}. Style: {ART_STYLE}.")
         if use_ref and chosen:
@@ -1654,14 +1658,34 @@ def _layers_for(img):
         # only a standing, full-body figure may walk (never someone sitting on a chair or a cushion)
         d["can_walk"] = bool(bh_ > 1.15 * bw_ and ys_.max() > 0.82 * H and bh_ > 0.45 * H)
         d["foot"], d["fig_h"] = (float(xs_.mean()), float(ys_.max())), float(bh_)
+        # separate characters (if they do not touch): each can move on its own
+        d["parts"] = []
+        nl, lab_, st_, _c = cv2.connectedComponentsWithStats((d["fg_a"] > 0.5).astype("uint8"))
+        big = [i for i in range(1, nl) if st_[i, 4] > 0.015 * W * H]
+        if 2 <= len(big) <= 4:
+            owner = {}                                # small loose bits (a hand, a tail) belong to the nearest character
+            for i in range(1, nl):
+                if i not in big:
+                    owner[i] = min(big, key=lambda b: (_c[b][0] - _c[i][0]) ** 2 + (_c[b][1] - _c[i][1]) ** 2)
+            for i in sorted(big, key=lambda i: st_[i, 0]):
+                mine = [i] + [q for q, o in owner.items() if o == i]
+                m_ = cv2.dilate(np.isin(lab_, mine).astype("uint8"), np.ones((9, 9), "uint8")).astype("float32")
+                d["parts"].append({"a": d["fg_a"] * cv2.GaussianBlur(m_, (0, 0), 2), "lab": i})
+                lab_[np.isin(lab_, mine)] = i
+            d["part_lab"] = lab_
         d["faces"] = []
         if env("FACE_ANIM") != "0":
             try:                                      # eyes + mouth for blinking and talking
                 import animate
                 d["faces"] = sorted(animate.find_faces(np.ascontiguousarray(fg[..., :3])),
-                                    key=lambda f_: -f_["mouth"][2])
+                                    key=lambda f_: f_["mouth"][0])           # left -> right
             except Exception as e:
                 log(f"  face animation skipped: {str(e)[:100]}")
+        for f_ in d["faces"]:                         # which separate character each face belongs to
+            f_["part"] = None
+            if d["parts"]:
+                lb = d["part_lab"][int(min(H - 1, f_["mouth"][1])), int(min(W - 1, f_["mouth"][0]))]
+                f_["part"] = next((j for j, pt in enumerate(d["parts"]) if pt["lab"] == lb), None)
         ys, xs = np.nonzero(d["fg_a"] > 0.5)
         d["cx"], d["cy"] = float(xs.mean()), float(ys.max())
         d["head"] = float(ys.min() + 0.28 * (ys.max() - ys.min()))
@@ -1693,7 +1717,8 @@ def plan_shots(segments, total):
 
 
 def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
-    """talk: [(start, end, silent, emotion, text)] - when characters speak (mouth moves in sync with the words)."""
+    """talk: [(start, end, silent, emotion, text, who)] - when characters speak (mouth moves in sync with the words).
+    who = (left-to-right position of the speaker among the people in the picture, how many people) or None."""
     np = _np()
     import cv2
     dur = duration(audio)
@@ -1713,7 +1738,7 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
     while lt < dur:
         looks.append((lt, brnd.uniform(-0.35, 0.35), brnd.uniform(-0.2, 0.2)))
         lt += brnd.uniform(1.2, 3.0)
-    gaze_now = [0.0, 0.0]
+    gaze_all = {}
     walks = walks or {}
     first_start = {}
     for (im_, st_, en_, cl_) in plan_shots(segments, dur):
@@ -1758,35 +1783,17 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
             bg_src = _clean_bg(WALK_BG[img]) if img in WALK_BG and L.get("can_walk") else L["bg"]
             frame = cv2.warpAffine(bg_src, Mb, (W, H), borderMode=cv2.BORDER_REFLECT).astype("float32")
             if "fg" in L:
-                mouth, emo, shape, speaking = 0.0, "", "a", False
-                for (ta, tb, nar, em, tx) in talk:
+                mouth, emo, shape, speaking, who = 0.0, "", "a", False, None
+                for (ta, tb, nar, em, tx, wh) in talk:
                     if ta <= sec < tb:
                         emo = str(em or "").lower()
                         if not nar and voice_env is not None and f < len(voice_env):
-                            mouth, speaking = float(voice_env[f]), True
+                            mouth, speaking, who = float(voice_env[f]), True, wh
                             if animate is not None:
                                 shape = animate.viseme_at(tx, sec - ta, tb - ta)
                                 if shape == "m":
                                     mouth = 0.0
                         break
-                # where the eyes look: at the camera while speaking, otherwise towards the middle of the
-                # picture (the other character), with small glances; down when sad, darting when scared
-                lx, ly = 0.0, 0.0
-                for (t0_, gx_, gy_) in looks:
-                    if t0_ <= sec:
-                        lx, ly = gx_, gy_
-                if not speaking and L.get("faces"):
-                    lx += 0.45 if L["faces"][0]["mouth"][0] < W / 2 else -0.45
-                if emo in ("sad", "crying"):
-                    ly = 0.6
-                elif emo == "scared":
-                    lx = 0.6 * math.sin(sec * 9)
-                gaze_now[0] += (lx - gaze_now[0]) * 0.35
-                gaze_now[1] += (ly - gaze_now[1]) * 0.35
-                blink = 0.0
-                for b0 in blinks:
-                    if 0 <= sec - b0 < 0.2:
-                        blink = math.sin(math.pi * (sec - b0) / 0.2)
                 hop = tremble = 0.0
                 if emo in ("excited", "laughing", "happy", "proud"):
                     hop = abs(math.sin(sec * math.pi * 2.6)) * (7 if emo != "proud" else 3)
@@ -1817,20 +1824,77 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
                         else:
                             wb = 14 * abs(math.sin((sec - st) * math.pi * 2.0)) * (1 - 0.5 * u_)
                             wt = 3.0 * math.sin((sec - st) * math.pi * 2.0) * (1 - u_)
+                faces_ = LL.get("faces") or []
+                # whose mouth moves: the speaker's face, matched by left-to-right position in the picture
+                spk = spk_part = None
+                parts_ = LL.get("parts") or []
+                if speaking:
+                    if who and who[0] is not None and parts_ and len(parts_) == who[1]:
+                        spk_part = who[0]                                # the speaker's own cut-out
+                        spk = next((q for q, fc in enumerate(faces_) if fc.get("part") == spk_part), None)
+                    elif who and who[0] is not None and len(faces_) == who[1]:
+                        spk = who[0]
+                        spk_part = faces_[spk].get("part")
+                    elif len(faces_) == 1 and (not who or who[1] <= 1):
+                        spk, spk_part = 0, faces_[0].get("part")
                 src = LL["fg"]
-                if animate is not None and LL.get("faces"):
-                    pic = animate.draw_face(LL["fg_rgb"], LL["faces"], blink, 0.0, "a", tuple(gaze_now))
-                    pic = animate.draw_face(pic, LL["faces"][:1], 0.0, mouth, shape)
+                if animate is not None and faces_:
+                    pic = LL["fg_rgb"]
+                    for fi, fc in enumerate(faces_):
+                        # each face blinks at its own moments
+                        bl = 0.0
+                        for b0 in blinks:
+                            b1 = b0 + 0.9 * fi
+                            if 0 <= sec - b1 < 0.2:
+                                bl = math.sin(math.pi * (sec - b1) / 0.2)
+                        # eyes: the speaker looks at us, the others look at the speaker
+                        lx, ly = 0.0, 0.0
+                        for (t0_, gx_, gy_) in looks:
+                            if t0_ <= sec + 0.4 * fi:
+                                lx, ly = gx_, gy_
+                        if spk is not None and fi != spk:
+                            lx = 0.7 if faces_[spk]["mouth"][0] > fc["mouth"][0] else -0.7
+                            ly = 0.0
+                        elif spk is None and not speaking:
+                            lx += 0.45 if fc["mouth"][0] < W / 2 else -0.45
+                        if emo in ("sad", "crying"):
+                            ly = 0.6
+                        elif emo == "scared":
+                            lx = 0.6 * math.sin(sec * 9 + fi)
+                        g_ = gaze_all.setdefault(fi, [0.0, 0.0])
+                        g_[0] += (lx - g_[0]) * 0.35
+                        g_[1] += (ly - g_[1]) * 0.35
+                        pic = animate.draw_face(pic, [fc], bl, mouth if fi == spk else 0.0, shape, tuple(g_))
                     src = cv2.cvtColor(np.clip(pic, 0, 255).astype("float32"), cv2.COLOR_RGB2BGR)
                 fz = bz * (1.0 + 0.03 * ease) + 0.004 * math.sin(sec * 1.6)
                 Mf = cv2.getRotationMatrix2D((fx, fy), 0.3 * math.sin(sec * 0.9) + wt, fz)
-                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * 26 - (fz - bz) * fx + tremble + wdx
-                Mf[1, 2] = Mb[1, 2] - 2.0 * math.sin(sec * 1.1) - (fz - bz) * fy - hop - 3.0 * mouth - wb
+                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * 26 - (fz - bz) * fx + wdx
+                Mf[1, 2] = Mb[1, 2] - 2.0 * math.sin(sec * 1.1) - (fz - bz) * fy - wb
                 if align is not None:                               # put picture B's feet where A's are
                     Mf = (np.vstack([Mf, [0, 0, 1]]) @ np.vstack([align, [0, 0, 1]]))[:2].astype("float64")
-                fgw = cv2.warpAffine(src, Mf, (W, H))
-                aw = cv2.warpAffine(LL["fg_a"], Mf, (W, H))[..., None]
-                frame = frame * (1 - aw) + fgw * aw
+                if parts_ and align is None and not wdx:
+                    # every character moves on its own: the speaker bounces with the words and the feeling,
+                    # the others just breathe gently (each at its own pace)
+                    rest = np.clip(LL["fg_a"] - sum(pt["a"] for pt in parts_), 0, 1)
+                    layers_ = [(rest, 0.0, 0.0)]
+                    for j, pt in enumerate(parts_):
+                        if spk_part is not None and j == spk_part:
+                            layers_.append((pt["a"], tremble, -hop - 3.0 * mouth))
+                        else:
+                            layers_.append((pt["a"], 0.0, -1.6 * math.sin(sec * (1.2 + 0.25 * j) + 1.7 * j)))
+                    for (a_, ddx, ddy) in layers_:
+                        M2 = Mf.copy()
+                        M2[0, 2] += ddx
+                        M2[1, 2] += ddy
+                        fgw = cv2.warpAffine(src, M2, (W, H))
+                        aw = cv2.warpAffine(a_, M2, (W, H))[..., None]
+                        frame = frame * (1 - aw) + fgw * aw
+                else:
+                    Mf[0, 2] += tremble
+                    Mf[1, 2] += -hop - 3.0 * mouth
+                    fgw = cv2.warpAffine(src, Mf, (W, H))
+                    aw = cv2.warpAffine(LL["fg_a"], Mf, (W, H))[..., None]
+                    frame = frame * (1 - aw) + fgw * aw
             if mood in ("happy", "funny") and env("SPARKLES") != "0":   # a few soft floating sparkles
                 glow = np.zeros((H, W), "float32")
                 for x_, y_, r_, sp_, ph_ in sparks:
@@ -1989,7 +2053,15 @@ def build_video(scene_parts, lang, out):
             ln = spoken[k] if k < len(spoken) else {}
             is_lumi = str(ln.get("speaker", "narrator")).lower().startswith("narrat")
             silent = (not is_lumi) if host_part else nar          # True = no mouth movement for this line
-            talk.append((st, st + du, silent, ln.get("emotion", ""), tx))
+            who = None
+            if not silent and not host_part:
+                pic_ = ln.get("image") if isinstance(ln.get("image"), dict) else {}
+                people = [n for n in (pic_.get("characters") or [])
+                          if (voices.cast.find(n) or {}).get("kind", "human") != "animal"]
+                spk_c = voices.cast.find(str(ln.get("speaker", "")))
+                idx_ = next((q for q, n in enumerate(people) if spk_c and voices.cast.find(n) is spk_c), None)
+                who = (idx_, len(people))
+            talk.append((st, st + du, silent, ln.get("emotion", ""), tx, who))
         walks = {}
         for k, ln in enumerate(spoken):          # a line whose picture shows someone walking / coming in
             img_k = shots[k] if k < len(shots) and shots[k] else None

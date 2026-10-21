@@ -406,7 +406,7 @@ Story rules:
   (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
   put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
 - Give every line an emotion so the voice acts it.
-
+{extras.STORY_CRAFT}{extras.WRITING_RULES.get(lang, "")}{extras.VOICE_ACTING}
 Return ONLY JSON with exactly these keys:
 {{
  "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
@@ -428,6 +428,8 @@ Return ONLY JSON with exactly these keys:
     "lines": [{{"speaker": "narrator or a character name", "text": "{L['name']} text",
                 "en": "the same line translated to natural English (for subtitles)",
                 "emotion": "one of {EMOTIONS}",
+                "delivery": "ENGLISH acting direction for the voice (pitch, speed, loudness, feeling)",
+                "voice_text": "same words as text, with 0-2 sound tags like <giggle> or <gasp> where they fit",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
                 "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a cartoon film still: WHO is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (close-up / medium / wide / low angle), light, important objects. Only things that can be SEEN",
@@ -748,6 +750,22 @@ class Voices:
             if ghost:
                 rate -= 10
             self.map[c["name"].lower()] = (voice, f"{rate:+d}%", f"{pitch:+d}Hz", ghost)
+        # expressive Gemini voices: never the same voice for two characters
+        self.gemini_map, taken = {"mithu": MITHU_GEMINI[0]}, {NARRATOR_GEMINI[0], MITHU_GEMINI[0]}
+        for c in cast.chars.values():
+            if c["name"].lower() == "mithu":
+                continue
+            g = "female" if c["gender"].startswith("f") else "male"
+            ag = age_group(c["age"])
+            pool = GEMINI_POOL[(g, ag)] + [v for k, vs in GEMINI_POOL.items() if k[0] == g for v in vs]
+            self.gemini_map[c["name"].lower()] = next((v for v in pool if v not in taken), pool[0])
+            taken.add(self.gemini_map[c["name"].lower()])
+        # free voice model (Indic Parler-TTS)
+        self.parler_map = extras.parler_cast(
+            [(c["name"], c["gender"], age_group(c["age"]), False) for c in cast.chars.values()
+             if c["name"].lower() != "mithu"], lang, "female")
+        spk = extras.PARLER_SPK.get(lang, extras.PARLER_SPK["bn"])
+        self.parler_map["mithu"] = (spk["male"][-1], "a very high-pitched, squeaky, playful", "fast")
         self.cast = cast
 
     def for_speaker(self, speaker):
@@ -760,6 +778,110 @@ class Voices:
             return self.map[c["name"].lower()]
         v, r, p = self.L["narrator"]
         return v, r, p, False
+
+
+# ---------- expressive voices (Gemini, free keys) - real human acting instead of a robotic voice
+NARRATOR_GEMINI = ("Sulafat", "Lumi Didi, a warm, loving young Indian woman telling a story to small children - "
+                              "lively, smiling, full of feeling, changing her voice with the story like a real storyteller")
+MITHU_GEMINI = ("Puck", "Mithu, a cheeky, funny little green parrot - a bright, squeaky, playful cartoon voice, "
+                        "always excited and giggly")
+GEMINI_POOL = {
+    ("male", "child"): ["Achird", "Puck"], ("male", "young"): ["Fenrir", "Zubenelgenubi", "Sadachbia"],
+    ("male", "adult"): ["Orus", "Iapetus", "Alnilam", "Schedar", "Umbriel"],
+    ("male", "old"): ["Algenib", "Rasalgethi", "Sadaltager"],
+    ("female", "child"): ["Leda", "Laomedeia"], ("female", "young"): ["Zephyr", "Aoede", "Despina"],
+    ("female", "adult"): ["Kore", "Callirrhoe", "Erinome", "Achernar"],
+    ("female", "old"): ["Gacrux", "Pulcherrima", "Autonoe"],
+}
+AGE_WORDS = {"child": "a small child of about seven, with a sweet, innocent child's voice",
+             "young": "a young person in their early twenties", "adult": "an adult of about forty",
+             "old": "a very old, kind grandparent in their late seventies, with a slow, slightly shaky voice"}
+EMOTION_WORDS = {
+    "normal": "naturally, with feeling", "calm": "calmly and gently", "whisper": "in a soft whisper",
+    "scared": "worried and a little scared", "angry": "angrily, sharply", "sad": "sadly, slowly, with a heavy heart",
+    "crying": "while crying and sobbing", "happy": "happily, smiling", "excited": "very excitedly",
+    "laughing": "laughing", "proud": "proudly",
+}
+GEMINI_CACHE = {}
+GEMINI_READY = False
+
+
+def gemini_persona(voices, speaker):
+    s = ascii_text(speaker).lower()
+    c = voices.cast.find(s) if s and not s.startswith("narrat") else None
+    if not c:
+        return NARRATOR_GEMINI
+    if c["name"].lower() == "mithu":
+        return MITHU_GEMINI
+    g = "female" if c["gender"].startswith("f") else "male"
+    ag = age_group(c["age"])
+    voice = voices.gemini_map.get(c["name"].lower(), GEMINI_POOL[(g, ag)][0])
+    what = "a cute talking animal in a cartoon" if c.get("kind") == "animal" else ("a girl" if g == "female" and ag == "child" else
+           "a boy" if ag == "child" else "a woman" if g == "female" else "a man")
+    return voice, f"{c['name']}, {what}: {AGE_WORDS[ag]}. A lively cartoon character with real, warm human feelings"
+
+
+def parler_persona(voices, speaker, lang):
+    s = ascii_text(speaker).lower()
+    c = voices.cast.find(s) if s and not s.startswith("narrat") else None
+    if not c:   # Lumi Didi
+        return (extras.PARLER_SPK.get(lang, extras.PARLER_SPK["bn"])["female"][0], "a warm, moderate-pitched", "moderate")
+    return voices.parler_map.get(c["name"].lower(), ("Aditi", "a moderate-pitched", "moderate"))
+
+
+def gemini_line(text, persona, emotion, lang, out_wav, delivery=""):
+    if MOCK or env("USE_GEMINI_VOICE") == "0" or extras.TTS_STATE["off"]:
+        return False
+    voice, who = persona
+    how = EMOTION_WORDS.get(str(emotion).lower(), "naturally, with feeling")
+    style = (f"Character: {who}. Emotion: {how}. " + (f"Delivery: {delivery}. " if delivery else "") +
+             "This is a children's cartoon story: expressive, clear, never flat or robotic. " + extras.PRONOUNCE[lang])
+    return extras.tts_gemini(text, voice, style, LANGS[lang]["name"], out_wav, SR)
+
+
+def _voice_all(todo, make, label, max_minutes):
+    global GEMINI_READY
+    t0 = time.time()
+    for k, (i, j, ln) in enumerate(todo):
+        if time.time() - t0 > max_minutes * 60:
+            log(f"  {label} too slow today")
+            break
+        p = os.path.join(WORK, f"g_{i:02d}_{j:02d}.wav")
+        if not make(ln, p):
+            log(f"  {label} stopped at line {k + 1}/{len(todo)}")
+            break
+        GEMINI_CACHE[(i, j)] = p
+    else:
+        GEMINI_READY = True
+        log(f"  all {len(todo)} lines voiced by {label} in {(time.time() - t0) / 60:.1f} min")
+        return True
+    GEMINI_CACHE.clear()
+    return False
+
+
+def prepare_voices(parts_lines, voices, lang):
+    """Voice the WHOLE video before it is made, all lines or none (so a voice never changes mid-video):
+    1) Gemini expressive voices (free keys)  2) free voice model on GitHub (Indic Parler-TTS)
+    3) otherwise Microsoft voices."""
+    if MOCK:
+        return False
+    todo = [(i, j, ln) for i, lines in enumerate(parts_lines) for j, ln in enumerate(lines or [])
+            if str(ln.get("text", "")).strip()]
+    if extras.tts_keys() and env("USE_GEMINI_VOICE") != "0":
+        log(f"Expressive voices for all {len(todo)} lines (keys: {len(extras.tts_keys())})")
+        if _voice_all(todo, lambda ln, p: gemini_line(extras.performed(ln), gemini_persona(voices, ln.get("speaker", "narrator")),
+                                                      ln.get("emotion", "normal"), lang, p, str(ln.get("delivery", ""))),
+                      "Gemini voices", 45):
+            return True
+    extras.TTS_STATE["off"] = True
+    if extras.parler_ok():
+        log(f"Free voice model for all {len(todo)} lines")
+        if _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
+                                                             ln.get("emotion", "normal"), p, SR),
+                      "free voice model", int(env("FREE_VOICE_MINUTES") or 50)):
+            return True
+    log("  using Microsoft voices for the whole video")
+    return False
 
 
 async def _edge(text, voice, rate, pitch, out, volume="+0%"):
@@ -1286,7 +1408,10 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
             t += 0.45
         spec = voices.for_speaker(ln.get("speaker", "narrator"))
         p = os.path.join(WORK, f"v_{idx:02d}_{j:02d}.wav")
-        tts_line(text, spec, LANGS[lang]["gtts"], p, ln.get("emotion", "normal"))
+        if (idx, j) in GEMINI_CACHE:
+            shutil.copy(GEMINI_CACHE[(idx, j)], p)
+        else:
+            tts_line(extras.strip_tags(text), spec, LANGS[lang]["gtts"], p, ln.get("emotion", "normal"))
         a = read_wav(p)
         pk = np.abs(a).max()
         if pk > 0:                                    # every voice equally clear; whispers softer
@@ -1708,6 +1833,8 @@ def build_video(scene_parts, lang, out):
     global TIMELINE
     clips, segs, t, wavs, part_times = [], [], 0.0, [], []
     voices = scene_parts[0]["voices"]
+    GEMINI_CACHE.clear()
+    prepare_voices([sp["lines"] for sp in scene_parts], voices, lang)
     for i, sp in enumerate(scene_parts):
         log(f"Voices + sound + clip {i + 1}/{len(scene_parts)}")
         part_times.append(t)

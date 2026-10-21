@@ -1228,3 +1228,303 @@ def current_slot(triggers, now=None):
 
 def slot_done(history, slot):
     return bool(slot) and any(h.get("slot") == slot for h in history[-12:])
+
+
+# ================================================================= v6: expressive voices (Gemini TTS)
+GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
+TAG_RE = None
+TTS_STATE = {"key": 0, "off": False, "bad_models": set()}
+NEW_TTS = ("gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts")
+OLD_TTS = ("gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts")
+
+
+def strip_tags(text):
+    """Remove voice tags like <sigh> or <short pause> (for subtitles and the backup voice)."""
+    import re as _re
+    return _re.sub(r"\s*<[A-Za-z][A-Za-z \-]{1,24}>\s*", " ", str(text)).strip()
+
+
+def tts_keys():
+    keys = [k for k in (env("GEMINI_TTS_KEY" + s) for s in ("", "_2", "_3", "_4", "_5")) if k]
+    if env("TTS_PAID") == "1" and env("GEMINI_API_KEY"):
+        keys.append(env("GEMINI_API_KEY"))          # your paid key, only if you switched it on
+    return keys
+
+
+def _find_audio(obj):
+    """Finds the base64 audio inside any Gemini reply shape."""
+    if isinstance(obj, dict):
+        if isinstance(obj.get("data"), str) and len(obj["data"]) > 200 and (
+                obj.get("type") == "audio" or "audio" in str(obj.get("mime_type", obj.get("mimeType", ""))) or
+                obj.get("type") in (None, "")):
+            return obj["data"]
+        for v in obj.values():
+            r = _find_audio(v)
+            if r:
+                return r
+    elif isinstance(obj, list):
+        for v in obj:
+            r = _find_audio(v)
+            if r:
+                return r
+    return None
+
+
+def _429_kind(r):
+    import re as _re
+    wait = 30.0
+    m = _re.search(r'"retryDelay"\s*:\s*"([\d.]+)s"', r.text)
+    if m:
+        wait = float(m.group(1))
+    return ("day" if _re.search(r"PerDay|per_day|daily", r.text, _re.I) else "minute"), wait
+
+
+def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_tries=2):
+    """Speaks one line with Gemini's expressive voice model.
+    voice_text may hold tags like <sigh>, <laugh>, <gasp>, <short pause>; style = how to perform it.
+    Tries the newest models first (3.8 Flash TTS), then older ones; rotates keys when a limit is hit.
+    Returns True when out_wav (mono, sr Hz) is ready."""
+    if TTS_STATE["off"]:
+        return False
+    keys = tts_keys()
+    if not keys:
+        return False
+    models = ([env("GEMINI_TTS_MODEL")] if env("GEMINI_TTS_MODEL") else []) + list(NEW_TTS) + list(OLD_TTS)
+    plain_len = len(strip_tags(voice_text))
+    while TTS_STATE["key"] < len(keys):
+        key = keys[TTS_STATE["key"]]
+        hdr = {"x-goog-api-key": key, "Content-Type": "application/json"}
+        key_dead = False
+        for model in models:
+            if model in TTS_STATE["bad_models"]:
+                continue
+            if model in NEW_TTS:
+                url = f"{GEMINI_BASE}/interactions"
+                body = {"model": model,
+                        "input": [{"type": "user_input", "content": [{
+                            "type": "text", "text": voice_text,
+                            "annotations": [{"type": "speech_metadata", "style": style[:600]}]}]}],
+                        "response_format": {"type": "audio"},
+                        "generation_config": {"speech_config": [{"voice": voice}]}}
+            else:
+                url = f"{GEMINI_BASE}/models/{model}:generateContent"
+                body = {"contents": [{"parts": [{"text": f"You are a voice actor in a {lang_label} audio drama. "
+                                                          f"Perform it like this: {style}. Say only this line:\n"
+                                                          f"{strip_tags(voice_text)}"}]}],
+                        "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {
+                            "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}}}
+            tries, waits = 0, 0
+            while tries < max_tries:
+                try:
+                    r = requests.post(url, headers=hdr, json=body, timeout=150)
+                    if r.status_code in (400, 404) and ("model" in r.text.lower() or "not found" in r.text.lower()
+                                                        or "unsupported" in r.text.lower() or r.status_code == 404):
+                        TTS_STATE["bad_models"].add(model)      # this model/API is not available here
+                        log(f"  voice model {model} not available ({r.status_code}) - trying the next one")
+                        break
+                    if r.status_code == 429:
+                        kind, wait = _429_kind(r)
+                        if kind == "minute" and waits < 4:
+                            waits += 1
+                            time.sleep(min(wait, 65) + 1)
+                            continue
+                        break                                    # daily limit of this model -> next model
+                    if r.status_code in (401, 403):
+                        key_dead = True
+                        break
+                    if not r.ok:
+                        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:150]}")
+                    b64 = _find_audio(r.json())
+                    if not b64:
+                        raise RuntimeError("no audio in reply")
+                    import base64 as _b64
+                    data = _b64.b64decode(b64)
+                    raw = out_wav + ".raw"
+                    with open(raw, "wb") as f:
+                        f.write(data)
+                    inp = ["-i", raw] if data[:4] == b"RIFF" else ["-f", "s16le", "-ar", "24000", "-ac", "1", "-i", raw]
+                    _run(["ffmpeg", "-y"] + inp + [
+                        "-af", "silenceremove=start_periods=1:start_threshold=-50dB:"
+                               "stop_periods=-1:stop_duration=1.2:stop_silence=0.6:stop_threshold=-50dB,"
+                               "areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse",
+                        "-ac", "1", "-ar", str(sr), out_wav])
+                    d = float(_run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                                    "-of", "default=nw=1:nk=1", out_wav]).strip() or 0)
+                    if d < max(0.4, plain_len / 40) or d > plain_len / 3 + 6:
+                        tries += 1                               # cut off or rambling -> ask again
+                        continue
+                    return True
+                except Exception as e:
+                    log(f"  voice attempt failed ({model}): {str(e)[:120]}")
+                    time.sleep(3)
+                    tries += 1
+            if key_dead:
+                break
+        TTS_STATE["key"] += 1
+        TTS_STATE["bad_models"] = set()
+        if TTS_STATE["key"] < len(keys):
+            log(f"  expressive voice: key {TTS_STATE['key']} used up - switching to key {TTS_STATE['key'] + 1}")
+    log("  expressive voice: all keys used up for today")
+    TTS_STATE["off"] = True
+    return False
+
+
+PRONOUNCE = {
+    "bn": "Speak natural standard Bangla (Kolkata/Shantiniketan standard colloquial, 'cholito bhasha') with clear, "
+          "correct pronunciation of every Bengali word - proper 'o'/'a' vowels, soft 'sh', correct conjuncts - like "
+          "a professional Bengali radio actor. Never sound like reading.",
+    "hi": "Speak natural, clear standard Hindi with correct pronunciation, like a professional Hindi radio actor. "
+          "Never sound like reading.",
+}
+
+
+# ===================== v7: free voice model that runs on GitHub itself (no limit) =====================
+# Indic Parler-TTS by AI4Bharat (IIT Madras) - free, open source (Apache 2.0), made for Indian languages,
+# speaks Bangla and Hindi clearly, and follows a written direction: which speaker, how high/low, how fast,
+# which emotion. Used when the Gemini voices run out, so the video still sounds human, not robotic.
+# Needs only a free Hugging Face read token in the secret HF_TOKEN (model page: accept the terms once).
+PARLER_ID = "ai4bharat/indic-parler-tts"
+PARLER = {"model": None, "off": False}
+PARLER_SPK = {"bn": {"male": ["Arjun", "Tapan", "Arnav"], "female": ["Aditi", "Rashmi", "Riya"]},
+              "hi": {"male": ["Rohit", "Aman"], "female": ["Divya", "Rani"]}}
+PARLER_EMO = {
+    "normal": "a natural, expressive", "calm": "a calm, gentle", "whisper": "a very soft, hushed, frightened",
+    "scared": "a fearful, trembling", "shout": "a loud, panicked", "angry": "an angry, sharp", "sad": "a sad, heavy",
+    "crying": "a sad, tearful, choked", "eerie": "a slow, eerie, menacing", "happy": "a happy, bright",
+    "excited": "an excited, surprised", "laughing": "a happy, laughing", "warm": "a warm, loving",
+}
+PARLER_AGE = {"child": ("a high-pitched", "fast"), "young": ("a slightly high-pitched", "moderate"),
+              "adult": ("a moderate-pitched", "moderate"), "old": ("a low-pitched, slightly shaky", "slow")}
+
+
+def parler_ok():
+    return bool(env("HF_TOKEN")) and env("USE_FREE_MODEL") != "0" and not PARLER["off"]
+
+
+def parler_cast(chars, lang, narrator_gender="male"):
+    """Give every character a different speaker (or the same speaker with a different pitch).
+    chars: list of (name, gender, age, is_ghost). Returns name.lower() -> (speaker, pitch words, speed)."""
+    spk = PARLER_SPK.get(lang, PARLER_SPK["bn"])
+    used = {"male": 1 if narrator_gender == "male" else 0, "female": 1 if narrator_gender == "female" else 0}
+    out = {}
+    for name, g, age, ghost in chars:
+        g = "female" if str(g).startswith("f") else "male"
+        pool = spk[g]
+        s = pool[used[g] % len(pool)]
+        used[g] += 1
+        pitch, pace = PARLER_AGE.get(age, PARLER_AGE["adult"])
+        if ghost:
+            pitch, pace = ("a very low-pitched, raspy" if g == "male" else "a thin, high, breathy"), "slow"
+        out[str(name).lower()] = (s, pitch, pace)
+    return out
+
+
+def _parler_load():
+    if PARLER["model"] is None:
+        import torch
+        from parler_tts import ParlerTTSForConditionalGeneration
+        from transformers import AutoTokenizer
+        torch.set_num_threads(max(1, os.cpu_count() or 2))
+        m = ParlerTTSForConditionalGeneration.from_pretrained(PARLER_ID, token=env("HF_TOKEN")).to("cpu")
+        tok = AutoTokenizer.from_pretrained(PARLER_ID, token=env("HF_TOKEN"))
+        dtok = AutoTokenizer.from_pretrained(m.config.text_encoder._name_or_path)
+        PARLER["model"] = (m, tok, dtok)
+    return PARLER["model"]
+
+
+def parler_line(text, spec, emotion, out_wav, sr=44100, extra=""):
+    """One line with the free model. spec = (speaker, pitch words, speed). True when done."""
+    if not parler_ok():
+        return False
+    text = strip_tags(text).strip()
+    if not text:
+        return False
+    try:
+        import numpy as np
+        import soundfile as sf
+        import torch
+        m, tok, dtok = _parler_load()
+        speaker, pitch, pace = spec
+        mood = PARLER_EMO.get(str(emotion).lower(), PARLER_EMO["normal"])
+        desc = (f"{speaker} speaks in {mood} tone with {pitch} voice at a {pace} pace{extra}. "
+                "The recording is very clear and close-up, with no background noise.")
+        d = dtok(desc, return_tensors="pt")
+        p = tok(text, return_tensors="pt")
+        with torch.inference_mode():
+            audio = m.generate(input_ids=d.input_ids, attention_mask=d.attention_mask,
+                               prompt_input_ids=p.input_ids, prompt_attention_mask=p.attention_mask)
+        a = audio.cpu().numpy().squeeze().astype("float32")
+        if a.size < m.config.sampling_rate * 0.3 or not np.isfinite(a).all():
+            return False
+        raw = out_wav + ".raw.wav"
+        sf.write(raw, a, m.config.sampling_rate)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-ac", "1", "-ar", str(sr),
+                        "-af", "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.05,"
+                               "areverse,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.1,areverse",
+                        out_wav], check=True)
+        os.remove(raw)
+        return os.path.exists(out_wav) and os.path.getsize(out_wav) > 2000
+    except Exception as e:
+        log(f"  free voice model failed: {str(e)[:200]}")
+        PARLER["off"] = True
+        return False
+
+
+# ===================== v7: better story writing + voice acting directions (both bots) =====================
+STORY_CRAFT = """
+STORY CRAFT (very important - the story must feel rich and alive, not a summary):
+- Plan first in your head: a strong opening hook, a clear goal or problem for the main character, 3 rising
+  turns that make it harder, an emotional low point, a climax, and a satisfying ending. Plant a small detail
+  early (an object, a promise, a sound) that pays off at the end.
+- SHOW, don't tell: instead of "she was scared", write her hands shaking, her breath stopping, her heart
+  pounding. Every scene has concrete detail of sight, sound, smell, touch or taste.
+- Give each character a clear personality and their OWN way of talking (one is brave and teasing, one is
+  nervous and stammers, an old person speaks slowly with sayings). Show their inner thoughts and feelings.
+- Real, natural dialogue: people interrupt, hesitate ("না... মানে..."), call each other by name, react to
+  each other. Mix short and long sentences. Emotions must change through the story (fun, worry, fear, hope,
+  sadness, joy) - never flat.
+- Every scene must move the story forward; no repeating, no filler, no sudden rushed ending.
+"""
+
+WRITING_RULES = {
+    "bn": """
+BENGALI WRITING (it will be read aloud by a voice engine, so pronunciation must come out right):
+- Standard, natural Kolkata চলিত বাংলা (the way a good Bengali radio storyteller speaks). Never সাধু ভাষা
+  (no করিয়াছিল / তাহার), no Bangladeshi or village dialect spellings unless a character is meant to speak so.
+- Correct Bengali spelling (বানান) - especially ী/ি, ূ/ু, ণ/ন, শ/ষ/স, য-ফলা, র-ফলা and যুক্তাক্ষর.
+  Use proper Bengali punctuation (। , ? ! ...).
+- Write numbers in words (তিনটে, সাতাশ, দুশো), never digits. No abbreviations, no emoji, no English letters
+  and no Hindi words inside spoken lines; use common Bengali words that everyone understands.
+- Names written in Bengali script exactly the same way every time.
+""",
+    "hi": """
+HINDI WRITING (it will be read aloud by a voice engine, so pronunciation must come out right):
+- Natural, everyday spoken Hindi in Devanagari, correct spelling and matras, proper punctuation (। , ? !).
+- Numbers in words, no digits, no abbreviations, no emoji, no English letters inside spoken lines.
+""",
+}
+
+VOICE_ACTING = """
+VOICE ACTING (every line is performed by a real-sounding AI voice actor, so direct them like a film):
+- "delivery": ENGLISH acting direction for THIS line, 6-15 words: pitch (low/high), speed (slow/fast),
+  loudness, and the exact feeling - e.g. "slow, low, trembling whisper, holding back tears",
+  "fast and breathless, high-pitched with panic", "warm, smiling, gently teasing".
+- "voice_text": the SAME words as "text", plus 0-2 sound tags in English angle brackets placed where they
+  naturally happen: <sigh> <laugh> <giggle> <gasp> <sob> <whispers> <breath> <short pause> <long pause>
+  <scream> <cackle> <growl>. Example: "<gasp> কে... কে ওখানে? <short pause> উত্তর দাও!"
+  Use tags only where they truly fit (not on every line). The words must stay exactly the same as "text".
+"""
+
+
+def performed(ln):
+    """The words the voice actor speaks: voice_text (with <sigh>-style tags) if its words match the
+    subtitle text, otherwise the plain text."""
+    import difflib
+    t = strip_tags(str(ln.get("text", ""))).strip()
+    v = str(ln.get("voice_text") or "").strip()
+    if v:
+        import re as _re
+        a, b = _re.sub(r"[\W_]", "", strip_tags(v)), _re.sub(r"[\W_]", "", t)
+        if b and difflib.SequenceMatcher(None, a, b).ratio() >= 0.85:
+            return v
+    return t

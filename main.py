@@ -426,6 +426,14 @@ Story rules:
   pot, the picture shows the crow dropping a stone in the pot.
   When a character arrives somewhere, say it in that line's picture prompt, e.g. "Gopal walks in from the left"
   (the video then shows them walking in). Do this 2-4 times in the story, at natural moments.
+- PICTURES MUST BE AUTHENTIC AND LOGICAL, frame by frame, like a real film storyboard. For every line imagine the
+  exact frame: who is in it (count them), where each one is, the BODY POSITION of each (lying / sitting /
+  standing / kneeling / walking / running / bending), what their HANDS are doing, where they LOOK, and the
+  FEELING on each face. Follow real life: a mother putting her child to sleep = the child LIES in bed under a
+  blanket with eyes closed, the mother SITS on the edge of the bed beside him, gently patting his head with a
+  loving smile, a small lamp glowing. Never add people who are not in the line, never show the same character
+  twice, a child never holds another child unless the story says so, sizes and ages stay true (a child is small,
+  an adult is tall), animals look like the real animal. Day/night and the place must match the story.
 - SOUND DESIGN like a children's audio drama: when a line mentions an action or a thing that makes a sound
   (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
   put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
@@ -456,7 +464,8 @@ Return ONLY JSON with exactly these keys:
                 "voice_text": "same words as text, with 0-2 sound tags like <giggle> or <gasp> where they fit",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
-                "image": {{"prompt": "ENGLISH picture prompt for THIS line, 30-50 words, like a cartoon film still: WHO is in frame and their exact action, pose and facial expression matching the words of this line, WHERE (which part of the setting), camera (close-up / medium / wide / low angle), light, important objects. Only things that can be SEEN",
+                "image": {{"prompt": "ENGLISH storyboard frame for THIS line, 35-60 words, like a cartoon film still: the exact moment of this line - who does what to whom, WHERE (which part of the setting, objects around), camera (close-up / medium / wide / over-the-shoulder / top view), time of day and light, the mood. Only things that can be SEEN",
+                           "people": [{{"name": "a character name exactly as in characters", "pose": "lying / sitting / standing / kneeling / walking / running / bending / sleeping ...", "doing": "exactly what the body and HANDS do, e.g. 'gently patting the boy's head with her right hand'", "where": "left / middle / right of the frame, and on what (on the bed, on the boat, under the tree)", "feeling": "facial expression and emotion, e.g. 'loving tired smile', 'eyes closed, peaceful'"}}],
                            "characters": ["names VISIBLE in this picture, in order from LEFT to RIGHT as they stand; [] if only a place or object is shown"]}}}}]
  }}],
  "moral": "one short {L['name']} line: the lesson (or the punchline for funny stories)",
@@ -588,13 +597,14 @@ class Cast:
                if chosen else "No people in this picture, only the place and the objects described. ")
         if len(chosen) >= 2:                  # fixed positions so the video knows whose mouth to move
             spots = ["on the LEFT", "in the MIDDLE", "on the RIGHT"] if len(chosen) == 3 else ["on the LEFT", "on the RIGHT"]
-            who += ("Positions, standing a little apart from each other, faces clearly visible: " +
+            who += ("Places in the frame, a little apart, each keeping the pose described above, faces visible: " +
                     ", ".join(f"{c['name']} {spots[min(k, len(spots) - 1)]}" for k, c in enumerate(chosen[:3])) + ". ")
         p = (f"{ascii_text(action)}. {who}"
              f"Location: {ascii_text(place)}. {self.setting}. Style: {ART_STYLE}.")
         if use_ref and chosen:
-            p = ("Same characters as in image 0 (same faces, hair, body and clothes), now acting out this NEW "
-                 "scene with a full background - not standing in a row, not a reference sheet: " + p)
+            p = ("Use image 0 ONLY for how the characters look (same faces, hair, body, clothes). Do NOT copy their "
+                 "poses or positions from image 0. Draw this NEW scene with a full background, each character in the "
+                 "exact pose and action written here: " + p)
         return p
 
 
@@ -1899,7 +1909,8 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
                         g_ = gaze_all.setdefault(fi, [0.0, 0.0])
                         g_[0] += (lx - g_[0]) * 0.35
                         g_[1] += (ly - g_[1]) * 0.35
-                        pic = animate.draw_face(pic, [fc], bl, mouth if fi == spk else 0.0, shape, tuple(g_))
+                        lips = mouth if (fi == spk and env("LIP_SYNC") == "1") else 0.0    # lip sync off by default
+                        pic = animate.draw_face(pic, [fc], bl, lips, shape, tuple(g_))
                     src = cv2.cvtColor(np.clip(pic, 0, 255).astype("float32"), cv2.COLOR_RGB2BGR)
                 fz = bz * (1.0 + 0.03 * ease) + 0.004 * math.sin(sec * 1.6)
                 Mf = cv2.getRotationMatrix2D((fx, fy), 0.3 * math.sin(sec * 0.9) + wt, fz)
@@ -2362,6 +2373,19 @@ def main():
             pic = first.get("image") if isinstance(first.get("image"), dict) else {}
             action = pic.get("prompt") or first.get("shot") or s.get("action", "")
             names = pic.get("characters") if isinstance(pic.get("characters"), list) else s.get("characters")
+            people = [x for x in (pic.get("people") or []) if isinstance(x, dict) and x.get("name")]
+            if people:                                   # exact poses first: the picture model follows them best
+                side_ = lambda x: (0 if "left" in str(x.get("where", "")).lower() else
+                                   2 if "right" in str(x.get("where", "")).lower() else 1)
+                people = sorted(people, key=side_)       # left -> right, same order as the positions below
+                n_ = len(people)
+                desc = "; ".join(
+                    f"{x['name']} is {x.get('pose', '')} {x.get('where', '')}, {x.get('doing', '')}, face: {x.get('feeling', '')}"
+                    for x in people[:4])
+                action = (f"EXACTLY {n_} {'character' if n_ == 1 else 'characters'} in the picture, no one else, nobody "
+                          f"appears twice. {desc}. {action}")
+                names = [x["name"] for x in people]
+                pic["characters"] = names                 # used later to know who stands where
             log(f"Picture {count} (scene {i + 1}, shot {g + 1}/{len(groups)})")
             walking = bool(WALK_RE.search(f"{action} {first.get('en', '')}".lower())) and len(WALK_PAIRS) < int(
                 env("MAX_WALKS") or 2)

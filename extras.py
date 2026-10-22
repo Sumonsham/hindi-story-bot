@@ -1791,3 +1791,164 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
 
 def parler_ok():                                      # the free on-GitHub model is too slow on GitHub's CPU;
     return (bool(env("HF_TOKEN")) and env("USE_FREE_MODEL") == "1" and not PARLER["off"])   # only if switched on
+
+
+# ===================== v9: correct request shape for the newest voice models (3.8 Flash TTS) =====================
+# Each line is its own text block with its own speaker + acting style (per-line feeling!). The newest models
+# have their OWN daily limit, separate from the older ones, so using them adds a lot of free capacity.
+API_REV = {"Api-Revision": "2026-05-20"}
+_SEEN_400 = set()
+
+
+def _tts_call(requests_to_try):
+    """requests_to_try: [(model_key, model, url, body, extra_headers)]. Returns audio bytes or None."""
+    import base64 as _b64
+    for item in requests_to_try:
+        key_name, model, url, body, extra = item if len(item) == 5 else (item[0], item[0], item[1], item[2], {})
+        if key_name in TTS_STATE["bad_models"]:
+            continue
+        for _ in range(14):
+            key = _pick_key(model)
+            if not key:
+                break
+            hdr = {"x-goog-api-key": key, "Content-Type": "application/json", **(extra or {})}
+            try:
+                r = requests.post(url, headers=hdr, json=body, timeout=180)
+            except Exception as e:
+                log(f"    voice request failed: {str(e)[:100]}")
+                time.sleep(3)
+                continue
+            if r.status_code == 429:
+                kind, wait = _429_kind(r)
+                if kind == "day":
+                    DAY_OUT.add((key, model))
+                else:
+                    KEY_COOL[key] = time.time() + min(wait, 65) + 1
+                continue
+            if r.status_code in (401, 403):
+                KEY_DEAD.add(key)
+                continue
+            if r.status_code in (400, 404):
+                TTS_STATE["bad_models"].add(key_name)
+                if key_name not in _SEEN_400:
+                    _SEEN_400.add(key_name)
+                    log(f"    voice model {key_name}: {r.status_code} {r.text[:220]}")
+                break
+            if not r.ok:
+                time.sleep(2)
+                continue
+            try:
+                b64 = _find_audio(r.json())
+            except Exception:
+                b64 = None
+            if b64:
+                return _b64.b64decode(b64)
+    return None
+
+
+def _requests_for(turns, speakers, lang_label, extra_note=""):
+    """turns: [(speaker_label, text_with_<tags>, style)], speakers: [(label, voice)] (1 or 2).
+    Returns every way of asking, best first."""
+    multi = len(speakers) > 1
+    out = []
+    sc = [{"speaker": s, "voice": v} for s, v in speakers] if multi else [{"voice": speakers[0][1]}]
+    for model in NEW_TTS:
+        blocks = [{"type": "text", "text": t + (" <long pause>" if k < len(turns) - 1 else ""),
+                   "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}
+                  for k, (s, t, st) in enumerate(turns)]
+        if not multi:
+            for b in blocks:
+                b["annotations"][0].pop("speaker")
+        out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
+                    {"model": model, "input": blocks, "response_format": {"type": "audio"},
+                     "generation_config": {"speech_config": sc}}, API_REV))
+        script = "\n".join((f"{s}: " if multi else "") + t + " <long pause>" for s, t, st in turns)
+        notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))
+        out.append((model + "#text", model, f"{GEMINI_BASE}/interactions",
+                    {"model": model, "input": f"{extra_note} {notes}\nPerform this {lang_label} audio drama:\n{script}",
+                     "response_format": {"type": "audio"}, "generation_config": {"speech_config": sc}}, API_REV))
+    for model in OLD_TTS:
+        plain = "\n".join((f"{s}: " if multi else "") + strip_tags(t) for s, t, st in turns)
+        notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))
+        cfg = ({"multiSpeakerVoiceConfig": {"speakerVoiceConfigs": [
+            {"speaker": s, "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": v}}} for s, v in speakers]}}
+            if multi else {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": speakers[0][1]}}})
+        out.append((model + ("#multi" if multi else "#single"), model, f"{GEMINI_BASE}/models/{model}:generateContent",
+                    {"contents": [{"parts": [{"text": f"You are voice actors in a {lang_label} audio drama. {extra_note} "
+                                                      f"{notes} Leave a clear pause between lines.\n{plain}"}]}],
+                     "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": cfg}}, {}))
+    return out
+
+
+def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_tries=2):
+    """One line with the expressive voice."""
+    if TTS_STATE["off"] or not tts_keys():
+        return False
+    plain_len = len(strip_tags(voice_text))
+    for _ in range(max_tries):
+        data = _tts_call(_requests_for([("Speaker1", voice_text, style)], [("Speaker1", voice)], lang_label))
+        if data is None:
+            TTS_STATE["off"] = True
+            log("  expressive voice: free limit used up on all keys")
+            return False
+        d = _audio_file(data, out_wav, sr)
+        if max(0.4, plain_len / 40) <= d <= plain_len / 3 + 6:
+            return True
+    return False
+
+
+def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
+    """items (story order): dict(text, plain, voice, who, feel, spk, out, lang). Up to 6 lines and 2 speakers per
+    request, each line with its own feeling; cut apart at the pauses. All lines or none."""
+    import numpy as np
+    from scipy.io import wavfile
+    t0 = time.time()
+    groups, cur = [], []
+    for it in items:
+        spk = {x["spk"] for x in cur} | {it["spk"]}
+        if cur and (len(spk) > 2 or len(cur) >= 6 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 650):
+            groups.append(cur)
+            cur = []
+        cur.append(it)
+    if cur:
+        groups.append(cur)
+    log(f"  {len(items)} lines in {len(groups)} voice requests (keys: {len(tts_keys())})")
+    done = 0
+    for gi, g in enumerate(groups):
+        if TTS_STATE["off"]:
+            return False
+        el = time.time() - t0
+        if el > minutes * 60 or (gi >= 3 and el / gi * len(groups) > minutes * 60):
+            log("  expressive voices too slow today")
+            return False
+        spk = []
+        for x in g:
+            if x["spk"] not in [s[0] for s in spk]:
+                spk.append((x["spk"], x["voice"], x["who"]))
+        labels = {s[0]: f"Speaker{k + 1}" for k, s in enumerate(spk)}
+        lang = g[0].get("lang", "bn")
+        note = " ".join(f"{labels[s[0]]} is {s[2]}." for s in spk) + " " + PRONOUNCE.get(lang, "")
+        turns = [(labels[x["spk"]], x["text"], x["feel"]) for x in g]
+        ok = False
+        if len(g) > 1:
+            data = _tts_call(_requests_for(turns, [(labels[s[0]], s[1]) for s in spk], lang_label, note))
+            if data:
+                tmp = g[0]["out"] + ".group.wav"
+                _audio_file(data, tmp, sr, trim=True)
+                cut = _split_at_pauses(tmp, [x["plain"] for x in g])
+                os.remove(tmp)
+                if cut:
+                    segs, rate = cut
+                    for x, seg in zip(g, segs):
+                        wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
+                        _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
+                        os.remove(x["out"] + ".seg.wav")
+                    ok = True
+        if not ok:
+            for x in g:
+                if not tts_gemini(x["text"], x["voice"], f"{x['who']}. {x['feel']}. " + PRONOUNCE.get(lang, ""),
+                                  lang_label, x["out"], sr):
+                    return False
+        done += len(g)
+        log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min)")
+    return True

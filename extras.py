@@ -2208,15 +2208,15 @@ def poster_thumbnail(base_img, title, subtitle, out, style, fallback_font, size=
 
     def fit(lines_, top=165):
         sz = top
-        while sz > 56:
+        while sz > 50:
             f_ = tf(style, sz, fallback_font)
-            if all(probe.textlength(l, font=f_) <= W_ * 0.52 for l in lines_) and sz * 1.15 * len(lines_) <= H_ * 0.54:
+            if all(probe.textlength(l, font=f_) <= W_ * 0.52 for l in lines_) and sz * (1.08 * len(lines_) + 0.75) <= H_ * 0.44:
                 return sz
             sz -= 5
         return sz
     lines = [title]
     big = fit(lines)
-    if big < 112 and len(words) >= 2:                # too long for one big line: two lines
+    if big < 100 and len(words) >= 2:                # too long for one big line: two lines
         half = len(words) // 2 + len(words) % 2
         lines = [" ".join(words[:half]), " ".join(words[half:])]
         big = fit(lines)
@@ -2240,7 +2240,7 @@ def poster_thumbnail(base_img, title, subtitle, out, style, fallback_font, size=
     cx = x0 + 10 + line_w // 2
     dr.polygon([(cx, yl - 9), (cx + 9, yl), (cx, yl + 9), (cx - 9, yl)], fill=col)
     if subtitle:
-        sf = tf(style, max(48, int(big * 0.52)), fallback_font, b"Bold")
+        sf = tf(style, max(40, int(big * 0.5)), fallback_font, b"Bold")
         sub_y = yl + 18
         if probe.textlength(subtitle, font=sf) > W_ * 0.5:
             sf = tf(style, max(40, int(big * 0.4)), fallback_font, b"Bold")
@@ -2253,10 +2253,10 @@ def poster_thumbnail(base_img, title, subtitle, out, style, fallback_font, size=
 THUMB_PROMPT = {
     "cartoon": ("Use case: thumbnail-art. Cinematic 16:9 YouTube episode thumbnail for an original {series} cartoon "
                 "episode. A polished, dramatic yet playful hand-painted 2D cartoon scene in {place}. {hero} is the "
-                "clear foreground hero on the RIGHT side of the frame, {hero_action}, large expressive face. {second}. "
+                "clear foreground hero on the RIGHT side of the frame, {hero_action}, large expressive face. {second}, placed in the middle or right, never at the left edge. "
                 "Visual story: {moment}. Rich authentic Bengali details, cinematic lighting and depth, warm lamps, "
                 "deep reds, gold and teal, lively expressions without caricature. Strong simple composition, faces "
-                "large and readable at small thumbnail size, clean dark negative space at the upper-left for a title. "
+                "large and readable at small thumbnail size, clean dark negative space at the upper-left for a title, no faces in the upper-left third. "
                 "No text, no letters, no watermark, no logo, no modern objects, no extra foreground characters, no "
                 "distorted faces, no malformed hands."),
     "horror": ("Create a cinematic 16:9 horror thumbnail for an original Bengali folk-horror episode. {hero} in the "
@@ -2264,7 +2264,7 @@ THUMB_PROMPT = {
                "non-graphic. Visual story: {moment}. Twisted banyan branches, thick mist, dim oil lamps, cold blue "
                "moonlight contrasted with warm amber lantern glow. Photorealistic cinematic Bengali folk-horror "
                "style, dramatic lighting, rich detail, the faces large enough to read at thumbnail size, clear dark "
-               "space at the upper-left for the title. No text, no letters, no gore, no violence, no modern objects, "
+               "space at the upper-left for the title, no faces in the upper-left third. No text, no letters, no gore, no violence, no modern objects, "
                "no caricature, no malformed hands, no watermark, no logo."),
 }
 

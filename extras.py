@@ -1952,3 +1952,121 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         done += len(g)
         log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min)")
     return True
+
+
+# ===================== v10: hooks that keep people watching + truly frightening horror =====================
+HOOK_RULES = """
+KEEP THEM WATCHING (very important - most viewers leave in the first 10 seconds):
+- COLD OPEN: the first 1-2 lines jump to the most gripping moment of the story (a scream, a shock, a funny
+  disaster, a mystery) - then "but how did it all begin? ..." and the story starts. Never start with a slow
+  introduction, never with "once upon a time" alone.
+- In the first 20 seconds promise something the listener must wait for ("what was behind that door - you will
+  know only at the very end").
+- OPEN LOOPS: every 2-3 scenes raise a new question before answering the old one.
+- Every scene ends on a small cliffhanger, a surprise or a strong feeling. Change the rhythm often: fast tense
+  lines, then a quiet moment, then a shock.
+- Around the middle, the narrator speaks directly to the listener once ("what would YOU have done? stay till the end").
+- The ending pays off every promise with a twist nobody expects, then ONE line teasing the next story.
+"""
+
+HORROR_DREAD = """
+MAKE IT GENUINELY TERRIFYING (but no gore, no blood details, no harm to children - the fear must be in the mind):
+- Real danger: someone's life or soul is truly at stake, and the danger keeps growing; at least one moment where
+  it seems there is NO way out.
+- Slow-burn dread: small wrong details first (a smell, a sound that answers back, a footprint that should not be
+  there), then closer and closer, then the full horror.
+- The ghost/spirit has rules and a terrible reason; it is clever, patient and personal - it knows the victim's name.
+- Use silence, breathing, whispers and sudden noises in the writing itself (short broken lines when afraid).
+- The listener should feel it could happen to THEM tonight (ordinary place, ordinary people, real Bengal).
+- End with a twist that makes the skin crawl, and a last line that lingers.
+"""
+
+
+# ===================== v10: high-quality, eye-catching thumbnails =====================
+HQ_THUMB_MODEL = "@cf/leonardo/lucid-origin"   # sharper, richer pictures (used for the thumbnail only)
+
+
+def hq_image(prompt, out, seed=0, w=1280, h=720):
+    """Thumbnail picture from the higher-quality model on the same free Cloudflare accounts.
+    Returns False (and the bot falls back to the normal model) if it is not available or the limit is reached."""
+    import base64 as _b64
+    if env("HQ_THUMB") == "0":
+        return False
+    accounts = [(env("CF_ACCOUNT_ID" + s), env("CF_API_TOKEN" + s)) for s in ("", "_2", "_3", "_4")]
+    for acc, tok in [a for a in accounts if a[0] and a[1]]:
+        try:
+            r = requests.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{HQ_THUMB_MODEL}",
+                              headers={"Authorization": f"Bearer {tok}"},
+                              json={"prompt": prompt[:2000], "width": w, "height": h, "steps": 25, "guidance": 4.5,
+                                    "seed": int(seed) % 2_000_000_000}, timeout=180)
+            if not r.ok:
+                log(f"  HQ thumbnail model: {r.status_code} {r.text[:150]}")
+                continue
+            js = r.json()
+            b64 = (js.get("result") or {}).get("image") if isinstance(js, dict) else None
+            if not b64:
+                continue
+            with open(out, "wb") as f:
+                f.write(_b64.b64decode(b64))
+            Image.open(out).convert("RGB").resize((w, h)).save(out, quality=95)
+            log("  thumbnail picture made with the high-quality model")
+            return True
+        except Exception as e:
+            log(f"  HQ thumbnail model failed: {str(e)[:120]}")
+    return False
+
+
+def pop_subject(base_img, out, glow=(255, 255, 255), size=(1280, 720)):
+    """YouTube-style 'sticker' look: the main character is cut out, made a little bigger and pushed to the
+    front with a bright outline and shadow; the background gets darker and softer. Returns True if done."""
+    import numpy as np
+    try:
+        from rembg import remove, new_session
+        W_, H_ = size
+        img = Image.open(base_img).convert("RGB").resize((W_, H_))
+        m = remove(img, session=new_session("isnet-general-use"), only_mask=True).convert("L").resize((W_, H_))
+        a = np.array(m).astype("float32") / 255
+        cover = (a > 0.5).mean()
+        if cover < 0.04 or cover > 0.6:
+            return False
+        ys, xs = np.nonzero(a > 0.5)
+        x0, y0, x1, y1 = xs.min(), ys.min(), xs.max(), ys.max()
+        subj = img.copy()
+        subj.putalpha(m)
+        bw_, bh_ = x1 - x0 + 1, y1 - y0 + 1
+        if bh_ > 1.3 * bw_:                          # a full standing figure: keep head + upper body (big face)
+            y1 = y0 + int(bh_ * 0.62)
+        subj = subj.crop((x0, y0, x1 + 1, y1 + 1))
+        sc = (H_ * 1.02) / subj.height                # fill the height - the face must be BIG
+        if subj.width * sc > W_ * 0.56:
+            sc = (W_ * 0.56) / subj.width
+        subj = subj.resize((int(subj.width * sc), int(subj.height * sc)), Image.LANCZOS)
+        # background: the old subject painted out, then softer and darker, so the new one pops
+        import cv2
+        hole = cv2.dilate((a > 0.3).astype("uint8") * 255, np.ones((41, 41), "uint8"))
+        small = cv2.inpaint(cv2.resize(np.array(img), (W_ // 2, H_ // 2)), cv2.resize(hole, (W_ // 2, H_ // 2)), 7,
+                            cv2.INPAINT_TELEA)
+        filled = np.where(hole[..., None] > 0, cv2.resize(small, (W_, H_)), np.array(img))
+        bg = Image.fromarray(filled.astype("uint8")).filter(ImageFilter.GaussianBlur(6))
+        bg = Image.blend(bg, Image.new("RGB", size, (0, 0, 0)), 0.32)
+        canvas = bg.convert("RGBA")
+        px = max(int(W_ * 0.46), W_ - subj.width - int(W_ * 0.02))
+        py = H_ - subj.height + 8
+        al = subj.split()[3]
+        # shadow + bright outline
+        sh = Image.new("RGBA", subj.size, (0, 0, 0, 0))
+        sh.putalpha(al.filter(ImageFilter.GaussianBlur(14)).point(lambda v: int(v * 0.8)))
+        canvas.alpha_composite(sh, (px + 14, py + 10))
+        ring = al.filter(ImageFilter.MaxFilter(17)).filter(ImageFilter.GaussianBlur(2))
+        outline = Image.new("RGBA", subj.size, glow + (0,))
+        outline.putalpha(ring)
+        halo = Image.new("RGBA", subj.size, glow + (0,))
+        halo.putalpha(al.filter(ImageFilter.MaxFilter(31)).filter(ImageFilter.GaussianBlur(16)).point(lambda v: int(v * 0.7)))
+        canvas.alpha_composite(halo, (px, py))
+        canvas.alpha_composite(outline, (px, py))
+        canvas.alpha_composite(subj, (px, py))
+        canvas.convert("RGB").save(out, quality=95)
+        return True
+    except Exception as e:
+        log(f"  subject pop-out skipped: {str(e)[:120]}")
+        return False

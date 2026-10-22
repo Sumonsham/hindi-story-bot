@@ -282,10 +282,14 @@ def save_history(items):
 
 
 def pick_language(history):
-    """One video Hindi, the next Bengali, and so on."""
+    """One language per page/channel (default Bengali) - a mixed-language channel splits its audience.
+    Set the secret CHANNEL_LANG to "hi" for Hindi; "both" brings back one Hindi, one Bengali."""
     forced = env("LANGUAGE").lower()
     if forced in LANGS:
         return forced
+    chan = (env("CHANNEL_LANG") or "bn").lower()
+    if chan in LANGS:
+        return chan
     last = history[-1].get("lang", "hi") if history else "bn"
     return "bn" if last == "hi" else "hi"
 
@@ -438,11 +442,11 @@ Story rules:
   (door, footsteps, birds, splash, laughing, a bell, wind, an elephant trumpeting, a cuckoo, clapping),
   put that real sound in the line's "sfx" with the right timing. 0-2 sfx per line, only real story events.
 - Give every line an emotion so the voice acts it.
-{extras.STORY_CRAFT}{extras.WRITING_RULES.get(lang, "")}{extras.VOICE_ACTING}
+{extras.STORY_CRAFT}{extras.HOOK_RULES}{extras.WRITING_RULES.get(lang, "")}{extras.VOICE_ACTING}
 Return ONLY JSON with exactly these keys:
 {{
  "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
- "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click (a question or surprise, e.g. 'लालच का फल?', 'বোকা সিংহ!')",
+ "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click - a surprising question, a funny shock or a promise (e.g. 'লোভের শাস্তি?', 'বোকা সিংহ!', 'শেষে কী হল?') - never just the title",
  "description": "3-4 line engaging {L['name']} description, ending with a question to the viewer",
  "hashtags": ["10 to 14 popular hashtags mixing {L['name']} and English, e.g. {L['example_tags']}"],
  "setting": "ENGLISH: the ONE main place of the story (landscape, buildings, plants, colors, time of day). Reused in every picture",
@@ -2431,14 +2435,18 @@ def main():
     ti = story.get("thumbnail_image") or {}
     if isinstance(ti, str):
         ti = {"action": ti}
-    if not make_image(cast, (ti.get("action") or scenes[-1].get("action", "")) +
-                      ". Viral YouTube kids thumbnail: the main character very big and close to the camera on the "
-                      "RIGHT half, huge expressive face (shocked, laughing or teary eyes), simple bright soft "
-                      "background on the LEFT half, vivid saturated colors, strong rim light, very sharp",
-                      "", ti.get("characters"), thumb_base, seed):
-        shutil.copy(first_ok, thumb_base)
+    t_action = ((ti.get("action") or scenes[-1].get("action", "")) +
+                ". Viral YouTube kids thumbnail: the main character very big and close to the camera on the RIGHT "
+                "half, huge expressive emotional face (shocked with mouth wide open, laughing, or teary eyes), "
+                "clean simple bright background on the LEFT half, vivid saturated colors, strong rim light, "
+                "cinematic lighting, ultra sharp, high detail, award-winning 3D animated film still")
+    if not extras.hq_image(cast.scene_prompt(t_action, "", ti.get("characters"), False), thumb_base, seed):
+        if not make_image(cast, t_action, "", ti.get("characters"), thumb_base, seed):
+            shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
-    make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
+    pop = os.path.join(WORK, "thumb_pop.jpg")
+    make_thumbnail(pop if extras.pop_subject(thumb_base, pop, (255, 230, 0)) else thumb_base,
+                   story.get("thumbnail_text") or title, thumb, L["labels"][category])
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]

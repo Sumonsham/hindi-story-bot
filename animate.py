@@ -93,7 +93,7 @@ def _eye_mask(img, e):
     win = ((xx - ix) / (0.95 * w)) ** 2 + ((yy - iy) / (0.62 * w)) ** 2 < 1
     lum = img.mean(2)
     sat = img.max(2) - img.min(2)
-    m = ((((lum > 190) & (sat < 80)) | (lum < 125)) & win).astype(np.uint8) * 255
+    m = ((((lum > 165) & (sat < 95)) | (lum < 125)) & win).astype(np.uint8) * 255
     m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8))
     n, lab = cv2.connectedComponents(m)
     k = lab[int(iy), int(ix)]

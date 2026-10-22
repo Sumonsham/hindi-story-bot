@@ -183,9 +183,12 @@ def fb_post_reel(video, description):
                        data=data, timeout=600).json()
     if not up.get("success"):
         raise RuntimeError(f"reel upload: {str(up)[:300]}")
-    fin = requests.post(f"{GRAPH}/{page}/video_reels", data={
-        "upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
-        "description": description[:2000], "access_token": token}, timeout=120).json()
+    data = {"upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
+            "description": description[:2000], "access_token": token}
+    at = publish_time()
+    if at:                                            # goes live together with the main video
+        data.update(video_state="SCHEDULED", scheduled_publish_time=str(int(at.timestamp())))
+    fin = requests.post(f"{GRAPH}/{page}/video_reels", data=data, timeout=120).json()
     if not fin.get("success"):
         raise RuntimeError(f"reel finish: {str(fin)[:300]}")
     return vid
@@ -2070,3 +2073,215 @@ def pop_subject(base_img, out, glow=(255, 255, 255), size=(1280, 720)):
     except Exception as e:
         log(f"  subject pop-out skipped: {str(e)[:120]}")
         return False
+
+
+# ===================== v11: make early, publish exactly on time =====================
+# The video is made about 3 hours early, uploaded as a SCHEDULED post (Facebook) / scheduled premiere-free
+# publish (YouTube publishAt), so it goes live exactly at the slot time even if making it took long.
+PUBLISH = {"at": None, "used": False}
+
+
+def plan_publish(slot):
+    """slot like '2026-10-23@13' -> publish at 13:00 India time that day."""
+    PUBLISH["at"], PUBLISH["used"] = None, False
+    if not slot or env("SCHEDULE_POSTS") == "0":
+        return None
+    try:
+        day, hour = slot.split("@")
+        y, m, d = (int(x) for x in day.split("-"))
+        PUBLISH["at"] = dt.datetime(y, m, d, int(hour), 0, tzinfo=IST)
+        log(f"Will publish at {PUBLISH['at'].strftime('%d %b %H:%M')} India time")
+    except Exception:
+        PUBLISH["at"] = None
+    return PUBLISH["at"]
+
+
+def publish_time():
+    """The planned time if it is still at least 15 minutes away (else: post right now)."""
+    at = PUBLISH["at"]
+    if at and (at - dt.datetime.now(IST)).total_seconds() >= 15 * 60:
+        PUBLISH["used"] = True
+        return at
+    return None
+
+
+def wait_for_publish():
+    """Before comments / replies: wait until the scheduled video is live."""
+    at = PUBLISH["at"]
+    if not (PUBLISH["used"] and at):
+        return
+    left = (at - dt.datetime.now(IST)).total_seconds() + 60
+    if left > 0:
+        log(f"  waiting {left / 60:.0f} min until the video is live, then comments")
+        time.sleep(left)
+
+
+# ===================== v12: poster-style thumbnails (series title + episode name over a cinematic picture) ==========
+THUMB_FONTS = {
+    "cartoon": "https://raw.githubusercontent.com/google/fonts/main/ofl/balooda2/BalooDa2%5Bwght%5D.ttf",
+    "horror": "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifbengali/NotoSerifBengali%5Bwdth,wght%5D.ttf",
+}
+
+
+def thumb_font(style, size, fallback, weight=b"ExtraBold"):
+    """Beautiful Bengali display font (downloaded once, free Google Fonts); falls back to the normal font."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "work", f"thumbfont_{style}.ttf")
+    try:
+        if not os.path.exists(path) and not env("MOCK"):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            r = requests.get(THUMB_FONTS[style], timeout=60)
+            if r.ok and len(r.content) > 50000:
+                open(path, "wb").write(r.content)
+        if os.path.exists(path):
+            f = ImageFont.truetype(path, size)
+            try:
+                names = f.get_variation_names()
+                want = weight if weight in names else (b"Black" if b"Black" in names else names[-1])
+                f.set_variation_by_name(want)
+            except Exception:
+                pass
+            return f
+    except Exception as e:
+        log(f"  thumbnail font: {str(e)[:80]}")
+    return ImageFont.truetype(fallback, size)
+
+
+def _gradient_text(img, xy, text, font, top, bottom, stroke, stroke_w, glow=None, shadow=True, grunge=False):
+    """Draws text filled with a vertical colour gradient, dark outline, soft shadow and optional glow."""
+    import numpy as np
+    W_, H_ = img.size
+    mask = Image.new("L", img.size, 0)
+    ImageDraw.Draw(mask).text(xy, text, font=font, fill=255)
+    outl = Image.new("L", img.size, 0)
+    ImageDraw.Draw(outl).text(xy, text, font=font, fill=255, stroke_width=stroke_w, stroke_fill=255)
+    base = img.convert("RGBA")
+    if shadow:
+        sh = outl.filter(ImageFilter.GaussianBlur(10))
+        layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        layer.putalpha(sh.point(lambda v: int(v * 0.85)))
+        base = Image.alpha_composite(base, layer.transform(img.size, Image.AFFINE, (1, 0, -6, 0, 1, -8)))
+    if glow:
+        g = outl.filter(ImageFilter.GaussianBlur(18))
+        layer = Image.new("RGBA", img.size, glow + (0,))
+        layer.putalpha(g.point(lambda v: int(v * 0.9)))
+        base = Image.alpha_composite(base, layer)
+    st = Image.new("RGBA", img.size, stroke + (0,))
+    st.putalpha(outl)
+    base = Image.alpha_composite(base, st)
+    bbox = mask.getbbox() or (0, 0, W_, H_)
+    y0, y1 = bbox[1], max(bbox[3], bbox[1] + 1)
+    t = np.clip((np.arange(H_) - y0) / (y1 - y0), 0, 1)[:, None, None]
+    grad = (np.array(top)[None, None, :] * (1 - t) + np.array(bottom)[None, None, :] * t)
+    grad = np.repeat(grad, W_, axis=1).astype("uint8")
+    fill = Image.fromarray(grad, "RGB").convert("RGBA")
+    a = mask
+    if grunge:                                       # worn, scratched horror letters
+        rnd = np.random.default_rng(3)
+        noise = (rnd.random((H_ // 3 + 1, W_ // 3 + 1)) > 0.22).astype("uint8") * 255
+        noise = Image.fromarray(noise).resize(img.size).filter(ImageFilter.GaussianBlur(0.8))
+        a = Image.fromarray((np.array(mask).astype("float32") * np.array(noise).astype("float32") / 255).astype("uint8"))
+    fill.putalpha(a)
+    return Image.alpha_composite(base, fill).convert("RGB")
+
+
+def poster_thumbnail(base_img, title, subtitle, out, style, fallback_font, size=(1280, 720)):
+    """Poster-style thumbnail like big channels: cinematic picture, darkened upper-left, a big series title
+    (gold for cartoons, eerie white + blood red for horror), an ornament line and the episode name."""
+    from PIL import ImageEnhance
+    W_, H_ = size
+    deva = any("\u0900" <= ch <= "\u097f" for ch in f"{title}{subtitle}")   # Hindi: the Bengali display fonts lack it
+    tf = (lambda st, sz, fb, w=b"ExtraBold": ImageFont.truetype(fb, sz)) if deva else thumb_font
+    img = Image.open(base_img).convert("RGB").resize(size)
+    img = ImageEnhance.Contrast(img).enhance(1.12)
+    img = ImageEnhance.Color(img).enhance(1.12)
+    img = ImageEnhance.Sharpness(img).enhance(1.4)
+    shade = Image.new("L", size, 0)                  # soft darkness behind the words (upper-left)
+    d = ImageDraw.Draw(shade)
+    for i in range(140):
+        r = i / 140
+        d.ellipse([-W_ * 0.35 * (1 - r) - 60, -H_ * 0.55 * (1 - r) - 60, W_ * 0.62 * (1 - r) + 40,
+                   H_ * 0.78 * (1 - r) + 20], fill=int(200 * r ** 0.8))
+    shade = shade.filter(ImageFilter.GaussianBlur(40))
+    img = Image.composite(Image.new("RGB", size, (5, 5, 12)), img, shade)
+    words = str(title).split()
+    probe = ImageDraw.Draw(img)
+
+    def fit(lines_, top=165):
+        sz = top
+        while sz > 56:
+            f_ = tf(style, sz, fallback_font)
+            if all(probe.textlength(l, font=f_) <= W_ * 0.52 for l in lines_) and sz * 1.15 * len(lines_) <= H_ * 0.54:
+                return sz
+            sz -= 5
+        return sz
+    lines = [title]
+    big = fit(lines)
+    if big < 112 and len(words) >= 2:                # too long for one big line: two lines
+        half = len(words) // 2 + len(words) % 2
+        lines = [" ".join(words[:half]), " ".join(words[half:])]
+        big = fit(lines)
+    f = tf(style, big, fallback_font)
+    x0, y = 44, 22
+    for i, l in enumerate(lines):
+        if style == "horror":
+            top, bot = ((245, 245, 240), (170, 170, 165)) if i == 0 else ((235, 50, 40), (120, 0, 0))
+            img = _gradient_text(img, (x0, y), l, f, top, bot, (10, 5, 5), max(4, big // 22),
+                                 glow=(150, 0, 0) if i else None, grunge=True)
+        else:
+            img = _gradient_text(img, (x0, y), l, f, (255, 244, 170), (230, 150, 20), (70, 30, 0), max(5, big // 18),
+                                 glow=(255, 170, 40))
+        y += int(big * 1.08)
+    # ornament line
+    dr = ImageDraw.Draw(img)
+    line_w = int(W_ * 0.42)
+    yl = y + int(big * 0.12)
+    col = (220, 40, 40) if style == "horror" else (240, 190, 70)
+    dr.line([(x0 + 10, yl), (x0 + line_w, yl)], fill=col, width=3)
+    cx = x0 + 10 + line_w // 2
+    dr.polygon([(cx, yl - 9), (cx + 9, yl), (cx, yl + 9), (cx - 9, yl)], fill=col)
+    if subtitle:
+        sf = tf(style, max(48, int(big * 0.52)), fallback_font, b"Bold")
+        sub_y = yl + 18
+        if probe.textlength(subtitle, font=sf) > W_ * 0.5:
+            sf = tf(style, max(40, int(big * 0.4)), fallback_font, b"Bold")
+        img = _gradient_text(img, (x0 + 8, sub_y), subtitle, sf, (255, 255, 255), (225, 225, 225), (0, 0, 0),
+                             max(4, sf.size // 14), glow=(0, 0, 0) if style == "horror" else None)
+    img.save(out, quality=95)
+    return out
+
+
+THUMB_PROMPT = {
+    "cartoon": ("Use case: thumbnail-art. Cinematic 16:9 YouTube episode thumbnail for an original {series} cartoon "
+                "episode. A polished, dramatic yet playful hand-painted 2D cartoon scene in {place}. {hero} is the "
+                "clear foreground hero on the RIGHT side of the frame, {hero_action}, large expressive face. {second}. "
+                "Visual story: {moment}. Rich authentic Bengali details, cinematic lighting and depth, warm lamps, "
+                "deep reds, gold and teal, lively expressions without caricature. Strong simple composition, faces "
+                "large and readable at small thumbnail size, clean dark negative space at the upper-left for a title. "
+                "No text, no letters, no watermark, no logo, no modern objects, no extra foreground characters, no "
+                "distorted faces, no malformed hands."),
+    "horror": ("Create a cinematic 16:9 horror thumbnail for an original Bengali folk-horror episode. {hero} in the "
+               "foreground, {hero_action}, in {place} at night. {second} Make it unsettling and ghostly but "
+               "non-graphic. Visual story: {moment}. Twisted banyan branches, thick mist, dim oil lamps, cold blue "
+               "moonlight contrasted with warm amber lantern glow. Photorealistic cinematic Bengali folk-horror "
+               "style, dramatic lighting, rich detail, the faces large enough to read at thumbnail size, clear dark "
+               "space at the upper-left for the title. No text, no letters, no gore, no violence, no modern objects, "
+               "no caricature, no malformed hands, no watermark, no logo."),
+}
+
+
+def poster_prompt(style, ti, cast_describe, series, place):
+    """Fill the thumbnail formula with THIS story's people and moment."""
+    ti = ti if isinstance(ti, dict) else {}
+    hero = ti.get("hero") or ""
+    second = ti.get("second") or ""
+    hero_desc = cast_describe(hero) or hero or "the main character"
+    sec_desc = cast_describe(second) or second
+    if style == "horror":
+        sec_txt = (f"Show a clearly visible, eerie {sec_desc} {ti.get('second_action') or 'in the background'}, with a "
+                   "faint supernatural glow; the hero looks toward it with tense focus.") if sec_desc else ""
+    else:
+        sec_txt = (f"{sec_desc} {ti.get('second_action') or 'reacts in the middle ground'}, with a few softly "
+                   "blurred background figures") if sec_desc else "A few softly blurred background figures"
+    return THUMB_PROMPT[style].format(series=series or "Bengali", place=ti.get("place") or place or "the story's place",
+                                      hero=hero_desc, hero_action=ti.get("hero_action") or "with a strong expression",
+                                      second=sec_txt, moment=ti.get("moment") or ti.get("action") or "")

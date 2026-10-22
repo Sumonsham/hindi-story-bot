@@ -61,6 +61,8 @@ LANGS = {
                    "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
                    "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
                    "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला", "gopal": "गोपाल भांड की कहानी"},
+        "series_titles": {"gopal": "गोपाल भांड", "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र",
+                          "divine": "भगवान की लीला"},
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
         "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
         "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
@@ -94,6 +96,8 @@ LANGS = {
                    "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
                    "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
                    "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা", "gopal": "গোপাল ভাঁড়ের গল্প"},
+        "series_titles": {"gopal": "গোপাল ভাঁড়", "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্র",
+                          "divine": "ঠাকুরের লীলা"},
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
         "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
         "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
@@ -256,7 +260,7 @@ def load_history():
 
 # cron-job.org starts each video about 1 hour before it should be online (India time):
 # (start hour, start minute, the hour the video should be out)
-TRIGGERS = [(6, 55, 8), (11, 55, 13), (17, 55, 19)]
+TRIGGERS = [(5, 0, 8), (10, 0, 13), (16, 0, 19)]   # start 3 hours early, publish at 8 AM, 1 PM, 7 PM
 SLOT = None
 
 
@@ -454,7 +458,8 @@ Return ONLY JSON with exactly these keys:
                   "age": "child, young, adult or old", "kind": "human or animal",
                   "look": "ENGLISH, very specific never-changing look: species/age, body size, exact colors of fur/skin/hair, clothes with exact colors, one special accessory. 20-35 words"}}],
  "source": "ENGLISH: e.g. 'Inspired by Panchatantra' / 'Inspired by Thakurmar Jhuli' / 'From the Bhagavata Purana' / 'Original story'",
- "thumbnail_image": {{"characters": ["1-2 main names"], "action": "ENGLISH: the most surprising or emotional moment of the story, the main character with a BIG expressive face (shocked, laughing, crying) close to the camera"}},
+ "episode_name": "2-3 word {L['name']} episode name for the thumbnail, catchy and exact (e.g. 'রাজার ধাঁধা', 'নদীর গান', 'লোভী শেয়াল')",
+ "thumbnail_image": {{"hero": "the main character's name (big in the foreground, right side)", "hero_action": "ENGLISH: the hero's pose, hand gesture and very expressive face at the story's most exciting moment, e.g. 'raising one finger with a clever smile as he answers the riddle'", "second": "the second most important character's name (or '' if none)", "second_action": "ENGLISH: how the second character reacts in the middle ground, e.g. 'the king sits on his ornate throne, astonished, hand on chin'", "place": "ENGLISH: the exact place with rich authentic details and light", "moment": "ENGLISH: one sentence - the visual story of the thumbnail (what just happened)"}},
  "scenes": [{{
     "characters": ["names VISIBLE in the picture"],
     "action": "ENGLISH: what happens in this scene",
@@ -2159,6 +2164,14 @@ def _fb_json(r):
         raise RuntimeError(f"Facebook replied HTTP {r.status_code}: {r.text[:200]!r}")
 
 
+def fb_when():
+    at = extras.publish_time()
+    if at:
+        log(f"  Facebook: scheduled for {at.strftime('%H:%M')} India time")
+        return {"published": "false", "scheduled_publish_time": str(int(at.timestamp()))}
+    return {"published": "true"}
+
+
 def post_to_facebook(video, thumb, title, description):
     """Uploads in pieces (resumable), so big videos don't fail half-way."""
     page, token = need_env("FB_PAGE_ID"), need_env("FB_PAGE_TOKEN")
@@ -2198,7 +2211,7 @@ def post_to_facebook(video, thumb, title, description):
             with open(thumb, "rb") as th:
                 jf = _fb_json(requests.post(url, data={"access_token": token, "upload_phase": "finish",
                                                        "upload_session_id": sid, "title": title,
-                                                       "description": description, "published": "true"},
+                                                       "description": description, **fb_when()},
                                             files={"thumb": ("thumb.jpg", th, "image/jpeg")}, timeout=300))
             if jf.get("success") or jf.get("id"):
                 return js.get("video_id") or jf.get("id") or sid
@@ -2229,6 +2242,11 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
         "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") != "0",   # children's cartoons must be marked "made for kids"
                    "containsSyntheticMedia": True},
     }
+    at = extras.publish_time()
+    if at and not env("YT_PRIVACY"):                  # private until the planned time, then public by itself
+        meta["status"]["privacyStatus"] = "private"
+        meta["status"]["publishAt"] = at.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        log(f"  YouTube: scheduled for {at.strftime('%H:%M')} India time")
     size = os.path.getsize(video)
     r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
                       headers={**hdr, "Content-Type": "application/json; charset=UTF-8",
@@ -2301,6 +2319,7 @@ def main():
     history = load_history()
     global SLOT
     SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
+    extras.plan_publish(SLOT)
     if env("MODE") == "compilation":
         return make_compilation(history)
     # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
@@ -2435,18 +2454,26 @@ def main():
     ti = story.get("thumbnail_image") or {}
     if isinstance(ti, str):
         ti = {"action": ti}
-    t_action = ((ti.get("action") or scenes[-1].get("action", "")) +
-                ". Viral YouTube kids thumbnail: the main character very big and close to the camera on the RIGHT "
-                "half, huge expressive emotional face (shocked with mouth wide open, laughing, or teary eyes), "
-                "clean simple bright background on the LEFT half, vivid saturated colors, strong rim light, "
-                "cinematic lighting, ultra sharp, high detail, award-winning 3D animated film still")
-    if not extras.hq_image(cast.scene_prompt(t_action, "", ti.get("characters"), False), thumb_base, seed):
-        if not make_image(cast, t_action, "", ti.get("characters"), thumb_base, seed):
+    # poster-style thumbnail: the formula stays the same, only the people and the moment change
+    hero = ti.get("hero") or (ti.get("characters") or [""])[0]
+    second = ti.get("second") or ((ti.get("characters") or ["", ""])[1:2] or [""])[0]
+    describe = lambda n: (f"{cast.find(n)['name']} ({cast.find(n)['look']})" if n and cast.find(n) else n)
+    series_en = {"gopal": "Gopal Bhar", "divine": "Bengali devotional", "folk": "Thakurmar Jhuli fairy-tale",
+                 "panchatantra": "Panchatantra fable"}.get(category, "Bengali children's story")
+    t_prompt = extras.poster_prompt("cartoon", {**ti, "hero": hero, "second": second}, describe, series_en,
+                                    cast.setting)
+    if not extras.hq_image(t_prompt, thumb_base, seed):
+        if not make_image(cast, t_prompt, "", [n for n in (hero, second) if n], thumb_base, seed):
             shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
-    pop = os.path.join(WORK, "thumb_pop.jpg")
-    make_thumbnail(pop if extras.pop_subject(thumb_base, pop, (255, 230, 0)) else thumb_base,
-                   story.get("thumbnail_text") or title, thumb, L["labels"][category])
+    series_bn = L.get("series_titles", {}).get(category)
+    big = series_bn or str(story.get("thumbnail_text") or title).strip()
+    sub = str(story.get("episode_name") or (story.get("thumbnail_text") if series_bn else "") or "").strip()
+    try:
+        extras.poster_thumbnail(thumb_base, big, sub, thumb, "cartoon", FONT)
+    except Exception as e:
+        log("  poster thumbnail failed, simple one:", str(e)[:120])
+        make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
@@ -2726,6 +2753,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
                 log(f"  'coming soon' post scheduled for {when.strftime('%d %b %H:%M')} India time")
         except Exception as e:
             log("  announcement skipped:", str(e)[:160])
+    extras.wait_for_publish()
     if question and results.get("facebook"):
         try:
             extras.fb_comment(results["facebook"], question)

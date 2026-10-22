@@ -1545,3 +1545,249 @@ def performed(ln):
         if b and difflib.SequenceMatcher(None, a, b).ratio() >= 0.85:
             return v
     return t
+
+
+# ===================== v8: faster expressive voices (fewer requests, all keys used together) =====================
+# The free Gemini voice keys have small per-minute AND per-day limits. So:
+#  1) on a per-minute limit we do not wait - the next key is used at once (each key has its own limit);
+#  2) several lines (one or two speakers) are voiced in ONE request, then cut apart at the pauses -
+#     about 4x fewer requests per story, so the daily limit covers whole stories.
+KEY_COOL, KEY_LAST, KEY_DEAD, DAY_OUT = {}, {}, set(), set()
+
+
+def _pick_key(model):
+    keys = [k for k in tts_keys() if k not in KEY_DEAD and (k, model) not in DAY_OUT]
+    if not keys:
+        return None
+    now = time.time()
+    ready = [k for k in keys if KEY_COOL.get(k, 0) <= now]
+    if not ready:                                     # every key is cooling down: wait for the first one
+        k = min(keys, key=lambda k: KEY_COOL.get(k, 0))
+        time.sleep(max(0.0, KEY_COOL.get(k, 0) - now) + 0.5)
+        ready = [k]
+    k = min(ready, key=lambda k: KEY_LAST.get(k, 0))  # round robin
+    KEY_LAST[k] = time.time()
+    return k
+
+
+def _tts_call(requests_to_try):
+    """requests_to_try: [(model, url, body)] in order of preference. Returns raw audio bytes or None."""
+    import base64 as _b64
+    for model, url, body in requests_to_try:
+        if model in TTS_STATE["bad_models"]:
+            continue
+        for _ in range(14):
+            key = _pick_key(model)
+            if not key:
+                break                                     # this model's daily limit is used up on all keys
+            try:
+                r = requests.post(url, headers={"x-goog-api-key": key, "Content-Type": "application/json"},
+                                  json=body, timeout=180)
+            except Exception as e:
+                log(f"    voice request failed: {str(e)[:100]}")
+                time.sleep(3)
+                continue
+            if r.status_code == 429:
+                kind, wait = _429_kind(r)
+                if kind == "day":
+                    DAY_OUT.add((key, model))
+                else:
+                    KEY_COOL[key] = time.time() + min(wait, 65) + 1
+                continue
+            if r.status_code in (401, 403):
+                KEY_DEAD.add(key)
+                continue
+            if r.status_code in (400, 404):
+                low = r.text.lower()
+                if r.status_code == 404 or any(w in low for w in ("model", "not found", "unsupported", "invalid")):
+                    TTS_STATE["bad_models"].add(model)
+                    log(f"    voice model {model}: not usable this way ({r.status_code})")
+                    break
+            if not r.ok:
+                time.sleep(2)
+                continue
+            try:
+                b64 = _find_audio(r.json())
+            except Exception:
+                b64 = None
+            if b64:
+                return _b64.b64decode(b64)
+    return None
+
+
+def _audio_file(data, out_wav, sr, trim=True):
+    raw = out_wav + ".raw"
+    with open(raw, "wb") as f:
+        f.write(data)
+    inp = ["-i", raw] if data[:4] == b"RIFF" else ["-f", "s16le", "-ar", "24000", "-ac", "1", "-i", raw]
+    af = (["-af", "silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
+                  "silenceremove=start_periods=1:start_threshold=-50dB,areverse"] if trim else [])
+    _run(["ffmpeg", "-y", "-loglevel", "error"] + inp + af + ["-ac", "1", "-ar", str(sr), out_wav])
+    os.remove(raw)
+    return float(_run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+                       "default=nw=1:nk=1", out_wav]).strip() or 0)
+
+
+def _single_body(model, text, voice, style, lang_label):
+    if model in NEW_TTS:
+        return (model, f"{GEMINI_BASE}/interactions",
+                {"model": model, "input": [{"type": "user_input", "content": [{
+                    "type": "text", "text": text,
+                    "annotations": [{"type": "speech_metadata", "style": style[:1500]}]}]}],
+                 "response_format": {"type": "audio"}, "generation_config": {"speech_config": [{"voice": voice}]}})
+    return (model, f"{GEMINI_BASE}/models/{model}:generateContent",
+            {"contents": [{"parts": [{"text": f"You are a voice actor in a {lang_label} audio drama. Perform it like "
+                                              f"this: {style}\nSay only these words:\n{strip_tags(text)}"}]}],
+             "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {
+                 "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}}})
+
+
+def _multi_bodies(script, notes, speakers, lang_label):
+    """speakers: [(label, voice)] (max 2)."""
+    out = []
+    for model in NEW_TTS:
+        out.append((model, f"{GEMINI_BASE}/interactions",
+                    {"model": model, "input": [{"type": "user_input", "content": [{
+                        "type": "text", "text": script,
+                        "annotations": [{"type": "speech_metadata", "style": notes[:1500]}]}]}],
+                     "response_format": {"type": "audio"},
+                     "generation_config": {"speech_config": [{"speaker": s, "voice": v} for s, v in speakers]}}))
+    for model in OLD_TTS:
+        out.append((model + "#multi", f"{GEMINI_BASE}/models/{model}:generateContent",
+                    {"contents": [{"parts": [{"text": f"{notes}\nPerform this {lang_label} audio drama scene:\n{script}"}]}],
+                     "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {"multiSpeakerVoiceConfig": {
+                         "speakerVoiceConfigs": [{"speaker": s, "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": v}}}
+                                                 for s, v in speakers]}}}}))
+    return out
+
+
+def _split_at_pauses(wav, plains):
+    """Cut one recording of several lines at its pauses. Returns [numpy arrays] or None if unsure."""
+    import numpy as np
+    from scipy.io import wavfile
+    sr, a = wavfile.read(wav)
+    a = a.astype("float32")
+    n = len(plains)
+    if n == 1:
+        return [a], sr
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+    if rms.size == 0:
+        return None
+    quiet = rms < max(rms.max() * 0.04, 1e-6)
+    runs, i = [], 0
+    while i < len(quiet):
+        if quiet[i]:
+            j = i
+            while j < len(quiet) and quiet[j]:
+                j += 1
+            if (j - i) * 0.02 >= 0.25:
+                runs.append(((j - i), (i + j) // 2))
+            i = j
+        else:
+            i += 1
+    if len(runs) < n - 1:
+        return None
+    cuts = sorted(c for _, c in sorted(runs, reverse=True)[:n - 1])
+    bounds = [0] + [c * hop for c in cuts] + [len(a)]
+    segs = [a[bounds[k]:bounds[k + 1]] for k in range(n)]
+    total_chars = sum(max(1, len(p)) for p in plains)
+    total = len(a) / sr
+    for seg, p in zip(segs, plains):                  # each piece must fit its line's length
+        want = total * max(1, len(p)) / total_chars
+        if not (0.4 * want <= len(seg) / sr <= 2.4 * want + 0.4):
+            return None
+    return segs, sr
+
+
+def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_tries=2):
+    """One line with the expressive voice (replaces the older version: now rotates keys on per-minute limits)."""
+    if TTS_STATE["off"] or not tts_keys():
+        return False
+    plain_len = len(strip_tags(voice_text))
+    for _ in range(max_tries):
+        data = _tts_call([_single_body(m, voice_text, voice, style, lang_label)
+                          for m in (([env("GEMINI_TTS_MODEL")] if env("GEMINI_TTS_MODEL") else []) +
+                                    list(NEW_TTS) + list(OLD_TTS))])
+        if data is None:
+            TTS_STATE["off"] = True
+            log("  expressive voice: free limit used up on all keys")
+            return False
+        d = _audio_file(data, out_wav, sr)
+        if max(0.4, plain_len / 40) <= d <= plain_len / 3 + 6:
+            return True
+    return False
+
+
+def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
+    """items (in story order): dict(text, plain, voice, who, feel, spk, out). Voices them in groups of up to
+    6 lines with at most 2 speakers per request; any group that cannot be cut cleanly is voiced line by line.
+    Returns True only if EVERY line was made (all-or-none keeps each voice the same through the video)."""
+    import numpy as np
+    from scipy.io import wavfile
+    t0 = time.time()
+    groups, cur = [], []
+    for it in items:
+        spk = {x["spk"] for x in cur} | {it["spk"]}
+        if cur and (len(spk) > 2 or len(cur) >= 6 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 650):
+            groups.append(cur)
+            cur = []
+        cur.append(it)
+    if cur:
+        groups.append(cur)
+    log(f"  {len(items)} lines in {len(groups)} voice requests (keys: {len(tts_keys())})")
+    done = 0
+    for gi, g in enumerate(groups):
+        if TTS_STATE["off"]:
+            return False
+        el = time.time() - t0
+        if el > minutes * 60 or (gi >= 3 and el / gi * len(groups) > minutes * 60):
+            log("  expressive voices too slow today")
+            return False
+        ok = False
+        spk = []
+        for x in g:
+            if x["spk"] not in [s[0] for s in spk]:
+                spk.append((x["spk"], x["voice"], x["who"]))
+        plains = [x["plain"] for x in g]
+        if len(g) > 1:
+            if len(spk) == 1:
+                text = "\n<long pause>\n".join(x["text"] for x in g)
+                style = (f"Character: {spk[0][2]}. Read these {len(g)} lines in order, with a clear long pause "
+                         "between lines. Feeling of each line: " +
+                         "; ".join(f"line {k + 1}: {x['feel']}" for k, x in enumerate(g)) + ". " + PRONOUNCE.get(
+                             g[0].get("lang", "bn"), ""))
+                data = _tts_call([_single_body(m, text, spk[0][1], style, lang_label) for m in NEW_TTS + OLD_TTS])
+            else:
+                labels = {s[0]: f"Speaker{k + 1}" for k, s in enumerate(spk)}
+                script = "\n".join(f"{labels[x['spk']]}: {x['text']}" for x in g)
+                notes = (" ".join(f"{labels[s[0]]} is {s[2]}." for s in spk) +
+                         " Leave a clear pause between lines. Feeling of each line: " +
+                         "; ".join(f"line {k + 1}: {x['feel']}" for k, x in enumerate(g)) + ". " +
+                         PRONOUNCE.get(g[0].get("lang", "bn"), ""))
+                data = _tts_call(_multi_bodies(script, notes, [(labels[s[0]], s[1]) for s in spk], lang_label))
+            if data:
+                tmp = g[0]["out"] + ".group.wav"
+                _audio_file(data, tmp, sr, trim=True)
+                cut = _split_at_pauses(tmp, plains)
+                os.remove(tmp)
+                if cut:
+                    segs, rate = cut
+                    for x, seg in zip(g, segs):
+                        wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
+                        _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
+                        os.remove(x["out"] + ".seg.wav")
+                    ok = True
+        if not ok:                                    # one line per request for this group
+            for x in g:
+                if not tts_gemini(x["text"], x["voice"],
+                                  f"Character: {x['who']}. Emotion: {x['feel']}. " + PRONOUNCE.get(x.get("lang", "bn"), ""),
+                                  lang_label, x["out"], sr):
+                    return False
+        done += len(g)
+        log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min)")
+    return True
+
+
+def parler_ok():                                      # the free on-GitHub model is too slow on GitHub's CPU;
+    return (bool(env("HF_TOKEN")) and env("USE_FREE_MODEL") == "1" and not PARLER["off"])   # only if switched on

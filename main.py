@@ -901,11 +901,24 @@ def prepare_voices(parts_lines, voices, lang):
     todo = [(i, j, ln) for i, lines in enumerate(parts_lines) for j, ln in enumerate(lines or [])
             if str(ln.get("text", "")).strip()]
     if extras.tts_keys() and env("USE_GEMINI_VOICE") != "0":
-        log(f"Expressive voices for all {len(todo)} lines (keys: {len(extras.tts_keys())})")
-        if _voice_all(todo, lambda ln, p: gemini_line(extras.performed(ln), gemini_persona(voices, ln.get("speaker", "narrator")),
-                                                      ln.get("emotion", "normal"), lang, p, str(ln.get("delivery", ""))),
-                      "Gemini voices", 45):
+        global GEMINI_READY
+        log(f"Expressive voices for all {len(todo)} lines")
+        items = []
+        for (i, j, ln) in todo:
+            voice, who = gemini_persona(voices, ln.get("speaker", "narrator"))
+            feel = f"{EMOTION_WORDS.get(str(ln.get('emotion', 'normal')).lower(), 'naturally')}" + (
+                f", {ln.get('delivery')}" if ln.get("delivery") else "")
+            items.append({"text": extras.performed(ln), "plain": extras.strip_tags(str(ln["text"])), "voice": voice,
+                          "who": who + ". This is a children's cartoon story: expressive, never flat or robotic",
+                          "feel": feel, "spk": voice, "out": os.path.join(WORK, f"g_{i:02d}_{j:02d}.wav"),
+                          "lang": lang})
+        if extras.tts_gemini_batch(items, LANGS[lang]["name"], SR, 45):
+            for (i, j, ln), it in zip(todo, items):
+                GEMINI_CACHE[(i, j)] = it["out"]
+            GEMINI_READY = True
+            log("  all lines voiced by Gemini")
             return True
+        GEMINI_CACHE.clear()
     extras.TTS_STATE["off"] = True
     if extras.parler_ok():
         log(f"Free voice model for all {len(todo)} lines")

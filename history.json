@@ -148,7 +148,13 @@
   "category": "panchatantra",
   "title": "नेवला और नन्हा बाबू: क्या हुई बड़ी भूल? 🐾",
   "facebook": "1521933219769839",
-  "youtube": "B1_ft88ts5E"
+  "youtube": "B1_ft88ts5E",
+  "stats": {
+   "likes": 0,
+   "comments": 0,
+   "views": 1,
+   "checked": "2026-10-22T01:27+00:00"
+  }
  },
  {
   "date": "2026-10-21T02:51+00:00",
@@ -156,7 +162,13 @@
   "category": "life",
   "title": "টুলির বকুলফুল আর একলা দাদু 🌼",
   "facebook": "2309540206489908",
-  "youtube": "qn7bbqgyg2o"
+  "youtube": "qn7bbqgyg2o",
+  "stats": {
+   "likes": 0,
+   "comments": 0,
+   "views": 1,
+   "checked": "2026-10-22T01:27+00:00"
+  }
  },
  {
   "date": "2026-10-21T08:03+00:00",
@@ -184,5 +196,22 @@
   "fb_reel": "2164138674449501",
   "coloring": "122135384006735948",
   "yt_short": "WESHPz6BUrg"
+ },
+ {
+  "date": "2026-10-22T02:32+00:00",
+  "lang": "hi",
+  "slot": "2026-10-22@8",
+  "category": "life",
+  "title": "मास्टरजी की पुरानी छतरी 🌂✨",
+  "festival": null,
+  "quiz": {
+   "label": "क",
+   "text": "नई छतरी"
+  },
+  "facebook": "1627454398834725",
+  "youtube": "QpyMwUwSuLc",
+  "fb_reel": "1119735880609636",
+  "coloring": "122135446124735948",
+  "yt_short": "3OkswBOJWQ8"
  }
 ]

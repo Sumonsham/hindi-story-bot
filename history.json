@@ -178,7 +178,13 @@
   "facebook": "3641385456008630",
   "youtube": "NfWJ_ntxHho",
   "fb_reel": "1812028326710816",
-  "yt_short": "dgWalsX38eM"
+  "yt_short": "dgWalsX38eM",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-22T06:28+00:00"
+  }
  },
  {
   "date": "2026-10-21T13:43+00:00",
@@ -213,5 +219,21 @@
   "fb_reel": "1119735880609636",
   "coloring": "122135446124735948",
   "yt_short": "3OkswBOJWQ8"
+ },
+ {
+  "date": "2026-10-22T07:11+00:00",
+  "lang": "bn",
+  "slot": "2026-10-22@13",
+  "category": "bedtime",
+  "title": "নদীর ঘুমপাড়ানি গান 🌊✨",
+  "festival": null,
+  "quiz": {
+   "label": "খ",
+   "text": "রূপালী নদী"
+  },
+  "facebook": "1123848706796122",
+  "youtube": "Myq8gOpda30",
+  "fb_reel": "1771346504090555",
+  "yt_short": "kjfTcacIl4w"
  }
 ]

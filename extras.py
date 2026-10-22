@@ -2260,7 +2260,7 @@ THUMB_PROMPT = {
                 "No text, no letters, no watermark, no logo, no modern objects, no extra foreground characters, no "
                 "distorted faces, no malformed hands."),
     "horror": ("Create a cinematic 16:9 horror thumbnail for an original Bengali folk-horror episode. {hero} in the "
-               "foreground, {hero_action}, in {place} at night. {second} Make it unsettling and ghostly but "
+               "foreground, {hero_action}, in {place}. {second} Make it unsettling and ghostly but "
                "non-graphic. Visual story: {moment}. Twisted banyan branches, thick mist, dim oil lamps, cold blue "
                "moonlight contrasted with warm amber lantern glow. Photorealistic cinematic Bengali folk-horror "
                "style, dramatic lighting, rich detail, the faces large enough to read at thumbnail size, clear dark "
@@ -2273,7 +2273,7 @@ def poster_prompt(style, ti, cast_describe, series, place):
     """Fill the thumbnail formula with THIS story's people and moment."""
     ti = ti if isinstance(ti, dict) else {}
     hero = ti.get("hero") or ""
-    second = ti.get("second") or ""
+    second = ti.get("second") or (ti.get("ghost") if style == "horror" else "") or ""
     hero_desc = cast_describe(hero) or hero or "the main character"
     sec_desc = cast_describe(second) or second
     if style == "horror":
@@ -2282,6 +2282,9 @@ def poster_prompt(style, ti, cast_describe, series, place):
     else:
         sec_txt = (f"{sec_desc} {ti.get('second_action') or 'reacts in the middle ground'}, with a few softly "
                    "blurred background figures") if sec_desc else "A few softly blurred background figures"
-    return THUMB_PROMPT[style].format(series=series or "Bengali", place=ti.get("place") or place or "the story's place",
+    pl = ti.get("place") or place or "the story's place"
+    if style == "horror" and "night" not in pl.lower():
+        pl += " at night"
+    return " ".join(THUMB_PROMPT[style].format(series=series or "Bengali", place=pl,
                                       hero=hero_desc, hero_action=ti.get("hero_action") or "with a strong expression",
-                                      second=sec_txt, moment=ti.get("moment") or ti.get("action") or "")
+                                      second=sec_txt, moment=ti.get("moment") or ti.get("action") or "").split())

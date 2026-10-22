@@ -30,6 +30,8 @@ jobs:
   post:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    env:
+      USE_FREE_MODEL: ${{ secrets.USE_FREE_MODEL }}   # "1" = also try the slow free on-GitHub voice model
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,12 +50,14 @@ jobs:
         run: pip install -q requests pillow edge-tts gTTS numpy scipy opencv-python-headless "rembg[cpu]" "mediapipe==0.10.14"
 
       - name: Keep the free voice model saved between runs
+        if: env.USE_FREE_MODEL == '1'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: indic-parler-tts-v1
 
-      - name: Install the free voice model (only when HF_TOKEN is set)
+      - name: Install the free voice model (only when switched on)
+        if: env.USE_FREE_MODEL == '1'
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |

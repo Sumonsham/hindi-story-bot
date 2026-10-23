@@ -1390,9 +1390,11 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
 
 
 PRONOUNCE = {
-    "bn": "Speak natural standard Bangla (Kolkata/Shantiniketan standard colloquial, 'cholito bhasha') with clear, "
-          "correct pronunciation of every Bengali word - proper 'o'/'a' vowels, soft 'sh', correct conjuncts - like "
-          "a professional Bengali radio actor. Never sound like reading.",
+    "bn": "Accent: West Bengal, India - pure standard Kolkata Bengali (cholito bhasha) exactly as spoken by Kolkata "
+          "radio actors of Sunday Suspense / Akashvani Kolkata. NOT a Bangladeshi or Dhaka accent, no Bangladeshi "
+          "words or intonation. Clear, correct pronunciation of every word - proper Kolkata 'o'/'a' vowels, soft 'sh', "
+          "correct conjuncts. Act it with real feeling and changing tension, breathing and pauses, like a live radio "
+          "drama - never flat, never like reading.",
     "hi": "Speak natural, clear standard Hindi with correct pronunciation, like a professional Hindi radio actor. "
           "Never sound like reading.",
 }
@@ -1636,8 +1638,9 @@ def _single_body(model, text, voice, style, lang_label):
         return (model, f"{GEMINI_BASE}/interactions",
                 {"model": model, "input": [{"type": "user_input", "content": [{
                     "type": "text", "text": text,
-                    "annotations": [{"type": "speech_metadata", "style": style[:1500]}]}]}],
-                 "response_format": {"type": "audio"}, "generation_config": {"speech_config": [{"voice": voice}]}})
+                    "annotations": [{"type": "speech_metadata", "speaker": "Speaker1", "style": style[:1500]}]}]}],
+                 "response_format": {"type": "audio"},
+                 "generation_config": {"speech_config": {"speakers": [{"speaker": "Speaker1", "voice": voice}]}}})
     return (model, f"{GEMINI_BASE}/models/{model}:generateContent",
             {"contents": [{"parts": [{"text": f"You are a voice actor in a {lang_label} audio drama. Perform it like "
                                               f"this: {style}\nSay only these words:\n{strip_tags(text)}"}]}],
@@ -1852,24 +1855,28 @@ def _tts_call(requests_to_try):
 def _requests_for(turns, speakers, lang_label, extra_note=""):
     """turns: [(speaker_label, text_with_<tags>, style)], speakers: [(label, voice)] (1 or 2).
     Returns every way of asking, best first."""
+    if lang_label == "Bengali":
+        lang_label = "Kolkata (West Bengal, India) Bengali"
     multi = len(speakers) > 1
     out = []
-    sc = [{"speaker": s, "voice": v} for s, v in speakers] if multi else [{"voice": speakers[0][1]}]
+    # Interactions API (docs): input = [{type: user_input, content: [text turns, each with its speaker]}],
+    # speech_config = {speakers: [{speaker, voice}]} - every turn names a speaker that is in that list
+    sc = {"speakers": [{"speaker": s, "voice": v} for s, v in speakers]}
+    if multi:
+        sc["mode"] = "conversational"
     for model in NEW_TTS:
         blocks = [{"type": "text", "text": t + (" <long pause>" if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}
                   for k, (s, t, st) in enumerate(turns)]
-        if not multi:
-            for b in blocks:
-                b["annotations"][0].pop("speaker")
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
-                    {"model": model, "input": blocks, "response_format": {"type": "audio"},
-                     "generation_config": {"speech_config": sc}}, API_REV))
-        script = "\n".join((f"{s}: " if multi else "") + t + " <long pause>" for s, t, st in turns)
-        notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))
-        out.append((model + "#text", model, f"{GEMINI_BASE}/interactions",
-                    {"model": model, "input": f"{extra_note} {notes}\nPerform this {lang_label} audio drama:\n{script}",
+                    {"model": model, "input": [{"type": "user_input", "content": blocks}],
                      "response_format": {"type": "audio"}, "generation_config": {"speech_config": sc}}, API_REV))
+        if not multi:          # one speaker: a plain text prompt also works
+            out.append((model + "#text", model, f"{GEMINI_BASE}/interactions",
+                        {"model": model, "input": f"{extra_note} {turns[0][2]}\nPerform this {lang_label} line:\n"
+                                                  f"{turns[0][1]}",
+                         "response_format": {"type": "audio"},
+                         "generation_config": {"speech_config": {"voice": speakers[0][1]}}}, API_REV))
     for model in OLD_TTS:
         plain = "\n".join((f"{s}: " if multi else "") + strip_tags(t) for s, t, st in turns)
         notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))
@@ -2103,6 +2110,16 @@ def publish_time():
         PUBLISH["used"] = True
         return at
     return None
+
+
+def voice_minutes(default=45):
+    """How long the expressive voices may take: all the spare time before the post time (minus ~40 minutes
+    for making and uploading the video), at least 30, at most 120 minutes."""
+    at = PUBLISH.get("at")
+    if not at:
+        return default
+    left = (at - dt.datetime.now(IST)).total_seconds() / 60 - 40
+    return int(max(30, min(120, left)))
 
 
 def wait_for_publish():

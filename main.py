@@ -83,8 +83,8 @@ LANGS = {
     "bn": {
         "name": "Bengali", "script": "Bengali",
         "font_family": "Noto Sans Bengali", "font_glob": "NotoSansBengali",
-        "male": ["bn-IN-BashkarNeural", "bn-BD-PradeepNeural"],
-        "female": ["bn-BD-NabanitaNeural", "bn-IN-TanishaaNeural"],
+        "male": ["bn-IN-BashkarNeural", "bn-IN-BashkarNeural"],
+        "female": ["bn-IN-TanishaaNeural", "bn-IN-TanishaaNeural"],
         "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
         "intro": "নমস্কার ছোট্ট বন্ধুরা! আমি তোমাদের লুমি দিদি। আজকের গল্প... {title}।",
         "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
@@ -931,7 +931,7 @@ def prepare_voices(parts_lines, voices, lang):
                           "who": who + ". This is a children's cartoon story: expressive, never flat or robotic",
                           "feel": feel, "spk": voice, "out": os.path.join(WORK, f"g_{i:02d}_{j:02d}.wav"),
                           "lang": lang})
-        if extras.tts_gemini_batch(items, LANGS[lang]["name"], SR, 45):
+        if extras.tts_gemini_batch(items, LANGS[lang]["name"], SR, extras.voice_minutes(45)):
             for (i, j, ln), it in zip(todo, items):
                 GEMINI_CACHE[(i, j)] = it["out"]
             GEMINI_READY = True

@@ -246,7 +246,13 @@
   "facebook": "1123848706796122",
   "youtube": "Myq8gOpda30",
   "fb_reel": "1771346504090555",
-  "yt_short": "kjfTcacIl4w"
+  "yt_short": "kjfTcacIl4w",
+  "stats": {
+   "likes": 5,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-23T04:31+00:00"
+  }
  },
  {
   "date": "2026-10-22T13:59+00:00",
@@ -279,5 +285,21 @@
   "fb_reel": "1508345001201598",
   "coloring": "122135603132735948",
   "yt_short": "5qn7k62gyIQ"
+ },
+ {
+  "date": "2026-10-23T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-23@13",
+  "category": "animal",
+  "title": "বাছুর গাবলু ও হারানো সোনার চাবি! 🐮✨",
+  "festival": null,
+  "quiz": {
+   "label": "খ",
+   "text": "গাবলুর গলার ফিতেয়"
+  },
+  "facebook": "1647907946887679",
+  "youtube": "-HRwYYbn7-o",
+  "fb_reel": "1130346839965321",
+  "yt_short": "aYR3HGec1SA"
  }
 ]

@@ -224,7 +224,13 @@
   "youtube": "QpyMwUwSuLc",
   "fb_reel": "1119735880609636",
   "coloring": "122135446124735948",
-  "yt_short": "3OkswBOJWQ8"
+  "yt_short": "3OkswBOJWQ8",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-22T23:31+00:00"
+  }
  },
  {
   "date": "2026-10-22T07:11+00:00",
@@ -256,5 +262,22 @@
   "facebook": "1530532622216306",
   "youtube": "puLaLaYZ9_Y",
   "fb_reel": "2921410098240417"
+ },
+ {
+  "date": "2026-10-23T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-23@8",
+  "category": "gopal",
+  "title": "গোপাল ভাঁড় ও কৃপণ জমিদারের শিক্ষা! 🥭",
+  "festival": null,
+  "quiz": {
+   "label": "ক",
+   "text": "মুদ্রার মিষ্টি শব্দ"
+  },
+  "facebook": "3682865245223099",
+  "youtube": "vVlGOOZErC0",
+  "fb_reel": "1508345001201598",
+  "coloring": "122135603132735948",
+  "yt_short": "5qn7k62gyIQ"
  }
 ]

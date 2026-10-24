@@ -94,6 +94,7 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID_2: ${{ secrets.CF_ACCOUNT_ID_2 }}
           CF_API_TOKEN_2: ${{ secrets.CF_API_TOKEN_2 }}
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}

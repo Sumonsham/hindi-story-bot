@@ -2009,15 +2009,32 @@ KEEP THEM WATCHING (very important - most viewers leave in the first 10 seconds)
 """
 
 HORROR_DREAD = """
-MAKE IT GENUINELY TERRIFYING (but no gore, no blood details, no harm to children - the fear must be in the mind):
-- Real danger: someone's life or soul is truly at stake, and the danger keeps growing; at least one moment where
-  it seems there is NO way out.
-- Slow-burn dread: small wrong details first (a smell, a sound that answers back, a footprint that should not be
-  there), then closer and closer, then the full horror.
-- The ghost/spirit has rules and a terrible reason; it is clever, patient and personal - it knows the victim's name.
-- Use silence, breathing, whispers and sudden noises in the writing itself (short broken lines when afraid).
-- The listener should feel it could happen to THEM tonight (ordinary place, ordinary people, real Bengal).
-- End with a twist that makes the skin crawl, and a last line that lingers.
+MAKE IT GENUINELY TERRIFYING - the listener's heart must pound (but no gore, no blood details, no harm to
+children, nothing sexual - the fear must be in the mind):
+- REALISTIC FIRST: it must feel like a TRUE incident someone in Bengal really lived through. Real, specific
+  places (a railway quarter in Bardhaman, a zamindar bari in Nadia, a hostel in north Kolkata, a pond in a
+  Sundarban village), real daily life (load-shedding, a hurricane lamp, the last local train, a night shift,
+  a phone with 2% battery), believable ordinary people with names, jobs and families. Exact times ("রাত তখন
+  দুটো বেজে সতেরো"), exact small details. No fantasy, no silly monsters - the supernatural enters a very real life.
+- STEP-BY-STEP DREAD, every step worse than the last:
+  1) something tiny is WRONG (a smell of burnt hair, a second set of footprints, a voice that knows a secret);
+  2) it is explained away... then it happens again, closer;
+  3) proof it is real - nobody believes the hero, the hero is alone;
+  4) the ghost gets personal - it uses the hero's name, a dead relative's voice, things only family knew;
+  5) a trap: no escape, the light goes out, the door is locked from OUTSIDE;
+  6) the face-to-face moment, described slowly, line by line;
+  7) a twist that turns everything upside down, and a last line that keeps people awake.
+- Every scene ends on a question or a threat the listener cannot ignore. Never relax the tension for long;
+  a short calm moment only to make the next scare hit harder.
+- Use the senses and the body: ice-cold breath on the neck, hair standing up, the heartbeat in the ears,
+  the throat too dry to scream, a hand that is suddenly holding yours in the dark.
+- Fear in the WRITING itself: short broken lines, '...', silence, whispers, counting breaths; long sentences
+  only when the dread is slowly growing.
+- The ghost has rules, patience and a terrible, believable reason (an old injustice, a broken promise, a
+  hidden death) - it is clever and it wants something from THIS person.
+- The listener must feel it could happen to THEM tonight, in their own house.
+- A big story is fine: if there is too much for one video, it will be told in parts - then every part ends
+  on a cliffhanger that makes people desperate for the next part.
 """
 
 

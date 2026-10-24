@@ -939,14 +939,25 @@ def prepare_voices(parts_lines, voices, lang):
             return True
         GEMINI_CACHE.clear()
     extras.TTS_STATE["off"] = True
-    if extras.parler_ok():
-        log(f"Free voice model for all {len(todo)} lines")
+    if extras.parler_ok() and extras.ensure_parler():
+        log(f"Free voice model for all {len(todo)} lines (slow - the post may be a little late)")
         if _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
                                                              ln.get("emotion", "normal"), p, SR),
-                      "free voice model", int(env("FREE_VOICE_MINUTES") or 50)):
+                      "free voice model", int(env("FREE_VOICE_MINUTES") or 200)):
             return True
-    log("  using Microsoft voices for the whole video")
-    return False
+    if env("ALLOW_MICROSOFT") == "1":
+        log("  using Microsoft voices for the whole video")
+        return False
+    no_voice_stop()
+
+
+def no_voice_stop():
+    """No good voice today (Gemini limit over, free model failed): no robotic Microsoft voice - skip this video."""
+    log("STOPPED: no expressive voice available today (Gemini free limit used up and the free voice model "
+        "failed). Nothing was posted - the next run will try again. (Microsoft voices are switched off.)")
+    extras.telegram("⚠️ Little Lumi: today's voices could not be made (Gemini limit over, free voice model failed) "
+                    "- this video was skipped. The next run will try again.")
+    sys.exit(0)
 
 
 async def _edge(text, voice, rate, pitch, out, volume="+0%"):

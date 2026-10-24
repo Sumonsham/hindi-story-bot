@@ -14,6 +14,7 @@ import json
 import os
 import random
 import subprocess
+import sys
 import time
 
 import requests
@@ -1795,8 +1796,33 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     return True
 
 
-def parler_ok():                                      # the free on-GitHub model is too slow on GitHub's CPU;
-    return (bool(env("HF_TOKEN")) and env("USE_FREE_MODEL") == "1" and not PARLER["off"])   # only if switched on
+def parler_ok():          # the free on-GitHub model (slow, but no daily limit): used when Gemini's limit is over
+    return bool(env("HF_TOKEN")) and env("USE_FREE_MODEL") != "0" and not PARLER["off"]
+
+
+def ensure_parler():
+    """Install the free voice model's tools only on the days they are needed (saves time on normal days)."""
+    try:
+        import torch, torchaudio  # noqa: F401
+        from parler_tts import ParlerTTSForConditionalGeneration  # noqa: F401
+        return True
+    except Exception:
+        pass
+    log("  installing the free voice model (a few minutes) ...")
+    try:
+        pip = [sys.executable, "-m", "pip", "install", "-q"]
+        subprocess.run(pip + ["torch==2.5.1", "torchaudio==2.5.1", "--index-url",
+                              "https://download.pytorch.org/whl/cpu"], check=True, timeout=1500)
+        subprocess.run(pip + ["git+https://github.com/huggingface/parler-tts.git", "soundfile"], check=True,
+                       timeout=1500)
+        import importlib
+        importlib.invalidate_caches()
+        from parler_tts import ParlerTTSForConditionalGeneration  # noqa: F401,F811
+        return True
+    except Exception as e:
+        log("  free voice model could not be installed:", str(e)[:200])
+        PARLER["off"] = True
+        return False
 
 
 # ===================== v9: correct request shape for the newest voice models (3.8 Flash TTS) =====================
@@ -1861,9 +1887,7 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     out = []
     # Interactions API (docs): input = [{type: user_input, content: [text turns, each with its speaker]}],
     # speech_config = {speakers: [{speaker, voice}]} - every turn names a speaker that is in that list
-    sc = {"speakers": [{"speaker": s, "voice": v} for s, v in speakers]}
-    if multi:
-        sc["mode"] = "conversational"
+    sc = {"speakers": [{"speaker": s, "voice": v} for s, v in speakers]}     # (no "mode": the API refuses it)
     for model in NEW_TTS:
         blocks = [{"type": "text", "text": t + (" <long pause>" if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}
@@ -1871,12 +1895,6 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
                     {"model": model, "input": [{"type": "user_input", "content": blocks}],
                      "response_format": {"type": "audio"}, "generation_config": {"speech_config": sc}}, API_REV))
-        if not multi:          # one speaker: a plain text prompt also works
-            out.append((model + "#text", model, f"{GEMINI_BASE}/interactions",
-                        {"model": model, "input": f"{extra_note} {turns[0][2]}\nPerform this {lang_label} line:\n"
-                                                  f"{turns[0][1]}",
-                         "response_format": {"type": "audio"},
-                         "generation_config": {"speech_config": {"voice": speakers[0][1]}}}, API_REV))
     for model in OLD_TTS:
         plain = "\n".join((f"{s}: " if multi else "") + strip_tags(t) for s, t, st in turns)
         notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))

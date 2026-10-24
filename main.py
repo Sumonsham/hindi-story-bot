@@ -636,7 +636,30 @@ def cf_accounts():
 CF_ACTIVE = 0
 
 
+AGNES_SAID = False
+
+
 def cf_request(model, prompt, ref_path=None, w=PIC_W, h=PIC_H, seed=None):
+    """A picture: Cloudflare first (account 1, then 2); when their free daily limit is used up,
+    the free Agnes AI pictures (if AGNES_API_KEY is set)."""
+    global AGNES_SAID
+    if not CF_QUOTA_OUT:
+        try:
+            return _cf_request_all(model, prompt, ref_path, w, h, seed)
+        except RuntimeError:
+            if not CF_QUOTA_OUT:
+                raise
+    if extras.agnes_ok():
+        if not AGNES_SAID:
+            log("  Cloudflare limit used up - making the rest of the pictures with Agnes AI")
+            AGNES_SAID = True
+        if "exact pose and action written here: " in prompt:          # no reference picture on Agnes
+            prompt = prompt.split("exact pose and action written here: ", 1)[1]
+        return extras.agnes_image(prompt)
+    raise RuntimeError("all Cloudflare accounts used up their daily free allocation (4006)")
+
+
+def _cf_request_all(model, prompt, ref_path=None, w=PIC_W, h=PIC_H, seed=None):
     """Ask Cloudflare for a picture. When one account's free daily limit is used up,
     move on to the next account automatically."""
     global CF_ACTIVE, CF_QUOTA_OUT
@@ -712,7 +735,7 @@ def make_image(cast, action, place, names, path, seed):
     global CF_QUOTA_OUT
     if MOCK:
         return mock_image(path, seed)
-    if CF_QUOTA_OUT:
+    if CF_QUOTA_OUT and not extras.agnes_ok():
         return False
     tries = []
     if cast.ref:
@@ -729,7 +752,7 @@ def make_image(cast, action, place, names, path, seed):
         except Exception as e:
             if "flagged" in str(e).lower() or "3030" in str(e):
                 soft = True                       # safety filter: next try uses gentler words
-            if any(k in str(e).lower() for k in ("allocation", "4006", "quota", "neurons")):
+            if any(k in str(e).lower() for k in ("allocation", "4006", "quota", "neurons")) and not extras.agnes_ok():
                 CF_QUOTA_OUT = True               # free daily limit used up: reuse earlier pictures
                 log("  Cloudflare daily free limit reached - reusing earlier pictures with new camera moves")
                 return False
@@ -2454,8 +2477,7 @@ def main():
             extras.telegram("⚠️ Little Lumi: today's free picture limit is used up - this video was skipped. "
                             "It resets at 5:30 AM India time.")
             log("STOPPED: today's free Cloudflare picture limit is used up on every account. "
-                "Nothing was posted. It resets every day at 5:30 AM India time; the next run will work. "
-                "(Tip: add a 2nd free Cloudflare account as CF_ACCOUNT_ID_2 / CF_API_TOKEN_2.)")
+                "Nothing was posted. It resets every day at 5:30 AM India time; the next run will work.")
             sys.exit(0)
         raise RuntimeError("No pictures could be made (check CF_ACCOUNT_ID / CF_API_TOKEN).")
     imgs = [p or first_ok for p in imgs]

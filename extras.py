@@ -2323,3 +2323,83 @@ def poster_prompt(style, ti, cast_describe, series, place):
     return " ".join(THUMB_PROMPT[style].format(series=series or "Bengali", place=pl,
                                       hero=hero_desc, hero_action=ti.get("hero_action") or "with a strong expression",
                                       second=sec_txt, moment=ti.get("moment") or ti.get("action") or "").split())
+
+
+# ===================== v13: Agnes AI pictures - a backup when the Cloudflare free limit is used up =====================
+AGNES = {"off": False, "size": None, "model": None, "fails": 0}
+AGNES_URL = "https://apihub.agnes-ai.com/v1/images/generations"
+AGNES_MODELS = ("agnes-image-2.1-flash", "agnes-image-2.0-flash")
+AGNES_SIZES = ("1280x720", "1024x576", "1344x768", "1024x768", "1024x1024")
+
+
+def agnes_ok():
+    return bool(env("AGNES_API_KEY")) and not AGNES["off"] and env("USE_AGNES") != "0"
+
+
+def _crop_16x9(data):
+    """Any picture -> a 16:9 picture (centre cut), as JPEG bytes."""
+    import io
+    im = Image.open(io.BytesIO(data)).convert("RGB")
+    W_, H_ = im.size
+    if abs(W_ / H_ - 16 / 9) > 0.03:
+        if W_ / H_ > 16 / 9:
+            nw = int(H_ * 16 / 9)
+            im = im.crop(((W_ - nw) // 2, 0, (W_ - nw) // 2 + nw, H_))
+        else:
+            nh = int(W_ * 9 / 16)
+            top = max(0, int((H_ - nh) * 0.35))           # keep a little more of the top (faces)
+            im = im.crop((0, top, W_, top + nh))
+    out = io.BytesIO()
+    im.save(out, "JPEG", quality=95)
+    return out.getvalue()
+
+
+def agnes_image(prompt):
+    """One 16:9 picture from Agnes AI (free API, own key). Returns JPEG bytes; raises when it can't."""
+    import base64 as _b64
+    if not agnes_ok():
+        raise RuntimeError("Agnes not available")
+    hdr = {"Authorization": f"Bearer {env('AGNES_API_KEY')}", "Content-Type": "application/json"}
+    models = [AGNES["model"]] if AGNES["model"] else list(AGNES_MODELS)
+    sizes = [AGNES["size"]] if AGNES["size"] else list(AGNES_SIZES)
+    last = ""
+    for model in models:
+        for size in sizes:
+            for fmt in ("b64_json", "url"):
+                try:
+                    r = requests.post(AGNES_URL, headers=hdr, timeout=240,
+                                      json={"model": model, "prompt": prompt[:3000], "size": size, "n": 1,
+                                            "response_format": fmt})
+                except Exception as e:
+                    last = str(e)[:150]
+                    continue
+                if r.status_code in (401, 403):
+                    AGNES["off"] = True
+                    raise RuntimeError(f"Agnes key refused ({r.status_code}): {r.text[:150]}")
+                if r.status_code == 429:
+                    time.sleep(20)
+                    last = f"429 {r.text[:150]}"
+                    continue
+                if not r.ok:
+                    last = f"{r.status_code} {r.text[:200]}"
+                    continue
+                try:
+                    d = (r.json().get("data") or [{}])[0]
+                    if d.get("b64_json"):
+                        data = _b64.b64decode(d["b64_json"])
+                    elif d.get("url"):
+                        data = requests.get(d["url"], timeout=120).content
+                    else:
+                        last = "no picture in reply: " + r.text[:150]
+                        continue
+                    data = _crop_16x9(data)
+                except Exception as e:
+                    last = str(e)[:150]
+                    continue
+                AGNES["model"], AGNES["size"], AGNES["fails"] = model, size, 0
+                return data
+    AGNES["fails"] += 1
+    if AGNES["fails"] >= 4:
+        AGNES["off"] = True
+        log("  Agnes pictures: stopped for this run (kept failing)")
+    raise RuntimeError(f"Agnes picture failed: {last}")

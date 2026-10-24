@@ -142,8 +142,8 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
     top_col, band_col = colors
     ov = Image.new("RGBA", (VW, VH), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
-    lines, f, size = _fit_text(d, hook_text, font_path, VW - 70, 86)
-    y = 150
+    lines, f, size = _fit_text(d, hook_text, font_path, VW - 70, 78, lines_max=2)
+    y = 36
     for l in lines:
         tw = d.textlength(l, font=f)
         d.text(((VW - tw) / 2, y), l, font=f, fill=top_col + (255,), stroke_width=max(5, size // 12),
@@ -151,15 +151,22 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
         y += int(size * 1.3)
     cl, cf, cs = _fit_text(d, cta_text, font_path, VW - 110, 46, lines_max=1)
     tw = d.textlength(cl[0], font=cf)
-    by = VH - 260
+    by = VH - 185
     d.rounded_rectangle([(VW - tw) / 2 - 30, by - 14, (VW + tw) / 2 + 30, by + cs * 1.35 + 10], radius=26,
                         fill=band_col + (240,), outline=(255, 255, 255, 255), width=3)
     d.text(((VW - tw) / 2, by), cl[0], font=cf, fill=(255, 255, 255, 255))
     png = os.path.join(workdir, "teaser_overlay.png")
     ov.save(png)
     dur = max(5.0, end - start)
-    fc = (f"[0:v]split[a][b];[a]scale=-2:{VH},crop={VW}:{VH},boxblur=22:2,eq=brightness=-0.18[bg];"
-          f"[b]scale={VW}:-2[fg];[bg][fg]overlay=0:(H-h)/2[v1];[v1][1:v]overlay=0:0,format=yuv420p[v]")
+    # Facebook ranks Reels lower when the real picture is only a thin 16:9 strip in the middle
+    # ("content quality: aspect ratio"). So the story picture is shown BIG (about 2/3 of the screen),
+    # gently panning left-right so nothing important stays hidden; blurred copy only at the very edges.
+    fh = int(VH * 0.64) // 2 * 2                  # height of the big picture
+    fw = int(fh * 16 / 9) // 2 * 2
+    fy = int(VH * 0.19)
+    fc = (f"[0:v]split[a][b];[a]scale=-2:{VH},crop={VW}:{VH},boxblur=22:2,eq=brightness=-0.22[bg];"
+          f"[b]scale={fw}:{fh},crop={VW}:{fh}:'({fw}-{VW})/2+({fw}-{VW})*0.22*sin(2*PI*t/14)':0[fg];"
+          f"[bg][fg]overlay=0:{fy}[v1];[v1][1:v]overlay=0:0,format=yuv420p[v]")
     _run(["ffmpeg", "-y", "-ss", f"{start:.2f}", "-t", f"{dur:.2f}", "-i", video, "-i", png,
           "-filter_complex", fc, "-map", "[v]", "-map", "0:a",
           "-af", f"afade=t=in:st=0:d=0.3,afade=t=out:st={max(0.0, dur - 1.2):.2f}:d=1.2",

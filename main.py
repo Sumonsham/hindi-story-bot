@@ -2208,6 +2208,8 @@ def fb_when():
 
 def post_to_facebook(video, thumb, title, description):
     """Uploads in pieces (resumable), so big videos don't fail half-way."""
+    video, thumb = extras.fb_square(video, thumb, WORK)       # 1:1 ranks better on phones
+    description = extras.fb_caption(description)               # Facebook likes 10-400 characters
     page, token = need_env("FB_PAGE_ID"), need_env("FB_PAGE_TOKEN")
     url = f"https://graph-video.facebook.com/v21.0/{page}/videos"
     size = os.path.getsize(video)

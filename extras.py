@@ -2431,3 +2431,78 @@ def agnes_image(prompt):
         AGNES["off"] = True
         log("  Agnes pictures: stopped for this run (kept failing)")
     raise RuntimeError(f"Agnes picture failed: {last}")
+
+
+# ===================== v14: Facebook quality checklist - square video + short caption =====================
+SQ = 1080        # Facebook ranks 1:1 (or 4:5) videos higher on phones than 16:9
+
+
+def fb_square(video, thumb, workdir):
+    """A 1:1 copy of the 16:9 story video for Facebook: the picture shown big (3/4 of the width, gently panning so
+    nothing stays hidden), a blurred copy of the same picture above and below. Also a square thumbnail with the
+    WHOLE poster visible. Returns (video, thumb); the originals if anything fails or FB_SQUARE=0."""
+    if env("FB_SQUARE") == "0":
+        return video, thumb
+    try:
+        out_v = os.path.join(workdir, "facebook_square.mp4")
+        fh = int(SQ * 0.75) // 2 * 2
+        fw = int(fh * 16 / 9) // 2 * 2
+        fy = (SQ - fh) // 2
+        fc = (f"[0:v]split[a][b];[a]scale=-2:{SQ},crop={SQ}:{SQ},boxblur=24:2,eq=brightness=-0.20[bg];"
+              f"[b]scale={fw}:{fh},crop={SQ}:{fh}:'({fw}-{SQ})/2+({fw}-{SQ})*0.35*sin(2*PI*t/16)':0[fg];"
+              f"[bg][fg]overlay=0:{fy},format=yuv420p[v]")
+        _run(["ffmpeg", "-y", "-i", video, "-filter_complex", fc, "-map", "[v]", "-map", "0:a?",
+              "-c:v", "libx264", "-preset", "veryfast", "-crf", "22", "-r", "25", "-c:a", "copy",
+              "-movflags", "+faststart", out_v])
+        out_t = thumb
+        if thumb and os.path.exists(thumb):
+            t = Image.open(thumb).convert("RGB")
+            bg = t.resize((SQ * t.width // t.height, SQ)).crop(((SQ * t.width // t.height - SQ) // 2, 0,
+                                                               (SQ * t.width // t.height + SQ) // 2, SQ))
+            from PIL import ImageEnhance
+            bg = ImageEnhance.Brightness(bg.filter(ImageFilter.GaussianBlur(28))).enhance(0.7)
+            fg = t.resize((SQ, SQ * t.height // t.width))
+            bg.paste(fg, (0, (SQ - fg.height) // 2))
+            out_t = os.path.join(workdir, "thumbnail_square.jpg")
+            bg.save(out_t, quality=94)
+        log("  Facebook: square 1:1 version made")
+        return out_v, out_t
+    except Exception as e:
+        log("  square Facebook version skipped:", str(e)[:200])
+        return video, thumb
+
+
+def fb_caption(description, limit=390):
+    """Facebook likes captions of 10-400 characters. Keeps the title, the AI note and the most important lines,
+    shortens the long text, then adds as many hashtags as fit."""
+    paras = [p.strip() for p in str(description).split("\n\n") if p.strip()]
+    tags = []
+    if paras and paras[-1].startswith("#"):
+        tags = paras.pop().split()
+    if not paras:
+        return " ".join(tags)[:limit]
+    head, rest = paras[0], paras[1:]
+    note = [p for p in rest if "AI" in p and len(p) < 90][:1]
+    rest = [p for p in rest if p not in note]
+    out = [head[:150]]
+    tag_room = min(75, len(" ".join(tags[:5])) + 2) if tags else 0      # keep space for ~5 hashtags
+    room = lambda: limit - tag_room - len("\n\n".join(out + note)) - 4
+    for p in rest:
+        if room() <= 25:
+            break
+        if len(p) + 2 > min(room(), 190):
+            cut = p[:min(room(), 190) - 2]
+            for sep in ("।", "?", "!", ".", " "):
+                if sep in cut[40:]:
+                    cut = cut[:cut.rindex(sep) + 1]
+                    break
+            p = cut.rstrip() + ("…" if not cut.rstrip().endswith(("।", "?", "!", ".")) else "")
+        out.append(p)
+    out += note
+    text = "\n\n".join(out)
+    line = ""
+    for t in tags:
+        if len(text) + len(line) + len(t) + 3 > limit:
+            break
+        line += (" " if line else "") + t
+    return (text + ("\n\n" + line if line else ""))[:limit]

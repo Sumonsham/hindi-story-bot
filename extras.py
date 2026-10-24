@@ -1641,7 +1641,9 @@ def _single_body(model, text, voice, style, lang_label):
                     "type": "text", "text": text,
                     "annotations": [{"type": "speech_metadata", "speaker": "Speaker1", "style": style[:1500]}]}]}],
                  "response_format": {"type": "audio"},
-                 "generation_config": {"speech_config": {"speakers": [{"speaker": "Speaker1", "voice": voice}]}}})
+                 "generation_config": {"speech_config": {"speakers": [
+                     {"speaker": "Speaker1", "voice": voice},
+                     {"speaker": "Unused", "voice": "Puck" if voice != "Puck" else "Kore"}]}}})
     return (model, f"{GEMINI_BASE}/models/{model}:generateContent",
             {"contents": [{"parts": [{"text": f"You are a voice actor in a {lang_label} audio drama. Perform it like "
                                               f"this: {style}\nSay only these words:\n{strip_tags(text)}"}]}],
@@ -1888,6 +1890,8 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     # Interactions API (docs): input = [{type: user_input, content: [text turns, each with its speaker]}],
     # speech_config = {speakers: [{speaker, voice}]} - every turn names a speaker that is in that list
     sc = {"speakers": [{"speaker": s, "voice": v} for s, v in speakers]}     # (no "mode": the API refuses it)
+    if len(sc["speakers"]) == 1:      # the API wants exactly 2 voices listed; the 2nd one simply never speaks
+        sc["speakers"].append({"speaker": "Unused", "voice": "Puck" if speakers[0][1] != "Puck" else "Kore"})
     for model in NEW_TTS:
         blocks = [{"type": "text", "text": t + (" <long pause>" if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}

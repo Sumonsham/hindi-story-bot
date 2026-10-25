@@ -152,8 +152,8 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 1,
-   "checked": "2026-10-22T01:27+00:00"
+   "views": 0,
+   "checked": "2026-10-25T04:31+00:00"
   }
  },
  {
@@ -166,8 +166,8 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 1,
-   "checked": "2026-10-22T01:27+00:00"
+   "views": 0,
+   "checked": "2026-10-25T04:31+00:00"
   }
  },
  {
@@ -377,7 +377,13 @@
   "youtube": "PvMrR8YOx9I",
   "fb_reel": "1769629730987706",
   "coloring": "122135811584735948",
-  "yt_short": "Kltet-MEZYw"
+  "yt_short": "Kltet-MEZYw",
+  "stats": {
+   "likes": 2,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-25T04:31+00:00"
+  }
  },
  {
   "date": "2026-10-24T13:31+00:00",
@@ -411,5 +417,21 @@
   "fb_reel": "1741667840226273",
   "coloring": "122135909666735948",
   "yt_short": "XD4DBG0Qa1k"
+ },
+ {
+  "date": "2026-10-25T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-25@13",
+  "category": "fairy",
+  "title": "ইচ্ছেপূরণের জাদুগাছ আর ছোট্ট টুপু 🌳✨",
+  "festival": null,
+  "quiz": {
+   "label": "খ",
+   "text": "শুকনো পাতা ও নুড়িপাথর"
+  },
+  "facebook": "1093655609967564",
+  "youtube": "O7NOiuJq4dA",
+  "fb_reel": "1384803516770472",
+  "yt_short": "o-K5rjZT2q0"
  }
 ]

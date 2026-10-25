@@ -139,7 +139,7 @@
    "likes": 2,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-21T13:06+00:00"
+   "checked": "2026-10-24T23:31+00:00"
   }
  },
  {
@@ -354,7 +354,13 @@
   },
   "facebook": "1809091720411350",
   "youtube": "11AkgLCdihg",
-  "fb_reel": "987374231078473"
+  "fb_reel": "987374231078473",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-24T23:31+00:00"
+  }
  },
  {
   "date": "2026-10-24T07:49+00:00",
@@ -388,5 +394,22 @@
   "youtube": "UaMulXdjOLc",
   "fb_reel": "2445384515869982",
   "yt_short": "V5Z8856cBhQ"
+ },
+ {
+  "date": "2026-10-25T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-25@8",
+  "category": "divine",
+  "title": "কোজাগরী পূর্ণিমার রাতে মা লক্ষ্মী কার ঘরে এলেন? 🌕✨",
+  "festival": "Kojagari Lakshmi Puja",
+  "quiz": {
+   "label": "ক",
+   "text": "বাতাসা ও খই"
+  },
+  "facebook": "1096264659790346",
+  "youtube": "rFnCDLG6OMM",
+  "fb_reel": "1741667840226273",
+  "coloring": "122135909666735948",
+  "yt_short": "XD4DBG0Qa1k"
  }
 ]

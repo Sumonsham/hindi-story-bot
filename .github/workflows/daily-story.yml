@@ -120,6 +120,7 @@ jobs:
           git config user.name "story-bot"
           git config user.email "story-bot@users.noreply.github.com"
           git add history.json
+          git add -A next_part.json 2>/dev/null || true
           git add assets 2>/dev/null || true
           git commit -m "story posted $(date -u +%F_%H%M)" || exit 0
           git pull --rebase -q || true

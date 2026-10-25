@@ -60,12 +60,24 @@ LANGS = {
                    "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र की कहानी", "life": "जीवन की सीख",
                    "witty": "चतुराई की कहानी", "fairy": "परी की कहानी", "adventure": "साहसिक कहानी",
                    "festival": "त्योहार की कहानी", "bedtime": "सोने से पहले की कहानी", "school": "स्कूल की कहानी",
-                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला", "gopal": "गोपाल भांड की कहानी"},
+                   "nature": "प्रकृति की कहानी", "divine": "भगवान की लीला", "gopal": "गोपाल भांड की कहानी",
+                   "birbal": "अकबर-बीरबल", "betal": "विक्रम-बेताल", "jataka": "जातक कथा", "para": "मोहल्ले की कहानी",
+                   "detective": "जासूसी कहानी", "lok": "लोककथा", "ramayan": "रामायण", "mahabharat": "महाभारत",
+                   "gita": "गीता ज्ञान", "rhyme": "कविता कहानी"},
         "series_titles": {"gopal": "गोपाल भांड", "folk": "दादी माँ की कहानी", "panchatantra": "पंचतंत्र",
-                          "divine": "भगवान की लीला"},
+                          "divine": "भगवान की लीला", "birbal": "अकबर-बीरबल", "betal": "विक्रम-बेताल",
+                          "ramayan": "रामायण", "mahabharat": "महाभारत", "gita": "गीता ज्ञान"},
+        "part": "भाग {n}", "episode": "{name} भाग {n}",
+        "outro_part1": "कहानी का अगला भाग कल शाम 7 बजे... मिस मत कीजिए, अभी {page} को फॉलो कीजिए!",
+        "vote_line": "अब आपकी बारी! कल सुबह की कहानी कौन सी हो? {o1} चाहिए तो कमेंट में 1 लिखिए, {o2} चाहिए तो 2 लिखिए!",
+        "vote_thanks": "आज की कहानी आपने ही वोट देकर चुनी थी। धन्यवाद!",
+        "viewer_chars": "आज की कहानी के कुछ किरदारों के नाम हमारे दर्शक {names} के नाम से हैं। धन्यवाद!",
+        "reel_comment": "🎬 पूरी कहानी यहाँ देखें 👉 {link}",
+        "riddle_title": "आज की पहेली", "riddle_msg": "🧩 आज की पहेली:\n\n{q}\n\nजवाब कमेंट में लिखिए! सही जवाब कल बताएँगे 😉",
+        "riddle_prev": "✅ कल की पहेली का जवाब: {a}",
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
         "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
-        "cta": "पूरी कहानी हमारे पेज पर 👉", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
+        "cta": "पूरी कहानी देखने के लिए कमेंट का लिंक दबाइए 👇", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
         "quiz_title": "क्विज़ टाइम!", "quiz_labels": ["क", "ख", "ग"],
         "quiz_intro": "अब एक छोटा सा सवाल, बच्चों!", "quiz_count": "सोचो... तीन... दो... एक...",
         "quiz_answer": "सही जवाब है... {lab}: {ans}! क्या तुमने सही बताया? कमेंट में लिखो!",
@@ -86,31 +98,45 @@ LANGS = {
         "male": ["bn-IN-BashkarNeural", "bn-IN-BashkarNeural"],
         "female": ["bn-IN-TanishaaNeural", "bn-IN-TanishaaNeural"],
         "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
-        "intro": "নমস্কার ছোট্ট বন্ধুরা! আমি তোমাদের লুমি দিদি। আজকের গল্প... {title}।",
+        "intro": "নমস্কার বন্ধুরা! আমি লুমি দিদি। আজকের গল্প... {title}।",
         "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
         "page_default": "আমাদের পেজ",
         "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
-        "moral_intro": "তাহলে ছোট্ট বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
+        "moral_intro": "তাহলে বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
         "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প",
                    "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্রের গল্প", "life": "জীবনের শিক্ষা",
                    "witty": "বুদ্ধির গল্প", "fairy": "পরীর গল্প", "adventure": "অ্যাডভেঞ্চারের গল্প",
                    "festival": "উৎসবের গল্প", "bedtime": "ঘুমপাড়ানি গল্প", "school": "স্কুলের গল্প",
-                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা", "gopal": "গোপাল ভাঁড়ের গল্প"},
+                   "nature": "প্রকৃতির গল্প", "divine": "ঠাকুরের লীলা", "gopal": "গোপাল ভাঁড়ের গল্প",
+                   "birbal": "আকবর-বীরবল", "betal": "বিক্রম-বেতাল", "jataka": "জাতকের গল্প", "para": "পাড়ার মজার গল্প",
+                   "detective": "গোয়েন্দা গল্প", "lok": "বাংলার লোককথা", "ramayan": "রামায়ণ", "mahabharat": "মহাভারত",
+                   "gita": "গীতার জ্ঞান", "rhyme": "ছড়ার গল্প"},
         "series_titles": {"gopal": "গোপাল ভাঁড়", "folk": "ঠাকুমার ঝুলি", "panchatantra": "পঞ্চতন্ত্র",
-                          "divine": "ঠাকুরের লীলা"},
+                          "divine": "ঠাকুরের লীলা", "birbal": "আকবর-বীরবল", "betal": "বিক্রম-বেতাল",
+                          "jataka": "জাতকের গল্প", "para": "পাড়ার মজা", "detective": "ঝন্টু-মিনির রহস্য",
+                          "lok": "বাংলার লোককথা", "ramayan": "রামায়ণ", "mahabharat": "মহাভারত", "gita": "গীতার জ্ঞান",
+                          "rhyme": "ছড়ার দেশে"},
+        "part": "পর্ব {n}", "episode": "{name} পর্ব {n}",
+        "outro_part1": "গল্পের পরের পর্ব আসছে কাল সন্ধ্যা ৭টায়... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন!",
+        "vote_line": "এবার আপনার পালা! কাল সকালের গল্প কোনটা হবে? {o1} শুনতে চাইলে কমেন্টে লিখুন ১, আর {o2} শুনতে চাইলে লিখুন ২। বেশি ভোট যেটা পাবে, সেটাই আসবে!",
+        "vote_thanks": "আজকের গল্পটা আপনারাই ভোট দিয়ে বেছে নিয়েছিলেন। ধন্যবাদ বন্ধুরা!",
+        "viewer_chars": "আজকের গল্পের কয়েকটা চরিত্রের নাম এসেছে আমাদের দর্শক বন্ধু {names}-এর নাম থেকে। ধন্যবাদ!",
+        "reel_comment": "🎬 পুরো গল্পটা এখানে দেখুন 👉 {link}",
+        "riddle_title": "আজকের ধাঁধা", "riddle_msg": "🧩 আজকের ধাঁধা:\n\n{q}\n\nউত্তর কমেন্টে লিখুন! ঠিক উত্তর জানাব কাল 😉",
+        "riddle_prev": "✅ গতকালের ধাঁধার উত্তর: {a}",
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
         "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
-        "cta": "পুরো গল্প আমাদের পেজে 👉", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
+        "cta": "পুরো গল্প দেখতে কমেন্টের লিংকে ক্লিক করুন 👇", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
         "quiz_title": "কুইজ টাইম!", "quiz_labels": ["ক", "খ", "গ"],
-        "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবো... তিন... দুই... এক...",
-        "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! তুমি কি ঠিক বলেছিলে? কমেন্টে লেখো!",
-        "ann1": "নতুন মিষ্টি গল্প", "ann_msg": "🧸 {when} আসছে লুমি দিদির নতুন গল্প! ছোটদের দেখাতে ভুলবেন না 🔔",
-        "comp_title": "{m} মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের গল্প",
-        "how_to_join": "বন্ধুরা, কুইজের উত্তর কমেন্টে লেখো, যেমন ক, খ বা গ। যাদের উত্তর ঠিক হবে, পরের গল্পে লুমি দিদি তাদের নাম বলবে! আর রং করা ছবি কমেন্টে পাঠাতে ভুলো না।",
+        "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবুন... তিন... দুই... এক...",
+        "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! আপনি কি ঠিক বলেছিলেন? কমেন্টে লিখুন!",
+        "ann1": "নতুন মিষ্টি গল্প", "ann_msg": "🎬 {when} আসছে লুমি দিদির নতুন গল্প! পরিবারের সবাইকে নিয়ে দেখুন 🔔",
+        "comp_title": "{m} মিনিটের সেরা গল্প 🎬 | সপ্তাহের {n}টি গল্প একসাথে", "comp_thumb": "{m} মিনিটের গল্প",
+        "how_to_join": "বন্ধুরা, কুইজের উত্তর কমেন্টে লিখুন, যেমন ক, খ বা গ। ঠিক উত্তরদাতাদের নাম পরের গল্পে বলব! আর কমেন্টে নিজের নামটা লিখে রাখুন, পরের কোনো গল্পে আপনার নামেই একটা চরিত্র আসতে পারে!",
         "shout_line": "আগের গল্পের কুইজে ঠিক উত্তর দিয়েছিল {names}। দারুণ! হাততালি!",
-        "join_comment": "👇 কীভাবে অংশ নেবেন:\n✅ কুইজের উত্তর কমেন্টে লিখুন (ক / খ / গ) - ঠিক উত্তরদাতাদের নাম পরের গল্পে!\n🖍️ রং করা ছবি তুলে কমেন্টে পাঠান\n🔔 ফলো করুন, রোজের গল্প যেন মিস না হয়",
+        "join_comment": "👇 কীভাবে অংশ নেবেন:\n✅ কুইজের উত্তর কমেন্টে লিখুন (ক / খ / গ) - ঠিক উত্তরদাতাদের নাম পরের গল্পে!\n🗳️ ভোট থাকলে ১ বা ২ লিখুন - পরের গল্প আপনারাই বাছবেন\n🙋 কমেন্টে নিজের নাম লিখুন - পরের গল্পে আপনার নামে চরিত্র আসতে পারে\n📅 রোজ দুপুর ১টা: সোম গোপাল ভাঁড় • মঙ্গল ঠাকুমার ঝুলি • বুধ আকবর-বীরবল • বৃহস্পতি রামায়ণ • শুক্র বিক্রম-বেতাল • শনি মহাভারত • রবি গীতার জ্ঞান\n🔔 ফলো করুন, রোজের গল্প যেন মিস না হয়",
         "shout_comment": "🏆 আগের গল্পের কুইজে ঠিক উত্তর: {names} - দারুণ!",
-        "congrats_reply": "🏆 দারুণ! তোমার উত্তর ঠিক ছিল, আজকের গল্পে লুমি দিদি তোমার নাম বলেছে 👉 {link}",
+        "congrats_reply": "🏆 দারুণ! আপনার উত্তর ঠিক ছিল, আজকের গল্পে লুমি দিদি আপনার নাম বলেছে 👉 {link}",
         "words_title": "আজকের ৩টে ইংরেজি শব্দ", "words_line": "এবার শিখি আজকের গল্পের তিনটে ইংরেজি শব্দ! {items}",
         "word_item": "{en} মানে {m}।", "color_title": "রং করো!",
         "color_msg": "🖍️ আজকের রং করার পাতা! প্রিন্ট করুন, ছোটদের দিয়ে রং করান আর ছবি তুলে কমেন্টে দিন 🌈",
@@ -205,12 +231,131 @@ CATEGORIES = {
               "a boastful wrestler", "a naughty goat", "a magical cooking pot gone wrong"],
 }
 
+# ---- v15: stories for ALL ages ----
+CATEGORIES.update({
+    # Akbar-Birbal: centuries-old folk anecdotes (public domain), retold in our own words
+    "birbal": ["Birbal and the line that became shorter without touching it", "Birbal counts the crows of Agra",
+               "Birbal's khichdi that cooked far from the fire", "who is the biggest fool? Birbal's list",
+               "Birbal and the mango tree's real owner", "Birbal finds the thief with magic sticks",
+               "the emperor's question: what is the best weapon?", "Birbal and the well that was sold, not its water",
+               "Birbal brings the emperor 'nothing' as a gift", "Birbal and the jealous courtier's trap",
+               "Birbal's answer: how many bangles in your wife's hand?", "Birbal and the donkey's wisdom"],
+    # Vikram-Betal (Baital Pachisi, ancient, public domain): every tale ends with Betal's riddle
+    "betal": ["the three suitors who brought the princess back to life", "the switched heads of husband and brother",
+              "the most sensitive of three queens", "the four brothers who made a lion alive",
+              "the thief who laughed and then cried", "who is the real father of the child?",
+              "the generous merchant and the sacrifice", "the king's servant who gave everything"],
+    "jataka": ["the golden goose that gave one feather at a time", "the monkey bridge: the monkey king saves his tribe",
+               "the quail who led his flock to freedom", "the elephant who saved travellers in the desert",
+               "the honest woodcutter's choice", "the parrot who would not leave the burning tree",
+               "the deer king who offered himself", "the tortoise who could not keep quiet"],
+    # our own recurring Bengali para (neighbourhood) family comedy - original characters
+    "para": ["Bhombol-da's new bicycle and the whole para chasing it", "the cricket match on the para field",
+             "Dadu's lost glasses that were on his head", "the power cut during the big football final",
+             "Mashima's secret pickle recipe goes missing", "the para Durga Puja committee's crazy meeting",
+             "the new neighbour who says he is a famous singer", "the family wedding where everyone got the date wrong",
+             "the morning walk club and the runaway goat", "Kaku's mobile phone that only talks in English"],
+    # our own detective duo Jhontu and Mini - original characters, small clever mysteries
+    "detective": ["the missing rosogolla from the sweet shop", "the mystery of the midnight bell in the old school",
+                  "who took Thakuma's gold locket?", "the footprints that walked backwards",
+                  "the secret of the locked attic", "the vanished prize cup of the para club",
+                  "the parrot that spoke the thief's name", "the coded letter in the library book"],
+    # folk tales from the districts of Bengal (public domain), retold in our own words
+    "lok": ["Purulia's Chhau dancer and the forest spirit", "the Bankura terracotta horse that came alive",
+            "Coochbehar's clever potter", "the boatman of the Padma and the river goddess's test",
+            "Bishnupur's music and the proud king", "the honey collector of Sundarbans and Bonbibi",
+            "the Teesta and the shepherd girl", "the weaver of Shantipur's magic sari"],
+    # original rhyme-stories (ছড়া) told in verse
+    "rhyme": ["the cat who wanted to go to the fair", "the rain that came to a village wedding",
+              "the moon who came down to eat pithe", "the clever little ant and the big elephant",
+              "the river's song to the sea", "Dadu's umbrella that flew away"],
+})
+CATEGORIES["life"] += ["an old father waiting at the railway station", "a mother's torn sari and her son's first salary",
+                       "the rickshaw puller who paid his daughter's college fees", "two old friends meet after fifty years",
+                       "the teacher who never forgot a poor student", "a grandmother's last letter"]
+# ---- the great epics and the Gita: told IN ORDER, one episode each week (faithful to the scriptures)
+EPIC = {
+    "ramayan": ["Ratnakar the robber becomes the sage Valmiki and the first verse is born",
+                "King Dasharatha's yajna and the birth of Rama, Lakshmana, Bharata and Shatrughna",
+                "Sage Vishwamitra takes young Rama and Lakshmana to protect the yajna (Tadaka is defeated)",
+                "Rama frees Ahalya from the curse", "Rama breaks Shiva's bow and marries Sita in Mithila",
+                "Queen Kaikeyi asks for her two boons", "Rama, Sita and Lakshmana leave Ayodhya for the forest",
+                "Guhak the boatman washes Rama's feet and takes them across the Ganga",
+                "Bharata brings Rama's sandals (paduka) back to rule Ayodhya", "life in the Panchavati forest",
+                "Surpanakha comes to Panchavati", "the golden deer (Maricha)",
+                "Ravana carries Sita away and brave Jatayu fights for her", "Shabari's sweet berries for Rama",
+                "Rama meets Hanuman and Sugriva", "Hanuman's great leap across the ocean",
+                "Hanuman meets Sita in the Ashoka garden with Rama's ring", "Hanuman's burning tail and Lanka",
+                "Vibhishana comes to Rama", "the bridge to Lanka (Ram Setu) and the little squirrel",
+                "Angad's foot in Ravana's court", "Lakshmana falls and Hanuman brings the Sanjeevani mountain",
+                "Kumbhakarna wakes up", "Rama's Akal Bodhan - the untimely worship of Ma Durga (Krittivasi Ramayan)",
+                "Rama's victory over Ravana", "Sita's agni pariksha", "the return to Ayodhya - the first Diwali lamps",
+                "Rama's coronation and Ram Rajya"],
+    "mahabharat": ["Devavrata's terrible vow - he becomes Bhishma", "the birth of the Pandavas and the Kauravas",
+                   "Guru Drona's test - Arjuna sees only the bird's eye", "Ekalavya's devotion to his guru",
+                   "Karna comes to the tournament", "the house of lac (Lakshagriha) and the escape",
+                   "Bhima saves the village from Bakasura", "Draupadi's swayamvar - Arjuna hits the fish's eye",
+                   "Indraprastha and Maya's wonderful palace", "the Rajasuya yajna",
+                   "the game of dice", "Krishna protects Draupadi's honour",
+                   "the Akshaya Patra and Sage Durvasa's visit", "the Yaksha's questions to Yudhishthira",
+                   "the secret year in King Virata's palace", "Krishna's peace mission and his universal form in the court",
+                   "Kunti meets Karna", "Arjuna chooses Krishna, Duryodhana chooses the army",
+                   "Krishna's Gita on the battlefield of Kurukshetra", "Bhishma on the bed of arrows",
+                   "brave Abhimanyu and the Chakravyuha", "Karna gives away his armour and earrings",
+                   "the end of the war and Yudhishthira's crowning", "the last journey of the Pandavas and the faithful dog"],
+    "gita": ["Chapter 1 - Arjuna's sorrow on the battlefield", "Chapter 2 - the soul never dies; do your duty without "
+             "worrying about the result (2.47)", "Chapter 3 - Karma Yoga: selfless work",
+             "Chapter 4 - whenever dharma declines, I come (4.7-4.8)", "Chapter 5 - working without attachment",
+             "Chapter 6 - the restless mind and meditation", "Chapter 7 - knowing God in everything",
+             "Chapter 8 - remembering God at every moment", "Chapter 9 - a leaf, a flower, a fruit or water offered "
+             "with love (9.26)", "Chapter 10 - God's glories in the world", "Chapter 11 - the universal form (Vishwarupa)",
+             "Chapter 12 - the qualities of a true devotee", "Chapter 13 - the body and the knower of the body",
+             "Chapter 14 - the three gunas", "Chapter 15 - the eternal tree", "Chapter 16 - divine and demonic qualities",
+             "Chapter 17 - three kinds of faith", "Chapter 18 - surrender to Me (18.66)"],
+}
+MYTH = ("ramayan", "mahabharat", "gita")
+MYTH_STYLE = ("majestic, reverent, high quality 2D Indian devotional animation still for all ages, rich traditional "
+              "Indian painting colours (gold, saffron, deep blue, red), divine soft golden light, graceful dignified "
+              "faces, traditional iconography, cinematic composition, no text, no letters, no watermark")
+MYTH_LOOKS = {
+    "rama": "Lord Rama: divine young prince with a calm, compassionate face, soft dark-blue (shyam) complexion, long black "
+            "hair, tall golden crown (mukut), tilak on the forehead, yellow silk dhoti and saffron-gold angavastram, "
+            "gold ornaments, holding a great bow (Kodanda) with a quiver on his back, soft golden halo",
+    "sita": "Mother Sita: graceful young princess with a gentle serene face, long black braid with flowers, red-and-gold "
+            "silk sari, gold jewellery, red sindoor, soft divine glow",
+    "lakshmana": "Lakshmana: loyal young prince, fair complexion, golden crown, saffron dhoti, bow and quiver, alert "
+                 "devoted expression",
+    "hanuman": "Lord Hanuman: mighty, devoted vanara with a reddish-orange face and body, golden crown, red dhoti, "
+               "golden gada (mace) on his shoulder, long tail, eyes full of devotion, folded hands when near Rama",
+    "ravana": "Ravana: proud ten-headed king of Lanka, ten golden crowns, dark royal robes with gold, thick moustache, "
+              "fierce but not gory",
+    "dasharatha": "King Dasharatha: elderly kind king, white beard, golden crown, royal red robes",
+    "krishna": "Lord Krishna: divine young man with blue skin, peacock feather in a golden crown, yellow silk dhoti "
+               "(pitambar), flower garland (vaijayanti), gentle smile, gold ornaments, soft golden halo",
+    "arjuna": "Arjuna: brave warrior prince, fair complexion, golden crown, white-and-gold armour, the Gandiva bow",
+    "bhishma": "Bhishma: very old dignified warrior, long white hair and beard, white robes, calm strong eyes",
+    "yudhishthira": "Yudhishthira: calm righteous king, short beard, golden crown, white and gold royal robes",
+    "bhima": "Bhima: huge strong warrior, broad chest, golden crown, orange dhoti, a big gada (mace)",
+    "draupadi": "Draupadi: dignified queen with dark complexion and bright eyes, long open black hair, red and gold sari",
+    "karna": "Karna: noble warrior with shining golden armour (kavacha) and golden earrings (kundala), fair face, bow",
+    "duryodhana": "Duryodhana: proud prince, thick moustache, dark purple and gold robes, golden crown, mace",
+    "kunti": "Mother Kunti: graceful elderly queen, white sari with a thin gold border, kind sad eyes",
+}
+MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman": "lakshmana", "laxman": "lakshmana",
+                "hanuman": "hanuman", "ravan": "ravana", "dasharath": "dasharatha", "dashrath": "dasharatha",
+                "arjun": "arjuna", "bhishma": "bhishma", "yudhishthir": "yudhishthira", "bheem": "bhima",
+                "bhim": "bhima", "duryodhan": "duryodhana", "sri krishna": "krishna", "shri krishna": "krishna"}
+# the weekly routine: the 1 PM story of each day is always this series (Mon=0 ... Sun=6)
+DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
+SERIES_CATS = ("adventure", "detective", "folk", "para")      # big stories told in 2-3 parts at 7 PM
+NEXT_PART = os.path.join(HERE, "next_part.json")
+
 SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "birds", "water", "footsteps", "creak", "knock",
               "boing", "whoosh", "pop", "bell", "splash"]
 MOODS = ["happy", "calm", "funny", "adventure", "sad"]
 EMOTIONS = ["normal", "happy", "excited", "laughing", "sad", "crying", "scared", "angry", "whisper", "calm", "proud"]
 
-ART_STYLE = ("high quality 2D cartoon animation still for kids, Indian storybook world, bright cheerful colors, "
+ART_STYLE = ("high quality 2D cartoon animation still for all ages (family animated film), Indian storybook world, bright cheerful colors, "
              "soft lighting, clean outlines, cute expressive characters with big eyes, Pixar-like charm, "
              "no text, no letters, no watermark")
 
@@ -369,7 +514,7 @@ def gemini_models(key):
     return out
 
 
-def make_story(lang, theme, history, extra_rules=""):
+def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2):
     if MOCK:
         return mock_story(lang)
     key = need_env("GEMINI_API_KEY")
@@ -409,26 +554,102 @@ def make_story(lang, theme, history, extra_rules=""):
                  "2-3 times (say 'Gopal walks in from the left' in that picture prompt).",
         "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
                 "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
-                "It must teach a clear life lesson and gently touch the heart.",
+                "It must teach a clear life lesson and touch the heart so deeply that grown-ups feel a lump in "
+                "the throat and want to share it.",
+        "birbal": "This is an Akbar-Birbal story (centuries-old folk anecdote, public domain) - retell it in your OWN "
+                  "words with new dialogue and a fresh twist. Clean, clever humour for all ages; Birbal wins with "
+                  "wit, the emperor laughs and rewards him. Use EXACTLY these looks: {\"name\": \"Birbal\", "
+                  "\"gender\": \"male\", \"age\": \"adult\", \"kind\": \"human\", \"look\": \"slim witty "
+                  "Mughal-court minister, neat short black beard, sharp smiling eyes, white turban with a small red "
+                  "plume, long cream jama with gold buttons, red sash\"} and {\"name\": \"Akbar\", \"gender\": "
+                  "\"male\", \"age\": \"adult\", \"kind\": \"human\", \"look\": \"grand Mughal emperor, full "
+                  "black moustache, jewelled golden turban with a feather, rich green and gold royal robe, pearl "
+                  "necklaces\"}.",
+        "betal": "This is a Vikram-Betal tale (Baital Pachisi, ancient, public domain), retold in your OWN words. "
+                 "Frame: brave King Vikramaditya carries the ghost Betal on his shoulder through a dark cremation "
+                 "forest; Betal tells a story and at the end asks a clever riddle. Betal is spooky-funny, not "
+                 "frightening. Do NOT give the king's answer: Betal asks the VIEWERS to comment the answer, and "
+                 "says the answer will come next time. Looks: King Vikram - tall brave king, short black beard, "
+                 "golden crown, red royal robe, sword at the waist; Betal - a pale, thin, mischievous ghost with "
+                 "long white hair, glowing eyes, hanging upside down or sitting on Vikram's shoulder.",
+        "jataka": "This is a Jataka tale (ancient Buddhist fable, public domain), retold in your OWN words with lively "
+                  "dialogue; the wise animal or person shows compassion and courage; a clear lesson for all ages.",
+        "para": "This is our own Bengali para (neighbourhood) comedy - original characters, warm family humour for "
+                "all ages, everyday Kolkata/town life. Recurring characters (use the ones who fit, same looks every "
+                "time): Bhombol-da (plump cheerful young man, curly hair, red t-shirt and lungi), Dadu (thin old "
+                "grandfather, round glasses, white dhoti-kurta, walking stick), Mashima (plump kind aunt, red-bordered "
+                "white sari, big bindi), Kaku (bald middle-aged uncle, moustache, checked shirt, always on his phone). "
+                "Gentle comedy of misunderstandings, never mocking anyone's body, religion or caste.",
+        "detective": "This is a case of our own young detective duo JHONTU (sharp 12-year-old boy, messy hair, round "
+                     "glasses, blue striped t-shirt, magnifying glass) and MINI (brave 11-year-old girl, two plaits, "
+                     "yellow frock, notebook and pencil). A small clever mystery in a Bengal town: real clues shown "
+                     "early, two suspects, a fair twist; viewers can guess. Nobody is hurt; the culprit is forgiven.",
+        "lok": "This is a folk tale from the districts of Bengal (public domain), retold in your OWN words with local "
+               "colour - the place, the crafts, the songs, the food of that district.",
+        "rhyme": "Tell this story in rhyming {lang} verse (ছড়া style, like old Bengali rhymes): every line rhymes "
+                 "with the next, a bouncy rhythm, funny and sweet, easy to sing along. Dialogue lines also rhyme.",
+        "ramayan": "This is an episode of the RAMAYANA, told IN ORDER as a weekly series. Follow the Valmiki Ramayana "
+                   "and Krittivas Ojha's Bengali Ramayana faithfully - do NOT invent events, do NOT change who did what, "
+                   "keep every name and relationship correct. Lord Rama, Mother Sita and Lord Hanuman are shown with "
+                   "deep devotion, dignity and glory (bhakti) - never as jokes, never silly, never cute caricatures. "
+                   "Battles are shown with grandeur but no blood or gore. Make it gripping and emotional like a great "
+                   "film; end with the spiritual lesson of this episode and one line that makes viewers wait for next "
+                   "week's episode.",
+        "mahabharat": "This is an episode of the MAHABHARATA, told IN ORDER as a weekly series. Follow Vyasa's Mahabharata "
+                      "and Kashiram Das's Bengali Mahabharata faithfully - do NOT invent events, do NOT change who did "
+                      "what, keep every name and relationship correct. Lord Krishna is shown with deep devotion, dignity "
+                      "and divine glory - never as a joke. Battles have grandeur but no blood or gore. Gripping, "
+                      "emotional, with the dharma lesson of this episode, ending with a line that makes viewers wait "
+                      "for next week.",
+        "gita": "This is an episode of GITA GYAN - one chapter of the Srimad Bhagavad Gita, in order. Frame: on the "
+                "chariot at Kurukshetra, Lord Krishna (the charioteer) teaches Arjuna. Explain the chapter's main "
+                "teaching faithfully and simply; quote ONLY a famous verse you are certain of (Sanskrit, with its "
+                "chapter and verse number) and explain its meaning in simple {lang}; never invent verses. Then show "
+                "the same teaching in a short, touching modern Bengali family example (a student before an exam, a "
+                "father who lost his job...). Deep reverence for Lord Krishna; uplifting and practical for all ages.",
     }.get(category, "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
+    kind_rules = kind_rules.replace("{lang}", L["name"])
+    if part == 1:
+        kind_rules += ("\nSERIES: this is PART 1 of a bigger story told in parts on following days. Introduce the "
+                       "people and the world, build curiosity and STOP at an exciting cliffhanger (unresolved). Add "
+                       "JSON keys: \"total_parts\": 2 or 3 (3 only if the plot is truly big), \"summary\" (ENGLISH, "
+                       "5-8 sentences: everything that happened so far) and \"part2_plan\" (ENGLISH, 4-6 sentences: how "
+                       "the next part continues).\n")
+    elif part >= 2 and prev:
+        kind_rules += (f"\nSERIES: this is PART {part} of {total}. Title of part 1: {prev.get('title')}. What happened so far: "
+                       f"{prev.get('summary')} Planned continuation: {prev.get('part2_plan')} Use EXACTLY these characters "
+                       f"(same names, same looks): {json.dumps(prev.get('characters'), ensure_ascii=False)} and this "
+                       f"setting: {prev.get('setting')}. Begin with a short recap by the narrator (2-3 lines). ")
+        kind_rules += ("This is a MIDDLE part: a new surprise, and STOP again at a bigger cliffhanger. Add JSON keys "
+                       "\"summary\" (ENGLISH, everything so far) and \"part2_plan\" (ENGLISH, how the next part goes).\n"
+                       if part < total else "This is the FINAL part: a satisfying, surprising ending that answers "
+                       "everything.\n")
+    if category in MYTH:
+        kind_rules += (" Use these EXACT looks for the holy and epic characters who appear (same every time): "
+                       + "; ".join(MYTH_LOOKS.values()) + ". Use 'Rama', 'Sita', 'Krishna', 'Arjuna' etc. as names.")
     prompt = f"""
-You are India's best {L['name']} children's storyteller, writing for a cartoon story video page.
-Write ONE {L['name']} story ({L['script']} script, simple sweet everyday {L['name']} that kids and
-families understand). Type: {category} story. Theme: {idea}.
+You are India's best {L['name']} storyteller for a family cartoon story page that people of ALL AGES watch -
+children, teenagers, parents and grandparents.
+Write ONE {L['name']} story ({L['script']} script, natural everyday {L['name']} that the whole family
+understands). Type: {category} story. Theme: {idea}.
 {kind_rules}{extra_rules}
 Never use modern copyrighted characters (no Disney, Chhota Bheem, Motu Patlu etc.).
 Must be different from these earlier stories: {json.dumps(old_titles, ensure_ascii=False)}
-Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the children).
+Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the whole family).
 
 Story rules:
 - LENGTH: 14 to 18 scenes, 5-6 minutes when spoken - at least 750 spoken words in total. Never rush the
   ending; the story must feel complete. The FIRST line must hook in 5 seconds (a surprise, a question
   or a funny moment). Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
-- Make it emotional and memorable so families want to share it: cute humour, a warm heart, a clear lesson.
-- Warm and cheerful, suitable for small children. No violence, nothing scary.
+- Make it emotional and memorable so families want to share it: smart humour grown-ups also laugh at, a warm
+  heart, real feelings, a clear lesson.
+- Clean family entertainment for all ages: no vulgarity, no graphic violence, nothing that frightens small children.
 - 2 to 4 characters (people or animals) plus a narrator, with real, lively dialogue between characters.
 - Each scene has 4 to 7 lines. The narrator describes; characters speak only their own words.
   Narrator lines 20-45 words, dialogue lines 4-20 words.
+- SMOOTH, COMPLETE STORYTELLING: every scene follows from the one before; when time or place changes the narrator
+  says so; every character is introduced before acting; nothing is skipped or jumped over; every question is
+  answered (unless it is deliberately left for the next part).
 - Think like a cartoon film director: every line gets its own PICTURE that shows exactly what that line says
   (who, doing what, where). The picture must match the words - if the line says the crow drops a stone in the
   pot, the picture shows the crow dropping a stone in the pot.
@@ -484,7 +705,8 @@ Return ONLY JSON with exactly these keys:
  "mithu_intro": "Mithu the cheeky parrot (Lumi Didi's friend) says ONE short funny {L['name']} line at the start, about today's story (max 15 words)",
  "mithu_outro": "Mithu's ONE short funny {L['name']} goodbye line (max 15 words)",
  "english_words": [{{"en": "3 simple English words from this story (e.g. Crow, Water, Stone)", "meaning": "meaning in {L['name']}"}}],
- "quiz": {{"question": "one easy {L['name']} question for children about THIS story (max 12 words)",
+ "riddle": {{"q": "one short fun {L['name']} riddle (dhadha) for the whole family, NOT about this story, max 25 words", "a": "its short answer"}},
+ "quiz": {{"question": "one easy {L['name']} question for viewers about THIS story (max 12 words)",
            "options": ["3 short {L['name']} answers (2-4 words each), only one correct"], "answer": "0, 1 or 2: index of the correct option"}}
 }}
 Every scene object also has "chapter": "2-4 word {L['name']} chapter name for YouTube chapters".
@@ -2275,7 +2497,7 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
         "snippet": {"title": title[:100], "description": description[:4900],
                     "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "1",   # Film & Animation
                     "defaultLanguage": lang, "defaultAudioLanguage": lang},
-        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") != "0",   # children's cartoons must be marked "made for kids"
+        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") == "1",   # children's cartoons must be marked "made for kids"
                    "containsSyntheticMedia": True},
     }
     at = extras.publish_time()
@@ -2347,6 +2569,67 @@ def voice_demo():
 
 
 # ----------------------------------------------------------------- main
+def load_next_part(ready_only=True):
+    """A big story told in parts: part 1 today 7 PM, part 2 tomorrow 7 PM, part 3 the day after."""
+    try:
+        with open(NEXT_PART, encoding="utf-8") as f:
+            nxt = json.load(f)
+        made = dt.datetime.fromisoformat(nxt["created"])
+        if (dt.datetime.now(dt.timezone.utc) - made).total_seconds() < 5 * 86400:
+            if ready_only and made.astimezone(extras.IST).date() >= dt.datetime.now(extras.IST).date():
+                return None
+            return nxt
+    except Exception:
+        pass
+    return None
+
+
+def viewer_names(history, n=2):
+    """First names of real viewers who commented recently (they asked to appear in a story)."""
+    if MOCK:
+        return []
+    used = {x for h in history[-15:] for x in (h.get("viewer_names") or [])}
+    page = (env("PAGE_NAME_BN") + " " + env("PAGE_NAME_HI") + " Little Lumi").lower()
+    names = []
+    for h in reversed(history[-4:]):
+        if not h.get("facebook"):
+            continue
+        try:
+            for c in extras.post_comments(h.get("facebook")):
+                first = str(c.get("name") or "").strip().split(" ")[0]
+                first = re.sub(r"[^A-Za-z\u0980-\u09FF\u0900-\u097F]", "", first)
+                if 2 <= len(first) <= 14 and first.lower() not in page and first not in used and first not in names:
+                    names.append(first)
+        except Exception:
+            pass
+    random.shuffle(names)
+    return names[:n]
+
+
+def vote_winner(history):
+    """Yesterday's 1 PM video asked viewers to choose this morning's story (comment 1 or 2)."""
+    for h in reversed(history[-6:]):
+        v = h.get("vote")
+        if not v or h.get("vote_used") or not h.get("facebook"):
+            continue
+        try:
+            t = dt.datetime.fromisoformat(str(h.get("date")))
+            if (dt.datetime.now(dt.timezone.utc) - t.replace(tzinfo=t.tzinfo or dt.timezone.utc)).total_seconds() > 36 * 3600:
+                return None, None
+        except Exception:
+            return None, None
+        try:
+            vc = extras.vote_count(extras.post_comments(h.get("facebook"), h.get("youtube")))
+            v1, v2 = len(vc["1"]), len(vc["2"])
+        except Exception:
+            v1 = v2 = 0
+        win = 0 if v1 >= v2 else 1
+        log(f"Viewers' vote for this story: 1 = {v1}, 2 = {v2}")
+        h["vote_used"] = True
+        return tuple(v["ideas"][win]), (v1 + v2)
+    return None, None
+
+
 def main():
     global FONT
     pass
@@ -2389,16 +2672,79 @@ def main():
         festival = fest[0]
         theme = ("divine" if fest[0] in DIVINE_FESTIVALS else "festival", fest[1])
         log(f"Festival special: {festival}")
+    # ---- the weekly routine, the 7 PM serial, the viewers' vote (a festival always comes first)
+    global ART_STYLE
+    slot_hour = int(str(SLOT).split("@")[1]) if SLOT and "@" in str(SLOT) else None
+    weekday = dt.datetime.now(extras.IST).weekday()
+    part, total, prev, episode, voted = 0, 2, None, None, None
+    prev_ready = load_next_part()
+    series_waiting = prev_ready is None and load_next_part(ready_only=False) is not None
+    if not festival and env("ROUTINE") != "0":
+        if slot_hour == 13:                          # the day's fixed series
+            cat = DAY_SPECIAL[weekday]
+            if cat in EPIC:
+                episode = 1 + sum(1 for h in history if h.get("category") == cat)
+                theme = (cat, EPIC[cat][(episode - 1) % len(EPIC[cat])])
+            else:
+                theme = (cat, random.choice(CATEGORIES[cat]))
+            log(f"Weekly routine: {cat}" + (f" episode {episode}" if episode else ""))
+        elif slot_hour == 19 and prev_ready:         # next part of the serial
+            prev = prev_ready
+            part = int(prev.get("done", 1)) + 1
+            total = max(part, int(prev.get("total", 2)))
+            theme = (prev["category"], prev["idea"])
+        elif slot_hour == 19 and not series_waiting and random.random() < float(env("SERIES_CHANCE") or 0.4):
+            cat = random.choice(SERIES_CATS)
+            theme, part = (cat, random.choice(CATEGORIES[cat])), 1
+        elif slot_hour == 8:
+            win, n_votes = vote_winner(history)
+            if win:
+                theme, voted = win, n_votes
+                log(f"This story was chosen by the viewers: {win[1]}")
     category = theme[0]
-    log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}")
+    if category in MYTH:
+        ART_STYLE = MYTH_STYLE                       # reverent devotional look for the epics and the Gita
+    log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}" + (f" | SERIES part {part}" if part else ""))
 
     extra = ""
     wx = extras.weather_now(lang) if not MOCK else None
     if wx and any(k in wx for k in ("rain", "drizzle", "thunder", "fog", "cold")) and category not in ("divine", "panchatantra"):
         extra = f"\nTODAY'S WEATHER: {wx}. If it fits, let the story happen in this weather (cosy, not scary).\n"
         log("Weather:", wx)
-    story = make_story(lang, theme, history, extra_rules=extra)
-    title = story["title"].strip()[:95]
+    vnames = viewer_names(history) if category not in MYTH and part < 2 and env("VIEWER_NAMES") != "0" else []
+    if vnames:
+        extra += (f"\nOUR VIEWERS IN THE STORY: give 1-2 friendly side characters these first names of real viewers "
+                  f"(kind, positive roles only): {', '.join(vnames)}.\n")
+        log("Viewer names in the story:", ", ".join(vnames))
+    vote_ideas = None
+    if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow morning's story
+        free = [c for c in CATEGORIES if c not in DAY_SPECIAL.values() and c not in ("moral", "animal")]
+        c1, c2 = random.sample(free, 2)
+        vote_ideas = [[c1, random.choice(CATEGORIES[c1])], [c2, random.choice(CATEGORIES[c2])]]
+        extra += (f"\nAlso add the JSON key \"vote_labels\": two short catchy {L['name']} labels (2-5 words each) for "
+                  f"these two story ideas for tomorrow: 1) {vote_ideas[0][1]} 2) {vote_ideas[1][1]}.\n")
+    story = make_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)
+    if part == 1:
+        try:
+            total = min(3, max(2, int(str(story.get("total_parts") or 2)[:1])))
+        except ValueError:
+            total = 2
+    continues = bool(part) and part < total
+    series_id = (prev or {}).get("series_id") if part >= 2 else (
+        dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes") if part == 1 else None)
+    if part >= 2:                                    # same people and place as part 1
+        story["characters"], story["setting"] = prev["characters"], prev["setting"]
+    if category in MYTH:                             # the holy characters always look the same, as tradition shows
+        for c in story.get("characters", []):
+            k = MYTH_ALIASES.get(str(c.get("name", "")).lower().strip(), str(c.get("name", "")).lower().strip())
+            if k in MYTH_LOOKS:
+                c["look"] = MYTH_LOOKS[k]
+        story["mithu_intro"] = story["mithu_outro"] = ""   # no parrot jokes in the holy stories
+    title = story["title"].strip()[:85]
+    if episode:
+        title = f"{L['episode'].format(name=L['series_titles'].get(category, ''), n=episode)}: {title}"[:95]
+    if part:
+        title = f"{title} | {L['part'].format(n=part)}"[:95]
     log("Title:", title)
     with open(os.path.join(WORK, "story.json"), "w", encoding="utf-8") as f:
         json.dump(story, f, ensure_ascii=False, indent=1)
@@ -2494,7 +2840,10 @@ def main():
     second = ti.get("second") or ((ti.get("characters") or ["", ""])[1:2] or [""])[0]
     describe = lambda n: (f"{cast.find(n)['name']} ({cast.find(n)['look']})" if n and cast.find(n) else n)
     series_en = {"gopal": "Gopal Bhar", "divine": "Bengali devotional", "folk": "Thakurmar Jhuli fairy-tale",
-                 "panchatantra": "Panchatantra fable"}.get(category, "Bengali children's story")
+                 "panchatantra": "Panchatantra fable", "birbal": "Akbar-Birbal", "betal": "Vikram-Betal",
+                 "ramayan": "Ramayana (reverent devotional)", "mahabharat": "Mahabharata (reverent devotional)",
+                 "gita": "Bhagavad Gita (reverent devotional)", "detective": "family detective",
+                 "para": "Bengali family comedy"}.get(category, "Bengali family story")
     t_prompt = extras.poster_prompt("cartoon", {**ti, "hero": hero, "second": second}, describe, series_en,
                                     cast.setting)
     if not extras.hq_image(t_prompt, thumb_base, seed):
@@ -2568,10 +2917,20 @@ def main():
     if shout_names:
         end_lines.append({"speaker": "narrator", "emotion": "happy",
                           "text": L["shout_line"].format(names=extras.name_list(shout_names, lang))})
+    if vnames:
+        end_lines.append({"speaker": "narrator", "emotion": "happy",
+                          "text": L["viewer_chars"].format(names=extras.name_list(vnames, lang))})
+    if voted:
+        end_lines.append({"speaker": "narrator", "emotion": "happy", "text": L["vote_thanks"]})
+    vote_saved = None
+    vl = [str(x).strip() for x in (story.get("vote_labels") or []) if str(x).strip()][:2]
+    if vote_ideas and len(vl) == 2:
+        vote_saved = {"ideas": vote_ideas, "labels": vl}
+        end_lines.append({"speaker": "narrator", "emotion": "excited", "text": L["vote_line"].format(o1=vl[0], o2=vl[1])})
     end_lines.append({"speaker": "narrator", "emotion": "happy", "text": L["how_to_join"]})
     if str(story.get("mithu_outro", "")).strip():
         end_lines.append({"speaker": "Mithu", "emotion": "laughing", "text": str(story["mithu_outro"]).strip()})
-    end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
+    end_lines.append({"speaker": "narrator", "text": (L["outro_part1"] if continues else L["outro"]).format(page=page)})
     parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
 
     video = os.path.join(WORK, "final.mp4")
@@ -2620,10 +2979,21 @@ def main():
         log(f"  congratulated {n} children/parents under their comments")
 
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang, "slot": SLOT,
-                    "category": category, "title": title, "festival": festival,
-                    "quiz": quiz_saved, **results})
+                    "category": category, "idea": theme[1], "episode": episode, "part": part, "continues": continues,
+                    "series_id": series_id, "title": title, "festival": festival, "vote": vote_saved,
+                    "viewer_names": vnames, "quiz": quiz_saved, **results})
     if not MOCK:
         save_history(history)
+        if continues:
+            with open(NEXT_PART, "w", encoding="utf-8") as f:
+                json.dump({"created": dt.datetime.now(dt.timezone.utc).isoformat(), "category": category,
+                           "idea": theme[1], "title": (prev or {}).get("title") or story["title"], "done": part,
+                           "total": total, "series_id": series_id, "summary": story.get("summary", ""),
+                           "part2_plan": story.get("part2_plan", ""), "characters": story.get("characters"),
+                           "setting": story.get("setting", "")}, f, ensure_ascii=False, indent=1)
+            log(f"Series: part {part + 1} of {total} comes tomorrow at 7 PM")
+        elif part >= 2 and os.path.exists(NEXT_PART):
+            os.remove(NEXT_PART)
     extras.telegram(extras.report_text(env(f"PAGE_NAME_{lang.upper()}") or "Little Lumi Stories", title, results, history))
 
 
@@ -2795,6 +3165,37 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  first comment posted on Facebook")
         except Exception as e:
             log("  Facebook comment skipped (needs pages_manage_engagement):", str(e)[:160])
+    # the 1-minute Reel / Short: its first comment links to the full story
+    if out.get("fb_reel") and results.get("facebook"):
+        try:
+            extras.fb_comment(out["fb_reel"], L["reel_comment"].format(link=f"https://www.facebook.com/{results['facebook']}"))
+            log("  Reel comment with the full-story link posted")
+        except Exception as e:
+            log("  Reel comment skipped:", str(e)[:160])
+    if out.get("yt_short") and results.get("youtube") and env("YT_MADE_FOR_KIDS") != "1":
+        try:
+            extras.yt_comment(out["yt_short"], L["reel_comment"].format(link=f"https://youtu.be/{results['youtube']}"))
+            log("  Short comment with the full-story link posted")
+        except Exception as e:
+            log("  Short comment skipped:", str(e)[:160])
+    # one riddle picture a day (made from today's video - no new AI picture)
+    rd = story.get("riddle") if isinstance(story.get("riddle"), dict) else {}
+    riddle_today = any(h.get("riddle_post") and dt.datetime.fromisoformat(h["date"]).astimezone(extras.IST).date() == today
+                       for h in history[-5:] if h.get("date"))
+    if rd.get("q") and rd.get("a") and results.get("facebook") and not riddle_today and env("RIDDLE") != "0":
+        try:
+            frame = os.path.join(WORK, "riddle_frame.jpg")
+            run(["ffmpeg", "-y", "-ss", "40", "-i", video, "-frames:v", "1", frame])
+            card = extras.riddle_card(frame, FONT, L["riddle_title"], str(rd["q"]), os.path.join(WORK, "riddle.jpg"))
+            last = next((h for h in reversed(history) if h.get("riddle_post") and h.get("riddle")), None)
+            msg = L["riddle_msg"].format(q=str(rd["q"]).strip())
+            if last:
+                msg = L["riddle_prev"].format(a=last["riddle"].get("a", "")) + "\n\n" + msg
+            out["riddle_post"] = extras.fb_photo(card, msg)
+            out["riddle"] = {"q": str(rd["q"]), "a": str(rd["a"])}
+            log("Posted today's riddle:", out["riddle_post"])
+        except Exception as e:
+            log("  riddle post skipped:", str(e)[:160])
     return out
 
 

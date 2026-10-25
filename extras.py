@@ -2535,3 +2535,38 @@ def fb_caption(description, limit=390):
             break
         line += (" " if line else "") + t
     return (text + ("\n\n" + line if line else ""))[:limit]
+
+
+# ===================== v15: daily riddle picture (from today's video - no new picture needed) =====================
+def riddle_card(base_img, font_path, title, question, out):
+    """1080x1080 card: a blurred frame of today's video, a big title and the riddle."""
+    W = H = 1080
+    img = Image.open(base_img).convert("RGB")
+    s = max(W / img.width, H / img.height)
+    img = img.resize((int(img.width * s), int(img.height * s)))
+    l, t = (img.width - W) // 2, (img.height - H) // 2
+    img = img.crop((l, t, l + W, t + H)).filter(ImageFilter.GaussianBlur(8))
+    img = Image.blend(img, Image.new("RGB", (W, H), (10, 10, 40)), 0.55)
+    d = ImageDraw.Draw(img)
+    tl, tf, ts = _fit_text(d, title, font_path, W - 160, 110, lines_max=1)
+    tw = d.textlength(tl[0], font=tf)
+    d.text(((W - tw) / 2, 110), tl[0], font=tf, fill=(255, 220, 60), stroke_width=7, stroke_fill=(0, 0, 0))
+    words, lines, cur = str(question).split(), [], ""
+    f = ImageFont.truetype(font_path, 64)
+    for w_ in words:
+        if d.textlength((cur + " " + w_).strip(), font=f) > W - 170:
+            lines.append(cur)
+            cur = w_
+        else:
+            cur = (cur + " " + w_).strip()
+    if cur:
+        lines.append(cur)
+    size = 64 if len(lines) <= 6 else 50
+    f = ImageFont.truetype(font_path, size)
+    y = max(300, (H - len(lines) * size * 1.45) / 2 + 60)
+    for ln_ in lines[:9]:
+        tw = d.textlength(ln_, font=f)
+        d.text(((W - tw) / 2, y), ln_, font=f, fill=(255, 255, 255), stroke_width=4, stroke_fill=(0, 0, 0))
+        y += size * 1.45
+    img.save(out, quality=92)
+    return out

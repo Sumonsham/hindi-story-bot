@@ -182,8 +182,8 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-10-22T06:28+00:00"
+   "views": 0,
+   "checked": "2026-10-25T10:24+00:00"
   }
  },
  {
@@ -399,7 +399,13 @@
   "facebook": "1391022053104032",
   "youtube": "UaMulXdjOLc",
   "fb_reel": "2445384515869982",
-  "yt_short": "V5Z8856cBhQ"
+  "yt_short": "V5Z8856cBhQ",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 223,
+   "checked": "2026-10-25T10:24+00:00"
+  }
  },
  {
   "date": "2026-10-25T02:31+00:00",
@@ -441,5 +447,32 @@
   "title": "116 মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1824168128780921",
   "youtube": "215yvUVBpeI"
+ },
+ {
+  "date": "2026-10-25T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-25@19",
+  "category": "gopal",
+  "idea": "Gopal counts all the crows of Krishnanagar",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড়ের কাক গণনা! 🐦👑",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "বায়ান্ন হাজার চারশো তেইশ"
+  },
+  "facebook": "1674006717463247",
+  "youtube": "q7TYTxusIy4",
+  "fb_reel": "1805919113866298",
+  "riddle_post": "122136010226735948",
+  "riddle": {
+   "q": "পাখা নেই তবুও সে আকাশেতে ওড়ে, সুতো কেটে দিলে সে মাটিতে পড়ে। বল তো সেটা কী?",
+   "a": "ঘুড়ি"
+  }
  }
 ]

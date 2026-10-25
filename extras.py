@@ -1270,6 +1270,25 @@ def strip_tags(text):
     return _re.sub(r"\s*<[A-Za-z][A-Za-z \-]{1,24}>\s*", " ", str(text)).strip()
 
 
+TAG_WORDS = {"laugh": "laughs", "laughs": "laughs", "sigh": "sighs", "gasp": "gasps", "sob": "sobs",
+             "whisper": "whispers", "whispers": "whispers", "breath": "breathes in", "scream": "screams",
+             "cackle": "cackles wickedly", "growl": "growls", "giggle": "giggles", "evil laugh": "laughs wickedly"}
+
+
+def tts_tags(text):
+    """Voice tags for the newest Gemini voices: they understand [sighs] / [laughs] in square brackets and pauses
+    as '...'. Our <sigh>-style tags would otherwise be READ OUT ('long pause' spoken aloud!)."""
+    import re as _re
+
+    def one(m):
+        w = m.group(1).strip().lower()
+        if "pause" in w:
+            return " ... ... " if "long" in w else " ... "
+        return f" [{TAG_WORDS.get(w, w)}] "
+    out = _re.sub(r"<\s*([A-Za-z][A-Za-z \-]{1,24})\s*>", one, str(text))
+    return _re.sub(r"\s{2,}", " ", out).strip()
+
+
 def tts_keys():
     keys = [k for k in (env("GEMINI_TTS_KEY" + s) for s in ("", "_2", "_3", "_4", "_5")) if k]
     if env("TTS_PAID") == "1" and env("GEMINI_API_KEY"):
@@ -1645,7 +1664,7 @@ def _single_body(model, text, voice, style, lang_label):
     if model in NEW_TTS:
         return (model, f"{GEMINI_BASE}/interactions",
                 {"model": model, "input": [{"type": "user_input", "content": [{
-                    "type": "text", "text": text,
+                    "type": "text", "text": tts_tags(text),
                     "annotations": [{"type": "speech_metadata", "speaker": "Speaker1", "style": style[:1500]}]}]}],
                  "response_format": {"type": "audio"},
                  "generation_config": {"speech_config": {"speakers": [
@@ -1900,7 +1919,7 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     if len(sc["speakers"]) == 1:      # the API wants exactly 2 voices listed; the 2nd one simply never speaks
         sc["speakers"].append({"speaker": "Unused", "voice": "Puck" if speakers[0][1] != "Puck" else "Kore"})
     for model in NEW_TTS:
-        blocks = [{"type": "text", "text": t + (" <long pause>" if k < len(turns) - 1 else ""),
+        blocks = [{"type": "text", "text": tts_tags(t) + (" ... ..." if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}
                   for k, (s, t, st) in enumerate(turns)]
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
@@ -2035,6 +2054,16 @@ children, nothing sexual - the fear must be in the mind):
 - The listener must feel it could happen to THEM tonight, in their own house.
 - A big story is fine: if there is too much for one video, it will be told in parts - then every part ends
   on a cliffhanger that makes people desperate for the next part.
+- SMOOTH, COMPLETE STORYTELLING - nothing may feel missing or skipped:
+  * every scene follows from the one before; when time or place changes, the narrator says so in one line
+    ("সেই রাতে আর ঘুম এল না। পরদিন সন্ধ্যায়...");
+  * every character is introduced (who they are, why they are there) BEFORE they act or speak;
+  * every strange event is shown happening, never jumped over ("suddenly he was in the forest" is NOT allowed -
+    show how he got there);
+  * every question the story raises is answered by the end (or deliberately left for the next part);
+  * the listener always knows where we are, what time it is and who is in the room.
+- Before writing, plan the whole plot (beginning - rising dread - trap - face-to-face - twist), then write it
+  scene by scene without shortcuts.
 """
 
 

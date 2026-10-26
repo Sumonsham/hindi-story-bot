@@ -1005,10 +1005,11 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
     last_err = None
     best, min_words = None, int(env("MIN_WORDS") or 650)       # ~650+ spoken words = 5+ minutes
     models = gemini_models(key)
-    for round_no in range(3):
-        if round_no:
-            log(f"All Gemini models busy - waiting {90 * round_no} s")
-            time.sleep(90 * round_no)
+    waits = [0, 90, 180, 300, 300, 420]           # Google's servers are sometimes busy for a while: be patient
+    for round_no, wait in enumerate(waits):
+        if wait:
+            log(f"All Gemini models busy - waiting {wait} s (round {round_no + 1}/{len(waits)})")
+            time.sleep(wait)
         for model in list(models):
             try:
                 log(f"Writing story with {model} ...")
@@ -1022,7 +1023,7 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
                 cand = r.json()["candidates"][0]
                 text = cand["content"]["parts"][0]["text"]
                 text = re.sub(r"^```(?:json)?|```$", "", text.strip()).strip()
-                story = json.loads(text)
+                story = extras.load_json_loose(text)     # small JSON mistakes are repaired, not thrown away
                 assert story.get("title") and len(story.get("scenes", [])) >= 6
                 assert all(s.get("lines") for s in story["scenes"])
                 words = sum(len(str(ln.get("text", "")).split()) for sc in story["scenes"] for ln in sc["lines"])
@@ -1040,7 +1041,7 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
                 models.remove(model)
             except Exception as e:
                 last_err = e
-                log("  trying next model:", str(e)[:200])
+                log("  trying next model:", (str(e) or type(e).__name__)[:200])
                 time.sleep(5)
     if best:
         log(f"  using the longest story written ({best[0]} words)")

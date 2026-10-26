@@ -2600,3 +2600,40 @@ def riddle_card(base_img, font_path, title, question, out):
         y += size * 1.45
     img.save(out, quality=92)
     return out
+
+
+def load_json_loose(text):
+    """The story JSON from Gemini. Long answers sometimes have a small mistake (a missing comma, a stray quote,
+    a cut-off end) - repair it instead of throwing the whole story away."""
+    import re as _re
+    t = str(text).strip()
+    t = _re.sub(r"^```(?:json)?|```$", "", t).strip()
+    try:
+        return json.loads(t)
+    except Exception as first:
+        err = first
+    try:
+        return json.loads(t, strict=False)          # raw line breaks / tabs inside strings
+    except Exception:
+        pass
+    try:
+        try:
+            import json_repair                       # pip package json-repair
+        except ImportError:
+            subprocess.run([sys.executable, "-m", "pip", "install", "-q", "json-repair"], timeout=120)
+            import json_repair
+        out = json_repair.loads(t)
+        if isinstance(out, dict) and out:
+            log("  story JSON had a small mistake - repaired")
+            return out
+    except Exception:
+        pass
+    # simple repairs: trailing commas, missing commas between } {, ] [, "..." "..."
+    u = _re.sub(r",\s*([}\]])", r"\1", t)
+    u = _re.sub(r"([}\]\"])\s*\n\s*([{\[\"])", r"\1,\n\2", u)
+    try:
+        out = json.loads(u, strict=False)
+        log("  story JSON had a small mistake - repaired")
+        return out
+    except Exception:
+        raise err

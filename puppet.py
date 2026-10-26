@@ -99,27 +99,36 @@ def _unpack():
     """characters can be uploaded as one zip per character (GitHub's website takes max 100 files at a time):
     characters/gopal.zip -> characters/gopal/..."""
     import zipfile
-    for z in sorted(os.listdir(CHAR_DIR)):
-        if z.endswith(".zip") and not os.path.exists(os.path.join(CHAR_DIR, z[:-4], "rig.json")):
-            try:
-                with zipfile.ZipFile(os.path.join(CHAR_DIR, z)) as f:
-                    names = f.namelist()
-                    inner = z[:-4] + "/"
-                    dest = CHAR_DIR if all(n.startswith(inner) for n in names) else os.path.join(CHAR_DIR, z[:-4])
-                    f.extractall(dest)
-            except Exception as e:
-                print("  character pack", z, "could not be opened:", str(e)[:100])
+    zips = []                                  # in characters/ or (uploaded there by mistake) next to main.py
+    for folder in (CHAR_DIR, HERE):
+        if os.path.isdir(folder):
+            zips += [os.path.join(folder, z) for z in sorted(os.listdir(folder)) if z.endswith(".zip")]
+    for zp in zips:
+        name = os.path.basename(zp)[:-4]
+        if os.path.exists(os.path.join(CHAR_DIR, name, "rig.json")):
+            continue
+        try:
+            with zipfile.ZipFile(zp) as f:
+                names = f.namelist()
+                if not any(n.endswith("rig.json") for n in names):
+                    continue                   # some other zip, not a character
+                os.makedirs(CHAR_DIR, exist_ok=True)
+                inner = name + "/"
+                dest = CHAR_DIR if all(n.startswith(inner) for n in names) else os.path.join(CHAR_DIR, name)
+                f.extractall(dest)
+        except Exception as e:
+            print("  character pack", name, "could not be opened:", str(e)[:100])
 
 
 _UNPACKED = []
 
 
 def available():
-    if not os.path.isdir(CHAR_DIR):
-        return set()
     if not _UNPACKED:
         _UNPACKED.append(1)
         _unpack()
+    if not os.path.isdir(CHAR_DIR):
+        return set()
     return {d for d in os.listdir(CHAR_DIR) if os.path.exists(os.path.join(CHAR_DIR, d, "rig.json"))}
 
 

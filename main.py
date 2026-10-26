@@ -33,6 +33,10 @@ import wave
 
 import requests
 import extras
+try:
+    import puppet                    # TV-style cut-out cartoon with our ready-made characters
+except Exception:                     # (never stops the bot - the old way still works)
+    puppet = None
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 # ----------------------------------------------------------------- settings
@@ -514,6 +518,277 @@ def gemini_models(key):
     return out
 
 
+# ---- SAHEB: the channel's own hero, in (almost) every story. Never inside the scriptures (Ramayan, Mahabharat,
+# divine leelas) - those stay faithful; in the Gita he is the person in the modern-life example.
+SAHEB_FACE = ("friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle "
+              "confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, "
+              "short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), "
+              "wheat-brown skin")
+SAHEB_CLASSIC = SAHEB_FACE + ", maroon kurta with small gold buttons, cream dhoti, cream shawl with a thin gold " \
+                             "border over the left shoulder, small brown cloth shoulder bag, brown nagra shoes"
+SAHEB_MODERN = SAHEB_FACE + ", teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
+SAHEB_MODERN_CATS = ("para", "detective", "school", "life", "festival", "adventure", "nature", "bedtime", "gita")
+SAHEB_ROLE = {
+    "gopal": "Gopal's loyal young friend and helper at the court of Krishnanagar - he helps with Gopal's plan, asks the "
+             "questions the viewers would ask, and is always amazed by Gopal's wit (Gopal stays the hero)",
+    "birbal": "a young scholar from Bengal visiting Emperor Akbar's court who becomes Birbal's admiring helper "
+              "(Birbal stays the hero)",
+    "witty": "a clever young man who helps the hero and sees through the trick",
+    "betal": "a brave young traveller inside Betal's tale (or someone Vikram meets on the way)",
+    "folk": "a brave, kind young villager who helps the hero or heroine on the journey",
+    "fairy": "a kind young man from the village who helps the little hero or heroine",
+    "lok": "a curious young traveller from Kolkata who hears or sees this district's tale",
+    "funny": "the sensible young man in the middle of the comedy who tries to calm everyone down",
+    "para": "the friendly young neighbour Saheb-da whom the whole para trusts",
+    "detective": "Jhontu and Mini's friendly elder cousin Saheb-da who helps them get around - but the KIDS solve "
+                 "the case, never Saheb",
+    "school": "a kind young teacher or a visiting elder brother at the school",
+    "life": "a kind young man of the family or the neighbourhood",
+    "festival": "a cheerful young man of the family who joins the festival",
+    "adventure": "the kids' brave elder cousin who joins the adventure (the kids are still the heroes)",
+    "nature": "a young nature lover who helps the children understand",
+    "bedtime": "the gentle elder brother who tucks the child in",
+    "gita": "the young man in the modern-life example who learns the Gita's lesson",
+}
+SAHEB_SKIP = ("ramayan", "mahabharat", "divine")
+
+
+def saheb_rule(category):
+    if env("SAHEB") == "0" or category in SAHEB_SKIP:
+        return ""
+    look = SAHEB_MODERN if category in SAHEB_MODERN_CATS else SAHEB_CLASSIC
+    role = SAHEB_ROLE.get(category, "if the story has human characters, he plays a kind, helpful human in it "
+                                    "(a traveller, farmer, woodcutter or villager - he never harms animals); if it "
+                                    "is only animals, he is the young man who finds them at the end and says the "
+                                    "lesson")
+    return ("\nOUR OWN HERO: include SAHEB in this story - name \"Saheb\" (in Bengali 'সাহেব', Hindi 'साहेब'), "
+            "gender male, age adult, kind human, EXACTLY this look every time: \"" + look + "\". His role: " + role +
+            ". Give him 2-5 natural lines; he is warm, curious and funny, never rude. Put him in the characters "
+            "list with this exact look.\n")
+
+
+# ----------------------------------------------------------------- TV-style cartoon with our own characters
+# The ready-made characters live in characters/<id>/ (made once, same in every video). A series uses them when
+# its characters are there; every scene whose people are all available is acted out like a TV cartoon
+# (lip-sync, blinks, poses, walk-ins, camera cuts) on an empty background "set" - otherwise the old way.
+PUPPET_SERIES = {"gopal"}
+PUPPET_CAST = {   # id -> (name to use in the story, gender, age, look)
+    "gopal": ("Gopal", "male", "adult", "round, plump, cheerful Bengali man, clean-shaven round face, big bright eyes, "
+              "small black tuft of hair (tiki) on a fully shaved head, a sandalwood tilak line on the forehead, short "
+              "leaf-green kurta with a small white collar, white dhoti, maroon-and-white checked gamchha on the left "
+              "shoulder, barefoot"),
+    "raja": ("Raja", "male", "adult", "tall dignified kind king about 50, neat black moustache with curled tips, "
+             "cream-white turban with a red ruby and a white feather plume, royal-blue silk robe with a gold border, "
+             "maroon shawl over one shoulder, pearl necklace, gold embroidered shoes"),
+    "mantri": ("Mantri", "male", "adult", "tall very thin jealous royal minister, long narrow face, thin pointed "
+               "moustache and small pointed beard, grey streaks in his hair, small orange turban, purple robe with a "
+               "silver border"),
+    "rani": ("Rani", "female", "adult", "kind graceful queen, hair in a neat bun, small gold tiara, sindoor, red "
+             "bindi, red Banarasi saree with a gold border, gold jewellery"),
+    "gopal_bou": ("Gopal's wife", "female", "adult", "plump cheerful Bengali village wife, hair in a bun, sindoor, red "
+                  "bindi, white saree with a red border, red and white bangles, a bunch of keys tucked at the waist"),
+    "saheb": ("Saheb", "male", "adult", SAHEB_CLASSIC),
+    "paharadar": ("Palace guard", "male", "adult", "tall broad palace guard, big curled black moustache, small red "
+                  "turban, brown leather vest over a white kurta, red waist sash, white dhoti, a long spear"),
+    "senapati": ("Senapati", "male", "adult", "proud boastful army chief, thick black beard, huge upturned moustache, "
+                 "tall saffron turban, silver-grey chest armour over a dark red tunic, a curved sword at the belt"),
+    "rajvaidya": ("Rajvaidya", "male", "old", "short round fussy royal physician, neat white beard, small round "
+                  "spectacles, small green turban, long teal-green robe, a cloth medicine bag, a brass bowl"),
+    "pandit": ("Pandit", "male", "old", "thin proud Brahmin scholar, small round spectacles, shaved head with a small "
+               "white tiki, thin white moustache, white dhoti, cream shawl, a palm-leaf manuscript"),
+    "mahajan": ("Mahajan", "male", "old", "greedy pot-bellied village moneylender, bald head with grey sides, thin "
+                "curled moustache, cream kurta with a brown waistcoat, white dhoti, red account book under his arm"),
+    "moyra": ("Moyra", "male", "adult", "cheerful round Bengali sweet-maker, black moustache, white cloth band on a bald "
+              "head, white vest, white dhoti, green checked gamchha on the shoulder"),
+    "bonik": ("Bonik", "male", "adult", "rich boastful merchant, curled black moustache and short beard, big magenta "
+              "turban, long magenta-pink jama with gold embroidery, gold waist sash, gold chain"),
+    "zamindar": ("Zamindar", "male", "old", "tall skinny miser landlord, long sour face, thin grey moustache, old grey "
+                 "shawl wrapped tightly, patched cream kurta, white dhoti, a big iron key on a string round his neck"),
+    "chashi": ("Chashi", "male", "adult", "thin honest village farmer, sun-darkened skin, thin moustache, short brown "
+               "kurta, knee-length off-white dhoti, red gamchha tied on his head, barefoot"),
+    "gramer_bou": ("Village woman", "female", "adult", "slim kind village woman, hair in a bun, sindoor, small red "
+                   "bindi, yellow cotton saree with a green border, brass water pot on her hip, barefoot"),
+}
+SETS = {   # the same set looks the same in every episode (made once, saved in assets/sets/)
+    "court": "the grand royal court hall of an 18th-century Bengali king: carved white-and-gold pillars, red and gold "
+             "drapes, brass lamps, a red carpet on a marble floor, a raised EMPTY platform at the back (no throne)",
+    "palace_garden": "the royal palace garden: marble path, a fountain, flower beds, mango trees, palace walls behind",
+    "gopal_home": "the courtyard of a simple Bengali village house: mud walls, thatched roof, a tulsi plant on a small "
+                  "platform, clay pots, a wooden door, morning light",
+    "village_path": "a Bengali village lane: mud path, banana and coconut trees, thatched mud houses, a pond at the side",
+    "market": "a village market street with EMPTY stalls: baskets of vegetables, sacks of rice, cloth awnings",
+    "sweet_shop": "the front of an old Bengali sweet shop: wooden counter with big trays of rasgullas and sandesh, "
+                  "glass jars, a big brass pan, a cloth awning",
+    "riverside": "a river ghat with stone steps, a big banyan tree, a small boat tied at the bank, afternoon light",
+    "farm": "green rice fields with a mud path, a haystack, a small hut and palm trees, sunny",
+    "rich_house": "inside a rich old Bengali house: a big iron money chest, wooden cupboards, a carpet, arched window",
+    "temple": "a village temple courtyard: terracotta temple, a bell, marigold garlands, stone floor",
+    "forest": "a forest clearing with big trees, bushes and beams of sunlight",
+    "room": "a simple room in a village house: mud walls, a wooden cot at the side, a window, a lantern, a clay pot",
+    "night_village": "a Bengali village lane at night: moonlight, a lantern hanging at a hut door, stars",
+    "host": "a cheerful storytelling corner in a Bengali village courtyard: a big mango tree, a thatched hut, marigold "
+            "flowers in clay pots, soft clouds, bright morning sun",
+}
+SET_DIR = os.path.join(HERE, "assets", "sets")
+SET_RULE = ("EMPTY place, nobody in the picture: no people, no animals, no throne, no chairs in the middle. "
+            "Eye-level wide view, the floor or ground clearly visible in the lower third, open space in front. "
+            "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, "
+            "no text, no letters, no watermark")
+
+
+def puppet_ready(category=None):
+    """the character packs this video can use (empty = the old way)"""
+    if puppet is None or env("PUPPET") == "0":
+        return set()
+    av = puppet.available()
+    if category is not None and (category not in PUPPET_SERIES or "gopal" not in av):
+        return set()
+    return av
+
+
+def puppet_rules(category):
+    av = puppet_ready(category)
+    if not av:
+        return ""
+    people = [{"name": n, "gender": g, "age": a, "kind": "human", "look": lk, "rig": cid}
+              for cid, (n, g, a, lk) in PUPPET_CAST.items() if cid in av]
+    return ("\nANIMATED CAST (very important - this story is animated with our ready-made cartoon characters): use "
+            "ONLY characters from this list, with EXACTLY these names, genders, ages and looks, and copy the key "
+            "\"rig\" into each of them in the characters list: " + json.dumps(people, ensure_ascii=False) +
+            ". Nobody else may appear or speak (no crowds, no children, no animals on screen - they may only be "
+            "talked about). At most 4 of them in one scene. Every scene gets the key \"set\": the place where it "
+            "happens, one of " + json.dumps([k for k in SETS if k != "host"]) + " (the Raja and the Rani are in "
+            "'court', Gopal's own house is 'gopal_home'). In every line's image.people give each visible character "
+            "simple clear acting: standing / sitting (only the Raja on his throne and the Rani) / walking in, and "
+            "a feeling or gesture: talking, laughing, angry, sad, surprised, thinking, idea (one finger raised), "
+            "namaste, bowing, pointing, scheming (Mantri), blessing (Raja), salute (guard). When someone arrives "
+            "write 'walks in'.\n")
+
+
+def get_set(key, place, seed):
+    """the background picture for a scene: a fixed set (made once and kept) or this story's own place"""
+    key = re.sub(r"[^a-z_]", "", str(key or "").lower())
+    if key in SETS:
+        path, desc, sd = os.path.join(SET_DIR, f"{key}.jpg"), SETS[key], 7000 + sorted(SETS).index(key)
+        if os.path.exists(path):
+            return path
+    else:
+        path, desc, sd = os.path.join(WORK, f"set_{abs(hash(place)) % 10 ** 8}.jpg"), ascii_text(place), seed
+        if os.path.exists(path):
+            return path
+        if not desc.strip():
+            return None
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if MOCK:
+        test = os.path.join(env("MOCK_SETS") or "-", f"{key}.png")
+        if os.path.exists(test):
+            fit(Image.open(test), 1920, 1080).save(path, quality=93)
+            return path
+        return path if mock_image(path, sd) else None
+    for model, size in ((CF_MODEL, (1536, 864)), (CF_MODEL, (PIC_W, PIC_H)), (CF_BACKUP, (PIC_W, PIC_H))):
+        try:
+            data = cf_request(model, f"{desc}. {SET_RULE}. Style: {ART_STYLE}", w=size[0], h=size[1], seed=sd)
+            with open(path + ".raw", "wb") as f:
+                f.write(data)
+            fit(Image.open(path + ".raw"), 1920, 1080).save(path, quality=93)
+            os.remove(path + ".raw")
+            log(f"  background set '{key or place[:40]}' made" + (" (kept for all future videos)" if key in SETS else ""))
+            return path
+        except Exception as e:
+            log(f"  set picture attempt failed ({model.split('/')[-1]} {size[0]}x{size[1]}): {str(e)[:150]}")
+    return None
+
+
+class RigMap:
+    """story character names -> character packs"""
+
+    def __init__(self, story, av):
+        self.av, self.m = av, {}
+        for c in story.get("characters", []):
+            rid = re.sub(r"[^a-z_0-9]", "", str(c.get("rig") or "").lower())
+            if rid not in av:
+                rid = puppet.rig_for(c.get("name", ""), c.get("look", ""), av)
+            if rid and c.get("name"):
+                self.m[ascii_text(c["name"]).lower().strip()] = rid
+
+    def __call__(self, name):
+        k = ascii_text(str(name or "")).lower().strip()
+        if not k or k.startswith("narrat"):
+            return None
+        if k in self.m:
+            return self.m[k]
+        for kk, v in self.m.items():
+            if kk and (kk in k or k in kk):
+                return v
+        return puppet.rig_for(k, "", self.av)
+
+
+def puppet_scene(s, rig):
+    """which characters stand where in this scene - or None if somebody in it has no ready-made character"""
+    names, where = [], {}
+    for n in s.get("characters") or []:
+        names.append(n)
+    for ln in s.get("lines") or []:
+        sp = str(ln.get("speaker", ""))
+        if sp and not sp.lower().startswith("narrat"):
+            names.append(sp)
+        pic = ln.get("image") if isinstance(ln.get("image"), dict) else {}
+        for x in pic.get("people") or []:
+            if isinstance(x, dict) and x.get("name"):
+                names.append(x["name"])
+                w = str(x.get("where", "")).lower()
+                pos = 0 if "left" in w else 2 if "right" in w else 1
+                where.setdefault(str(x["name"]), []).append(pos)
+    order = []
+    for n in names:
+        r = rig(n)
+        if not r:
+            return None
+        if r not in order:
+            order.append(r)
+    if not order or len(order) > 5:
+        return None
+    score = {}
+    for n, ps in where.items():
+        r = rig(n)
+        if r:
+            score.setdefault(r, []).extend(ps)
+    first = {r: k for k, r in enumerate(order)}
+    order.sort(key=lambda r: (sum(score.get(r, [1])) / len(score.get(r, [1])), first[r]))
+    return {"cast": order, "set": s.get("set"), "place": s.get("place", "")}
+
+
+def puppet_lines(sp, pz):
+    """the spoken lines of a part, in the renderer's words"""
+    rig = pz.get("rig")
+    out = []
+    for ln in sp["lines"]:
+        if not str(ln.get("text", "")).strip():
+            continue
+        name = str(ln.get("speaker", "narrator"))
+        if pz.get("host"):
+            who = "mithu" if name.lower().startswith("mithu") else "lumi_didi"
+        else:
+            who = rig(name) if rig else None
+        pic = ln.get("image") if isinstance(ln.get("image"), dict) else {}
+        people = {}
+        for x in pic.get("people") or []:
+            if isinstance(x, dict) and x.get("name") and rig:
+                r = rig(x["name"])
+                if r:
+                    people[r] = f"{x.get('pose', '')}. {x.get('doing', '')}. {x.get('feeling', '')}"
+        out.append({"speaker": who, "emotion": ln.get("emotion", ""), "people": people})
+    return out
+
+
+def host_puppet(fly_in):
+    av = puppet_ready()
+    if env("PUPPET_HOST") == "0" or not {"lumi_didi", "mithu"} <= av:
+        return None
+    bg = get_set("host", "", 0)
+    return {"host": {"fly_in": fly_in}, "bg": bg, "place": "village courtyard"} if bg else None
+
+
 def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2):
     if MOCK:
         return mock_story(lang)
@@ -546,10 +821,21 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                  "laughs and rewards him in the end. Use EXACTLY these two characters (same names and looks every "
                  "time) plus 1-2 others if needed: {\"name\": \"Gopal\", \"gender\": \"male\", \"age\": \"adult\", "
                  "\"kind\": \"human\", \"look\": \"round, plump, cheerful Bengali man, clean-shaven round face, big "
-                 "bright eyes, small black tuft of hair (tiki) on a shaved head, short yellow kurta, white dhoti, red "
-                 "gamchha scarf on the shoulder, barefoot\"} and {\"name\": \"Raja\", \"gender\": \"male\", "
-                 "\"age\": \"adult\", \"kind\": \"human\", \"look\": \"kind plump king, small curled moustache, "
-                 "golden turban with a pearl, maroon royal robe with gold border, pearl necklace\"}. "
+                 "bright eyes, small black tuft of hair (tiki) on a fully shaved head, a sandalwood tilak line on the "
+                 "forehead, short leaf-green kurta with a small white collar, white dhoti, maroon-and-white checked "
+                 "gamchha on the left shoulder, barefoot\"} and {\"name\": \"Raja\", \"gender\": \"male\", "
+                 "\"age\": \"adult\", \"kind\": \"human\", \"look\": \"tall dignified kind king about 50, neat black moustache with curled tips, cream-white turban with a red ruby and a "
+                 "white feather plume, royal-blue silk robe with a gold border, maroon shawl over one shoulder, pearl "
+                 "necklace, gold embroidered shoes\"}. "
+                 "If the story needs them, use EXACTLY these looks too: {\"name\": \"Mantri\", \"gender\": \"male\", "
+                 "\"age\": \"adult\", \"kind\": \"human\", \"look\": \"tall very thin jealous royal minister, long "
+                 "narrow face, thin pointed moustache and small pointed beard, grey streaks in his hair, small "
+                 "orange turban, purple robe with a silver border\"}, {\"name\": \"Rani\", \"gender\": \"female\", "
+                 "\"age\": \"adult\", \"kind\": \"human\", \"look\": \"kind graceful queen, hair in a neat bun, "
+                 "small gold tiara, sindoor, red bindi, red Banarasi saree with a gold border, gold jewellery\"}, "
+                 "{\"name\": \"Gopal's wife\", \"gender\": \"female\", \"age\": \"adult\", \"kind\": \"human\", "
+                 "\"look\": \"plump cheerful Bengali village wife, hair in a bun, sindoor, red bindi, white saree "
+                 "with a red border, red and white bangles, a bunch of keys tucked at the waist\"}. "
                  "Not the TV cartoon design - our own look as described. Gopal walks into the court or the village "
                  "2-3 times (say 'Gopal walks in from the left' in that picture prompt).",
         "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
@@ -627,6 +913,8 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
     if category in MYTH:
         kind_rules += (" Use these EXACT looks for the holy and epic characters who appear (same every time): "
                        + "; ".join(MYTH_LOOKS.values()) + ". Use 'Rama', 'Sita', 'Krishna', 'Arjuna' etc. as names.")
+    kind_rules += saheb_rule(category)
+    kind_rules += puppet_rules(category)
     prompt = f"""
 You are India's best {L['name']} storyteller for a family cartoon story page that people of ALL AGES watch -
 children, teenagers, parents and grandparents.
@@ -1232,6 +1520,10 @@ def _add(a, b, unit):
 
 def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
     """Speak one line -> mono 44.1k wav, acted with the given emotion. Returns seconds."""
+    if MOCK and env("MOCK_VOICES"):              # test run: real recorded voices instead of beeps
+        clips = sorted(glob.glob(os.path.join(env("MOCK_VOICES"), "*.wav")))
+        shutil.copy(clips[abs(hash(text)) % len(clips)], out_wav)
+        return duration(out_wav)
     if MOCK:
         secs = max(1.2, len(text) / 15)
         freq = 180 + (abs(hash(voice_spec[0] + voice_spec[2])) % 200)
@@ -1699,6 +1991,9 @@ def write_wav(path, a):
         w.writeframes((a * 32767).astype(np.int16).tobytes())
 
 
+LINE_WAVS = {}
+
+
 def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=None):
     """Like a radio drama: every line is spoken with its own voice + emotion, and each sound
     effect is placed exactly where the story says it happens (before / during / after the line).
@@ -1708,6 +2003,7 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
     rnd = np.random.default_rng(1000 + idx)
     gap, lead, tail = 0.35, 0.5, 1.0
     pieces, subs, cues, silences, t = [], [], [], [], lead
+    LINE_WAVS[idx] = []
     for j, ln in enumerate(lines):
         text = str(ln.get("text", "")).strip()
         if not text:
@@ -1747,6 +2043,7 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         sp = ascii_text(ln.get("speaker", "")).lower()
         is_nar = (not sp) or sp.startswith("narrat") or voices.cast.find(sp) is None
         subs.append((t, len(a) / SR, is_nar, text))
+        LINE_WAVS[idx].append(p)                     # the voice alone - the cartoon's lip-sync listens to it
         for x in during[:2]:
             snd = get_oneshot(x["sound"], rnd, max_sec=min(6.0, len(a) / SR + 1))
             if snd is not None:
@@ -2380,7 +2677,18 @@ def build_video(scene_parts, lang, out):
             words = f"{pr.get('prompt', '')} {ln.get('en', '')}".lower()
             if img_k and img_k not in walks and WALK_RE.search(words):
                 walks[img_k] = 1 if re.search(r"from (the )?right|to the left", words) else -1
-        d = scene_clip(segments, a, c, i, sp.get("mood", "creepy"), talk, walks)
+        d = None
+        pz = sp.get("puppet")
+        if pz and pz.get("bg"):                  # TV-style cartoon with our own characters
+            try:
+                spec = dict(pz, lines=puppet_lines(sp, pz))
+                d = puppet.render_scene(spec, [(st, du) for st, du, _, _ in subs], LINE_WAVS.get(i, []), a, c,
+                                        W=W, H=H, FPS=FPS, log=log)
+            except Exception as e:
+                log(f"  cartoon scene failed ({str(e)[:200]}) - pictures instead")
+                d = None
+        if d is None:
+            d = scene_clip(segments, a, c, i, sp.get("mood", "creepy"), talk, walks)
         segs += [(t + s, du, nar, tx) for s, du, nar, tx in subs]
         clips.append(c)
         t += d
@@ -2701,6 +3009,8 @@ def main():
             if win:
                 theme, voted = win, n_votes
                 log(f"This story was chosen by the viewers: {win[1]}")
+    if env("FORCE_CATEGORY") in CATEGORIES:          # manual run: this kind of story
+        theme = (env("FORCE_CATEGORY"), random.choice(CATEGORIES[env("FORCE_CATEGORY")]))
     category = theme[0]
     if category in MYTH:
         ART_STYLE = MYTH_STYLE                       # reverent devotional look for the epics and the Gita
@@ -2711,7 +3021,8 @@ def main():
     if wx and any(k in wx for k in ("rain", "drizzle", "thunder", "fog", "cold")) and category not in ("divine", "panchatantra"):
         extra = f"\nTODAY'S WEATHER: {wx}. If it fits, let the story happen in this weather (cosy, not scary).\n"
         log("Weather:", wx)
-    vnames = viewer_names(history) if category not in MYTH and part < 2 and env("VIEWER_NAMES") != "0" else []
+    vnames = viewer_names(history) if (category not in MYTH and part < 2 and env("VIEWER_NAMES") != "0"
+                                       and not puppet_ready(category)) else []
     if vnames:
         extra += (f"\nOUR VIEWERS IN THE STORY: give 1-2 friendly side characters these first names of real viewers "
                   f"(kind, positive roles only): {', '.join(vnames)}.\n")
@@ -2756,8 +3067,18 @@ def main():
     seed = random.randint(1, 1_000_000)
     scenes = story["scenes"][:24]          # never cut the story short
 
+    pup = puppet_ready(category)
+    rig = RigMap(story, pup) if pup else None
+    pups = [puppet_scene(s, rig) if rig else None for s in scenes]
+    for p in pups:
+        if p:
+            p["rig"] = rig
+    if pup:
+        log(f"Our own cartoon characters act {sum(1 for p in pups if p)} of {len(scenes)} scenes")
     log("Cast reference picture")
-    if not make_cast_sheet(cast, os.path.join(WORK, "cast.jpg"), seed):
+    if pups and all(pups):
+        log("  not needed - every scene uses our ready-made characters")
+    elif not make_cast_sheet(cast, os.path.join(WORK, "cast.jpg"), seed):
         log("  no cast picture - using text descriptions only")
     cast.chars["mithu"] = dict(MITHU)
     voices = Voices(lang, cast)
@@ -2768,6 +3089,16 @@ def main():
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0
     for i, (s, lines) in enumerate(zip(scenes, scene_lines)):
+        pz = pups[i]
+        if pz:                                       # TV-style scene: only an empty set picture is needed
+            bg = get_set(pz.get("set"), pz.get("place") or s.get("place", ""), seed)
+            if bg:
+                pz["bg"] = bg
+                shots_per_scene.append([bg] * max(1, len(lines)))
+                imgs.append(bg)
+                last_ok = bg
+                continue
+            pups[i] = None
         want = max(1, min(len(lines), round(len(lines) * budget / total_lines))) if lines else 1
         groups = [lines[round(g * len(lines) / want):round((g + 1) * len(lines) / want)] for g in range(want)] or [[]]
         scene_shots = []
@@ -2846,7 +3177,19 @@ def main():
                  "para": "Bengali family comedy"}.get(category, "Bengali family story")
     t_prompt = extras.poster_prompt("cartoon", {**ti, "hero": hero, "second": second}, describe, series_en,
                                     cast.setting)
-    if not extras.hq_image(t_prompt, thumb_base, seed):
+    poster_done = False
+    if rig and rig(hero):                            # poster from our own characters: they look exactly like the video
+        try:
+            r1, r2 = rig(hero), (rig(second) if second else None)
+            bgs = [p["bg"] for p in pups if p and p.get("bg") and r1 in p["cast"]] or \
+                  [p["bg"] for p in pups if p and p.get("bg")]
+            if bgs:
+                puppet.poster(bgs[0], (r1, f"{ti.get('hero_action', '')} {ti.get('moment', '')}"),
+                              (r2, ti.get("second_action", "")) if r2 and r2 != r1 else None, thumb_base)
+                poster_done = True
+        except Exception as e:
+            log("  cartoon poster skipped:", str(e)[:150])
+    if not poster_done and not extras.hq_image(t_prompt, thumb_base, seed):
         if not make_image(cast, t_prompt, "", [n for n in (hero, second) if n], thumb_base, seed):
             shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
@@ -2865,10 +3208,10 @@ def main():
     intro = [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}]
     if str(story.get("mithu_intro", "")).strip():
         intro.append({"speaker": "Mithu", "emotion": "excited", "text": str(story["mithu_intro"]).strip()})
-    parts = [{"image": host, "lines": intro,
+    parts = [{"image": host, "lines": intro, "host_part": True,
               "sounds": ["birds"], "mood": "happy", "voices": voices}]
-    for img, s, sh in zip(imgs, scenes, shots_per_scene):
-        parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []),
+    for img, s, sh, pz in zip(imgs, scenes, shots_per_scene, pups):
+        parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []), "puppet": pz,
                       "ambience": s.get("ambience", []), "mood": s.get("mood", "happy"), "voices": voices})
     end_lines = []
     moral = str(story.get("moral", "")).strip()
@@ -2879,7 +3222,8 @@ def main():
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
     end_img = host if host != thumb_base else (shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1])
     if end_lines:                                   # Lumi Didi tells the lesson, then the quiz, then goodbye
-        parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
+        parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices,
+                      "host_part": end_img == host})
         end_lines = []
     quiz = story.get("quiz") if isinstance(story.get("quiz"), dict) else {}
     qopts = [str(o).strip() for o in (quiz.get("options") or []) if str(o).strip()][:3]
@@ -2931,8 +3275,12 @@ def main():
     if str(story.get("mithu_outro", "")).strip():
         end_lines.append({"speaker": "Mithu", "emotion": "laughing", "text": str(story["mithu_outro"]).strip()})
     end_lines.append({"speaker": "narrator", "text": (L["outro_part1"] if continues else L["outro"]).format(page=page)})
-    parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices})
+    parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices,
+                      "host_part": end_img == host})
 
+    for k, p in enumerate(parts):                # Lumi Didi + Mithu (he flies in and sits on her shoulder)
+        if p.get("host_part"):
+            p["puppet"] = host_puppet(k == 0)
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
     log(f"Video ready: {duration(video):.0f} seconds")
@@ -3201,6 +3549,9 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
 
 # ----------------------------------------------------------------- offline test helpers
 def mock_story(lang):
+    if env("MOCK_STORY"):                          # test run with a story from a file
+        with open(env("MOCK_STORY"), encoding="utf-8") as f:
+            return json.load(f)
     return {
         "title": "लालची बंदर और जादुई आम 🥭", "thumbnail_text": "लालची बंदर का सबक",
         "description": "एक बंदर को मिला जादुई आम का पेड़!\nआप होते तो क्या करते?",

@@ -248,10 +248,10 @@
   "fb_reel": "1771346504090555",
   "yt_short": "kjfTcacIl4w",
   "stats": {
-   "likes": 5,
+   "likes": 6,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-23T04:31+00:00"
+   "checked": "2026-10-26T10:51+00:00"
   }
  },
  {
@@ -272,7 +272,7 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-23T10:31+00:00"
+   "checked": "2026-10-26T10:51+00:00"
   }
  },
  {
@@ -444,7 +444,13 @@
   "facebook": "1093655609967564",
   "youtube": "O7NOiuJq4dA",
   "fb_reel": "1384803516770472",
-  "yt_short": "o-K5rjZT2q0"
+  "yt_short": "o-K5rjZT2q0",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-26T10:51+00:00"
+  }
  },
  {
   "date": "2026-10-25T09:19+00:00",
@@ -452,7 +458,13 @@
   "kind": "compilation",
   "title": "116 মিনিটের মিষ্টি গল্প 🧸 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1824168128780921",
-  "youtube": "215yvUVBpeI"
+  "youtube": "215yvUVBpeI",
+  "stats": {
+   "likes": 0,
+   "comments": 0,
+   "views": 1,
+   "checked": "2026-10-26T10:51+00:00"
+  }
  },
  {
   "date": "2026-10-25T13:31+00:00",
@@ -479,6 +491,12 @@
   "riddle": {
    "q": "পাখা নেই তবুও সে আকাশেতে ওড়ে, সুতো কেটে দিলে সে মাটিতে পড়ে। বল তো সেটা কী?",
    "a": "ঘুড়ি"
+  },
+  "stats": {
+   "likes": 2,
+   "comments": 1,
+   "views": 3,
+   "checked": "2026-10-26T10:51+00:00"
   }
  },
  {
@@ -509,5 +527,28 @@
    "q": "বল তো কোনটা কাঁচা থাকতে সবুজ রসে ভরা, আর পাকলে হয়ে যায় মিষ্টি লাল টুকটুকে ফল?",
    "a": "তরমুজ"
   }
+ },
+ {
+  "date": "2026-10-26T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-26@19",
+  "category": "jataka",
+  "idea": "the quail who led his flock to freedom",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "একতার শক্তি ও বুদ্ধিমান কোয়েল পাখি 🐦✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "সবাই মিলে একসাথে জাল তুলে উড়ে গিয়ে"
+  },
+  "facebook": "1584374786299444",
+  "youtube": "6r2jTSN5FeY",
+  "fb_reel": "1069339472807155",
+  "yt_short": "_r9E4WAevl8"
  }
 ]

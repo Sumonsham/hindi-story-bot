@@ -2110,7 +2110,9 @@ FONT = None
 
 
 def font(size):
-    return ImageFont.truetype(FONT, size, layout_engine=ImageFont.Layout.RAQM)
+    from PIL import features                 # Bengali/Hindi shaping needs Raqm; without it, still never crash
+    eng = ImageFont.Layout.RAQM if features.check("raqm") else ImageFont.Layout.BASIC
+    return ImageFont.truetype(FONT, size, layout_engine=eng)
 
 
 # ----------------------------------------------------------------- 5. thumbnail

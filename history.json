@@ -550,5 +550,32 @@
   "youtube": "6r2jTSN5FeY",
   "fb_reel": "1069339472807155",
   "yt_short": "_r9E4WAevl8"
+ },
+ {
+  "date": "2026-10-26T19:52+00:00",
+  "lang": "bn",
+  "slot": "2026-10-26@19",
+  "category": "gopal",
+  "idea": "the king's impossible challenge: bring milk from a bull",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "ষাঁড়ের দুধ! গোপালের মাথাতেই এমন বুদ্ধি এল? 🐂",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "নাতি"
+  },
+  "facebook": "2110888119599719",
+  "youtube": "AnP0PSW0pos",
+  "fb_reel": "1899259788102165",
+  "riddle_post": "122136196916735948",
+  "riddle": {
+   "q": "কোন জিনিস একবার ভেঙে গেলে আর জোড়া লাগানো যায় না?",
+   "a": "ডিম"
+  }
  }
 ]

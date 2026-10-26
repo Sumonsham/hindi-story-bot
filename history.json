@@ -205,8 +205,8 @@
   "stats": {
    "likes": 2,
    "comments": 2,
-   "views": 2,
-   "checked": "2026-10-22T12:40+00:00"
+   "views": 1,
+   "checked": "2026-10-26T02:43+00:00"
   }
  },
  {
@@ -229,7 +229,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-22T23:31+00:00"
+   "checked": "2026-10-26T02:43+00:00"
   }
  },
  {
@@ -422,7 +422,13 @@
   "youtube": "rFnCDLG6OMM",
   "fb_reel": "1741667840226273",
   "coloring": "122135909666735948",
-  "yt_short": "XD4DBG0Qa1k"
+  "yt_short": "XD4DBG0Qa1k",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-26T02:43+00:00"
+  }
  },
  {
   "date": "2026-10-25T07:31+00:00",
@@ -473,6 +479,35 @@
   "riddle": {
    "q": "পাখা নেই তবুও সে আকাশেতে ওড়ে, সুতো কেটে দিলে সে মাটিতে পড়ে। বল তো সেটা কী?",
    "a": "ঘুড়ি"
+  }
+ },
+ {
+  "date": "2026-10-26T05:39+00:00",
+  "lang": "bn",
+  "slot": "2026-10-26@8",
+  "category": "divine",
+  "idea": "Ma Lakshmi visits the house that stays awake on Kojagari Purnima",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "কোজাগরী পূর্ণিমায় মা লক্ষ্মীর বরদান! 🌕✨",
+  "festival": "Kojagari Lakshmi Puja",
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "অনাথ কনকের কুঁড়েঘরে"
+  },
+  "facebook": "4318959485060820",
+  "youtube": "w54rTaq9dd0",
+  "fb_reel": "2940829632919408",
+  "coloring": "122136103196735948",
+  "yt_short": "7CXN0CISvkA",
+  "riddle_post": "122136103430735948",
+  "riddle": {
+   "q": "বল তো কোনটা কাঁচা থাকতে সবুজ রসে ভরা, আর পাকলে হয়ে যায় মিষ্টি লাল টুকটুকে ফল?",
+   "a": "তরমুজ"
   }
  }
 ]

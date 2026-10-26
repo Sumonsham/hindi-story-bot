@@ -19,6 +19,14 @@ on:
         description: "Leave empty for a test. compilation = weekly long video. (cron-job.org sends 'auto'.)"
         required: false
         default: ""
+      story_type:
+        description: "Force a story type, e.g. gopal (leave empty = normal choice)"
+        required: false
+        default: ""
+      test_only:
+        description: "1 = make the video but do NOT post it (download it from the run page)"
+        required: false
+        default: ""
 
 permissions:
   contents: write           # needed to save history.json (stops repeat stories)
@@ -112,6 +120,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FREESOUND_API_KEY: ${{ secrets.FREESOUND_API_KEY }}
           VOICE: ${{ secrets.VOICE }}
+          FORCE_CATEGORY: ${{ github.event.inputs.story_type }}
+          DRY_RUN: ${{ github.event.inputs.test_only }}
         run: python main.py
 
       - name: Remember this story

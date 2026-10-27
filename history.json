@@ -8,7 +8,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -20,7 +20,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -32,7 +32,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -44,7 +44,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -57,7 +57,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -70,7 +70,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -83,7 +83,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -97,7 +97,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -110,8 +110,8 @@
   "stats": {
    "likes": 2,
    "comments": 0,
-   "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "views": 1,
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -125,7 +125,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -295,7 +295,7 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-24T05:44+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -316,8 +316,8 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 3,
-   "checked": "2026-10-24T05:44+00:00"
+   "views": 1,
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -338,7 +338,7 @@
    "likes": 2,
    "comments": 1,
    "views": 2,
-   "checked": "2026-10-24T10:31+00:00"
+   "checked": "2026-10-27T11:29+00:00"
   }
  },
  {
@@ -555,7 +555,13 @@
   "facebook": "1584374786299444",
   "youtube": "6r2jTSN5FeY",
   "fb_reel": "1069339472807155",
-  "yt_short": "_r9E4WAevl8"
+  "yt_short": "_r9E4WAevl8",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-27T11:29+00:00"
+  }
  },
  {
   "date": "2026-10-26T19:52+00:00",
@@ -645,5 +651,27 @@
   "youtube": "EdD5NiMsRsE",
   "fb_reel": "1455547203123085",
   "yt_short": "R5IkhoV4LvQ"
+ },
+ {
+  "date": "2026-10-27T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-27@19",
+  "category": "adventure",
+  "idea": "a kite that flies to a strange island",
+  "episode": null,
+  "part": 1,
+  "continues": true,
+  "series_id": "2026-10-27T11:56+00:00",
+  "title": "অজানা দ্বীপের রহস্যময় ঘুড়ি! 🪁✨ (পর্ব ১) | পর্ব 1",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "নীল"
+  },
+  "facebook": "966387502736659",
+  "youtube": "KPtQu3QCzxo",
+  "fb_reel": "1662249668840526"
  }
 ]

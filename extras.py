@@ -47,7 +47,36 @@ def _font(path, size):
         return ImageFont.truetype(path, size)
 
 
+_CMAPS = {}
+
+
+def fit_glyphs(text, font_path):
+    """Only characters the font can draw: Bengali fonts have no ASCII digits or punctuation, so 1 -> ১,
+    ' -> ’, : -> ।, and anything else the font lacks is left out (no empty boxes on the picture)."""
+    try:
+        if font_path not in _CMAPS:
+            from fontTools.ttLib import TTFont
+            _CMAPS[font_path] = set(TTFont(font_path).getBestCmap())
+        cm = _CMAPS[font_path]
+    except Exception:
+        return no_tofu(text)
+    beng = 0x0995 in cm
+    rep = {"'": "’", '"': "’", ":": "।", "|": "।"}
+    out = []
+    for ch in no_tofu(text):
+        if ord(ch) in cm or ch in " \n":
+            out.append(ch)
+        elif beng and ch.isdigit() and ch.isascii():
+            out.append(chr(0x09E6 + int(ch)))
+        elif rep.get(ch) and ord(rep[ch]) in cm:
+            out.append(rep[ch])
+        elif ch in "-,.()#":
+            out.append(" " if ch in "-," else "")
+    return " ".join("".join(out).split())
+
+
 def _fit_text(draw, text, path, max_w, start, lines_max=2):
+    text = fit_glyphs(text, path)
     """Split text into up to 2 lines and find the biggest font size that fits max_w."""
     words = str(text).split()
     if len(words) >= 2 and lines_max > 1:

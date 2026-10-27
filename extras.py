@@ -2276,15 +2276,56 @@ def voice_minutes(default=45):
     return int(max(30, min(120, left)))
 
 
+PENDING = []          # comments that can only be posted once the scheduled video is live
+
+
 def wait_for_publish():
-    """Before comments / replies: wait until the scheduled video is live."""
+    """Is the video live? GitHub minutes are precious (2,000 free a month), so we no longer sit and wait for
+    hours: if the video goes live later, its comments are kept and the NEXT run posts them (flush_pending).
+    Returns True when the comments can be posted now."""
     at = PUBLISH["at"]
     if not (PUBLISH["used"] and at):
-        return
+        return True
     left = (at - dt.datetime.now(IST)).total_seconds() + 60
-    if left > 0:
+    if left <= 0:
+        return True
+    # public repositories: GitHub minutes are free, so we wait (up to 4 hours) and comment the moment it is live.
+    # Secret WAIT_FOR_LIVE = 0 (e.g. for a private repository): don't wait, the next run posts the comments.
+    if left <= 300 or (env("WAIT_FOR_LIVE") != "0" and left <= 4 * 3600):
         log(f"  waiting {left / 60:.0f} min until the video is live, then comments")
         time.sleep(left)
+        return True
+    log(f"  the video goes live in {left / 60:.0f} min - its comments will be posted by the next run")
+    return False
+
+
+def comment_when_live(object_id, text, live):
+    if live:
+        return fb_comment(object_id, text)
+    PENDING.append({"id": str(object_id), "text": text})
+    return None
+
+
+def flush_pending(history):
+    """Start of every run: post the comments of earlier videos that have gone live since.
+    Returns True if anything changed (then the caller saves the history at once)."""
+    changed = False
+    for h in history[-8:]:
+        todo = h.get("pending_comments") or []
+        if not todo:
+            continue
+        left = []
+        for c in todo:
+            try:
+                fb_comment(c["id"], c["text"])
+                log("  earlier video's comment posted")
+            except Exception as e:
+                log("  earlier comment not posted:", str(e)[:120])
+                if c.get("tries", 0) < 2:
+                    left.append(dict(c, tries=c.get("tries", 0) + 1))
+        h["pending_comments"] = left
+        changed = True
+    return changed
 
 
 # ===================== v12: poster-style thumbnails (series title + episode name over a cinematic picture) ==========

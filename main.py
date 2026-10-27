@@ -2993,6 +2993,12 @@ def main():
     shutil.rmtree(WORK, ignore_errors=True)
     os.makedirs(WORK)
     history = load_history()
+    if not MOCK and not DRY_RUN:
+        try:
+            if extras.flush_pending(history):          # comments of earlier videos that are live now
+                save_history(history)
+        except Exception as e:
+            log("  earlier comments skipped:", str(e)[:120])
     global SLOT
     SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
     extras.plan_publish(SLOT)
@@ -3379,6 +3385,7 @@ def main():
         log(f"  congratulated {n} children/parents under their comments")
 
     history.append({"date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"), "lang": lang, "slot": SLOT,
+                    "pending_comments": list(extras.PENDING),
                     "category": category, "idea": theme[1], "episode": episode, "part": part, "continues": continues,
                     "series_id": series_id, "title": title, "festival": festival, "vote": vote_saved,
                     "viewer_names": vnames, "quiz": quiz_saved, **results})
@@ -3611,17 +3618,18 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
                 log(f"  'coming soon' post scheduled for {when.strftime('%d %b %H:%M')} India time")
         except Exception as e:
             log("  announcement skipped:", str(e)[:160])
-    extras.wait_for_publish()
+    live = extras.wait_for_publish()
     if question and results.get("facebook"):
         try:
-            extras.fb_comment(results["facebook"], question)
+            extras.comment_when_live(results["facebook"], question, live)
             log("  first comment posted on Facebook")
         except Exception as e:
             log("  Facebook comment skipped (needs pages_manage_engagement):", str(e)[:160])
     # the 1-minute Reel / Short: its first comment links to the full story
     if out.get("fb_reel") and results.get("facebook"):
         try:
-            extras.fb_comment(out["fb_reel"], L["reel_comment"].format(link=f"https://www.facebook.com/{results['facebook']}"))
+            extras.comment_when_live(out["fb_reel"], L["reel_comment"].format(
+                link=f"https://www.facebook.com/{results['facebook']}"), live)
             log("  Reel comment with the full-story link posted")
         except Exception as e:
             log("  Reel comment skipped:", str(e)[:160])

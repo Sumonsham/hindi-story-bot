@@ -103,6 +103,7 @@ jobs:
       - name: Make the video and post it
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FREEMODEL_API_KEY: ${{ secrets.FREEMODEL_API_KEY }}
           GEMINI_TTS_KEY: ${{ secrets.GEMINI_TTS_KEY }}
           GEMINI_TTS_KEY_2: ${{ secrets.GEMINI_TTS_KEY_2 }}
           GEMINI_TTS_KEY_3: ${{ secrets.GEMINI_TTS_KEY_3 }}

@@ -103,7 +103,7 @@ def no_tofu(text):
 def make_badge(font_path, text, out, colors=((220, 0, 30), (255, 255, 255))):
     """A rounded pill (PNG with transparency) shown in the top-right corner of the main video."""
     bg, fg = colors
-    text = no_tofu(text.replace("•", "|"))          # the Bengali/Hindi font has no bullet or emoji
+    text = fit_glyphs(text.replace("•", "|"), font_path)   # only signs the Bengali/Hindi font can draw
     probe = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
     f = _font(font_path, 34)
     tw = int(probe.textlength(text, font=f))
@@ -245,6 +245,31 @@ def fb_post_reel(video, description):
     if not fin.get("success"):
         raise RuntimeError(f"reel finish: {str(fin)[:300]}")
     return vid
+
+
+def fb_post_story(video):
+    """Shares the teaser (vertical, under 60 s) to the page's Facebook Story - followers see it at the top of their
+    feed for 24 hours and tap through to the full story. Returns the story's post id."""
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if env("FB_STORY") == "0" or not (page and token):
+        return None
+    r = requests.post(f"{GRAPH}/{page}/video_stories", data={"upload_phase": "start", "access_token": token},
+                      timeout=60).json()
+    if "video_id" not in r:
+        raise RuntimeError(f"story start: {str(r)[:300]}")
+    vid = r["video_id"]
+    with open(video, "rb") as f:
+        data = f.read()
+    up = requests.post(r.get("upload_url") or f"https://rupload.facebook.com/video-upload/v21.0/{vid}",
+                       headers={"Authorization": f"OAuth {token}", "offset": "0", "file_size": str(len(data))},
+                       data=data, timeout=600).json()
+    if not up.get("success"):
+        raise RuntimeError(f"story upload: {str(up)[:300]}")
+    fin = requests.post(f"{GRAPH}/{page}/video_stories", data={"upload_phase": "finish", "video_id": vid,
+                                                                 "access_token": token}, timeout=120).json()
+    if not fin.get("success"):
+        raise RuntimeError(f"story finish: {str(fin)[:300]}")
+    return fin.get("post_id") or vid
 
 
 def fb_comment(object_id, text):
@@ -2097,6 +2122,12 @@ KEEP THEM WATCHING (very important - most viewers leave in the first 10 seconds)
 - COLD OPEN: the first 1-2 lines jump to the most gripping moment of the story (a scream, a shock, a funny
   disaster, a mystery) - then "but how did it all begin? ..." and the story starts. Never start with a slow
   introduction, never with "once upon a time" alone.
+- THE VIDEO STARTS DIRECTLY WITH SCENE 1 (the title comes after it): its very first line is max 10 words, spoken
+  by a character, and grabs instantly - a shout, a shock, a funny disaster, a mystery ('আরে! আমার ঘুড়িটা আকাশে
+  উধাও!'), with a sound effect. Never begin with a calm description or 'once upon a time'.
+- SCENE 1 is the SHORTEST scene (about 15-25 seconds: 4-6 lines, each max 12 words). No explaining, no slow
+  description, no names-and-background: the tension rises line by line and the scene STOPS on a cliffhanger (a
+  scream, a knock, a face at the window, an unanswered question) - the title cuts in exactly there.
 - In the first 20 seconds promise something the listener must wait for ("what was behind that door - you will
   know only at the very end").
 - OPEN LOOPS: every 2-3 scenes raise a new question before answering the old one.
@@ -2634,7 +2665,8 @@ def fb_caption(description, limit=390):
     note = [p for p in rest if "AI" in p and len(p) < 90][:1]
     rest = [p for p in rest if p not in note]
     out = [head[:150]]
-    tag_room = min(75, len(" ".join(tags[:5])) + 2) if tags else 0      # keep space for ~5 hashtags
+    tags = tags[:5]                     # Facebook: fewer than 6 hashtags = better quality signal
+    tag_room = min(75, len(" ".join(tags)) + 2) if tags else 0          # keep space for the 5 hashtags
     room = lambda: limit - tag_room - len("\n\n".join(out + note)) - 4
     for p in rest:
         if room() <= 25:
@@ -2814,3 +2846,70 @@ def sub_times(text, dur, chunks):
         e = starts[k + 1] - 0.14 if k + 1 < len(starts) else dur + 0.2   # never two pieces on screen at once
         out.append((max(0.0, s - 0.12), max(s + 0.3, e)))                  # a moment early, like TV subtitles
     return out
+
+
+# ----------------------------------------------------------------- talking with the fans
+def reply_fans(history, lang, max_n=5):
+    """Each run: answer the first few NEW comments under our recent videos - warm, short, personal replies (like
+    a real creator), so people feel heard and come back. Never more than max_n replies per run."""
+    token, page_id, key = env("FB_PAGE_TOKEN"), env("FB_PAGE_ID"), env("GEMINI_API_KEY")
+    if not (token and key) or env("REPLY_FANS") == "0":
+        return False
+    now = dt.datetime.now(dt.timezone.utc)
+    todo = []
+    for h in reversed(history[-6:]):
+        if not h.get("facebook") or not h.get("date"):
+            continue
+        try:
+            age = (now - dt.datetime.fromisoformat(h["date"])).total_seconds() / 3600
+        except Exception:
+            continue
+        if not 1 <= age <= 48:
+            continue
+        try:
+            r = requests.get(f"{GRAPH}/{h['facebook']}/comments", timeout=30, params={
+                "fields": "id,message,from{id,name},comment_count", "limit": 50, "order": "chronological",
+                "access_token": token}).json()
+        except Exception:
+            continue
+        done = set(h.get("replied") or [])
+        for c in r.get("data", []):
+            frm = c.get("from") or {}
+            msg = str(c.get("message", "")).strip()
+            if (c.get("id") in done or frm.get("id") == page_id or c.get("comment_count") or len(msg) < 2
+                    or len(todo) >= max_n):
+                continue
+            todo.append((h, c["id"], first_name(frm.get("name")), msg[:300], str(h.get("title", ""))[:80]))
+    if not todo:
+        return False
+    lang = todo[0][0].get("lang") or lang            # the language of the video they commented on
+    lang_name = "Bengali (pure Kolkata cholit bhasha)" if lang == "bn" else "Hindi"
+    ask = ("You run a popular story page. Write a short, warm, natural reply (max 18 words, 0-1 emoji) to each "
+           f"viewer comment in {lang_name}, like a real friendly creator: thank them by first name, answer their "
+           "question if they asked one (never spoil a twist), invite them to the next story. No links, no hashtags. "
+           "Return ONLY a JSON list of strings in the same order.\n" +
+           "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
+    try:
+        r = requests.post(f"{GEMINI_BASE}/models/gemini-flash-latest:generateContent", headers={"x-goog-api-key": key},
+                          json={"contents": [{"parts": [{"text": ask}]}],
+                                "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
+                          timeout=90)
+        replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+    except Exception as e:
+        log("  fan replies skipped:", str(e)[:120])
+        return False
+    n = 0
+    for (h, cid, name, msg, t), text in zip(todo, replies if isinstance(replies, list) else []):
+        text = str(text).strip()
+        if not text:
+            continue
+        try:
+            rr = requests.post(f"{GRAPH}/{cid}/comments", data={"message": text, "access_token": token},
+                               timeout=30).json()
+            if rr.get("id"):
+                n += 1
+        except Exception:
+            pass
+        h.setdefault("replied", []).append(cid)
+    log(f"  replied to {n} viewer comments")
+    return True

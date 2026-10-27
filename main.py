@@ -2679,6 +2679,28 @@ PORTRAIT_CLIPS = {}          # part number -> the cartoon scene filmed in 9:16 (
 BADGE_COLORS = ((255, 60, 120), (255, 255, 255))
 
 
+HOOK_TEXT = [""]             # big words on screen in the first seconds (the thumbnail's hook)
+
+
+def hook_png(text, path):
+    """the hook in big words at the top for the first seconds - most people watch the feed WITHOUT sound"""
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    if text:
+        d = ImageDraw.Draw(img)
+        rows, f, sz = extras._fit_text(d, text, FONT, W - 120, 78, lines_max=2)
+        band = int(len(rows) * sz * 1.35 + 40)
+        for y in range(band):
+            d.line([(0, y), (W, y)], fill=(0, 0, 0, int(160 * (1 - y / band) ** 0.6)))
+        y = 20
+        for r in rows:
+            tw = d.textlength(r, font=f)
+            d.text(((W - tw) / 2, y), r, font=f, fill=(255, 230, 0, 255), stroke_width=max(4, sz // 12),
+                   stroke_fill=(200, 30, 90, 255))
+            y += int(sz * 1.35)
+    img.save(path)
+    return path
+
+
 def build_video(scene_parts, lang, out):
     """scene_parts: list of dict(image, lines, sounds, mood). Returns mp4 path."""
     global TIMELINE
@@ -2755,8 +2777,10 @@ def build_video(scene_parts, lang, out):
     TIMELINE = (part_times, segs, clips, total)
     try:                                   # small "Like - Share - Follow" pill, top right, at the start and the end
         extras.make_badge(FONT, LANGS[lang]["badge"], os.path.join(WORK, "badge.png"), BADGE_COLORS)
-        pic = ["-i", "badge.png", "-filter_complex",
-               f"[0:v]{vf}[b];[b][2:v]overlay=W-w-24:22:enable='{extras.badge_filter(total)}'[v]", "-map", "[v]"]
+        hook_png(HOOK_TEXT[0], os.path.join(WORK, "hook.png"))      # big words for people watching without sound
+        pic = ["-i", "badge.png", "-i", "hook.png", "-filter_complex",
+               f"[0:v]{vf}[b];[b][2:v]overlay=W-w-24:22:enable='{extras.badge_filter(total)}'[c];"
+               f"[c][3:v]overlay=0:0:enable='between(t,0,4.5)'[v]", "-map", "[v]"]
     except Exception as e:
         log("  badge skipped:", str(e)[:120])
         pic = ["-vf", vf, "-map", "0:v"]
@@ -2995,7 +3019,9 @@ def main():
     history = load_history()
     if not MOCK and not DRY_RUN:
         try:
-            if extras.flush_pending(history):          # comments of earlier videos that are live now
+            changed = extras.flush_pending(history)    # comments of earlier videos that are live now
+            changed = extras.reply_fans(history, env("LANGUAGE") or "bn") or changed   # answer the fans
+            if changed:
                 save_history(history)
         except Exception as e:
             log("  earlier comments skipped:", str(e)[:120])
@@ -3336,9 +3362,17 @@ def main():
     parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices,
                       "host_part": end_img == host})
 
+    # COLD OPEN: people decide in 3 seconds - start INSIDE the story (its first, funniest/most gripping scene),
+    # then Lumi Didi greets and says the title, then the rest of the story
+    cold = env("COLD_OPEN") != "0" and len(parts) > 2 and not parts[1].get("host_part") and parts[0].get("host_part")
+    if cold:
+        parts[0], parts[1] = parts[1], parts[0]
+    first_host = True
     for k, p in enumerate(parts):                # Lumi Didi + Mithu (he flies in and sits on her shoulder)
         if p.get("host_part"):
-            p["puppet"] = host_puppet(k == 0)
+            p["puppet"] = host_puppet(first_host)
+            first_host = False
+    HOOK_TEXT[0] = str(story.get("thumbnail_text") or "").strip()
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
     log(f"Video ready: {duration(video):.0f} seconds")
@@ -3348,8 +3382,9 @@ def main():
     description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
                    + (f"📖 {source}\n" if source else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
     part_times, segs = TIMELINE[0], TIMELINE[1]
-    chap = extras.chapters_text(part_times, [L["ch_intro"]] + [sc.get("chapter") or f"{k + 1}" for k, sc in
-                                                                 enumerate(scenes)] + [L["ch_end"]], L["chapters"])
+    _lab = [sc.get("chapter") or f"{k + 1}" for k, sc in enumerate(scenes)]
+    _lab = [_lab[0], L["ch_intro"]] + _lab[1:] if cold else [L["ch_intro"]] + _lab
+    chap = extras.chapters_text(part_times, _lab + [L["ch_end"]], L["chapters"])
     yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
 
     results = {}
@@ -3557,6 +3592,12 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("Posted Facebook Reel:", out["fb_reel"])
         except Exception as e:
             log("  Facebook Reel skipped:", str(e)[:200])
+        try:                                     # the teaser on the page Story too (24 h, top of the feed)
+            out["fb_story"] = extras.fb_post_story(teaser)
+            if out["fb_story"]:
+                log("Shared to Facebook Story:", out["fb_story"])
+        except Exception as e:
+            log("  Facebook Story skipped:", str(e)[:200])
     if teaser and env("INSTAGRAM") == "1":           # only if you switch Instagram on (secret INSTAGRAM = 1)
         try:
             out["ig_reel"] = extras.ig_post_reel(teaser, short_desc)

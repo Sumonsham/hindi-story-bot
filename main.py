@@ -2085,6 +2085,7 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         sp = ascii_text(ln.get("speaker", "")).lower()
         is_nar = (not sp) or sp.startswith("narrat") or voices.cast.find(sp) is None
         subs.append((t, len(a) / SR, is_nar, text))
+        extras.remember_voice(text, a, SR)
         LINE_WAVS[idx].append(p)                     # the voice alone - the cartoon's lip-sync listens to it
         for x in during[:2]:
             snd = get_oneshot(x["sound"], rnd, max_sec=min(6.0, len(a) / SR + 1))
@@ -2097,6 +2098,7 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
                 cues.append((t - gap + 0.1, snd, 0.85))
                 t += min(len(snd) / SR, 2.0) * 0.7
     total = t - gap + tail
+    total = math.ceil(total * FPS - 1e-6) / FPS   # a whole number of video frames: picture and sound never drift
     n = int(total * SR)
 
     voice = np.zeros(n)
@@ -2396,7 +2398,7 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
         first_start.setdefault(im_, (st_, en_, cl_))
     sparks = np.c_[brnd.uniform(0, W, 28), brnd.uniform(0, H, 28), brnd.uniform(1.5, 3.5, 28),
                    brnd.uniform(8, 22, 28), brnd.uniform(0, 6.28, 28)]
-    n = int(dur * FPS) + 1
+    n = max(1, int(round(dur * FPS)))
     shots = plan_shots(segments, dur)
     rnd = np.random.default_rng(idx + 50)
     flicker = (rnd.uniform(0, 1, 400) > 0.93).astype("float32") * rnd.uniform(0.4, 1, 400)
@@ -2665,12 +2667,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     rows = []
     for start, dur, is_nar, text in segments:
         chunks = split_subs(text, 26 if size else 44)
-        total = sum(len(c) for c in chunks) or 1
-        t = start
-        for c in chunks:
-            d = dur * len(c) / total
-            rows.append(f"Dialogue: 0,{ass_time(t)},{ass_time(t + d)},{'Nar' if is_nar else 'Talk'},,0,0,0,,{c}")
-            t += d
+        for c, (s0, s1) in zip(chunks, extras.sub_times(text, dur, chunks)):   # in step with the real voice
+            rows.append(f"Dialogue: 0,{ass_time(start + s0)},{ass_time(start + s1)},"
+                        f"{'Nar' if is_nar else 'Talk'},,0,0,0,,{c}")
     with open(path, "w", encoding="utf-8") as f:
         f.write(head + "\n".join(rows) + "\n")
 

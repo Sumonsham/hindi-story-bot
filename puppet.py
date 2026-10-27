@@ -715,7 +715,7 @@ def render_scene(spec, timings, wavs, audio, out, W=1280, H=720, FPS=25, log=pri
         cams.append((PW, PH, plan_shots(lines, by, main, hosta, True), _ffmpeg_out(portrait_out, PW, PH, FPS, total)))
     held = {a.id: a.base_pose() for a in actors}
     alt = {}
-    nfr = int(math.ceil(total * FPS))
+    nfr = max(1, int(round(total * FPS)))
     try:
         idx = [0] * len(cams)
         for f in range(nfr):

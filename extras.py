@@ -1436,8 +1436,10 @@ PRONOUNCE = {
     "bn": "Accent: West Bengal, India - pure standard Kolkata Bengali (cholito bhasha) exactly as spoken by Kolkata "
           "radio actors of Sunday Suspense / Akashvani Kolkata. NOT a Bangladeshi or Dhaka accent, no Bangladeshi "
           "words or intonation. Clear, correct pronunciation of every word - proper Kolkata 'o'/'a' vowels, soft 'sh', "
-          "correct conjuncts. Act it with real feeling and changing tension, breathing and pauses, like a live radio "
-          "drama - never flat, never like reading.",
+          "correct conjuncts. Read EVERY word exactly as written - never skip, add or change a word; Bengali names "
+          "and places the Bengali way (not anglicised); 'ড়'/'ঢ়', 'য়', chandrabindu and hasanta said correctly. Act "
+          "it with real feeling and changing tension, breathing and pauses, like a live radio drama - never flat, "
+          "never like reading.",
     "hi": "Speak natural, clear standard Hindi with correct pronunciation, like a professional Hindi radio actor. "
           "Never sound like reading.",
 }
@@ -1549,6 +1551,8 @@ STORY CRAFT (very important - the story must feel rich and alive, not a summary)
   each other. Mix short and long sentences. Emotions must change through the story (fun, worry, fear, hope,
   sadness, joy) - never flat.
 - Every scene must move the story forward; no repeating, no filler, no sudden rushed ending.
+- Scenes flow into each other like a film: the end of each scene leads straight into the next (the same moment
+  continuing, or a clear bridge of time and place). Never jump to an unrelated moment; details stay consistent.
 """
 
 WRITING_RULES = {
@@ -2697,3 +2701,46 @@ def freemodel_text(prompt, max_tokens=32000):
         except Exception as e:
             log(f"  FreeModel {model} failed: {str(e)[:150]}")
     return None
+
+
+# ----------------------------------------------------------------- subtitles in step with the voice
+VOICE_SHAPE = {}      # (text, seconds) -> how far the voice has got (0..1) every 20 ms
+
+
+def remember_voice(text, a, sr):
+    """Called for every spoken line: where in the line the voice really sounds (pauses skipped), so each piece
+    of the subtitle comes up exactly when those words are said - not earlier, not later."""
+    try:
+        import numpy as np
+        hop = int(sr * 0.02)
+        n = len(a) // hop
+        if n < 3:
+            return
+        rms = np.sqrt(np.mean(np.asarray(a[:n * hop], dtype=np.float64).reshape(n, hop) ** 2, axis=1))
+        voiced = (rms > max(0.01, 0.12 * np.percentile(rms, 95))).astype(float)
+        cum = np.cumsum(voiced)
+        if cum[-1] <= 0:
+            return
+        VOICE_SHAPE[(str(text), round(len(a) / sr, 2))] = cum / cum[-1]
+    except Exception:
+        pass
+
+
+def sub_times(text, dur, chunks):
+    """[(start, end)] inside the line for every subtitle piece, from the real voice when we have it."""
+    total = sum(len(c) for c in chunks) or 1
+    fr, acc = [], 0
+    for c in chunks:
+        fr.append(acc / total)
+        acc += len(c)
+    shape = VOICE_SHAPE.get((str(text), round(dur, 2)))
+    if shape is None:
+        starts = [f * dur for f in fr]
+    else:
+        import numpy as np
+        starts = [float(np.searchsorted(shape, f + 1e-6)) * 0.02 if f > 0 else 0.0 for f in fr]
+    out = []
+    for k, s in enumerate(starts):
+        e = starts[k + 1] - 0.14 if k + 1 < len(starts) else dur + 0.2   # never two pieces on screen at once
+        out.append((max(0.0, s - 0.12), max(s + 0.3, e)))                  # a moment early, like TV subtitles
+    return out

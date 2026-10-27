@@ -529,8 +529,9 @@ SAHEB_CLASSIC = SAHEB_FACE + ", maroon kurta with small gold buttons, cream dhot
 SAHEB_MODERN = SAHEB_FACE + ", teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
 SAHEB_MODERN_CATS = ("para", "detective", "school", "life", "festival", "adventure", "nature", "bedtime", "gita")
 SAHEB_ROLE = {
-    "gopal": "Gopal's loyal young friend and helper at the court of Krishnanagar - he helps with Gopal's plan, asks the "
-             "questions the viewers would ask, and is always amazed by Gopal's wit (Gopal stays the hero)",
+    "gopal": "Gopal's young friend from the village (NEVER in the royal court): Gopal meets him on the village lane, at "
+             "the market or the riverside; they talk the problem over, Saheb asks the questions the viewers would "
+             "ask, sometimes shows the way or gives a small hint, and is amazed by Gopal's wit (Gopal stays the hero)",
     "birbal": "a young scholar from Bengal visiting Emperor Akbar's court who becomes Birbal's admiring helper "
               "(Birbal stays the hero)",
     "witty": "a clever young man who helps the hero and sees through the trick",
@@ -613,8 +614,9 @@ SETS = {   # the same set looks the same in every episode (made once, saved in a
     "court": "the grand royal court hall of an 18th-century Bengali king: carved white-and-gold pillars, red and gold "
              "drapes, brass lamps, a red carpet on a marble floor, a raised EMPTY platform at the back (no throne)",
     "palace_garden": "the royal palace garden: marble path, a fountain, flower beds, mango trees, palace walls behind",
-    "gopal_home": "the courtyard of a simple Bengali village house: mud walls, thatched roof, a tulsi plant on a small "
-                  "platform, clay pots, a wooden door, morning light",
+    "gopal_home": "the earthen courtyard of a poor Bengali village mud hut (kancha bari): brown mud walls, a thick "
+                  "thatched straw roof, a small low wooden door, a tulsi plant on a little mud platform, clay pots "
+                  "and a broom by the wall, a bamboo fence, banana trees behind, soft morning light",
     "village_path": "a Bengali village lane: mud path, banana and coconut trees, thatched mud houses, a pond at the side",
     "market": "a village market street with EMPTY stalls: baskets of vegetables, sacks of rice, cloth awnings",
     "sweet_shop": "the front of an old Bengali sweet shop: wooden counter with big trays of rasgullas and sandesh, "
@@ -630,6 +632,7 @@ SETS = {   # the same set looks the same in every episode (made once, saved in a
             "flowers in clay pots, soft clouds, bright morning sun",
 }
 SET_DIR = os.path.join(HERE, "assets", "sets")
+SET_VER = {"gopal_home": 2}      # a new number = that set is painted again (once) with its new description
 SET_RULE = ("EMPTY place, nobody in the picture: no people, no animals, no throne, no chairs in the middle. "
             "Eye-level wide view, the floor or ground clearly visible in the lower third, open space in front. "
             "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, "
@@ -656,20 +659,42 @@ def puppet_rules(category):
             "ONLY characters from this list, with EXACTLY these names, genders, ages and looks, and copy the key "
             "\"rig\" into each of them in the characters list: " + json.dumps(people, ensure_ascii=False) +
             ". Nobody else may appear or speak (no crowds, no children, no animals on screen - they may only be "
-            "talked about). At most 4 of them in one scene. Every scene gets the key \"set\": the place where it "
-            "happens, one of " + json.dumps([k for k in SETS if k != "host"]) + " (the Raja and the Rani are in "
-            "'court', Gopal's own house is 'gopal_home'). In every line's image.people give each visible character "
-            "simple clear acting: standing / sitting (only the Raja on his throne and the Rani) / walking in, and "
-            "a feeling or gesture: talking, laughing, angry, sad, surprised, thinking, idea (one finger raised), "
-            "namaste, bowing, pointing, scheming (Mantri), blessing (Raja), salute (guard). When someone arrives "
-            "write 'walks in'.\n")
+            "talked about). Up to 5 of them in one scene. Every scene gets the key \"set\": the place where it "
+            "happens, one of " + json.dumps([k for k in SETS if k != "host"]) + ".\n"
+            "WRITE IT LIKE AN EPISODE OF THE GOPAL BHAR TV CARTOON SERIES (a real film script, not a summary):\n"
+            "- NO NARRATOR inside the story: Lumi Didi introduces it before and says the lesson after (added "
+            "automatically). Every line is spoken by a character; what happens is shown through what they say and "
+            "do. 10-14 scenes, 6-12 short lines each, quick back-and-forth dialogue full of emotion, comic timing, "
+            "expressions and reactions.\n"
+            "- The places change like a TV episode: the royal court ('court'), Gopal's poor mud hut with his wife "
+            "('gopal_home'), village lanes ('village_path'), the market, the sweet shop, the riverside... Gopal "
+            "walks between places: a short scene of him walking home on the village lane, talking (to himself, or "
+            "with Saheb who joins him).\n"
+            "- THE COURT is full and alive: the Raja sits on his throne; courtiers sit at the sides and a guard "
+            "stands (they are drawn automatically). The Raja ASKS FOR OPINIONS: Mantri, Senapati, Pandit and "
+            "Rajvaidya each give their own (proud, wrong or funny) opinion in their own style, they argue a little, "
+            "the Mantri schemes against Gopal - then Gopal's clever answer wins and the Raja laughs and rewards him.\n"
+            "- SAHEB is NEVER in the royal court: he is Gopal's friend in the village. Gopal meets him standing on "
+            "the village lane (or the market / riverside); they talk the problem over, Saheb asks the questions the "
+            "viewers would ask, sometimes he shows the way or gives a small hint - Gopal always finds the answer.\n"
+            "- Gopal's wife at home: real, funny husband-and-wife talk (she scolds, worries, laughs).\n"
+            "- In EVERY line: \"to\" = the name of the character the speaker talks to (the speaker turns to them, "
+            "they look back); and image.people lists EVERY character who is in that scene with their REACTION to "
+            "this line in 'feeling'/'doing' (listening, nodding, laughing, shocked, angry, worried, scheming, "
+            "thinking, embarrassed...). Nobody vanishes: a character stays in the scene until you write 'walks "
+            "out'; somebody arriving 'walks in'.\n"
+            "- Acting words the animation understands: standing / sitting (only the Raja on his throne and the Rani) "
+            "/ walks in / walks out, and talking, laughing, angry, sad, surprised, worried, thinking, idea (one finger "
+            "raised), namaste, bowing, pointing, scheming (Mantri), embarrassed, blessing (Raja), salute (guard), "
+            "scolding (Gopal's wife).\n")
 
 
 def get_set(key, place, seed):
     """the background picture for a scene: a fixed set (made once and kept) or this story's own place"""
     key = re.sub(r"[^a-z_]", "", str(key or "").lower())
     if key in SETS:
-        path, desc, sd = os.path.join(SET_DIR, f"{key}.jpg"), SETS[key], 7000 + sorted(SETS).index(key)
+        path, desc, sd = os.path.join(SET_DIR, f"{key}_{SET_VER.get(key, 1)}.jpg"), SETS[key], \
+            7000 + sorted(SETS).index(key) + 100 * SET_VER.get(key, 1)
         if os.path.exists(path):
             return path
     else:
@@ -776,8 +801,9 @@ def puppet_lines(sp, pz):
             if isinstance(x, dict) and x.get("name") and rig:
                 r = rig(x["name"])
                 if r:
-                    people[r] = f"{x.get('pose', '')}. {x.get('doing', '')}. {x.get('feeling', '')}"
-        out.append({"speaker": who, "emotion": ln.get("emotion", ""), "people": people})
+                    people[r] = f"{x.get('pose', '')}. {x.get('doing', '')} || {x.get('feeling', '')}"
+        to = rig(ln.get("to")) if rig and ln.get("to") else None
+        out.append({"speaker": who, "to": to, "emotion": ln.get("emotion", ""), "people": people})
     return out
 
 
@@ -837,7 +863,7 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                  "\"look\": \"plump cheerful Bengali village wife, hair in a bun, sindoor, red bindi, white saree "
                  "with a red border, red and white bangles, a bunch of keys tucked at the waist\"}. "
                  "Not the TV cartoon design - our own look as described. Gopal walks into the court or the village "
-                 "2-3 times (say 'Gopal walks in from the left' in that picture prompt).",
+                 "2-3 times (write 'walks in' for him in that line's people).",
         "life": "This is a heart-touching everyday story about real people (children, parents, grandparents, "
                 "teachers, neighbours) in an Indian town or village. Realistic situations families relate to. "
                 "It must teach a clear life lesson and touch the heart so deeply that grown-ups feel a lump in "
@@ -1007,6 +1033,21 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
     models = gemini_models(key)
     waits = [0, 90, 180, 300, 300, 420]           # Google's servers are sometimes busy for a while: be patient
     for round_no, wait in enumerate(waits):
+        if wait and round_no <= 2:                # Gemini busy: try the backup writer before waiting
+            try:
+                text = extras.freemodel_text(body["contents"][0]["parts"][0]["text"])
+                if text:
+                    story = extras.load_json_loose(text)
+                    assert story.get("title") and len(story.get("scenes", [])) >= 6
+                    assert all(s.get("lines") for s in story["scenes"])
+                    words = sum(len(str(ln.get("text", "")).split()) for sc in story["scenes"] for ln in sc["lines"])
+                    log(f"  backup story: {len(story['scenes'])} scenes, {words} spoken words")
+                    if words >= min_words * 0.8:
+                        return story
+                    if not best or words > best[0]:
+                        best = (words, story)
+            except Exception as e:
+                log("  backup writer failed:", (str(e) or type(e).__name__)[:150])
         if wait:
             log(f"All Gemini models busy - waiting {wait} s (round {round_no + 1}/{len(waits)})")
             time.sleep(wait)
@@ -2602,25 +2643,28 @@ def split_subs(text, max_len=44):
     return out
 
 
-def write_ass(segments, path, family):
-    """segments: (start, dur, is_narrator, text). Narration white, dialogue yellow."""
+def write_ass(segments, path, family, size=None):
+    """segments: (start, dur, is_narrator, text). Narration white, dialogue yellow.
+    size=(720, 1280): 9:16 Reel subtitles (bigger margin: above the 'watch the full story' band)."""
+    pw, ph = size or (W, H)
+    fs, mv = (46, 250) if size else (52, 38)
     head = f"""[Script Info]
 ScriptType: v4.00+
-PlayResX: {W}
-PlayResY: {H}
+PlayResX: {pw}
+PlayResY: {ph}
 WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Nar,{family},52,&H00FFFFFF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,4,2,2,40,40,38,1
-Style: Talk,{family},54,&H0000E6FF,&H0000E6FF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,4,2,2,40,40,38,1
+Style: Nar,{family},{fs},&H00FFFFFF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,4,2,2,40,40,{mv},1
+Style: Talk,{family},{fs + 2},&H0000E6FF,&H0000E6FF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,4,2,2,40,40,{mv},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     rows = []
     for start, dur, is_nar, text in segments:
-        chunks = split_subs(text)
+        chunks = split_subs(text, 26 if size else 44)
         total = sum(len(c) for c in chunks) or 1
         t = start
         for c in chunks:
@@ -2632,6 +2676,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 
 TIMELINE = ([], [])          # (start second of every part, every spoken line) of the last video
+PORTRAIT_CLIPS = {}          # part number -> the cartoon scene filmed in 9:16 (for the Reels)
 BADGE_COLORS = ((255, 60, 120), (255, 255, 255))
 
 
@@ -2685,8 +2730,10 @@ def build_video(scene_parts, lang, out):
         if pz and pz.get("bg"):                  # TV-style cartoon with our own characters
             try:
                 spec = dict(pz, lines=puppet_lines(sp, pz))
+                pv = os.path.join(WORK, f"clip_{i:02d}_v.mp4")      # the same scene in 9:16 for the Reels
                 d = puppet.render_scene(spec, [(st, du) for st, du, _, _ in subs], LINE_WAVS.get(i, []), a, c,
-                                        W=W, H=H, FPS=FPS, log=log)
+                                        W=W, H=H, FPS=FPS, log=log, portrait_out=pv)
+                PORTRAIT_CLIPS[i] = pv
             except Exception as e:
                 log(f"  cartoon scene failed ({str(e)[:200]}) - pictures instead")
                 d = None
@@ -2706,7 +2753,7 @@ def build_video(scene_parts, lang, out):
     write_ass(segs, os.path.join(WORK, "subs.ass"), LANGS[lang]["font_family"])
     vf = f"ass=subs.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex,tpad=stop_mode=clone:stop_duration=3"
     total = duration(os.path.join(WORK, "full.wav"))
-    TIMELINE = (part_times, segs)
+    TIMELINE = (part_times, segs, clips, total)
     try:                                   # small "Like - Share - Follow" pill, top right, at the start and the end
         extras.make_badge(FONT, LANGS[lang]["badge"], os.path.join(WORK, "badge.png"), BADGE_COLORS)
         pic = ["-i", "badge.png", "-filter_complex",
@@ -2993,6 +3040,9 @@ def main():
     if not festival and env("ROUTINE") != "0":
         if slot_hour == 13:                          # the day's fixed series
             cat = DAY_SPECIAL[weekday]
+            if env("GOPAL_DAILY") != "0" and puppet_ready("gopal"):
+                cat = "gopal"                        # every noon: the Gopal Bhar TV cartoon (while it is our only
+                                                     # animated series; the other days' specials come back later)
             if cat in EPIC:
                 episode = 1 + sum(1 for h in history if h.get("category") == cat)
                 theme = (cat, EPIC[cat][(episode - 1) % len(EPIC[cat])])
@@ -3292,7 +3342,7 @@ def main():
     source = ascii_text(story.get("source", ""))
     description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
                    + (f"📖 {source}\n" if source else "") + f"{L['ai_note']}\n\n{' '.join(tags)}")
-    part_times, segs = TIMELINE
+    part_times, segs = TIMELINE[0], TIMELINE[1]
     chap = extras.chapters_text(part_times, [L["ch_intro"]] + [sc.get("chapter") or f"{k + 1}" for k, sc in
                                                                  enumerate(scenes)] + [L["ch_end"]], L["chapters"])
     yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
@@ -3424,16 +3474,69 @@ def make_compilation(history):
         save_history(history)
 
 
+def _run_in(cmd, cwd):
+    r = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
+    if r.returncode != 0:
+        raise RuntimeError(f"Command failed: {' '.join(cmd[:3])}...\n{r.stderr[-1500:]}")
+
+
+def portrait_source(st, en, lang):
+    """A 9:16 video of the teaser's part of the story: the cartoon scenes come from their own 9:16 camera,
+    any other part (quiz card...) is fitted in. With the voices and 9:16 subtitles. Returns (path, start)."""
+    if len(TIMELINE) < 4 or not PORTRAIT_CLIPS:
+        return None
+    part_times, segs, clips, total = TIMELINE
+    ends = list(part_times[1:]) + [total]
+    use = [i for i in range(len(part_times)) if ends[i] > st and part_times[i] < en]
+    if not use or not any(i in PORTRAIT_CLIPS and os.path.exists(PORTRAIT_CLIPS[i]) for i in use):
+        return None
+    parts = []
+    for i in use:
+        p = PORTRAIT_CLIPS.get(i)
+        if not (p and os.path.exists(p)):
+            p = os.path.join(WORK, f"clip_{i:02d}_vf.mp4")
+            run(["ffmpeg", "-y", "-i", clips[i], "-an", "-filter_complex",
+                 "[0:v]split[a][b];[a]scale=-2:1280,crop=720:1280,boxblur=20:2,eq=brightness=-0.2[bg];"
+                 "[b]scale=720:-2[fg];[bg][fg]overlay=0:(H-h)/2,format=yuv420p",
+                 "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", p])
+        parts.append(p)
+    lst = os.path.join(WORK, "portrait.txt")
+    with open(lst, "w") as f:
+        f.writelines(f"file '{os.path.basename(p)}'\n" for p in parts)
+    off = part_times[use[0]]
+    dur = ends[use[-1]] - off
+    ass = os.path.join(WORK, "subs_v.ass")
+    write_ass([(s - off, d, n, tx) for s, d, n, tx in segs if off <= s < off + dur], ass,
+              LANGS[lang]["font_family"], size=(720, 1280))
+    out = os.path.join(WORK, "portrait.mp4")
+    _run_in(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-ss", f"{off:.2f}", "-t", f"{dur:.2f}",
+         "-i", os.path.join(WORK, "full.wav"), "-map", "0:v", "-map", "1:a", "-t", f"{dur:.2f}",
+         "-vf", f"ass=subs_v.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex,format=yuv420p",
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-c:a", "aac", "-b:a", "160k", out],
+        cwd=WORK)
+    return out, off
+
+
 def grow(video, story, title, lang, L, category, tags, results, history, page):
     """Extra reach after the main post: Reel + Short teaser, first comment, playlist. Never stops the run.
     (Kids videos on YouTube have comments switched off by YouTube, so the question goes only to Facebook.)"""
     out = {}
-    part_times, segs = TIMELINE
+    part_times, segs = TIMELINE[0], TIMELINE[1]
     teaser = os.path.join(WORK, "teaser.mp4")
     try:
         st, en = extras.pick_window(segs, part_times, story.get("teaser_scene") or 2)
-        extras.make_teaser(video, st, en, teaser, FONT, story.get("thumbnail_text") or title, L["cta"], WORK,
-                           colors=((255, 225, 0), (255, 60, 120)))
+        src = None
+        try:
+            src = portrait_source(st, en, lang)          # the cartoon itself filmed in 9:16 (looks native on phones)
+        except Exception as e:
+            log("  9:16 teaser picture not made, using the wide one:", str(e)[:150])
+        if src:
+            path, off = src
+            extras.make_teaser(path, st - off, en - off, teaser, FONT, story.get("thumbnail_text") or title,
+                               L["cta"], WORK, colors=((255, 225, 0), (255, 60, 120)), vertical=True)
+        else:
+            extras.make_teaser(video, st, en, teaser, FONT, story.get("thumbnail_text") or title, L["cta"], WORK,
+                               colors=((255, 225, 0), (255, 60, 120)))
         log(f"Teaser ready ({en - st:.0f} s, from {st:.0f} s)")
     except Exception as e:
         log("  teaser skipped:", str(e)[:200])

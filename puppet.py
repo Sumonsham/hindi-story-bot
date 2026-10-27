@@ -226,12 +226,25 @@ NIGHT_RX = re.compile(r"\bnight|midnight|moonlit|moonlight|dark room|lantern|can
 DUSK_RX = re.compile(r"sunset|dusk|evening")
 
 
-def act_of(text, emotion=""):
-    t = str(text or "").lower()
+def _act(t):
     for a, rx in ACTS:
         if re.search(rx, t):
             return a
-    return EMO_ACT.get(str(emotion or "").lower().strip())
+    return None
+
+
+def act_of(text, emotion=""):
+    """'pose. doing || feeling' -> one acting word. A clear gesture (pointing, namaste...) wins, then a strong
+    feeling (laughing, shocked...), then anything else, then the line's emotion."""
+    t = str(text or "").lower()
+    doing, _, feeling = t.partition("||")
+    a_do, a_feel = _act(doing), _act(feeling)
+    gestures = {"namaste", "bow", "bless", "salute", "block", "point", "wave", "clap", "thumbs_up", "serving",
+                "counting", "reading", "medicine", "water_pot", "cooking", "phone", "scold", "hugging_key",
+                "showing_off", "boast", "idea"}
+    if a_do in gestures:
+        return a_do
+    return a_feel or a_do or EMO_ACT.get(str(emotion or "").lower().strip())
 
 
 class Actor:
@@ -353,91 +366,111 @@ def mouth_style(shape, emotion):
 
 
 # ------------------------------------------------------------------ the camera
-def window(kind, actors, who, others=()):
-    """a 16:9 part of the stage: (x0, y0, width)"""
+def _win(cx, eye, w, h, top_frac):
+    x0 = min(max(0.0, cx - w / 2), CW - w)
+    y0 = min(max(0.0, eye - top_frac * h), CH - h)
+    return (x0, y0, w, h)
+
+
+def window(kind, who=None, other=None, portrait=False):
+    """a part of the stage the camera sees: (x0, y0, width, height) - 16:9, or 9:16 for the Reels"""
+    if portrait:
+        if kind == "wide" or not who:
+            h = float(CH)
+            return _win(CW / 2 if not who else who.x, 0, h * 9 / 16, h, 0)
+        h = {"close": 0.62, "closeR": 0.66}.get(kind, 0.86) * CH
+        cx = who.x + (0.05 * CW if kind == "closeR" else 0)
+        if kind == "two" and other:                     # 9:16 is narrow: stay on the speaker
+            cx = who.x + 0.12 * (other.x - who.x)
+        # head a little lower than in the 16:9 picture: the Reel's title sits at the top
+        return _win(cx, who.floor - who.eye_up, h * 9 / 16, h, {"close": 0.42, "closeR": 0.44}.get(kind, 0.33))
     if kind == "wide" or not who:
-        return (0.0, 0.0, float(CW))
-    a = who[0]
-    if kind == "two" and others:
-        b = others[0]
+        return (0.0, 0.0, float(CW), float(CH))
+    a = who
+    if kind == "two" and other:
+        b = other
         lo = min(a.x - a.half_w, b.x - b.half_w) - 0.07 * CW
         hi = max(a.x + a.half_w, b.x + b.half_w) + 0.07 * CW
         w = min(float(CW), max(0.60 * CW, hi - lo))
-        cx = (lo + hi) / 2
-        eye = min(a.floor - a.eye_up, b.floor - b.eye_up)
-        top_frac = 0.27
-    elif kind == "close":
-        w, cx, eye, top_frac = 0.40 * CW, a.x, a.floor - a.eye_up, 0.40
-    elif kind == "closeR":                  # a little to the right: Lumi Didi and Mithu on her shoulder
-        w, cx, eye, top_frac = 0.42 * CW, a.x + 0.05 * CW, a.floor - a.eye_up, 0.42
-    else:                                   # medium
-        w, cx, eye, top_frac = 0.54 * CW, a.x, a.floor - a.eye_up, 0.32
-    h = w * 9 / 16
-    x0 = min(max(0.0, cx - w / 2), CW - w)
-    y0 = min(max(0.0, eye - top_frac * h), CH - h)
-    return (x0, y0, w)
+        return _win((lo + hi) / 2, min(a.floor - a.eye_up, b.floor - b.eye_up), w, w * 9 / 16, 0.27)
+    w, top = {"close": (0.40, 0.40), "closeR": (0.42, 0.42)}.get(kind, (0.54, 0.32))
+    cx = a.x + (0.05 * CW if kind == "closeR" else 0)
+    return _win(cx, a.floor - a.eye_up, w * CW, w * CW * 9 / 16, top)
 
 
-def plan_camera(lines, actors, total):
-    """one shot per line (cut a moment before the voice starts), wide to open the scene,
-    a reaction shot of the listener in the middle of long speeches"""
-    by = {a.id: a for a in actors}
-    main = [a for a in actors if a.depth == 1.0]
-    cuts = []
-    prev = None
-    host = by.get("lumi_didi") if len(main) == 1 and main[0].id == "lumi_didi" else None
+STRONG = {"laugh", "angry", "scold", "sad", "worried", "embarrassed", "surprised", "scheme", "idea", "thinking",
+          "namaste", "bow", "bless", "salute", "block", "point", "wave", "clap", "thumbs_up", "serving", "counting",
+          "reading", "medicine", "boast", "tired", "showing_off", "hugging_key", "water_pot", "cooking", "phone"}
+EXIT_RX = re.compile(r"\b(walks? (out|away|off)|leaves?|leaving|goes (out|away|home)|exits?|runs? (away|off)|"
+                     r"storms? out|hurr\w* (out|away|off))\b")
+FACE_FIX = {"mantri": {"08_three_quarter_left": 1}, "rani": {"08_three_quarter_left": -1},
+            "lumi_didi": {"10_three_quarter_left": -1}}
+
+
+def turned(c, d, talk):
+    """a pose of this character looking to the viewer's left (d=-1) or right (d=1)"""
+    best = None
+    for p, pe in c.P.items():
+        f = pe.get("facing", FACE_FIX.get(c.id, {}).get(p))
+        if f != d or (talk and not c.can_talk(p)):
+            continue
+        if best is None or ("blink" in pe and "blink" not in c.P[best]):
+            best = p
+    return best
+
+
+class Line:
+    pass
+
+
+def plan_shots(lines, by, main, host, portrait=False):
+    """TV editing: wide to open, then the speaker / two-shots of speaker and listener, close-ups on big
+    feelings, a reaction shot of the listener in long speeches, wide again when people walk"""
+    cuts, prev = [], None
     for k, ln in enumerate(lines):
         t0 = 0.0 if k == 0 else max(0.0, ln["start"] - 0.12)
-        sp = by.get(ln.get("speaker"))
-        if host:                                   # Lumi Didi + Mithu on her shoulder
-            if ln.get("speaker") == "mithu":
-                shot = ("closeR", "lumi_didi")
-            else:
-                shot = ("medium", "lumi_didi") if k == 0 or prev != ("medium", "lumi_didi") else ("close", "lumi_didi")
-                if k == 0:
-                    shot = ("medium", "lumi_didi")
-            if shot != prev:
-                cuts.append((t0, shot))
-                prev = shot
-            continue
+        sp, ad = by.get(ln.get("speaker")), by.get(ln.get("to"))
         dur = ln["end"] - ln["start"]
-        listeners = sorted([a for a in main if a is not sp], key=lambda a: abs(a.x - sp.x)) if sp else []
-        if k == 0 and len(main) > 1:
+        if host:
+            shot = ("closeR", host.id) if ln.get("speaker") == "mithu" else ("medium", host.id)
+        elif ln.get("walk") and not portrait:
             shot = ("wide",)
-        elif ln.get("walk"):
+        elif ln.get("walk") and portrait:
+            shot = ("follow", ln["walk"])
+        elif k == 0 and len(main) > 1 and not portrait:
             shot = ("wide",)
         elif not sp:
-            shot = ("wide",) if prev != ("wide",) or len(main) < 2 else ("two", main[0].id, main[-1].id)
-        elif len(main) == 1:
-            shot = ("close", sp.id) if prev == ("medium", sp.id) and dur > 2.5 else ("medium", sp.id)
-        elif str(ln.get("emotion", "")).lower() in ("angry", "shout", "surprised", "shocked", "scared") and dur > 1.0 \
-                and prev != ("close", sp.id):
+            shot = ("wide",) if not portrait else ("medium", (main[0] if main else None) and main[0].id)
+        elif str(ln.get("emotion", "")).lower() in ("angry", "shout", "surprised", "shocked", "scared") and \
+                dur > 1.0 and prev != ("close", sp.id):
             shot = ("close", sp.id)
-        elif prev and prev[0] in ("medium", "close") and prev[1] == sp.id:
-            shot = ("two", sp.id, listeners[0].id)
-        elif k % 5 == 4:
+        elif ad and not portrait and prev and prev[0] in ("medium", "close") and prev[1] in (sp.id, ad.id):
+            shot = ("two", sp.id, ad.id)
+        elif k % 6 == 5 and not portrait and len(main) > 2:
             shot = ("wide",)
         else:
             shot = ("medium", sp.id)
         if shot != prev:
             cuts.append((t0, shot))
             prev = shot
-        if ln.get("walk"):                         # after the walk-in, go closer for the rest of the line
+        if ln.get("walk_end") and not host:            # after somebody walked in: on the speaker
             arrive = ln["walk_end"] + 0.4
             if sp and ln["end"] - arrive > 1.2:
-                shot = ("medium", sp.id)
-                cuts.append((arrive, shot))
-                prev = shot
-        if sp and listeners and dur > 6.5:          # reaction shot of the listener
+                prev = ("medium", sp.id)
+                cuts.append((arrive, prev))
+        if sp and ad and dur > 6.0 and not host:        # the listener's face in the middle of a long speech
             r0 = ln["start"] + dur * 0.55
-            cuts.append((r0, ("medium", listeners[0].id)))
+            cuts.append((r0, ("medium", ad.id)))
             cuts.append((r0 + 1.7, prev))
     out = []
-    for t, shot in cuts:
-        who = [by[i] for i in shot[1:2] if i in by]
-        oth = [by[i] for i in shot[2:3] if i in by]
-        out.append((t, window(shot[0], actors, who, oth), shot[0]))
-    return out or [(0.0, (0.0, 0.0, float(CW)), "wide")]
+    for t, shot in sorted(cuts, key=lambda c: c[0]):
+        if shot[0] == "follow":
+            out.append((t, shot, "follow"))
+            continue
+        who = by.get(shot[1]) if len(shot) > 1 else None
+        oth = by.get(shot[2]) if len(shot) > 2 else None
+        out.append((t, window(shot[0], who, oth, portrait), shot[0]))
+    return out or [(0.0, window("wide", portrait=portrait), "wide")]
 
 
 # ------------------------------------------------------------------ drawing
@@ -469,13 +502,12 @@ class Stage:
 
     def view(self, win, kind, W, H):
         if win not in self._views:
-            x0, y0, w = win
-            h = w * 9 / 16
+            x0, y0, w, h = win
             v = self.bg.resize((W, H), Image.LANCZOS, box=(x0, y0, x0 + w, y0 + h))
             blur = {"close": 2.2, "closeR": 2.2, "medium": 1.2}.get(kind, 0)
             if blur:                                         # shallow depth of field, like a film camera
                 v = v.filter(ImageFilter.GaussianBlur(blur))
-            if len(self._views) > 12:
+            if len(self._views) > 24:
                 self._views.pop(next(iter(self._views)))
             self._views[win] = v
         return self._views[win]
@@ -516,11 +548,27 @@ def draw_actor(frame, stage, win, so, actor, pose, mouth, blink, x, floor, shado
 
 
 # ------------------------------------------------------------------ one scene
-def render_scene(spec, timings, wavs, audio, out, W=1280, H=720, FPS=25, log=print):
-    """spec: {bg, place, cast: [ids left->right], lines: [{speaker, emotion, people: {id: text}}],
+def _sign(v):
+    return 1 if v > 0 else -1
+
+
+def _ffmpeg_out(path, W, H, FPS, total, audio=None):
+    cmd = ["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
+           "-i", "-"]
+    if audio:
+        cmd += ["-i", audio, "-t", f"{total:.2f}"]
+    cmd += ["-vf", f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(0, total - 0.4):.2f}:d=0.4,format=yuv420p",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-maxrate", "3500k", "-bufsize", "7000k"]
+    cmd += (["-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2"] if audio else ["-an"]) + [path]
+    return subprocess.Popen(cmd, stdin=subprocess.PIPE)
+
+
+def render_scene(spec, timings, wavs, audio, out, W=1280, H=720, FPS=25, log=print, portrait_out=None):
+    """spec: {bg, place, cast: [ids left->right], lines: [{speaker, to, emotion, people: {id: text}}],
               host: None | {"fly_in": bool}}
     timings: (start, dur) of every spoken line; wavs: the voice file of every line; audio: the mixed scene sound.
-    Writes out (video + sound) and returns its length in seconds."""
+    Writes out (16:9 video + sound) and, if asked, portrait_out (9:16 picture for the Reels).
+    Returns the length in seconds."""
     rnd = random.Random(hash(out) & 0xffff)
     total = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
                                   "default=nw=1:nk=1", audio], capture_output=True, text=True).stdout.strip())
@@ -533,155 +581,213 @@ def render_scene(spec, timings, wavs, audio, out, W=1280, H=720, FPS=25, log=pri
         if k >= len(timings):
             break
         st, du = timings[k]
-        lines.append(dict(ln, start=st, end=st + du, wav=wavs[k] if k < len(wavs) else None))
+        lines.append(dict(ln, start=st, end=st + du, wav=wavs[k] if k < len(wavs) else None,
+                          people=dict(ln.get("people") or {})))
+    av = available()
 
-    # ---- who stands where
-    cast = [c for c in spec.get("cast", []) if c in available()][:5]
-    if host:
-        cast = ["lumi_didi"]
-    n = len(cast)
-    slots = {1: [.5], 2: [.31, .69], 3: [.19, .5, .81], 4: [.13, .38, .62, .87], 5: [.1, .3, .5, .7, .9]}.get(n, [])
-    if host:
-        slots = [.43]
-    court = bool(COURT_RX.search(place))
-    actors = []
-    for cid, sx in zip(cast, slots):
-        texts = " ".join(str(ln.get("people", {}).get(cid, "")) for ln in lines).lower()
+    # ---- who stands where (the Raja on his throne in the middle of the court, the others at both sides)
+    cast = ["lumi_didi"] if host else [c for c in spec.get("cast", []) if c in av][:6]
+    court = bool(COURT_RX.search(place)) and not host
+    seated = {}
+    for cid in cast:
+        texts = " ".join(str(ln["people"].get(cid, "")) for ln in lines).lower()
         c = char(cid)
         can_sit = bool(c.pose("throne_relaxed") or c.pose("seated"))
-        sit = len(SIT_RX.findall(texts)) + (2 if (cid == "raja" and court) else 0)
-        stand = len(STAND_RX.findall(texts))
-        actors.append(Actor(cid, sx * CW, can_sit and sit > stand, rnd))
-    extras = []
-    if court and not host and n <= 2 and not any(c.startswith("sabhasad") for c in cast):
-        for cid, sx in (("sabhasad_1", .075), ("sabhasad_2", .925)):
-            if cid in available() and char(cid).pose("sitting"):
-                a = Actor(cid, sx * CW, True, rnd, depth=0.70, floor=FLOOR - 150)
-                extras.append(a)
+        sit = len(SIT_RX.findall(texts)) + (3 if (cid == "raja" and court) else 0)
+        seated[cid] = can_sit and sit > len(STAND_RX.findall(texts))
+    xs = {}
+    if host:
+        xs["lumi_didi"] = 0.43
+    elif court and "raja" in cast and seated.get("raja"):
+        others = [c for c in cast if c != "raja"][:5]
+        half = (len(others) + 1) // 2
+        left, right = others[:half], others[half:]
+        lp = {1: [.27], 2: [.13, .29], 3: [.07, .19, .31]}.get(len(left), [])
+        rp = {1: [.73], 2: [.71, .87], 3: [.69, .81, .93]}.get(len(right), [])
+        xs.update(zip(left, lp))
+        xs.update(zip(right, rp))
+        xs["raja"] = 0.5
+    else:
+        n = len(cast)
+        sl = {1: [.5], 2: [.31, .69], 3: [.19, .5, .81], 4: [.13, .38, .62, .87], 5: [.1, .3, .5, .7, .9],
+              6: [.08, .25, .42, .58, .75, .92]}.get(n, [])
+        xs.update(zip(cast, sl))
+    actors = sorted((Actor(cid, xs[cid] * CW, seated[cid], rnd) for cid in cast if cid in xs), key=lambda a: a.x)
     by = {a.id: a for a in actors}
+    extras = []
+    if court:                                   # the court is never empty: courtiers at the sides, a guard
+        for cid, sx, sit, fl, dp in (("sabhasad_1", .045, True, 150, .70), ("sabhasad_2", .955, True, 150, .70),
+                                     ("paharadar", .615, False, 235, .56)):
+            if cid in av and cid not in by:
+                e = Actor(cid, sx * CW, sit, rnd, depth=dp, floor=FLOOR - fl)
+                if e.base_pose():
+                    extras.append(e)
 
-    # ---- walk-ins (from the side the walking pictures face away from)
-    walks = {}
+    def speaking_in(cid, j):
+        return lines[j].get("speaker") == cid or cid in lines[j]["people"]
+
+    # ---- people walking in and out (with real steps, from / to the side they face)
+    ev = {a.id: {} for a in actors}
     for k, ln in enumerate(lines):
-        for cid, txt in (ln.get("people") or {}).items():
+        for cid, txt in ln["people"].items():
             a = by.get(cid)
-            if not a or a.seated or cid in walks or len(walks) >= 2 or not a.c.rig.get("walk_cycle"):
+            if not a or a.seated or not a.c.rig.get("walk_cycle"):
                 continue
-            seen_before = any(cid in (lines[j].get("people") or {}) for j in range(k))
-            if WALK_RX.search(str(txt).lower()) and not seen_before:
-                d = a.c.rig.get("walk_dir", "R")
+            low = str(txt).lower()
+            d = a.c.rig.get("walk_dir", "R")
+            speed = 0.80 * HB * a.c.rig.get("rel_h", 1)
+            if WALK_RX.search(low) and "enter" not in ev[cid] and not any(speaking_in(cid, j) for j in range(k)):
                 x_from = -0.12 * CW if d == "R" else 1.12 * CW
-                cyc = a.c.rig["walk_cycle"]
-                speed = 0.80 * HB * a.c.rig.get("rel_h", 1)          # stage px per second, matched to the steps
                 t0 = max(0.0, ln["start"] - 0.5)
                 t1 = t0 + abs(a.x - x_from) / speed
-                walks[cid] = (t0, t1, x_from, cyc, d)
-                ln["walk"], ln["walk_end"] = True, t1
+                ev[cid]["enter"] = (t0, t1, x_from)
+                ln["walk"], ln["walk_end"] = cid, t1
+            elif EXIT_RX.search(low) and "exit" not in ev[cid] and \
+                    not any(speaking_in(cid, j) for j in range(k + 1, len(lines))):
+                x_to = 1.12 * CW if d == "R" else -0.12 * CW
+                t0 = (ln["end"] - 0.1) if ln.get("speaker") == cid else ln["start"] + 0.4
+                ev[cid]["exit"] = (t0, t0 + abs(a.x - x_to) / speed, x_to)
+                ln["walk"] = cid
 
-    # ---- what everybody does, line by line
-    for ln in lines:
-        ln["acts"] = {cid: act_of(txt) for cid, txt in (ln.get("people") or {}).items()}
-        sp = ln.get("speaker")
-        if sp in by:
-            ln["acts"][sp] = act_of((ln.get("people") or {}).get(sp, ""), ln.get("emotion")) or "talk"
-        if ln.get("wav") and (sp in by or (host and sp == "mithu")):
+    def where(a, t):
+        """(visible, x, walking frame or None)"""
+        e = ev.get(a.id, {})
+        if "enter" in e:
+            t0, t1, x0 = e["enter"]
+            if t < t0:
+                return False, a.x, None
+            if t < t1:
+                u = t - t0
+                return True, x0 + (a.x - x0) * u / (t1 - t0), a.c.rig["walk_cycle"][int(u * 7) % len(a.c.rig["walk_cycle"])]
+        if "exit" in e:
+            t0, t1, x1 = e["exit"]
+            if t >= t1:
+                return False, a.x, None
+            if t >= t0:
+                u = t - t0
+                cyc = a.c.rig["walk_cycle"]
+                return True, a.x + (x1 - a.x) * u / (t1 - t0), cyc[int(u * 7) % len(cyc)]
+        return True, a.x, None
+
+    # ---- who talks to whom, and how everybody looks (speaker turns to the listener, listeners to the speaker)
+    for k, ln in enumerate(lines):
+        sp = by.get(ln.get("speaker"))
+        to = by.get(ln.get("to"))
+        if sp and (not to or to is sp):
+            prev = by.get(lines[k - 1].get("speaker")) if k else None
+            near = sorted([a for a in actors if a is not sp], key=lambda a: abs(a.x - sp.x))
+            to = prev if prev and prev is not sp else (near[0] if near else None)
+        ln["to"] = to.id if to else None
+        ln["lp"] = {}
+        for a in actors:
+            txt = ln["people"].get(a.id, "")
+            if a is sp:
+                act = act_of(txt, ln.get("emotion"))
+                if a.seated:
+                    p1, p2 = a.pose_for(act, True), None
+                elif act in STRONG:
+                    p1, p2 = a.pose_for(act, True), a.pose_for(None, True)
+                else:
+                    tq = turned(a.c, _sign(to.x - a.x), True) if to else None
+                    p1, p2 = (tq, a.pose_for(None, True)) if tq else (a.pose_for(None, True), None)
+                ln["sp"] = (p1, p2)
+            else:
+                act = act_of(txt)
+                if act in STRONG:
+                    ln["lp"][a.id] = a.pose_for(act, False)
+                elif a.seated:
+                    ln["lp"][a.id] = a.pose_for(None, False)
+                elif sp:
+                    ln["lp"][a.id] = turned(a.c, _sign(sp.x - a.x), False) or a.pose_for(None, False)
+        if ln.get("wav") and (sp or (host and ln.get("speaker") == "mithu")):
             try:
                 ln["vis"], ln["jaw"] = visemes(ln["wav"], FPS)
             except Exception as e:
                 log("  lip-sync skipped:", str(e)[:100])
 
-    # Mithu on Lumi's shoulder
-    mithu = char("mithu") if host and "mithu" in available() else None
-    mithu_actor = Actor("mithu", 0, False, rnd) if mithu else None
+    mithu_actor = Actor("mithu", 0, False, rnd) if host and "mithu" in av else None
     fly = (0.3, 2.3) if host and host.get("fly_in") else None
-
-    cuts = plan_camera(lines, actors, total)
-    nfr = int(math.ceil(total * FPS))
-    cmd = ["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
-           "-i", "-", "-i", audio, "-t", f"{total:.2f}",
-           "-vf", f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(0, total - 0.4):.2f}:d=0.4,format=yuv420p",
-           "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-maxrate", "3500k", "-bufsize", "7000k",
-           "-c:a", "aac", "-b:a", "160k", "-ar", "44100", "-ac", "2", out]
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    state = {a.id: a.base_pose() for a in actors}
+    main = [a for a in actors]
+    hosta = by.get("lumi_didi") if host else None
+    cams = [(W, H, plan_shots(lines, by, main, hosta, False), _ffmpeg_out(out, W, H, FPS, total, audio))]
+    if portrait_out:
+        PW, PH = 720, 1280
+        cams.append((PW, PH, plan_shots(lines, by, main, hosta, True), _ffmpeg_out(portrait_out, PW, PH, FPS, total)))
+    held = {a.id: a.base_pose() for a in actors}
     alt = {}
+    nfr = int(math.ceil(total * FPS))
     try:
-        ci = 0
+        idx = [0] * len(cams)
         for f in range(nfr):
             t = f / FPS
-            while ci + 1 < len(cuts) and cuts[ci + 1][0] <= t:
-                ci += 1
-            _, win, kind = cuts[ci]
-            so = W / win[2]
-            frame = stage.view(win, kind, W, H).copy()
-            cur = next((ln for ln in lines if ln["start"] - 0.12 <= t < ln["end"] + 0.3), None)
-            # extras at the back first
-            for a in extras:
-                draw_actor(frame, stage, win, so, a, a.base_pose(), None, a.blink_at(t), a.x, a.floor)
-            walkers = []
+            ci = max([k for k, ln in enumerate(lines) if ln["start"] - 0.12 <= t] or [0])
+            cur = lines[ci] if lines else None
+            todo = []                                     # (actor, pose, mouth, blink, x, walking)
             for a in actors:
-                if a.id in walks:
-                    t0, t1, x_from, cyc, d = walks[a.id]
-                    if t < t0:
-                        continue
-                    if t < t1:
-                        walkers.append((a, t0, t1, x_from, cyc, d))
-                        continue
-                    if t < t1 + 0.35:                        # turning to the others
-                        tq = a.c.pose("three_quarter_right" if d == "R" else "three_quarter_left")
-                        if tq:
-                            draw_actor(frame, stage, win, so, a, tq, None, 0, a.x, a.floor)
-                            continue
-                pose, mouth = state[a.id], None
-                if cur:
-                    act = cur["acts"].get(a.id)
-                    talking = cur.get("speaker") == a.id and cur["start"] <= t < cur["end"] + 0.25
-                    if talking:
-                        p_act = a.pose_for(act if act not in ("talk", "happy") else None, True)
-                        p_talk = a.pose_for(None, True)
-                        u = t - cur["start"]
-                        if not a.c.can_talk(p_act):               # e.g. a big laugh: show it, then talk
-                            pose = p_act if u < min(1.3, 0.4 * (cur["end"] - cur["start"])) else p_talk
-                        else:
-                            pose = p_act
-                        # long speeches: change between two talking poses at the pauses
+                vis_, x, wf = where(a, t)
+                if not vis_:
+                    continue
+                if wf:
+                    todo.append((a, wf, None, 0, x, True))
+                    continue
+                pose, mouth = held[a.id], None
+                if cur and cur.get("speaker") == a.id and t < cur["end"] + 0.2 and "sp" in cur:
+                    p1, p2 = cur["sp"]
+                    u = t - cur["start"]
+                    talk = a.pose_for(None, True)
+                    if not a.c.can_talk(p1):                    # a big laugh: show it, then talk
+                        pose = p1 if u < min(1.3, 0.4 * (cur["end"] - cur["start"])) else (p2 or talk)
+                    else:
                         vis = cur.get("vis")
                         i = int(u * FPS)
-                        if vis and a.c.can_talk(pose):
-                            key = id(cur)
-                            if key not in alt:
-                                alt[key] = (pose, 0.0)
-                            p_now, since = alt[key]
+                        key = id(cur)
+                        p_now, since = alt.get(key, (p1, 0.0))
+                        if vis and p2 and a.c.can_talk(p2):     # long speeches: change pose at the pauses
                             quiet = 0 <= i < len(vis) and all(v == "closed" for v in vis[max(0, i - 6):i + 1])
                             if quiet and u - since > 2.6 and cur["end"] - t > 1.5:
-                                other = a.pose_for(None, False) if p_now == pose else pose
-                                if a.c.can_talk(other):
-                                    p_now, since = other, u
-                                    alt[key] = (p_now, since)
-                            pose = p_now
-                            sh = vis[i] if 0 <= i < len(vis) else "closed"
-                            mouth = mouth_style(sh, cur.get("emotion"))
-                    elif act is not None:
-                        pose = a.pose_for(act, False)
+                                p_now, since = (p2 if p_now == p1 else p1), u
+                        alt[key] = (p_now, since)
+                        pose = p_now
+                    if a.c.can_talk(pose):
+                        vis = cur.get("vis")
+                        i = int(u * FPS)
+                        sh = vis[i] if vis and 0 <= i < len(vis) and t < cur["end"] else "closed"
+                        mouth = mouth_style(sh, cur.get("emotion"))
+                elif cur and a.id in cur["lp"]:
+                    pose = cur["lp"][a.id]
+                    held[a.id] = pose
+                elif a.c.short.get("talk") == pose or (pose and a.c.can_talk(pose) and "three_quarter" not in pose
+                                                      and pose == a.pose_for(None, True)):
+                    pose = a.base_pose()
+                    held[a.id] = pose
+                todo.append((a, pose, mouth, a.blink_at(t), x, False))
+            for n_, (CWo, CHo, shots, proc) in enumerate(cams):
+                while idx[n_] + 1 < len(shots) and shots[idx[n_] + 1][0] <= t:
+                    idx[n_] += 1
+                _, win, kind = shots[idx[n_]]
+                if kind == "follow":                       # the Reel camera walks along with the walker
+                    w_ = next((x for (a, p, m, b, x, wk) in todo if wk and a.id == win[1]), None)
+                    a_ = by.get(win[1])
+                    if w_ is None or a_ is None:
+                        win = window("wide", portrait=True)
                     else:
-                        pose = state[a.id]
-                        if a.c.short.get("talk") == pose:
-                            pose = a.base_pose()
-                    if not talking:
-                        state[a.id] = pose if pose != a.pose_for(None, True) or a.seated else a.base_pose()
-                draw_actor(frame, stage, win, so, a, pose, mouth, a.blink_at(t), a.x, a.floor)
-                if mithu_actor and a.id == "lumi_didi":
-                    draw_mithu(frame, stage, win, so, a, pose, mithu_actor, t, fly, cur, lines, FPS)
-            for a, t0, t1, x_from, cyc, d in walkers:            # walking people in front of everybody
-                u = t - t0
-                x = x_from + (a.x - x_from) * (u / (t1 - t0))
-                fr = cyc[int(u * 7) % len(cyc)]
-                draw_actor(frame, stage, win, so, a, fr, None, 0, x, a.floor)
-            proc.stdin.write(frame.tobytes())
+                        tmp = type("P", (), dict(x=round(w_ / 6) * 6, floor=a_.floor, eye_up=a_.eye_up, half_w=a_.half_w))
+                        win = window("medium", tmp, None, True)
+                    kind = "medium"
+                so = CWo / win[2]
+                frame = stage.view(win, kind, CWo, CHo).copy()
+                for e in extras:
+                    draw_actor(frame, stage, win, so, e, e.base_pose(), None, e.blink_at(t), e.x, e.floor)
+                for a, pose, mouth, bl, x, wk in sorted(todo, key=lambda z: z[5]):   # walkers in front
+                    draw_actor(frame, stage, win, so, a, pose, mouth, bl, x, a.floor)
+                    if mithu_actor and a.id == "lumi_didi":
+                        draw_mithu(frame, stage, win, so, a, pose, mithu_actor, t, fly, cur, lines, FPS)
+                proc.stdin.write(frame.tobytes())
     finally:
-        proc.stdin.close()
-        proc.wait()
-    if proc.returncode != 0:
+        for _, _, _, proc in cams:
+            proc.stdin.close()
+            proc.wait()
+    if any(proc.returncode != 0 for *_, proc in cams):
         raise RuntimeError("puppet render failed")
     return total
 

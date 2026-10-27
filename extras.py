@@ -65,9 +65,16 @@ def _fit_text(draw, text, path, max_w, start, lines_max=2):
 
 
 # ----------------------------------------------------------------- Like / Share / Follow badge
+def no_tofu(text):
+    """drop emoji and symbols the Bengali/Hindi fonts cannot draw (they would show as empty boxes)"""
+    import re as _re
+    return _re.sub(r"[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200d]", "", str(text)).strip()
+
+
 def make_badge(font_path, text, out, colors=((220, 0, 30), (255, 255, 255))):
     """A rounded pill (PNG with transparency) shown in the top-right corner of the main video."""
     bg, fg = colors
+    text = no_tofu(text.replace("•", "|"))          # the Bengali/Hindi font has no bullet or emoji
     probe = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
     f = _font(font_path, 34)
     tw = int(probe.textlength(text, font=f))
@@ -136,10 +143,11 @@ def pick_window(segs, part_times, scene_no, max_len=55.0, min_len=25.0):
 
 
 def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
-                colors=((255, 225, 0), (210, 0, 0))):
+                colors=((255, 225, 0), (210, 0, 0)), vertical=False):
     """Vertical 720x1280 teaser: blurred video fills the background, the real video in the middle,
     a big hook text on top and a 'watch the full story' line at the bottom."""
     top_col, band_col = colors
+    hook_text, cta_text = no_tofu(hook_text), no_tofu(cta_text)
     ov = Image.new("RGBA", (VW, VH), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     lines, f, size = _fit_text(d, hook_text, font_path, VW - 70, 78, lines_max=2)
@@ -158,6 +166,14 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
     png = os.path.join(workdir, "teaser_overlay.png")
     ov.save(png)
     dur = max(5.0, end - start)
+    if vertical:                                  # already filmed in 9:16: only the title and the band on top
+        _run(["ffmpeg", "-y", "-ss", f"{start:.2f}", "-t", f"{dur:.2f}", "-i", video, "-i", png,
+              "-filter_complex", f"[0:v]scale={VW}:{VH}[b];[b][1:v]overlay=0:0,format=yuv420p[v]",
+              "-map", "[v]", "-map", "0:a",
+              "-af", f"afade=t=in:st=0:d=0.3,afade=t=out:st={max(0.0, dur - 1.2):.2f}:d=1.2",
+              "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-r", "25",
+              "-c:a", "aac", "-b:a", "160k", "-ac", "2", "-movflags", "+faststart", out])
+        return out
     # Facebook ranks Reels lower when the real picture is only a thin 16:9 strip in the middle
     # ("content quality: aspect ratio"). So the story picture is shown BIG (about 2/3 of the screen),
     # gently panning left-right so nothing important stays hidden; blurred copy only at the very edges.
@@ -2637,3 +2653,47 @@ def load_json_loose(text):
         return out
     except Exception:
         raise err
+
+
+FREEMODEL = {"models": None}
+
+
+def freemodel_text(prompt, max_tokens=32000):
+    """Backup story writer when every Gemini model is busy: FreeModel (OpenAI-style API, small free monthly
+    allowance). Needs the GitHub secret FREEMODEL_API_KEY. Returns the answer text or None."""
+    key = env("FREEMODEL_API_KEY")
+    if not key:
+        return None
+    base = (env("FREEMODEL_BASE") or "https://freemodel.in/v1").rstrip("/")
+    hdr = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    if FREEMODEL["models"] is None:
+        names = []
+        try:
+            r = requests.get(f"{base}/models", headers=hdr, timeout=30)
+            names = [m.get("id", "") for m in r.json().get("data", [])]
+        except Exception as e:
+            log("  FreeModel: could not list models:", str(e)[:120])
+        # best writers first (large, good at Bengali/Hindi), cheap ones last
+        pref = ("sonnet", "gpt-5.5", "gpt-5.4", "opus", "gemini", "gpt-5", "haiku", "mini")
+        rank = lambda n: next((i for i, p in enumerate(pref) if p in n.lower()), len(pref))
+        names = [n for n in names if n and not any(x in n.lower() for x in ("embed", "tts", "image", "whisper",
+                                                                             "codex", "audio"))]
+        names = ([env("FREEMODEL_MODEL")] if env("FREEMODEL_MODEL") else []) + sorted(names, key=rank)
+        FREEMODEL["models"] = list(dict.fromkeys(names))[:3]
+        log("  FreeModel models:", ", ".join(FREEMODEL["models"]) or "none")
+    for model in FREEMODEL["models"]:
+        try:
+            log(f"Writing story with FreeModel {model} (backup) ...")
+            r = requests.post(f"{base}/chat/completions", headers=hdr, timeout=420, json={
+                "model": model, "max_tokens": max_tokens, "temperature": 1.0,
+                "messages": [{"role": "system", "content": "Answer with ONE valid JSON object only - no other text."},
+                             {"role": "user", "content": prompt}]})
+            if not r.ok:
+                log(f"  FreeModel {model}: {r.status_code} {r.text[:150]}")
+                continue
+            text = r.json()["choices"][0]["message"]["content"]
+            if text and "{" in text:
+                return text[text.find("{"):text.rfind("}") + 1]
+        except Exception as e:
+            log(f"  FreeModel {model} failed: {str(e)[:150]}")
+    return None

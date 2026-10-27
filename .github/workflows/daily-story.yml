@@ -77,7 +77,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python packages
-        run: pip install -q requests pillow edge-tts gTTS numpy scipy opencv-python-headless "rembg[cpu]" "mediapipe==0.10.14"
+        run: pip install -q fonttools requests pillow edge-tts gTTS numpy scipy opencv-python-headless "rembg[cpu]" "mediapipe==0.10.14"
 
       - name: Keep the free voice model saved between runs
         if: env.USE_FREE_MODEL == '1'

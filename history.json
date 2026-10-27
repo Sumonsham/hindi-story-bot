@@ -526,6 +526,12 @@
   "riddle": {
    "q": "বল তো কোনটা কাঁচা থাকতে সবুজ রসে ভরা, আর পাকলে হয়ে যায় মিষ্টি লাল টুকটুকে ফল?",
    "a": "তরমুজ"
+  },
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-27T04:31+00:00"
   }
  },
  {
@@ -601,5 +607,43 @@
   "fb_reel": "1034127922973533",
   "coloring": "122136225902735948",
   "yt_short": "53VZi11fpBY"
+ },
+ {
+  "date": "2026-10-27T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-27@13",
+  "category": "gopal",
+  "idea": "Gopal teaches the miser zamindar to share",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও কৃপণ জমিদারের আসল শিক্ষা! 💰",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "festival",
+     "Raksha Bandhan and the brother far away"
+    ],
+    [
+     "adventure",
+     "the treasure hidden under the old banyan tree"
+    ]
+   ],
+   "labels": [
+    "রক্ষা বন্ধন ও দূরের ভাই",
+    "পুরোনো গাছের তলার গুপ্তধন"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "বিনা মজুরিতে কাজ করিয়ে নেওয়া"
+  },
+  "facebook": "2656112311508416",
+  "youtube": "EdD5NiMsRsE",
+  "fb_reel": "1455547203123085",
+  "yt_short": "R5IkhoV4LvQ"
  }
 ]

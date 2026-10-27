@@ -577,5 +577,29 @@
    "q": "কোন জিনিস একবার ভেঙে গেলে আর জোড়া লাগানো যায় না?",
    "a": "ডিম"
   }
+ },
+ {
+  "date": "2026-10-27T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-27@8",
+  "category": "adventure",
+  "idea": "a little boat's journey down the Ganga",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গঙ্গার বুকে ছোট্ট কুসুমের রোমাঞ্চকর অভিযান! 🛶",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "কুসুম"
+  },
+  "facebook": "2340349670132480",
+  "youtube": "x5hGcs8HruY",
+  "fb_reel": "1034127922973533",
+  "coloring": "122136225902735948",
+  "yt_short": "53VZi11fpBY"
  }
 ]

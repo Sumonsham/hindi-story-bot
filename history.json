@@ -139,7 +139,7 @@
    "likes": 2,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-24T23:31+00:00"
+   "checked": "2026-10-27T23:31+00:00"
   }
  },
  {
@@ -356,10 +356,10 @@
   "youtube": "11AkgLCdihg",
   "fb_reel": "987374231078473",
   "stats": {
-   "likes": 0,
+   "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-24T23:31+00:00"
+   "checked": "2026-10-27T23:31+00:00"
   }
  },
  {
@@ -588,6 +588,12 @@
   "riddle": {
    "q": "কোন জিনিস একবার ভেঙে গেলে আর জোড়া লাগানো যায় না?",
    "a": "ডিম"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-27T23:31+00:00"
   }
  },
  {
@@ -612,7 +618,13 @@
   "youtube": "x5hGcs8HruY",
   "fb_reel": "1034127922973533",
   "coloring": "122136225902735948",
-  "yt_short": "53VZi11fpBY"
+  "yt_short": "53VZi11fpBY",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-27T23:31+00:00"
+  }
  },
  {
   "date": "2026-10-27T07:31+00:00",
@@ -650,7 +662,8 @@
   "facebook": "2656112311508416",
   "youtube": "EdD5NiMsRsE",
   "fb_reel": "1455547203123085",
-  "yt_short": "R5IkhoV4LvQ"
+  "yt_short": "R5IkhoV4LvQ",
+  "vote_used": true
  },
  {
   "date": "2026-10-27T13:31+00:00",
@@ -673,5 +686,36 @@
   "facebook": "966387502736659",
   "youtube": "KPtQu3QCzxo",
   "fb_reel": "1662249668840526"
+ },
+ {
+  "date": "2026-10-28T02:52+00:00",
+  "lang": "bn",
+  "slot": "2026-10-28@8",
+  "pending_comments": [],
+  "category": "festival",
+  "idea": "Raksha Bandhan and the brother far away",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "দূরের রাখি আর সাহেবের ম্যাজিক! 🎁✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "বেঙ্গালুরু"
+  },
+  "facebook": "4496451307241986",
+  "youtube": "cNhHv_DKXEQ",
+  "fb_reel": "1905857377231929",
+  "fb_story": "941381598795692",
+  "coloring": "122136411734735948",
+  "yt_short": "PutZYlJr58s",
+  "riddle_post": "122136411950735948",
+  "riddle": {
+   "q": "একটু জল দিলে যা মারা যায়, কিন্তু হাওয়া দিলে বেঁচে ওঠে, সে কী?",
+   "a": "আগুন"
+  }
  }
 ]

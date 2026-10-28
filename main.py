@@ -74,7 +74,7 @@ LANGS = {
                           "ramayan": "रामायण", "mahabharat": "महाभारत", "gita": "गीता ज्ञान"},
         "part": "भाग {n}", "episode": "{name} भाग {n}",
         "outro_part1": "कहानी का अगला भाग कल शाम 7 बजे... मिस मत कीजिए, अभी {page} को फॉलो कीजिए!",
-        "vote_line": "अब आपकी बारी! कल सुबह की कहानी कौन सी हो? {o1} चाहिए तो कमेंट में 1 लिखिए, {o2} चाहिए तो 2 लिखिए!",
+        "vote_line": "अब आपकी बारी! कल शाम की कहानी कौन सी हो? {o1} चाहिए तो कमेंट में 1 लिखिए, {o2} चाहिए तो 2 लिखिए!",
         "vote_thanks": "आज की कहानी आपने ही वोट देकर चुनी थी। धन्यवाद!",
         "viewer_chars": "आज की कहानी के कुछ किरदारों के नाम हमारे दर्शक {names} के नाम से हैं। धन्यवाद!",
         "reel_comment": "🎬 पूरी कहानी यहाँ देखें 👉 {link}",
@@ -124,7 +124,7 @@ LANGS = {
                           "rhyme": "ছড়ার দেশে"},
         "part": "পর্ব {n}", "episode": "{name} পর্ব {n}",
         "outro_part1": "গল্পের পরের পর্ব আসছে কাল সন্ধ্যা ৭টায়... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন!",
-        "vote_line": "এবার আপনার পালা! কাল সকালের গল্প কোনটা হবে? {o1} শুনতে চাইলে কমেন্টে লিখুন ১, আর {o2} শুনতে চাইলে লিখুন ২। বেশি ভোট যেটা পাবে, সেটাই আসবে!",
+        "vote_line": "এবার আপনার পালা! কাল সন্ধ্যার গল্প কোনটা হবে? {o1} শুনতে চাইলে কমেন্টে লিখুন ১, আর {o2} শুনতে চাইলে লিখুন ২। বেশি ভোট যেটা পাবে, সেটাই আসবে!",
         "vote_thanks": "আজকের গল্পটা আপনারাই ভোট দিয়ে বেছে নিয়েছিলেন। ধন্যবাদ বন্ধুরা!",
         "viewer_chars": "আজকের গল্পের কয়েকটা চরিত্রের নাম এসেছে আমাদের দর্শক বন্ধু {names}-এর নাম থেকে। ধন্যবাদ!",
         "reel_comment": "🎬 পুরো গল্পটা এখানে দেখুন 👉 {link}",
@@ -411,7 +411,7 @@ def load_history():
 
 # cron-job.org starts each video about 1 hour before it should be online (India time):
 # (start hour, start minute, the hour the video should be out)
-TRIGGERS = [(5, 0, 8), (10, 0, 13), (16, 0, 19)]   # start 3 hours early, publish at 8 AM, 1 PM, 7 PM
+TRIGGERS = [(10, 0, 13), (16, 0, 19)]   # two videos a day: start 3 hours early, publish at 1 PM and 7 PM
 SLOT = None
 
 
@@ -1454,7 +1454,7 @@ def parler_persona(voices, speaker, lang):
 
 
 def gemini_line(text, persona, emotion, lang, out_wav, delivery=""):
-    if MOCK or env("USE_GEMINI_VOICE") == "0" or extras.TTS_STATE["off"]:
+    if MOCK or extras.TTS_STATE["off"]:
         return False
     voice, who = persona
     how = EMOTION_WORDS.get(str(emotion).lower(), "naturally, with feeling")
@@ -1496,8 +1496,11 @@ def prepare_voices(parts_lines, voices, lang):
         return False
     todo = [(i, j, ln) for i, lines in enumerate(parts_lines) for j, ln in enumerate(lines or [])
             if str(ln.get("text", "")).strip()]
-    if extras.tts_keys() and env("USE_GEMINI_VOICE") != "0":
-        global GEMINI_READY
+    global GEMINI_READY
+
+    def gemini_all():
+        if not extras.tts_keys():
+            return False
         log(f"Expressive voices for all {len(todo)} lines")
         items = []
         for (i, j, ln) in todo:
@@ -1511,17 +1514,28 @@ def prepare_voices(parts_lines, voices, lang):
         if extras.tts_gemini_batch(items, LANGS[lang]["name"], SR, extras.voice_minutes(45)):
             for (i, j, ln), it in zip(todo, items):
                 GEMINI_CACHE[(i, j)] = it["out"]
-            GEMINI_READY = True
             log("  all lines voiced by Gemini")
             return True
         GEMINI_CACHE.clear()
-    extras.TTS_STATE["off"] = True
-    if extras.parler_ok() and extras.ensure_parler():
-        log(f"Free voice model for all {len(todo)} lines (slow - the post may be a little late)")
-        if _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
-                                                             ln.get("emotion", "normal"), p, SR),
-                      "free voice model", int(env("FREE_VOICE_MINUTES") or 200)):
+        return False
+
+    def free_all():
+        if not (extras.parler_ok() and extras.ensure_parler()):
+            log("  free voice model not available (check the HF_TOKEN secret)")
+            return False
+        log(f"Free voice model for all {len(todo)} lines")
+        return _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
+                                                                 ln.get("emotion", "normal"), p, SR),
+                          "free voice model", int(env("FREE_VOICE_MINUTES") or 200))
+
+    # cartoons: the free voice model first (the Gemini voice limit is kept for the horror stories);
+    # Gemini only as a backup if the free model fails. USE_GEMINI_VOICE=1 puts Gemini first again.
+    order = (gemini_all, free_all) if env("USE_GEMINI_VOICE") == "1" else (free_all, gemini_all)
+    for engine in order:
+        if engine():
+            GEMINI_READY = True
             return True
+    extras.TTS_STATE["off"] = True
     if env("ALLOW_MICROSOFT") == "1":
         log("  using Microsoft voices for the whole video")
         return False
@@ -2990,7 +3004,7 @@ def viewer_names(history, n=2):
 
 
 def vote_winner(history):
-    """Yesterday's 1 PM video asked viewers to choose this morning's story (comment 1 or 2)."""
+    """Yesterday's 1 PM video asked viewers to choose this evening's story (comment 1 or 2)."""
     for h in reversed(history[-6:]):
         v = h.get("vote")
         if not v or h.get("vote_used") or not h.get("facebook"):
@@ -3087,14 +3101,14 @@ def main():
             part = int(prev.get("done", 1)) + 1
             total = max(part, int(prev.get("total", 2)))
             theme = (prev["category"], prev["idea"])
-        elif slot_hour == 19 and not series_waiting and random.random() < float(env("SERIES_CHANCE") or 0.4):
-            cat = random.choice(SERIES_CATS)
-            theme, part = (cat, random.choice(CATEGORIES[cat])), 1
-        elif slot_hour == 8:
+        elif slot_hour == 19:                        # the viewers' choice from yesterday's 1 PM vote, or a serial
             win, n_votes = vote_winner(history)
             if win:
                 theme, voted = win, n_votes
                 log(f"This story was chosen by the viewers: {win[1]}")
+            elif not series_waiting and random.random() < float(env("SERIES_CHANCE") or 0.4):
+                cat = random.choice(SERIES_CATS)
+                theme, part = (cat, random.choice(CATEGORIES[cat])), 1
     if env("FORCE_CATEGORY") in CATEGORIES:          # manual run: this kind of story
         theme = (env("FORCE_CATEGORY"), random.choice(CATEGORIES[env("FORCE_CATEGORY")]))
     category = theme[0]
@@ -3114,7 +3128,7 @@ def main():
                   f"(kind, positive roles only): {', '.join(vnames)}.\n")
         log("Viewer names in the story:", ", ".join(vnames))
     vote_ideas = None
-    if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow morning's story
+    if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow evening's story
         free = [c for c in CATEGORIES if c not in DAY_SPECIAL.values() and c not in ("moral", "animal")]
         c1, c2 = random.sample(free, 2)
         vote_ideas = [[c1, random.choice(CATEGORIES[c1])], [c2, random.choice(CATEGORIES[c2])]]
@@ -3658,7 +3672,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  subtitles skipped:", str(e)[:160])
     if results.get("facebook") and env("ANNOUNCE") != "0":
         try:                                          # "coming soon" post 2 hours before the evening video
-            nxt = extras.next_slot([8, 13, 19], [19])
+            nxt = extras.next_slot([13, 19], [19])
             if nxt:
                 slot, when, day = nxt
                 words = f"{extras.DAY_WORDS[lang][day]} {extras.TIME_WORDS[lang][slot.hour]}"

@@ -1532,7 +1532,11 @@ PRONOUNCE = {
           "correct conjuncts. Read EVERY word exactly as written - never skip, add or change a word; Bengali names "
           "and places the Bengali way (not anglicised); 'ড়'/'ঢ়', 'য়', chandrabindu and hasanta said correctly. Act "
           "it with real feeling and changing tension, breathing and pauses, like a live radio drama - never flat, "
-          "never like reading.",
+          "never like reading. Say these words exactly: শাঁকচুন্নি = 'shaank-chun-ni' (long nasal 'aan', double "
+          "'nn' - never 'shak-chuni'), ব্রহ্মদৈত্য = 'brom-ho-doi-tto', পেত্নি = 'pet-ni', মামদো = 'mam-do', "
+          "স্কন্ধকাটা = 'skon-dho-ka-ta', নিশি = 'ni-shi', একানড়ে = 'e-ka-no-re', গেছোভূত = 'ge-chho-bhut', "
+          "তান্ত্রিক = 'tan-trik', শ্মশান = 'shoshan' (the 'm' is silent), ব্রাহ্মণ = 'bram-hon', লক্ষ্মী = 'lokkhi', "
+          "আত্মা = 'atta', পদ্ম = 'poddo', বিশ্বাস = 'bish-shash', ঘটনা = 'gho-tona' (the inherent vowel is 'o').",
     "hi": "Speak natural, clear standard Hindi with correct pronunciation, like a professional Hindi radio actor. "
           "Never sound like reading.",
 }
@@ -2342,8 +2346,8 @@ def voice_minutes(default=45):
     at = PUBLISH.get("at")
     if not at:
         return default
-    left = (at - dt.datetime.now(IST)).total_seconds() / 60 - 40
-    return int(max(30, min(120, left)))
+    left = (at - dt.datetime.now(IST)).total_seconds() / 60 - float(env("VOICE_RESERVE") or 40)
+    return int(max(30, min(float(env("VOICE_MAX") or 120), left)))
 
 
 PENDING = []          # comments that can only be posted once the scheduled video is live

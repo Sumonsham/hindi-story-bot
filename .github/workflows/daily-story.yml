@@ -2,10 +2,9 @@ name: Daily Hindi Story
 
 on:
   schedule:
-    # The main start comes from cron-job.org at 5:00 AM, 10:00 AM and 4:00 PM India time: each video is made
-    # ~3 hours early and goes live by itself at exactly 8:00 AM, 1:00 PM and 7:00 PM (scheduled post).
+    # The main start comes from cron-job.org at 10:00 AM and 4:00 PM India time: each video is made
+    # ~3 hours early and goes live by itself at exactly 1:00 PM and 7:00 PM (scheduled post). Two videos a day.
     # These GitHub times are only a backup - they do nothing if that slot's video is already done.
-    - cron: "0 0 * * *"     # backup 5:30 AM India time
     - cron: "0 5 * * *"     # backup 10:30 AM India time
     - cron: "0 11 * * *"    # backup 4:30 PM India time
     - cron: "30 4 * * 0"    # Sunday 10:00 AM India time: weekly long compilation video
@@ -40,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 320
     env:
-      USE_FREE_MODEL: ${{ secrets.USE_FREE_MODEL }}   # "1" = also try the slow free on-GitHub voice model
+      USE_FREE_MODEL: "1"        # cartoons use the free on-GitHub voice model (Gemini voices are kept for horror)
     steps:
       - uses: actions/checkout@v4
         with:

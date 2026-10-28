@@ -153,7 +153,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-25T04:31+00:00"
+   "checked": "2026-10-28T10:31+00:00"
   }
  },
  {
@@ -167,7 +167,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-25T04:31+00:00"
+   "checked": "2026-10-28T10:31+00:00"
   }
  },
  {
@@ -183,7 +183,7 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-25T10:24+00:00"
+   "checked": "2026-10-28T10:31+00:00"
   }
  },
  {
@@ -382,7 +382,7 @@
    "likes": 2,
    "comments": 1,
    "views": 1,
-   "checked": "2026-10-25T04:31+00:00"
+   "checked": "2026-10-28T10:31+00:00"
   }
  },
  {
@@ -403,8 +403,8 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 223,
-   "checked": "2026-10-25T10:24+00:00"
+   "views": 258,
+   "checked": "2026-10-28T10:31+00:00"
   }
  },
  {
@@ -663,7 +663,13 @@
   "youtube": "EdD5NiMsRsE",
   "fb_reel": "1455547203123085",
   "yt_short": "R5IkhoV4LvQ",
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-28T10:31+00:00"
+  }
  },
  {
   "date": "2026-10-27T13:31+00:00",
@@ -685,7 +691,13 @@
   },
   "facebook": "966387502736659",
   "youtube": "KPtQu3QCzxo",
-  "fb_reel": "1662249668840526"
+  "fb_reel": "1662249668840526",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 2,
+   "checked": "2026-10-28T10:31+00:00"
+  }
  },
  {
   "date": "2026-10-28T02:52+00:00",
@@ -717,5 +729,30 @@
    "q": "একটু জল দিলে যা মারা যায়, কিন্তু হাওয়া দিলে বেঁচে ওঠে, সে কী?",
    "a": "আগুন"
   }
+ },
+ {
+  "date": "2026-10-28T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-28@19",
+  "pending_comments": [],
+  "category": "adventure",
+  "idea": "a kite that flies to a strange island",
+  "episode": null,
+  "part": 2,
+  "continues": false,
+  "series_id": "2026-10-27T11:56+00:00",
+  "title": "অজানা দ্বীপের রহস্যময় ঘুড়ি! 🪁✨ (পর্ব ২) | পর্ব 2",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ক্যামেরার লেন্স ও ঘুড়ি দিয়ে"
+  },
+  "facebook": "3520712664757169",
+  "youtube": "CUd3tgi7vmg",
+  "fb_reel": "1132653463067154",
+  "fb_story": "2025650584792066",
+  "yt_short": "UIAMb2w_rBU"
  }
 ]

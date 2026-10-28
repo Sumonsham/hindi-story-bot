@@ -797,6 +797,45 @@ def write_srt(segs, translations, path):
     return path
 
 
+def fb_add_captions(video_id, segs, lang, translations=None):
+    """Closed captions (CC) on the Facebook video: the story language, plus English when we have it - viewers
+    can switch them on, and Facebook understands the video better. Needs no extra permission."""
+    token = env("FB_PAGE_TOKEN")
+    if not (video_id and token and segs) or env("FB_CC") == "0":
+        return 0
+
+    def ts(x):
+        ms = int(round(max(0.0, x) * 1000))
+        return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+    done = 0
+    sets = [({"bn": "bn_IN", "hi": "hi_IN"}.get(lang, "en_US"), lambda t: strip_tags(t))]
+    if translations:
+        sets.append(("en_US", lambda t: translations.get(str(t).strip(), "")))
+    for loc, conv in sets:
+        rows, k = [], 0
+        for st, du, _, text in segs:
+            t = str(conv(text) or "").strip()
+            if t:
+                k += 1
+                rows.append(f"{k}\n{ts(st)} --> {ts(st + du)}\n{t}\n")
+        if k < 3:
+            continue
+        name = f"captions.{loc}.srt"
+        try:
+            r = requests.post(f"{GRAPH}/{video_id}/captions", timeout=120,
+                              data={"access_token": token, "default_locale": "none" if done else loc},
+                              files={"captions_file": (name, "\n".join(rows).encode("utf-8"), "application/x-subrip")}).json()
+            if r.get("success") or r.get("id"):
+                done += 1
+            else:
+                log(f"  Facebook captions ({loc}): {str(r)[:200]}")
+        except Exception as e:
+            log(f"  Facebook captions ({loc}) failed: {str(e)[:150]}")
+    if done:
+        log(f"  closed captions added on Facebook ({done} language{'s' if done > 1 else ''})")
+    return done
+
+
 def yt_upload_captions(video_id, srt_path, language="en", name="English"):
     hdr = yt_token()
     meta = json.dumps({"snippet": {"videoId": video_id, "language": language, "name": name, "isDraft": False}})
@@ -2663,6 +2702,7 @@ def fb_caption(description, limit=390):
         return " ".join(tags)[:limit]
     head, rest = paras[0], paras[1:]
     note = [p for p in rest if "AI" in p and len(p) < 90][:1]
+    note = [p for p in rest if p.startswith("🔁")][:1] + note      # "share + follow" always stays
     rest = [p for p in rest if p not in note]
     out = [head[:150]]
     tags = tags[:5]                     # Facebook: fewer than 6 hashtags = better quality signal

@@ -2825,9 +2825,46 @@ def fb_when():
     return {"published": "true"}
 
 
+FB_LANG = ["bn"]
+
+
+def portrait_thumb(thumb):
+    """9:16 thumbnail: the whole poster in the middle, a blurred copy behind"""
+    from PIL import ImageEnhance, ImageFilter
+    VW, VH = 1080, 1920
+    t = Image.open(thumb).convert("RGB")
+    s = max(VW / t.width, VH / t.height)
+    bg = t.resize((int(t.width * s) + 1, int(t.height * s) + 1))
+    bg = bg.crop(((bg.width - VW) // 2, (bg.height - VH) // 2, (bg.width - VW) // 2 + VW, (bg.height - VH) // 2 + VH))
+    bg = ImageEnhance.Brightness(bg.filter(ImageFilter.GaussianBlur(30))).enhance(0.6)
+    fg = t.resize((VW, VW * t.height // t.width))
+    bg.paste(fg, (0, (VH - fg.height) // 2))
+    out = os.path.join(WORK, "thumbnail_9x16.jpg")
+    bg.save(out, quality=93)
+    return out
+
+
 def post_to_facebook(video, thumb, title, description):
     """Uploads in pieces (resumable), so big videos don't fail half-way."""
-    video, thumb = extras.fb_square(video, thumb, WORK)       # 1:1 ranks better on phones
+    pv = None
+    if env("FB_PORTRAIT") != "0" and len(TIMELINE) >= 4 and PORTRAIT_CLIPS:
+        try:                                          # 9:16 - fills the whole phone screen
+            res = portrait_source(0, TIMELINE[3], FB_LANG[0])
+            if res and os.path.exists(res[0]):
+                pv = os.path.join(WORK, "facebook_9x16.mp4")
+                shutil.copy(res[0], pv)
+                log("  Facebook: 9:16 version made")
+        except Exception as e:
+            log("  9:16 version failed - square instead:", str(e)[:160])
+            pv = None
+    if pv:
+        video = pv
+        try:
+            thumb = portrait_thumb(thumb) if thumb and os.path.exists(thumb) else thumb
+        except Exception as e:
+            log("  9:16 thumbnail skipped:", str(e)[:120])
+    else:
+        video, thumb = extras.fb_square(video, thumb, WORK)   # 1:1 ranks better on phones
     description = extras.fb_caption(description)               # Facebook likes 10-400 characters
     page, token = need_env("FB_PAGE_ID"), need_env("FB_PAGE_TOKEN")
     url = f"https://graph-video.facebook.com/v21.0/{page}/videos"
@@ -3409,6 +3446,7 @@ def main():
         log("DRY RUN - not posting. Files are in the 'work' folder.")
     else:
         try:
+            FB_LANG[0] = lang
             results["facebook"] = post_to_facebook(video, thumb, title, description)
             log("Posted to Facebook:", results["facebook"])
         except Exception as e:
@@ -3516,6 +3554,7 @@ def make_compilation(history):
     results = {}
     if not DRY_RUN:
         try:
+            FB_LANG[0] = lang
             results["facebook"] = post_to_facebook(video, thumb, title, description)
             log("Posted compilation to Facebook:", results["facebook"])
         except Exception as e:

@@ -82,7 +82,7 @@ LANGS = {
         "riddle_prev": "✅ कल की पहेली का जवाब: {a}",
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
         "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
-        "cta": "पूरी कहानी देखने के लिए कमेंट का लिंक दबाइए 👇", "playlist_tail": "Hindi Kids Stories", "full_link": "पूरी कहानी देखें:",
+        "cta": "पूरी कहानी देखने के लिए नीचे लिखे लिंक पर क्लिक करें 👇", "playlist_tail": "Hindi Kids Stories", "full_link": "👉 पूरी कहानी सुनने के लिए इस लिंक पर क्लिक करें:",
         "quiz_title": "क्विज़ टाइम!", "quiz_labels": ["क", "ख", "ग"],
         "quiz_intro": "अब एक छोटा सा सवाल, बच्चों!", "quiz_count": "सोचो... तीन... दो... एक...",
         "quiz_answer": "सही जवाब है... {lab}: {ans}! क्या तुमने सही बताया? कमेंट में लिखो!",
@@ -132,7 +132,7 @@ LANGS = {
         "riddle_prev": "✅ গতকালের ধাঁধার উত্তর: {a}",
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
         "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
-        "cta": "পুরো গল্প দেখতে কমেন্টের লিংকে ক্লিক করুন 👇", "playlist_tail": "Bangla Kids Stories", "full_link": "পুরো গল্প দেখুন:",
+        "cta": "পুরো গল্প দেখতে নিচের লেখার লিংকে ক্লিক করুন 👇", "playlist_tail": "Bangla Kids Stories", "full_link": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে:",
         "quiz_title": "কুইজ টাইম!", "quiz_labels": ["ক", "খ", "গ"],
         "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবুন... তিন... দুই... এক...",
         "quiz_answer": "ঠিক উত্তর হলো... {lab}: {ans}! আপনি কি ঠিক বলেছিলেন? কমেন্টে লিখুন!",
@@ -3641,7 +3641,8 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
     if DRY_RUN:
         return out
     question = str(story.get("comment_question", "")).strip()
-    short_desc = f"{title}\n{L['full_link']} {page}\n{' '.join(tags[:6])}"
+    fb_full = f"https://www.facebook.com/watch/?v={results['facebook']}" if results.get("facebook") else page
+    short_desc = f"{title}\n\n{L['full_link']} {fb_full}\n\n{' '.join(tags[:5])}"   # the FULL story's own link
     if teaser and env("FB_REELS") != "0":
         try:
             out["fb_reel"] = extras.fb_post_reel(teaser, short_desc)
@@ -3687,7 +3688,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
         if (teaser and extras.yt_extra_ok() and env("YT_SHORTS") != "0"
                 and extras.shorts_today(history) < int(env("YT_SHORTS_PER_DAY") or 2)):
             try:
-                desc = f"{title}\n{L['full_link']} https://youtu.be/{results['youtube']}\n{' '.join(tags[:6])}"
+                desc = f"{L['full_link']} https://youtu.be/{results['youtube']}\n\n{title}\n{' '.join(tags[:5])}"
                 out["yt_short"] = post_to_youtube(teaser, None, f"{title[:80]} #Shorts", desc, tags, lang)
                 log("Posted YouTube Short:", out["yt_short"])
             except Exception as e:

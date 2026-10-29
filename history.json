@@ -203,10 +203,10 @@
   "coloring": "122135384006735948",
   "yt_short": "WESHPz6BUrg",
   "stats": {
-   "likes": 2,
-   "comments": 2,
+   "likes": 3,
+   "comments": 3,
    "views": 1,
-   "checked": "2026-10-26T02:43+00:00"
+   "checked": "2026-10-29T05:02+00:00"
   }
  },
  {
@@ -229,7 +229,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-26T02:43+00:00"
+   "checked": "2026-10-29T05:02+00:00"
   }
  },
  {
@@ -427,7 +427,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-26T02:43+00:00"
+   "checked": "2026-10-29T05:02+00:00"
   }
  },
  {
@@ -728,6 +728,12 @@
   "riddle": {
    "q": "একটু জল দিলে যা মারা যায়, কিন্তু হাওয়া দিলে বেঁচে ওঠে, সে কী?",
    "a": "আগুন"
+  },
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-29T05:02+00:00"
   }
  },
  {
@@ -754,5 +760,51 @@
   "fb_reel": "1132653463067154",
   "fb_story": "2025650584792066",
   "yt_short": "UIAMb2w_rBU"
+ },
+ {
+  "date": "2026-10-29T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-29@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "Gopal and the king's dream of a golden mango tree",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও রাজার স্বপ্নের সোনার আমগাছ! 🥭👑",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "school",
+     "a homework copied and the honest confession"
+    ],
+    [
+     "lok",
+     "Bishnupur's music and the proud king"
+    ]
+   ],
+   "labels": [
+    "নকল খাতা ও সত্যি কথা",
+    "বিষ্ণুপুরের গান ও অহংকারী রাজা"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "যে কখনও মিথ্যে বলেনি"
+  },
+  "facebook": "1440854538173909",
+  "youtube": "CF_gE9uBz4E",
+  "fb_reel": "1383251784877600",
+  "fb_story": "2062339384398115",
+  "coloring": "122136575054735948",
+  "yt_short": "-M89aG5fqJo",
+  "riddle_post": "122136580076735948",
+  "riddle": {
+   "q": "কাঁচা থাকতে সবুজ গায়ের রঙ, পাকলে হয় যে সোনা, ফলের রাজা বলতে তাকে কেই বা নাহি জানা?",
+   "a": "আম"
+  }
  }
 ]

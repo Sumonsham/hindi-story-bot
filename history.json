@@ -251,7 +251,7 @@
    "likes": 6,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-26T10:51+00:00"
+   "checked": "2026-10-29T11:26+00:00"
   }
  },
  {
@@ -272,7 +272,7 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-26T10:51+00:00"
+   "checked": "2026-10-29T11:26+00:00"
   }
  },
  {
@@ -449,7 +449,7 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-26T10:51+00:00"
+   "checked": "2026-10-29T11:26+00:00"
   }
  },
  {
@@ -462,8 +462,8 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 1,
-   "checked": "2026-10-26T10:51+00:00"
+   "views": 3,
+   "checked": "2026-10-29T11:26+00:00"
   }
  },
  {
@@ -495,8 +495,8 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 3,
-   "checked": "2026-10-26T10:51+00:00"
+   "views": 2,
+   "checked": "2026-10-29T11:26+00:00"
   }
  },
  {
@@ -759,7 +759,13 @@
   "youtube": "CUd3tgi7vmg",
   "fb_reel": "1132653463067154",
   "fb_story": "2025650584792066",
-  "yt_short": "UIAMb2w_rBU"
+  "yt_short": "UIAMb2w_rBU",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-29T11:26+00:00"
+  }
  },
  {
   "date": "2026-10-29T07:31+00:00",
@@ -805,6 +811,32 @@
   "riddle": {
    "q": "কাঁচা থাকতে সবুজ গায়ের রঙ, পাকলে হয় যে সোনা, ফলের রাজা বলতে তাকে কেই বা নাহি জানা?",
    "a": "আম"
-  }
+  },
+  "vote_used": true
+ },
+ {
+  "date": "2026-10-29T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-29@19",
+  "pending_comments": [],
+  "category": "school",
+  "idea": "a homework copied and the honest confession",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "বুবাইয়ের নকল খাতা আর সাহেবের শিক্ষা! 📝✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "দাদুর"
+  },
+  "facebook": "30095860090013807",
+  "youtube": "8AsKOVTG1-s",
+  "fb_reel": "2169911923607814",
+  "fb_story": "2375985916540106",
+  "yt_short": "_BCDq8Q4gCs"
  }
 ]

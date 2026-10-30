@@ -530,8 +530,8 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-10-27T04:31+00:00"
+   "views": 0,
+   "checked": "2026-10-30T05:02+00:00"
   }
  },
  {
@@ -812,7 +812,13 @@
    "q": "কাঁচা থাকতে সবুজ গায়ের রঙ, পাকলে হয় যে সোনা, ফলের রাজা বলতে তাকে কেই বা নাহি জানা?",
    "a": "আম"
   },
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-30T05:02+00:00"
+  }
  },
  {
   "date": "2026-10-29T13:31+00:00",
@@ -838,5 +844,51 @@
   "fb_reel": "2169911923607814",
   "fb_story": "2375985916540106",
   "yt_short": "_BCDq8Q4gCs"
+ },
+ {
+  "date": "2026-10-30T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-30@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "how many stars are in the sky? Gopal's clever answer",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "আকাশে কটা তারা আছে? গোপালের মজার বুদ্ধি! ✨",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "funny",
+     "a boastful wrestler"
+    ],
+    [
+     "lok",
+     "the boatman of the Padma and the river goddess's test"
+    ]
+   ],
+   "labels": [
+    "১) অহংকারী কুস্তিগীর ও গোপাল",
+    "২) পদ্মার মাঝি ও নদীর রহস্য"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "ভেড়া"
+  },
+  "facebook": "1159794083677010",
+  "youtube": "-krAZsm5CFc",
+  "fb_reel": "2674048189692476",
+  "fb_story": "1132997012428663",
+  "coloring": "122136739118735948",
+  "yt_short": "roKFkYsm1N8",
+  "riddle_post": "122136745844735948",
+  "riddle": {
+   "q": "কোন জিনিস কাটার আগে তার সাইজ ছোট হয় না, কিন্তু বড় হয়ে যায়?",
+   "a": "গর্ত বা খাদ!"
+  }
  }
 ]

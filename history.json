@@ -843,7 +843,13 @@
   "youtube": "8AsKOVTG1-s",
   "fb_reel": "2169911923607814",
   "fb_story": "2375985916540106",
-  "yt_short": "_BCDq8Q4gCs"
+  "yt_short": "_BCDq8Q4gCs",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-10-30T11:18+00:00"
+  }
  },
  {
   "date": "2026-10-30T07:31+00:00",
@@ -889,6 +895,32 @@
   "riddle": {
    "q": "কোন জিনিস কাটার আগে তার সাইজ ছোট হয় না, কিন্তু বড় হয়ে যায়?",
    "a": "গর্ত বা খাদ!"
-  }
+  },
+  "vote_used": true
+ },
+ {
+  "date": "2026-10-30T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-30@19",
+  "pending_comments": [],
+  "category": "funny",
+  "idea": "a boastful wrestler",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "পালোয়ান ভীমসেন আর সাহেবের বুদ্ধির লড়াই! 💪😂",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "তুলো"
+  },
+  "facebook": "2382870045872674",
+  "youtube": "ZI6IOwJdQ0E",
+  "fb_reel": "1430739119254721",
+  "fb_story": "40741351505451896",
+  "yt_short": "TN5Kx-Qmlyc"
  }
 ]

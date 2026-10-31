@@ -8,7 +8,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -20,7 +20,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -32,7 +32,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -44,7 +44,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -57,7 +57,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -70,7 +70,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -83,7 +83,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -97,7 +97,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -111,7 +111,7 @@
    "likes": 2,
    "comments": 0,
    "views": 1,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -125,7 +125,7 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -139,7 +139,7 @@
    "likes": 2,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-27T23:31+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -295,7 +295,7 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -316,8 +316,8 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-10-27T11:29+00:00"
+   "views": 2,
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -338,7 +338,7 @@
    "likes": 2,
    "comments": 1,
    "views": 2,
-   "checked": "2026-10-27T11:29+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -359,7 +359,7 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-27T23:31+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -559,8 +559,8 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-10-27T11:29+00:00"
+   "views": 0,
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -593,7 +593,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-27T23:31+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -623,7 +623,7 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-27T23:31+00:00"
+   "checked": "2026-10-31T05:02+00:00"
   }
  },
  {
@@ -896,7 +896,13 @@
    "q": "কোন জিনিস কাটার আগে তার সাইজ ছোট হয় না, কিন্তু বড় হয়ে যায়?",
    "a": "গর্ত বা খাদ!"
   },
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-31T05:02+00:00"
+  }
  },
  {
   "date": "2026-10-30T13:31+00:00",
@@ -922,5 +928,50 @@
   "fb_reel": "1430739119254721",
   "fb_story": "40741351505451896",
   "yt_short": "TN5Kx-Qmlyc"
+ },
+ {
+  "date": "2026-10-31T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-31@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "Gopal and the king's lost golden ring",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও রাজার হারানো সোনার আংটি! 💍",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "jataka",
+     "the honest woodcutter's choice"
+    ],
+    [
+     "lok",
+     "the boatman of the Padma and the river goddess's test"
+    ]
+   ],
+   "labels": [
+    "১) সৎ কাঠুরের পছন্দ",
+    "২) পদ্মার মাঝি ও নদীমাতা"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "কালো কালি"
+  },
+  "facebook": "2564936214005177",
+  "youtube": "RcxpmqWwtgs",
+  "fb_reel": "2186968008699955",
+  "fb_story": "1774383087185262",
+  "yt_short": "vCS5EP3EbF4",
+  "riddle_post": "122136910886735948",
+  "riddle": {
+   "q": "কোন জিনিস যার নিজের কোনো হাত-পা নেই, তবুও সে সারাদিন ঘরের দেয়াল জুড়ে ঘুরে বেড়ায়?",
+   "a": "ঘড়ি"
+  }
  }
 ]

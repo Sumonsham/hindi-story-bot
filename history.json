@@ -153,7 +153,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-28T10:31+00:00"
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -167,7 +167,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-28T10:31+00:00"
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -183,7 +183,7 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-28T10:31+00:00"
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -382,7 +382,7 @@
    "likes": 2,
    "comments": 1,
    "views": 1,
-   "checked": "2026-10-28T10:31+00:00"
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -403,8 +403,8 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 258,
-   "checked": "2026-10-28T10:31+00:00"
+   "views": 263,
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -667,8 +667,8 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
-   "checked": "2026-10-28T10:31+00:00"
+   "views": 1,
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -695,8 +695,8 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 2,
-   "checked": "2026-10-28T10:31+00:00"
+   "views": 3,
+   "checked": "2026-10-31T10:50+00:00"
   }
  },
  {
@@ -927,7 +927,13 @@
   "youtube": "ZI6IOwJdQ0E",
   "fb_reel": "1430739119254721",
   "fb_story": "40741351505451896",
-  "yt_short": "TN5Kx-Qmlyc"
+  "yt_short": "TN5Kx-Qmlyc",
+  "stats": {
+   "likes": 2,
+   "comments": 1,
+   "views": 0,
+   "checked": "2026-10-31T10:50+00:00"
+  }
  },
  {
   "date": "2026-10-31T07:31+00:00",
@@ -972,6 +978,33 @@
   "riddle": {
    "q": "কোন জিনিস যার নিজের কোনো হাত-পা নেই, তবুও সে সারাদিন ঘরের দেয়াল জুড়ে ঘুরে বেড়ায়?",
    "a": "ঘড়ি"
-  }
+  },
+  "vote_used": true
+ },
+ {
+  "date": "2026-10-31T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-10-31@19",
+  "pending_comments": [],
+  "category": "jataka",
+  "idea": "the honest woodcutter's choice",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "সত্যবাদী কাঠুরে ও জলদেবতার পরীক্ষা 🪓✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "তিনটি"
+  },
+  "facebook": "1444245760670081",
+  "youtube": "b-ftbzxZ9Fs",
+  "fb_reel": "1368078521870193",
+  "fb_story": "867281303109635",
+  "coloring": "122136963236735948",
+  "yt_short": "RQRrNENKEK8"
  }
 ]

@@ -1373,10 +1373,30 @@ NEW_TTS = ("gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts")
 OLD_TTS = ("gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts")
 
 
-def strip_tags(text):
-    """Remove voice tags like <sigh> or <short pause> (for subtitles and the backup voice)."""
+AUTHOR_NOTE_RX = r"\s*(?:\([^()]{0,60}\)|\[[^\[\]]{0,60}\]|\{[^{}]{0,60}\}|（[^（）]{0,60}）)\s*"
+STAGE_WORDS_RX = (r"(?i)\b(?:whisper(?:s|ing)?|sigh(?:s|ing)?|gasp(?:s|ing)?|laugh(?:s|ing)?|cr(?:ies|ying)|sob(?:s|bing)?|"
+                  r"pause[sd]?|softly|slowly|angrily|loudly|quietly|sadly|nervously|shouting|screams?|smiling|"
+                  r"long pause|short pause|beat|silence)\b[:,.]?")
+
+
+def speakable(text):
+    """What a voice may read: never the writer's notes in brackets - '(ফিসফিস করে)', '(whispering)',
+    '[door creaks]' - nor loose English stage words inside a Bengali / Hindi line. Our own <sigh>-style voice
+    tags are kept (they become real sighs, not words)."""
     import re as _re
-    return _re.sub(r"\s*<[A-Za-z][A-Za-z \-]{1,24}>\s*", " ", str(text)).strip()
+    t = str(text or "")
+    t = _re.sub(AUTHOR_NOTE_RX, " ", t)
+    if _re.search(r"[\u0980-\u09FF\u0900-\u097F]", t):        # an Indian-language line: no English stage words
+        parts = _re.split(r"(<[^<>]{1,30}>)", t)
+        t = "".join(p if p.startswith("<") else _re.sub(STAGE_WORDS_RX, " ", p) for p in parts)
+    return _re.sub(r"\s{2,}", " ", t).strip(" ,")
+
+
+def strip_tags(text):
+    """Remove voice tags like <sigh> or <short pause>, and the writer's notes in brackets (for subtitles and the
+    backup voice)."""
+    import re as _re
+    return _re.sub(r"\s*<[A-Za-z][A-Za-z \-]{1,24}>\s*", " ", speakable(text)).strip()
 
 
 TAG_WORDS = {"laugh": "laughs", "laughs": "laughs", "sigh": "sighs", "gasp": "gasps", "sob": "sobs",
@@ -1387,6 +1407,7 @@ TAG_WORDS = {"laugh": "laughs", "laughs": "laughs", "sigh": "sighs", "gasp": "ga
 def tts_tags(text):
     """Voice tags for the newest Gemini voices: they understand [sighs] / [laughs] in square brackets and pauses
     as '...'. Our <sigh>-style tags would otherwise be READ OUT ('long pause' spoken aloud!)."""
+    text = speakable(text)                    # never read the writer's notes in brackets aloud
     import re as _re
 
     def one(m):
@@ -2957,3 +2978,98 @@ def reply_fans(history, lang, max_n=5):
         h.setdefault("replied", []).append(cid)
     log(f"  replied to {n} viewer comments")
     return True
+
+
+# ----------------------------------------------------------------- series that continue on their category's day
+def series_all(path):
+    """{category: state} of the unfinished stories. Older files (one series, no category) are read too."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return {}
+    if isinstance(data, dict) and data.get("created"):                   # old format: a single series
+        return {str(data.get("category") or data.get("special") or "default"): data}
+    return {k: v for k, v in (data or {}).items() if isinstance(v, dict) and v.get("created")}
+
+
+def series_get(path, key, ready_only=True, max_days=21):
+    """the unfinished story of this category - only if it was NOT started today (the next part comes on the
+    category's next day) and is not too old"""
+    st = series_all(path).get(str(key))
+    if not st:
+        return None
+    try:
+        made = dt.datetime.fromisoformat(st.get("updated") or st["created"])
+        if (dt.datetime.now(dt.timezone.utc) - made).days > max_days:
+            return None
+        if ready_only and made.astimezone(IST).date() >= dt.datetime.now(IST).date():
+            return None
+    except Exception:
+        return None
+    return st
+
+
+def series_put(path, key, state):
+    data = series_all(path)
+    if state is None:
+        data.pop(str(key), None)
+    else:
+        state["updated"] = dt.datetime.now(dt.timezone.utc).isoformat()
+        data[str(key)] = state
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+
+
+# ----------------------------------------------------------------- what people are watching this week
+def trending_topics(kind, lang, cache_dir):
+    """Once a day: what Bengali / Indian viewers are watching NOW in this kind of video on YouTube and Facebook
+    (found with Google Search) - so our stories ride the trend. Cached for the day in cache_dir/trends.json.
+    Returns a short list of English topic lines ([] if unknown)."""
+    key = env("GEMINI_API_KEY")
+    if not key or env("TRENDS") == "0":
+        return []
+    today = dt.datetime.now(IST).date().isoformat()
+    path = os.path.join(cache_dir, "trends.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+    k = f"{kind}_{lang}"
+    if (data.get(k) or {}).get("date") == today:
+        return data[k].get("topics", [])
+    what = ("Bengali / Hindi horror audio stories (bhuter golpo, bhoot ki kahani, Sunday-suspense style radio "
+            "dramas, true ghost experiences)" if kind == "horror" else
+            "Bengali / Hindi children's cartoon and moral stories (Gopal Bhar, Thakurmar Jhuli, Panchatantra, "
+            "kids' animated stories)")
+    prompt = (f"Search YouTube and Facebook trends of the last 7 days in India for {what} in "
+              f"{'Bengali' if lang == 'bn' else 'Hindi'}. Which topics, characters, settings and story types are getting "
+              "the most views and comments right now? Answer ONLY a JSON list of 6 short English lines, each a concrete "
+              "story topic idea that rides one of these trends (no channel names, no copyrighted characters except "
+              "folk / public-domain ones).")
+    topics = []
+    for model in ("gemini-flash-latest", "gemini-2.5-flash"):
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}], "tools": [{"google_search": {}}],
+                                    "generationConfig": {"temperature": 0.4}}, timeout=120)
+            if not r.ok:
+                continue
+            text = "\n".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
+            got = load_json_loose(text[text.find("["):text.rfind("]") + 1]) if "[" in text else []
+            topics = [str(x)[:160] for x in got if str(x).strip()][:6]
+            if topics:
+                break
+        except Exception as e:
+            log(f"  trends ({model}) failed: {str(e)[:100]}")
+    data[k] = {"date": today, "topics": topics}
+    try:
+        os.makedirs(cache_dir, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1)
+    except Exception:
+        pass
+    if topics:
+        log("Trending now:", " | ".join(t[:60] for t in topics[:3]))
+    return topics

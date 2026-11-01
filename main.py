@@ -353,6 +353,9 @@ MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman"
                 "bhim": "bhima", "duryodhan": "duryodhana", "sri krishna": "krishna", "shri krishna": "krishna"}
 # the weekly routine: the 1 PM story of each day is always this series (Mon=0 ... Sun=6)
 DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
+# the weekly programme (0 = Monday) - every day and time has its own kind of story, like a children's TV channel
+MORNING_GRID = {0: "panchatantra", 1: "moral", 2: "nature", 3: "fairy", 4: "jataka", 5: "animal", 6: "gita"}
+EVENING_GRID = {0: "folk", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "para", 6: "mahabharat"}
 SERIES_CATS = ("adventure", "detective", "folk", "para")      # big stories told in 2-3 parts at 7 PM
 NEXT_PART = os.path.join(HERE, "next_part.json")
 
@@ -411,7 +414,7 @@ def load_history():
 
 # cron-job.org starts each video about 1 hour before it should be online (India time):
 # (start hour, start minute, the hour the video should be out)
-TRIGGERS = [(10, 0, 13), (16, 0, 19)]   # two videos a day: start 3 hours early, publish at 1 PM and 7 PM
+TRIGGERS = [(5, 0, 8), (10, 0, 13), (16, 0, 19)]   # three videos a day: start 3 hours early; 8 AM, 1 PM, 7 PM
 SLOT = None
 
 
@@ -933,7 +936,9 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
         kind_rules += (f"\nSERIES: this is PART {part} of {total}. Title of part 1: {prev.get('title')}. What happened so far: "
                        f"{prev.get('summary')} Planned continuation: {prev.get('part2_plan')} Use EXACTLY these characters "
                        f"(same names, same looks): {json.dumps(prev.get('characters'), ensure_ascii=False)} and this "
-                       f"setting: {prev.get('setting')}. Begin with a short recap by the narrator (2-3 lines). ")
+                       f"setting: {prev.get('setting')}. Begin with a short recap by the narrator (2-3 lines: 'গত পর্বে আমরা "
+                       f"দেখেছিলাম...') of exactly where the last part ended - its last lines were: {prev.get('last_lines', '')} - "
+                       "then continue from that very moment: the same story, never a new one. ")
         kind_rules += ("This is a MIDDLE part: a new surprise, and STOP again at a bigger cliffhanger. Add JSON keys "
                        "\"summary\" (ENGLISH, everything so far) and \"part2_plan\" (ENGLISH, how the next part goes).\n"
                        if part < total else "This is the FINAL part: a satisfying, surprising ending that answers "
@@ -3119,33 +3124,33 @@ def main():
     slot_hour = int(str(SLOT).split("@")[1]) if SLOT and "@" in str(SLOT) else None
     weekday = dt.datetime.now(extras.IST).weekday()
     part, total, prev, episode, voted = 0, 2, None, None, None
-    prev_ready = load_next_part()
-    series_waiting = prev_ready is None and load_next_part(ready_only=False) is not None
     if not festival and env("ROUTINE") != "0":
-        if slot_hour == 13:                          # the day's fixed series
-            cat = DAY_SPECIAL[weekday]
-            if env("GOPAL_DAILY") != "0" and puppet_ready("gopal"):
-                cat = "gopal"                        # every noon: the Gopal Bhar TV cartoon (while it is our only
-                                                     # animated series; the other days' specials come back later)
-            if cat in EPIC:
-                episode = 1 + sum(1 for h in history if h.get("category") == cat)
-                theme = (cat, EPIC[cat][(episode - 1) % len(EPIC[cat])])
-            else:
-                theme = (cat, random.choice(CATEGORIES[cat]))
-            log(f"Weekly routine: {cat}" + (f" episode {episode}" if episode else ""))
-        elif slot_hour == 19 and prev_ready:         # next part of the serial
-            prev = prev_ready
+        if slot_hour == 13:                          # every noon: the Gopal Bhar TV cartoon (our animated series)
+            cat = "gopal" if (env("GOPAL_DAILY") != "0" and puppet_ready("gopal")) else DAY_SPECIAL[weekday]
+        elif slot_hour == 8:
+            cat = MORNING_GRID[weekday]
+        else:
+            cat = EVENING_GRID[weekday]
+        prev = extras.series_get(NEXT_PART, cat)     # this category's story that continues today
+        if prev:
             part = int(prev.get("done", 1)) + 1
             total = max(part, int(prev.get("total", 2)))
             theme = (prev["category"], prev["idea"])
-        elif slot_hour == 19:                        # the viewers' choice from yesterday's 1 PM vote, or a serial
-            win, n_votes = vote_winner(history)
-            if win:
-                theme, voted = win, n_votes
-                log(f"This story was chosen by the viewers: {win[1]}")
-            elif not series_waiting and random.random() < float(env("SERIES_CHANCE") or 0.4):
-                cat = random.choice(SERIES_CATS)
-                theme, part = (cat, random.choice(CATEGORIES[cat])), 1
+            log(f"Category {cat}: part {part} of {total} of '{prev.get('title')}'")
+        elif cat in EPIC:
+            episode = 1 + sum(1 for h in history if h.get("category") == cat)
+            theme = (cat, EPIC[cat][(episode - 1) % len(EPIC[cat])])
+        else:
+            theme = (cat, random.choice(CATEGORIES[cat]))
+            if slot_hour == 19:
+                win, n_votes = vote_winner(history)  # yesterday's 1 PM vote chose between two of today's stories
+                if win and win[0] == cat:
+                    theme, voted = win, n_votes
+                    log(f"This story was chosen by the viewers: {win[1]}")
+            if cat in SERIES_CATS and random.random() < float(env("SERIES_CHANCE") or 0.5):
+                part = 1                             # a big story: the next part comes on this category's next day
+        log(f"Weekly programme: {slot_hour}:00 - {cat}" + (f" episode {episode}" if episode else "")
+            + (f" | part {part}" if part else ""))
     if env("FORCE_CATEGORY") in CATEGORIES:          # manual run: this kind of story
         theme = (env("FORCE_CATEGORY"), random.choice(CATEGORIES[env("FORCE_CATEGORY")]))
     category = theme[0]
@@ -3164,13 +3169,24 @@ def main():
         extra += (f"\nOUR VIEWERS IN THE STORY: give 1-2 friendly side characters these first names of real viewers "
                   f"(kind, positive roles only): {', '.join(vnames)}.\n")
         log("Viewer names in the story:", ", ".join(vnames))
+    if category not in MYTH and category != "gopal" and part < 2 and not MOCK:
+        try:                                         # ride what families are watching this week
+            tr = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
+        except Exception:
+            tr = []
+        if tr:
+            extra += ("\nTRENDING THIS WEEK (Indian families are watching these - if one fits today's kind of story, "
+                      "build on it): " + " | ".join(tr) + "\n")
     vote_ideas = None
     if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow evening's story
-        free = [c for c in CATEGORIES if c not in DAY_SPECIAL.values() and c not in ("moral", "animal")]
-        c1, c2 = random.sample(free, 2)
-        vote_ideas = [[c1, random.choice(CATEGORIES[c1])], [c2, random.choice(CATEGORIES[c2])]]
-        extra += (f"\nAlso add the JSON key \"vote_labels\": two short catchy {L['name']} labels (2-5 words each) for "
-                  f"these two story ideas for tomorrow: 1) {vote_ideas[0][1]} 2) {vote_ideas[1][1]}.\n")
+        tcat = EVENING_GRID[(weekday + 1) % 7]
+        if tcat in EPIC:                             # an epic goes in its order - no vote then
+            tcat = None
+        if tcat:
+            i1, i2 = random.sample(CATEGORIES[tcat], 2)
+            vote_ideas = [[tcat, i1], [tcat, i2]]
+            extra += (f"\nAlso add the JSON key \"vote_labels\": two short catchy {L['name']} labels (2-5 words each) "
+                      f"for these two story ideas for tomorrow: 1) {vote_ideas[0][1]} 2) {vote_ideas[1][1]}.\n")
     story = make_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)
     if part == 1:
         try:
@@ -3411,7 +3427,26 @@ def main():
     end_lines.append({"speaker": "narrator", "emotion": "happy", "text": L["how_to_join"]})
     if str(story.get("mithu_outro", "")).strip():
         end_lines.append({"speaker": "Mithu", "emotion": "laughing", "text": str(story["mithu_outro"]).strip()})
-    end_lines.append({"speaker": "narrator", "text": (L["outro_part1"] if continues else L["outro"]).format(page=page)})
+    if continues:                                    # when the next part comes: this category's next day
+        nd = 7
+        for d in range(1, 8):
+            day_ = (dt.datetime.now(extras.IST).weekday() + d) % 7
+            if (slot_hour == 8 and MORNING_GRID[day_] == category) or (slot_hour == 19 and EVENING_GRID[day_] == category) \
+                    or (slot_hour == 13 and category == "gopal"):
+                nd = d
+                break
+        days_bn = ["সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার", "রবিবার"]
+        days_hi = ["सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार", "रविवार"]
+        tday = (dt.datetime.now(extras.IST) + dt.timedelta(days=nd)).weekday()
+        t_bn = {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়"}.get(slot_hour, "")
+        t_hi = {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे"}.get(slot_hour, "")
+        when_ = (("কাল " if nd == 1 else days_bn[tday] + " ") + t_bn) if lang == "bn" else \
+                (("कल " if nd == 1 else days_hi[tday] + " ") + t_hi)
+        end_lines.append({"speaker": "narrator", "text": (
+            f"গল্পের পরের পর্ব আসবে {when_}... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন!" if lang == "bn" else
+            f"कहानी का अगला भाग आएगा {when_}... मिस मत कीजिए, अभी {page} को फॉलो कीजिए!")})
+    else:
+        end_lines.append({"speaker": "narrator", "text": L["outro"].format(page=page)})
     parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices,
                       "host_part": end_img == host})
 
@@ -3481,16 +3516,19 @@ def main():
                     "viewer_names": vnames, "quiz": quiz_saved, **results})
     if not MOCK:
         save_history(history)
-        if continues:
-            with open(NEXT_PART, "w", encoding="utf-8") as f:
-                json.dump({"created": dt.datetime.now(dt.timezone.utc).isoformat(), "category": category,
-                           "idea": theme[1], "title": (prev or {}).get("title") or story["title"], "done": part,
-                           "total": total, "series_id": series_id, "summary": story.get("summary", ""),
-                           "part2_plan": story.get("part2_plan", ""), "characters": story.get("characters"),
-                           "setting": story.get("setting", "")}, f, ensure_ascii=False, indent=1)
-            log(f"Series: part {part + 1} of {total} comes tomorrow at 7 PM")
-        elif part >= 2 and os.path.exists(NEXT_PART):
-            os.remove(NEXT_PART)
+        if continues:                                # the next part comes on this category's next day
+            last_sc = story["scenes"][-1] if story.get("scenes") else {}
+            extras.series_put(NEXT_PART, category, {
+                "created": (prev or {}).get("created") or dt.datetime.now(dt.timezone.utc).isoformat(),
+                "category": category, "idea": theme[1], "title": (prev or {}).get("title") or story["title"],
+                "done": part, "total": total, "series_id": series_id,
+                "summary": (((prev or {}).get("summary") or "") + " " + str(story.get("summary", "")))[-3000:],
+                "part2_plan": story.get("part2_plan", ""), "characters": story.get("characters"),
+                "last_lines": " / ".join(str(ln.get("text", "")) for ln in (last_sc.get("lines") or [])[-4:]),
+                "setting": story.get("setting", "")})
+            log(f"Series: part {part + 1} of {total} comes on the next {category} day")
+        elif part >= 2:
+            extras.series_put(NEXT_PART, category, None)
     extras.telegram(extras.report_text(env(f"PAGE_NAME_{lang.upper()}") or "Little Lumi Stories", title, results, history))
 
 
@@ -3712,7 +3750,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  subtitles skipped:", str(e)[:160])
     if results.get("facebook") and env("ANNOUNCE") != "0":
         try:                                          # "coming soon" post 2 hours before the evening video
-            nxt = extras.next_slot([13, 19], [19])
+            nxt = extras.next_slot([8, 13, 19], [19])
             if nxt:
                 slot, when, day = nxt
                 words = f"{extras.DAY_WORDS[lang][day]} {extras.TIME_WORDS[lang][slot.hour]}"

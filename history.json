@@ -206,7 +206,7 @@
    "likes": 3,
    "comments": 3,
    "views": 1,
-   "checked": "2026-10-29T05:02+00:00"
+   "checked": "2026-11-01T05:02+00:00"
   }
  },
  {
@@ -229,7 +229,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-29T05:02+00:00"
+   "checked": "2026-11-01T05:02+00:00"
   }
  },
  {
@@ -427,7 +427,7 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-29T05:02+00:00"
+   "checked": "2026-11-01T05:02+00:00"
   }
  },
  {
@@ -730,10 +730,10 @@
    "a": "আগুন"
   },
   "stats": {
-   "likes": 1,
+   "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-29T05:02+00:00"
+   "checked": "2026-11-01T05:02+00:00"
   }
  },
  {
@@ -979,7 +979,13 @@
    "q": "কোন জিনিস যার নিজের কোনো হাত-পা নেই, তবুও সে সারাদিন ঘরের দেয়াল জুড়ে ঘুরে বেড়ায়?",
    "a": "ঘড়ি"
   },
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-11-01T05:02+00:00"
+  }
  },
  {
   "date": "2026-10-31T13:31+00:00",
@@ -1006,5 +1012,51 @@
   "fb_story": "867281303109635",
   "coloring": "122136963236735948",
   "yt_short": "RQRrNENKEK8"
+ },
+ {
+  "date": "2026-11-01T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-01@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "the king's impossible challenge: bring milk from a bull",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "ষাঁড়ের দুধ! গোপালের মাথাতেই এমন বুদ্ধি এল? 🐂",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "detective",
+     "the mystery of the midnight bell in the old school"
+    ],
+    [
+     "festival",
+     "Makar Sankranti kite festival friendship"
+    ]
+   ],
+   "labels": [
+    "মধ্যরাতের স্কুলের ঘণ্টা 🔔",
+    "মকর সংক্রান্তির ঘুড়ি উৎসব 🪁"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "এক বাড়ির কর্তাকে"
+  },
+  "facebook": "1919247159238071",
+  "youtube": "Yi7qv_wmFiU",
+  "fb_reel": "4603024536692076",
+  "fb_story": "1637313757868406",
+  "coloring": "122137116260735948",
+  "yt_short": "KlngstHPpA0",
+  "riddle_post": "122137123604735948",
+  "riddle": {
+   "q": "কোন জিনিস যতই টানো, ততই ছোট হয়ে যায়?",
+   "a": "সিগারেট বা মোমবাতি / পেন্সিল"
+  }
  }
 ]

@@ -824,7 +824,7 @@ def fb_add_captions(video_id, segs, lang, translations=None):
         try:
             r = requests.post(f"{GRAPH}/{video_id}/captions", timeout=120,
                               data={"access_token": token, "default_locale": "none" if done else loc},
-                              files={"captions_file": (name, "\n".join(rows).encode("utf-8"), "application/x-subrip")}).json()
+                              files={"captions_file": (name, "\n".join(rows).encode("utf-8"), "text/plain")}).json()
             if r.get("success") or r.get("id"):
                 done += 1
             else:
@@ -3055,6 +3055,7 @@ def trending_topics(kind, lang, cache_dir):
                               json={"contents": [{"parts": [{"text": prompt}]}], "tools": [{"google_search": {}}],
                                     "generationConfig": {"temperature": 0.4}}, timeout=120)
             if not r.ok:
+                log(f"  trends: {model} answered {r.status_code} ({'busy / limit reached' if r.status_code in (429, 503) else r.text[:80]})")
                 continue
             text = "\n".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
             got = load_json_loose(text[text.find("["):text.rfind("]") + 1]) if "[" in text else []
@@ -3063,6 +3064,9 @@ def trending_topics(kind, lang, cache_dir):
                 break
         except Exception as e:
             log(f"  trends ({model}) failed: {str(e)[:100]}")
+    if not topics:                            # not remembered - the next run today tries again
+        log("  trends: nothing found this time - today's story is written without them")
+        return []
     data[k] = {"date": today, "topics": topics}
     try:
         os.makedirs(cache_dir, exist_ok=True)

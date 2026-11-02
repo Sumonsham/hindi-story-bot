@@ -3169,14 +3169,20 @@ def main():
         extra += (f"\nOUR VIEWERS IN THE STORY: give 1-2 friendly side characters these first names of real viewers "
                   f"(kind, positive roles only): {', '.join(vnames)}.\n")
         log("Viewer names in the story:", ", ".join(vnames))
-    if category not in MYTH and category != "gopal" and part < 2 and not MOCK:
-        try:                                         # ride what families are watching this week
+    tr = []
+    if not MOCK:
+        try:                                         # ride what families are watching this week (+ hashtags, search words)
             tr = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
         except Exception:
             tr = []
-        if tr:
+    if tr and category not in MYTH and category != "gopal" and part < 2:
             extra += ("\nTRENDING THIS WEEK (Indian families are watching these - if one fits today's kind of story, "
                       "build on it): " + " | ".join(tr) + "\n")
+    if not MOCK:
+        try:                                         # what worked on our own page, and what viewers asked for
+            extra += extras.lessons_rule(extras.learn_lessons(history, "cartoon", lang, os.path.join(HERE, "assets")))
+        except Exception as e:
+            log("  lessons skipped:", str(e)[:100])
     vote_ideas = None
     if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow evening's story
         tcat = EVENING_GRID[(weekday + 1) % 7]
@@ -3465,7 +3471,14 @@ def main():
     build_video(parts, lang, video)
     log(f"Video ready: {duration(video):.0f} seconds")
 
-    tags = [t if t.startswith("#") else "#" + t.replace(" ", "") for t in story.get("hashtags", [])[:15]]
+    own = [t if t.startswith("#") else "#" + t.replace(" ", "") for t in story.get("hashtags", [])[:15]]
+    seeds = ([category, "bangla cartoon golpo", "গোপাল ভাঁড়" if category == "gopal" else "রূপকথার গল্প"] if lang == "bn"
+             else [category, "hindi cartoon kahani", "moral stories hindi"])
+    trend_tags, seo_words = extras.seo_pack("cartoon", lang, os.path.join(HERE, "assets"), seeds) if not MOCK else ([], [])
+    tags = []                                        # Facebook shows the first 5: 2 of this story + 3 trending tags
+    for t in own[:2] + trend_tags[:3] + own[2:] + trend_tags[3:]:
+        if t.lower() not in {x.lower() for x in tags}:
+            tags.append(t)
     source = ascii_text(story.get("source", ""))
     description = (f"{title}\n\n{story.get('description', '').strip()}\n\n" + (f"✨ {moral}\n\n" if moral else "")
                    + (f"📖 {source}\n\n" if source else "") + f"{L['share_cta']}\n\n"
@@ -3475,6 +3488,11 @@ def main():
     _lab = [_lab[0], L["ch_intro"]] + _lab[1:] if cold else [L["ch_intro"]] + _lab
     chap = extras.chapters_text(part_times, _lab + [L["ch_end"]], L["chapters"])
     yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
+    if seo_words:                                    # YouTube: what people type in search, first in the text
+        yt_description = "🔎 " + " · ".join(seo_words[:6]) + "\n\n" + yt_description
+    kw = next((w for w in seo_words if w.lower() not in title.lower() and len(title) + 3 + len(w) <= 100), "")
+    yt_title = f"{title} | {kw}" if kw else title
+    yt_tags = list(seo_words) + tags
 
     results = {}
     if DRY_RUN:
@@ -3489,7 +3507,7 @@ def main():
             results["facebook_error"] = str(e)[:200]
         if youtube_ready():
             try:
-                results["youtube"] = post_to_youtube(video, thumb, title, yt_description, tags, lang)
+                results["youtube"] = post_to_youtube(video, thumb, yt_title, yt_description, yt_tags, lang)
                 log("Posted to YouTube:", results["youtube"])
             except Exception as e:
                 log("YOUTUBE FAILED:", e)

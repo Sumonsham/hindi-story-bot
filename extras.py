@@ -288,6 +288,27 @@ def fb_comment(object_id, text):
     raise RuntimeError(str(last)[:300])
 
 
+def fb_video_insights(video_id):
+    """How the video was really watched on Facebook: views (3 s+), average seconds watched, its length and the
+    share watched (retention). Needs the page token's insights permission - silently empty without it."""
+    token = env("FB_PAGE_TOKEN")
+    out = {}
+    r = requests.get(f"{GRAPH}/{video_id}/video_insights", timeout=30, params={
+        "metric": "total_video_views,total_video_avg_time_watched,total_video_complete_views",
+        "access_token": token}).json()
+    for d in r.get("data", []) or []:
+        v = ((d.get("values") or [{}])[0]).get("value")
+        if isinstance(v, (int, float)):
+            out[{"total_video_views": "fb_views", "total_video_avg_time_watched": "avg_watch_ms",
+                 "total_video_complete_views": "complete_views"}.get(d.get("name"), d.get("name"))] = v
+    ln = requests.get(f"{GRAPH}/{video_id}", params={"fields": "length", "access_token": token}, timeout=30).json()
+    if ln.get("length"):
+        out["length_s"] = round(float(ln["length"]))
+        if out.get("avg_watch_ms"):
+            out["watched_pct"] = round(100 * out["avg_watch_ms"] / 1000 / max(1, out["length_s"]), 1)
+    return out
+
+
 def fb_stats(object_id):
     token = env("FB_PAGE_TOKEN")
     r = requests.get(f"{GRAPH}/{object_id}", params={
@@ -418,8 +439,13 @@ def refresh_stats(history, max_items=25):
                 st["comments"] += fs.get("comments", 0)
             except Exception:
                 pass
+        if h.get("facebook") and env("FB_PAGE_TOKEN"):
+            try:
+                st.update(fb_video_insights(h["facebook"]))
+            except Exception:
+                pass
         ys = yt.get(h.get("youtube", ""), {})
-        for k in st:
+        for k in ("likes", "comments", "views"):
             st[k] += ys.get(k, 0)
         st["checked"] = now.isoformat(timespec="minutes")
         h["stats"] = st
@@ -3045,10 +3071,12 @@ def trending_topics(kind, lang, cache_dir):
             "kids' animated stories)")
     prompt = (f"Search YouTube and Facebook trends of the last 7 days in India for {what} in "
               f"{'Bengali' if lang == 'bn' else 'Hindi'}. Which topics, characters, settings and story types are getting "
-              "the most views and comments right now? Answer ONLY a JSON list of 6 short English lines, each a concrete "
-              "story topic idea that rides one of these trends (no channel names, no copyrighted characters except "
-              "folk / public-domain ones).")
-    topics = []
+              "the most views and comments right now? Answer ONLY JSON: {\"topics\": [6 short English lines, each a "
+              "concrete story topic idea that rides one of these trends (no channel names, no copyrighted characters "
+              "except folk / public-domain ones)], \"hashtags\": [10 hashtags these viewers really use now, Bengali/"
+              "Hindi and English, each starting with #], \"keywords\": [8 exact phrases people type in YouTube search "
+              "for this, in the story language and in English letters]}")
+    topics, tags_, kws = [], [], []
     for model in ("gemini-flash-latest", "gemini-2.5-flash"):
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
@@ -3058,8 +3086,13 @@ def trending_topics(kind, lang, cache_dir):
                 log(f"  trends: {model} answered {r.status_code} ({'busy / limit reached' if r.status_code in (429, 503) else r.text[:80]})")
                 continue
             text = "\n".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
-            got = load_json_loose(text[text.find("["):text.rfind("]") + 1]) if "[" in text else []
-            topics = [str(x)[:160] for x in got if str(x).strip()][:6]
+            got = load_json_loose(text[text.find("{"):text.rfind("}") + 1]) if "{" in text else {}
+            if isinstance(got, list):
+                got = {"topics": got}
+            topics = [str(x)[:160] for x in (got.get("topics") or []) if str(x).strip()][:6]
+            tags_ = [("#" + str(x).strip().lstrip("#").replace(" ", "")) for x in (got.get("hashtags") or [])
+                     if str(x).strip()][:10]
+            kws = [str(x).strip()[:60] for x in (got.get("keywords") or []) if str(x).strip()][:8]
             if topics:
                 break
         except Exception as e:
@@ -3067,7 +3100,7 @@ def trending_topics(kind, lang, cache_dir):
     if not topics:                            # not remembered - the next run today tries again
         log("  trends: nothing found this time - today's story is written without them")
         return []
-    data[k] = {"date": today, "topics": topics}
+    data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws}
     try:
         os.makedirs(cache_dir, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
@@ -3077,3 +3110,128 @@ def trending_topics(kind, lang, cache_dir):
     if topics:
         log("Trending now:", " | ".join(t[:60] for t in topics[:3]))
     return topics
+
+
+
+def trend_extras(kind, lang, cache_dir):
+    """today's trending hashtags and search phrases (saved by trending_topics): (hashtags, keywords)"""
+    try:
+        with open(os.path.join(cache_dir, "trends.json"), encoding="utf-8") as f:
+            d = json.load(f).get(f"{kind}_{lang}") or {}
+        if d.get("date") == dt.datetime.now(IST).date().isoformat():
+            return d.get("hashtags") or [], d.get("keywords") or []
+    except Exception:
+        pass
+    return [], []
+
+
+def yt_autocomplete(seeds, lang):
+    """What people really type in YouTube search (YouTube's own suggestions) - for tags and titles."""
+    out = []
+    for q in seeds[:4]:
+        try:
+            r = requests.get("https://suggestqueries.google.com/complete/search", timeout=15,
+                             params={"client": "firefox", "ds": "yt", "q": q, "hl": lang})
+            for s in (r.json()[1] if r.ok else [])[:6]:
+                if s not in out:
+                    out.append(s)
+        except Exception:
+            pass
+    return out[:15]
+
+
+def seo_pack(kind, lang, cache_dir, seeds):
+    """search words for this video: today's trending phrases + YouTube's own search suggestions"""
+    tags_, kws = trend_extras(kind, lang, cache_dir)
+    auto = yt_autocomplete(seeds, lang) if env("SEO") != "0" else []
+    words = []
+    for w in kws + auto:
+        w = str(w).strip()
+        if w and w.lower() not in [x.lower() for x in words]:
+            words.append(w)
+    if words:
+        log("  search words:", " | ".join(words[:6]))
+    return tags_, words[:15]
+
+
+# ----------------------------------------------------------------- learning from our own numbers + comments
+def learn_lessons(history, kind, lang, cache_dir):
+    """Every 2 days: compare our best and weakest videos (views, how long people watched, likes, comments) and read
+    the viewers' comments, then write short lessons for the next stories and what the viewers ask for.
+    Saved in cache_dir/lessons.json. Returns dict(lessons=[...], requests=[...], titles=[...])."""
+    path = os.path.join(cache_dir, "lessons.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+    k = f"{kind}_{lang}"
+    old = data.get(k) or {}
+    try:
+        if old and (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(old["made"])).days < 2:
+            return old
+    except Exception:
+        pass
+    key = env("GEMINI_API_KEY")
+    rows = []
+    for h in history[-40:]:
+        st = h.get("stats") or {}
+        if h.get("lang") != lang or not st:
+            continue
+        rows.append({"title": str(h.get("title", ""))[:80], "category": h.get("category") or h.get("special") or "",
+                     "format": str(h.get("format", ""))[:60], "slot": h.get("slot"), "views": st.get("views", 0),
+                     "fb_views": st.get("fb_views"), "watched_pct": st.get("watched_pct"), "likes": st.get("likes"),
+                     "comments": st.get("comments")})
+    if not key or len(rows) < 5:
+        return old
+    comments = []
+    for h in history[-8:]:
+        try:
+            comments += [c for c in comment_texts(h.get("facebook"), h.get("youtube")) if len(c) > 3][:25]
+        except Exception:
+            pass
+    prompt = (f"You analyse a {kind} video page (Facebook + YouTube, {'Bengali' if lang == 'bn' else 'Hindi'}). "
+              "Here are our recent videos with their numbers (watched_pct = average share of the video watched):\n"
+              + json.dumps(rows, ensure_ascii=False) + "\nAnd recent viewer comments:\n"
+              + json.dumps(comments[:120], ensure_ascii=False)[:6000]
+              + "\nCompare the best and the weakest videos. Answer ONLY JSON (ENGLISH): {\"lessons\": [5 short, "
+                "concrete lessons for writing the NEXT stories (openings, length, kinds of story, characters, endings) "
+                "that the numbers really support], \"titles\": [3 lessons about titles / hooks that got more clicks], "
+                "\"requests\": [up to 6 concrete things viewers asked for in the comments: a ghost, a place, a "
+                "character, a kind of story]}. Be honest - if the numbers are too few to tell, say less.")
+    for model in ("gemini-flash-latest", "gemini-2.5-flash"):
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}],
+                                    "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"}},
+                              timeout=120)
+            if not r.ok:
+                log(f"  lessons: {model} answered {r.status_code}")
+                continue
+            got = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            new = {"made": dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"),
+                   "lessons": [str(x)[:200] for x in got.get("lessons") or []][:5],
+                   "titles": [str(x)[:200] for x in got.get("titles") or []][:3],
+                   "requests": [str(x)[:160] for x in got.get("requests") or []][:6]}
+            data[k] = new
+            os.makedirs(cache_dir, exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=1)
+            log("Learned from our numbers:", " | ".join(x[:70] for x in new["lessons"][:2]))
+            return new
+        except Exception as e:
+            log(f"  lessons ({model}) failed: {str(e)[:100]}")
+    return old
+
+
+def lessons_rule(les):
+    """the lessons as words for the story writer"""
+    if not les or not (les.get("lessons") or les.get("requests") or les.get("titles")):
+        return ""
+    out = "\nLEARNED FROM OUR OWN VIEWERS' NUMBERS AND COMMENTS (follow these):\n"
+    out += "".join(f"- {x}\n" for x in les.get("lessons") or [])
+    out += "".join(f"- title: {x}\n" for x in les.get("titles") or [])
+    if les.get("requests"):
+        out += ("- Our viewers asked for: " + " | ".join(les["requests"]) +
+                " - if one fits today's kind of story, give it to them.\n")
+    return out

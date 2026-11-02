@@ -992,6 +992,8 @@ Story rules:
 Return ONLY JSON with exactly these keys:
 {{
  "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
+ "tagline": "{L['name']} tag line for the thumbnail and Reel, max 8 words, under the title: a fun promise or question (e.g. 'শেষে কে জিতল, জানেন?')",
+ "title_b": "a SECOND, different {L['name']} title for the same story (another hook, e.g. a question), max 60 characters, 1 emoji",
  "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click - a surprising question, a funny shock or a promise (e.g. 'লোভের শাস্তি?', 'বোকা সিংহ!', 'শেষে কী হল?') - never just the title",
  "description": "3-4 line engaging {L['name']} description, ending with a question to the viewer",
  "hashtags": ["10 to 14 popular hashtags mixing {L['name']} and English, e.g. {L['example_tags']}"],
@@ -3095,6 +3097,8 @@ def main():
     if not MOCK:
         try:
             extras.refresh_stats(history)            # learn which kinds of stories people liked
+            if extras.yt_title_test(history):        # a weak video gets its second title (once)
+                save_history(history)
         except Exception as e:
             log("  stats skipped:", str(e)[:150])
     lang = pick_language(history)
@@ -3353,8 +3357,9 @@ def main():
             shutil.copy(first_ok, thumb_base)
     thumb = os.path.join(WORK, "thumbnail.jpg")
     series_bn = L.get("series_titles", {}).get(category)
-    big = series_bn or str(story.get("thumbnail_text") or title).strip()
-    sub = str(story.get("episode_name") or (story.get("thumbnail_text") if series_bn else "") or "").strip()
+    big = re.sub(r"[^\w\sঀ-৿ऀ-ॿ!?,।'’-]", " ", re.sub(r"\s*\|.*$", "", title))   # the title on the thumbnail
+    big = re.sub(r"\s{2,}", " ", re.sub(r"[0-9০-৯०-९]+", " ", big)).strip()   # the poster font has no digits
+    sub = str(story.get("tagline") or story.get("thumbnail_text") or story.get("episode_name") or "").strip()   # ... + tag line
     try:
         extras.poster_thumbnail(thumb_base, big, sub, thumb, "cartoon", FONT)
     except Exception as e:
@@ -3531,7 +3536,10 @@ def main():
                     "pending_comments": list(extras.PENDING),
                     "category": category, "idea": theme[1], "episode": episode, "part": part, "continues": continues,
                     "series_id": series_id, "title": title, "festival": festival, "vote": vote_saved,
-                    "viewer_names": vnames, "quiz": quiz_saved, **results})
+                    "viewer_names": vnames, "quiz": quiz_saved,
+                    "title_b": str(story.get("title_b") or "").strip()[:95] or None,
+                    "question_post": extras.fb_question_post(history, "cartoon", lang) if not (MOCK or DRY_RUN) else None,
+                    **results})
     if not MOCK:
         save_history(history)
         if continues:                                # the next part comes on this category's next day
@@ -3685,10 +3693,11 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  9:16 teaser picture not made, using the wide one:", str(e)[:150])
         if src:
             path, off = src
-            extras.make_teaser(path, st - off, en - off, teaser, FONT, story.get("thumbnail_text") or title,
-                               L["cta"], WORK, colors=((255, 225, 0), (255, 60, 120)), vertical=True)
+            extras.make_teaser(path, st - off, en - off, teaser, FONT, re.sub(r"\s*\|.*$", "", title).strip(),
+                               L["cta"], WORK, colors=((255, 225, 0), (255, 60, 120)), vertical=True,
+                               tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""))
         else:
-            extras.make_teaser(video, st, en, teaser, FONT, story.get("thumbnail_text") or title, L["cta"], WORK,
+            extras.make_teaser(video, st, en, teaser, FONT, re.sub(r"\s*\|.*$", "", title).strip(), L["cta"], WORK, tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""),
                                colors=((255, 225, 0), (255, 60, 120)))
         log(f"Teaser ready ({en - st:.0f} s, from {st:.0f} s)")
     except Exception as e:
@@ -3711,6 +3720,19 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
                 log("Shared to Facebook Story:", out["fb_story"])
         except Exception as e:
             log("  Facebook Story skipped:", str(e)[:200])
+        if env("SECOND_REEL") != "0":                # a second Reel from another moment, 2 hours later
+            try:
+                pt_, sg_ = TIMELINE[0], TIMELINE[1]
+                s2, e2 = extras.pick_window(sg_, pt_, max(2, (len(pt_) * 3) // 5), max_len=50.0)
+                reel2 = os.path.join(WORK, "reel2.mp4")
+                extras.make_teaser(video, s2, e2, reel2, FONT, re.sub(r"\s*\|.*$", "", title).strip(), L["cta"], WORK,
+                                   tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""))
+                base = extras.PUBLISH.get("at") or dt.datetime.now(extras.IST)
+                out["fb_reel2"] = extras.fb_post_reel(reel2, short_desc, at=max(base, dt.datetime.now(extras.IST))
+                                                      + dt.timedelta(hours=2))
+                log("Second Facebook Reel scheduled (2 hours later):", out["fb_reel2"])
+            except Exception as e:
+                log("  second Reel skipped:", str(e)[:200])
     if teaser and env("INSTAGRAM") == "1":           # only if you switch Instagram on (secret INSTAGRAM = 1)
         try:
             out["ig_reel"] = extras.ig_post_reel(teaser, short_desc)

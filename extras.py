@@ -172,7 +172,7 @@ def pick_window(segs, part_times, scene_no, max_len=55.0, min_len=25.0):
 
 
 def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
-                colors=((255, 225, 0), (210, 0, 0)), vertical=False):
+                colors=((255, 225, 0), (210, 0, 0)), vertical=False, tagline=""):
     """Vertical 720x1280 teaser: blurred video fills the background, the real video in the middle,
     a big hook text on top and a 'watch the full story' line at the bottom."""
     top_col, band_col = colors
@@ -186,6 +186,14 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
         d.text(((VW - tw) / 2, y), l, font=f, fill=top_col + (255,), stroke_width=max(5, size // 12),
                stroke_fill=(0, 0, 0, 255))
         y += int(size * 1.3)
+    if tagline:                                   # the story's tag line under the title
+        tl, tf_, ts = _fit_text(d, no_tofu(tagline), font_path, VW - 90, 44, lines_max=2)
+        y += 4
+        for l in tl:
+            tw = d.textlength(l, font=tf_)
+            d.text(((VW - tw) / 2, y), l, font=tf_, fill=(255, 255, 255, 255), stroke_width=max(3, ts // 12),
+                   stroke_fill=(0, 0, 0, 255))
+            y += int(ts * 1.3)
     cl, cf, cs = _fit_text(d, cta_text, font_path, VW - 110, 46, lines_max=1)
     tw = d.textlength(cl[0], font=cf)
     by = VH - 185
@@ -221,7 +229,7 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
 
 
 # ----------------------------------------------------------------- Facebook
-def fb_post_reel(video, description):
+def fb_post_reel(video, description, at=None):
     """Publishes a Facebook Reel on the page. Returns the video id."""
     page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
     r = requests.post(f"{GRAPH}/{page}/video_reels", data={"upload_phase": "start", "access_token": token},
@@ -238,8 +246,8 @@ def fb_post_reel(video, description):
         raise RuntimeError(f"reel upload: {str(up)[:300]}")
     data = {"upload_phase": "finish", "video_id": vid, "video_state": "PUBLISHED",
             "description": description[:2000], "access_token": token}
-    at = publish_time()
-    if at:                                            # goes live together with the main video
+    at = at or publish_time()
+    if at:                                            # goes live together with the main video (or at its own time)
         data.update(video_state="SCHEDULED", scheduled_publish_time=str(int(at.timestamp())))
     fin = requests.post(f"{GRAPH}/{page}/video_reels", data=data, timeout=120).json()
     if not fin.get("success"):
@@ -447,6 +455,11 @@ def refresh_stats(history, max_items=25):
         ys = yt.get(h.get("youtube", ""), {})
         for k in ("likes", "comments", "views"):
             st[k] += ys.get(k, 0)
+        if h.get("youtube") and env("YT_REFRESH_TOKEN") and env("YT_ANALYTICS") != "0":
+            try:
+                st.update(yt_retention(h["youtube"]))
+            except Exception:
+                pass
         st["checked"] = now.isoformat(timespec="minutes")
         h["stats"] = st
     log(f"  updated likes/comments/views of {len(todo)} older posts")
@@ -1632,6 +1645,14 @@ def parler_cast(chars, lang, narrator_gender="male"):
 
 def _parler_load():
     if PARLER["model"] is None:
+        import warnings
+        os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")   # no pages of model settings in the log
+        warnings.filterwarnings("ignore")
+        try:
+            import transformers
+            transformers.logging.set_verbosity_error()
+        except Exception:
+            pass
         import torch
         from parler_tts import ParlerTTSForConditionalGeneration
         from transformers import AutoTokenizer
@@ -3181,7 +3202,9 @@ def learn_lessons(history, kind, lang, cache_dir):
         rows.append({"title": str(h.get("title", ""))[:80], "category": h.get("category") or h.get("special") or "",
                      "format": str(h.get("format", ""))[:60], "slot": h.get("slot"), "views": st.get("views", 0),
                      "fb_views": st.get("fb_views"), "watched_pct": st.get("watched_pct"), "likes": st.get("likes"),
-                     "comments": st.get("comments")})
+                     "comments": st.get("comments"), "yt_watched_pct": st.get("yt_avg_pct"),
+                     "yt_most_leave_at_pct": st.get("yt_drop_at"), "title_b": h.get("title_b"),
+                     "title_test": (h.get("title_test") or {}).get("result")})
     if not key or len(rows) < 5:
         return old
     comments = []
@@ -3191,7 +3214,9 @@ def learn_lessons(history, kind, lang, cache_dir):
         except Exception:
             pass
     prompt = (f"You analyse a {kind} video page (Facebook + YouTube, {'Bengali' if lang == 'bn' else 'Hindi'}). "
-              "Here are our recent videos with their numbers (watched_pct = average share of the video watched):\n"
+              "Here are our recent videos with their numbers (watched_pct / yt_watched_pct = average share of the video "
+              "watched; yt_most_leave_at_pct = where in the video most viewers leave; title_test swapped = the first "
+              "title got few views and title_b replaced it):\n"
               + json.dumps(rows, ensure_ascii=False) + "\nAnd recent viewer comments:\n"
               + json.dumps(comments[:120], ensure_ascii=False)[:6000]
               + "\nCompare the best and the weakest videos. Answer ONLY JSON (ENGLISH): {\"lessons\": [5 short, "
@@ -3235,3 +3260,124 @@ def lessons_rule(les):
         out += ("- Our viewers asked for: " + " | ".join(les["requests"]) +
                 " - if one fits today's kind of story, give it to them.\n")
     return out
+
+
+
+# ----------------------------------------------------------------- YouTube: how long people watch, title test
+YTA = "https://youtubeanalytics.googleapis.com/v2/reports"
+
+
+def yt_retention(video_id):
+    """YouTube Analytics (needs the yt-analytics.readonly permission): average % and seconds watched, and where in
+    the video most viewers leave (yt_drop_at = % of the video)."""
+    hdr = yt_token()
+    today = dt.date.today().isoformat()
+    out = {}
+    r = requests.get(YTA, headers=hdr, timeout=30, params={
+        "ids": "channel==MINE", "startDate": "2020-01-01", "endDate": today, "filters": f"video=={video_id}",
+        "metrics": "views,averageViewDuration,averageViewPercentage"})
+    if r.ok and r.json().get("rows"):
+        v, avg_s, avg_p = r.json()["rows"][0][:3]
+        out.update(yt_views=v, yt_avg_s=round(avg_s), yt_avg_pct=round(avg_p, 1))
+    r = requests.get(YTA, headers=hdr, timeout=30, params={
+        "ids": "channel==MINE", "startDate": "2020-01-01", "endDate": today, "filters": f"video=={video_id}",
+        "dimensions": "elapsedVideoTimeRatio", "metrics": "audienceWatchRatio"})
+    rows = r.json().get("rows") if r.ok else None
+    if rows and len(rows) > 5:
+        drops = [(rows[i][0], rows[i - 1][1] - rows[i][1]) for i in range(1, len(rows))]
+        at, size = max(drops[1:], key=lambda x: x[1])     # (not the first second - everyone drops there)
+        out["yt_drop_at"] = round(at * 100)
+    return out
+
+
+def yt_title_test(history, max_checks=6):
+    """A day after a video goes up: if it gets clearly fewer views than our usual videos, its second title
+    (made at writing time) replaces the first - once. Which title style wins is kept in history."""
+    if not env("YT_REFRESH_TOKEN") or env("TITLE_TEST") == "0":
+        return False
+    now = dt.datetime.now(dt.timezone.utc)
+    seen = sorted((h.get("stats") or {}).get("views", 0) for h in history[-30:] if (h.get("stats") or {}).get("views"))
+    if len(seen) < 5:
+        return False
+    median = seen[len(seen) // 2]
+    changed = False
+    for h in history[-12:]:
+        if not h.get("youtube") or not h.get("title_b") or h.get("title_test"):
+            continue
+        try:
+            age = (now - dt.datetime.fromisoformat(str(h["date"]))).total_seconds() / 3600
+        except Exception:
+            continue
+        if not 24 <= age <= 96:
+            continue
+        hdr = yt_token()
+        r = requests.get(f"{YT}/videos", headers=hdr, timeout=30,
+                         params={"part": "snippet,statistics", "id": h["youtube"]})
+        items = r.json().get("items") if r.ok else None
+        if not items:
+            continue
+        views = int(items[0]["statistics"].get("viewCount", 0))
+        if views >= median * 0.6:
+            h["title_test"] = {"result": "kept", "views": views}
+            changed = True
+            continue
+        sn = items[0]["snippet"]
+        new = {"id": h["youtube"], "snippet": {"title": str(h["title_b"])[:100], "description": sn.get("description", ""),
+                                                "categoryId": sn.get("categoryId", "24"), "tags": sn.get("tags", []),
+                                                "defaultLanguage": sn.get("defaultLanguage"),
+                                                "defaultAudioLanguage": sn.get("defaultAudioLanguage")}}
+        new["snippet"] = {k: v for k, v in new["snippet"].items() if v}
+        u = requests.put(f"{YT}/videos", headers={**hdr, "Content-Type": "application/json"}, params={"part": "snippet"},
+                         data=json.dumps(new), timeout=30)
+        if u.ok:
+            h["title_test"] = {"result": "swapped", "views_before": views, "at": now.isoformat(timespec="minutes")}
+            log(f"  YouTube title test: '{sn.get('title', '')[:40]}' had {views} views (usual {median}) - "
+                f"now '{str(h['title_b'])[:40]}'")
+        else:
+            h["title_test"] = {"result": "failed", "why": _yt_err(u)[:120]}
+        changed = True
+        max_checks -= 1
+        if max_checks <= 0:
+            break
+    return changed
+
+
+# ----------------------------------------------------------------- Facebook: a second Reel, a daily question
+def fb_question_post(history, kind, lang, page_name=""):
+    """Once a day a short question on the page (people answer -> Facebook shows the page to more people)."""
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if not (page and token) or env("FB_QUESTION") == "0":
+        return None
+    today = dt.datetime.now(IST).date().isoformat()
+    if any(h.get("question_post") == today for h in history[-8:]):
+        return None
+    qs = {("horror", "bn"): ["আপনার জীবনের সবচেয়ে ভয়ের রাত কোনটা? কমেন্টে লিখুন - সেরা অভিজ্ঞতা গল্প হয়ে আসবে 👻",
+                             "আপনি কি ভূতে বিশ্বাস করেন? হ্যাঁ হলে 1, না হলে 2 লিখুন 👇",
+                             "কোন ভূতের গল্প শুনতে চান? শাঁকচুন্নি, ব্রহ্মদৈত্য, নিশির ডাক, না অন্য কিছু? কমেন্টে লিখুন",
+                             "রাতে একা থাকলে কোন শব্দে সবচেয়ে ভয় লাগে? 🕯️",
+                             "আপনার গ্রামে বা পাড়ায় কোন ভুতুড়ে জায়গার গল্প শোনা যায়? কমেন্টে বলুন",
+                             "আজকের গল্পে সবচেয়ে ভয়ের মুহূর্ত কোনটা ছিল? 👇",
+                             "কাকে ট্যাগ করবেন যে একা ভূতের গল্প শুনতে ভয় পায়? 😅"],
+          ("horror", "hi"): ["आपकी ज़िंदगी की सबसे डरावनी रात कौन सी थी? कमेंट में लिखिए 👻",
+                             "क्या आप भूतों पर विश्वास करते हैं? हाँ तो 1, नहीं तो 2 लिखिए 👇",
+                             "कौन सी भूतिया कहानी सुनना चाहते हैं? कमेंट में लिखिए",
+                             "रात में अकेले हों तो किस आवाज़ से सबसे ज़्यादा डर लगता है? 🕯️",
+                             "उस दोस्त को टैग कीजिए जो अकेले भूत की कहानी नहीं सुन सकता 😅"],
+          ("cartoon", "bn"): ["আপনার ছোটবেলার সবচেয়ে প্রিয় গল্প কোনটা? কমেন্টে লিখুন 📚",
+                              "গোপাল ভাঁড়ের কোন গল্পটা আবার দেখতে চান? 😄",
+                              "বাচ্চারা কোন গল্প শুনতে সবচেয়ে ভালোবাসে - রূপকথা, পশুপাখি, না গোয়েন্দা? 👇",
+                              "আজকের গল্প থেকে কী শিখলেন? কমেন্টে লিখুন ✨",
+                              "ঠাকুমার কাছে শোনা কোন গল্প আজও মনে আছে? 🌙"],
+          ("cartoon", "hi"): ["आपके बचपन की सबसे पसंदीदा कहानी कौन सी है? कमेंट में लिखिए 📚",
+                              "बच्चे कौन सी कहानी सबसे ज़्यादा पसंद करते हैं - परी, जानवर या जासूसी? 👇",
+                              "आज की कहानी से क्या सीखा? कमेंट में लिखिए ✨",
+                              "दादी-नानी से सुनी कौन सी कहानी आज भी याद है? 🌙"]}.get((kind, lang)) or []
+    if not qs:
+        return None
+    msg = qs[dt.datetime.now(IST).timetuple().tm_yday % len(qs)]
+    r = requests.post(f"{GRAPH}/{page}/feed", data={"message": msg, "access_token": token}, timeout=30).json()
+    if r.get("id"):
+        log("  daily question posted on Facebook")
+        return today
+    log("  daily question skipped:", str(r)[:160])
+    return None

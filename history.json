@@ -1064,7 +1064,13 @@
    "q": "কোন জিনিস যতই টানো, ততই ছোট হয়ে যায়?",
    "a": "সিগারেট বা মোমবাতি / পেন্সিল"
   },
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 2,
+   "comments": 1,
+   "views": 1,
+   "checked": "2026-11-02T04:02+00:00"
+  }
  },
  {
   "date": "2026-11-01T11:28+00:00",
@@ -1098,5 +1104,36 @@
   "fb_reel": "1126844543093587",
   "fb_story": "1489769346385478",
   "yt_short": "BDRcChAU2lI"
+ },
+ {
+  "date": "2026-11-02T06:04+00:00",
+  "lang": "bn",
+  "slot": "2026-11-02@8",
+  "pending_comments": [],
+  "category": "panchatantra",
+  "idea": "the talkative tortoise and the two geese",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "আকাশে উড়ল বাচাল কচ্ছপ! 🐢🪿",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "সাহেব তাঁর চাদর দিয়ে"
+  },
+  "facebook": "2661535080931064",
+  "youtube": "8OsNiGeXiow",
+  "fb_reel": "1115623574669377",
+  "fb_story": "3850732138411912",
+  "coloring": "122137265246735948",
+  "yt_short": "ov6cOwBnTHI",
+  "riddle_post": "122137265540735948",
+  "riddle": {
+   "q": "মাথায় টুপি, গায়ে খোসা, জলের নিচে তার বাসা! বল তো কী?",
+   "a": "কচ্ছপ"
+  }
  }
 ]

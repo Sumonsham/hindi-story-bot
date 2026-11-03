@@ -1,13 +1,9 @@
 name: Daily Hindi Story
 
 on:
+  # Started by cron-job.org (3 hours before each video). GitHub's own clock is used only for the Sunday
+  # compilation - its timed runs are often hours late.
   schedule:
-    # The main start comes from cron-job.org at 5:00 AM, 10:00 AM and 4:00 PM India time: each video is made
-    # ~3 hours early and goes live by itself at exactly 8:00 AM, 1:00 PM and 7:00 PM (scheduled post).
-    # These GitHub times are only a backup - they do nothing if that slot's video is already done.
-    - cron: "0 0 * * *"     # backup 5:30 AM India time
-    - cron: "0 5 * * *"     # backup 10:30 AM India time
-    - cron: "0 11 * * *"    # backup 4:30 PM India time
     - cron: "30 4 * * 0"    # Sunday 10:00 AM India time: weekly long compilation video
   workflow_dispatch:        # lets you press "Run workflow" to test any time
     inputs:
@@ -104,17 +100,10 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FREEMODEL_API_KEY: ${{ secrets.FREEMODEL_API_KEY }}
-          GEMINI_TTS_KEY: ${{ secrets.GEMINI_TTS_KEY }}
-          GEMINI_TTS_KEY_2: ${{ secrets.GEMINI_TTS_KEY_2 }}
-          GEMINI_TTS_KEY_3: ${{ secrets.GEMINI_TTS_KEY_3 }}
-          GEMINI_TTS_KEY_4: ${{ secrets.GEMINI_TTS_KEY_4 }}
-          GEMINI_TTS_KEY_5: ${{ secrets.GEMINI_TTS_KEY_5 }}
           TTS_PAID: ${{ secrets.TTS_PAID }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID_2: ${{ secrets.CF_ACCOUNT_ID_2 }}
-          CF_API_TOKEN_2: ${{ secrets.CF_API_TOKEN_2 }}
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}

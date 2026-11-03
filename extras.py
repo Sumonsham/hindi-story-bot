@@ -3403,7 +3403,7 @@ def _jl(path, default):
 
 
 def _js(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
 
@@ -3438,8 +3438,11 @@ def creator_inbox(path, kind="horror"):
         if len(t) >= 150:                             # a story (short messages are just chat)
             msgs.append((int(msg.get("date") or 0), uid, t))
     groups = []
+    starts = lambda t: any(t[:40].lower().startswith(w) for w in CARTOON_WORDS + FICTION_WORDS)
     for d, uid, t in sorted(msgs):
-        if groups and d - groups[-1]["last"] <= 1200:
+        # a message that starts with 'কার্টুন' / 'কাল্পনিক' always begins a NEW story; other messages sent within
+        # 20 minutes are the next pieces of the same long story (Telegram cuts long texts)
+        if groups and d - groups[-1]["last"] <= 1200 and not starts(t):
             groups[-1]["text"] += "\n" + t
             groups[-1]["last"] = d
         else:

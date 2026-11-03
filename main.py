@@ -3111,6 +3111,9 @@ def vote_winner(history):
     return None, None
 
 
+CREATOR = {}                 # your own story from Telegram (if one is waiting)
+
+
 def main():
     global FONT
     pass
@@ -3186,12 +3189,22 @@ def main():
             theme = (cat, EPIC[cat][(episode - 1) % len(EPIC[cat])])
         else:
             theme = (cat, random.choice(CATEGORIES[cat]))
-            if slot_hour == 19:
+            mine = (extras.take_creator_story(os.path.join(HERE, "assets", "my_stories.json"), "cartoon")
+                    if slot_hour in (8, 19) and cat not in MYTH and cat != "gopal" else None)
+            if mine:                                 # YOUR OWN story from Telegram is today's story
+                theme = (cat, "the creator's own story")
+                CREATOR["story"] = mine
+                if re.search(r"[\u0980-\u09FF]", mine["text"]) and "bn" in LANGS:
+                    lang, L, FONT = "bn", LANGS["bn"], find_font("bn")   # a Bengali story is told in Bengali
+                elif re.search(r"[\u0900-\u097F]", mine["text"]) and "hi" in LANGS:
+                    lang, L, FONT = "hi", LANGS["hi"], find_font("hi")
+                log(f"YOUR OWN STORY from Telegram is today's story ({len(mine['text'])} characters)")
+            if slot_hour == 19 and not mine:
                 win, n_votes = vote_winner(history)  # yesterday's 1 PM vote chose between two of today's stories
                 if win and win[0] == cat:
                     theme, voted = win, n_votes
                     log(f"This story was chosen by the viewers: {win[1]}")
-            if cat in SERIES_CATS and random.random() < float(env("SERIES_CHANCE") or 0.5):
+            if cat in SERIES_CATS and not mine and random.random() < float(env("SERIES_CHANCE") or 0.5):
                 part = 1                             # a big story: the next part comes on this category's next day
         log(f"Weekly programme: {slot_hour}:00 - {cat}" + (f" episode {episode}" if episode else "")
             + (f" | part {part}" if part else ""))
@@ -3237,7 +3250,15 @@ def main():
             vote_ideas = [[tcat, i1], [tcat, i2]]
             extra += (f"\nAlso add the JSON key \"vote_labels\": two short catchy {L['name']} labels (2-5 words each) "
                       f"for these two story ideas for tomorrow: 1) {vote_ideas[0][1]} 2) {vote_ideas[1][1]}.\n")
+    if CREATOR.get("story"):
+        extra += ("\nTHE CREATOR'S OWN STORY - written by our page's creator. THIS is today's story; build the whole "
+                  f"video on it:\n<<<{CREATOR['story']['text']}>>>\nKeep its people, places, events, their ORDER and its "
+                  "ending exactly as the creator wrote them; turn it into our lively cartoon with dialogue, the "
+                  "narrator, sounds and fun small moments - never new main events or a different ending. Keep it "
+                  "child-friendly. If something is unclear or missing, fill it in the creator's own spirit.\n")
     story = make_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)
+    if (CREATOR.get("story") or {}).get("true"):         # 'সত্য ঘটনা অবলম্বনে' everywhere
+        extras.mark_true_story(story, lang)
     if part == 1:
         try:
             total = min(3, max(2, int(str(story.get("total_parts") or 2)[:1])))
@@ -3255,6 +3276,8 @@ def main():
                 c["look"] = MYTH_LOOKS[k]
         story["mithu_intro"] = story["mithu_outro"] = ""   # no parrot jokes in the holy stories
     title = story["title"].strip()[:85]
+    if story.get("true_label"):
+        title = extras.true_title(title, lang)
     if episode:
         title = f"{L['episode'].format(name=L['series_titles'].get(category, ''), n=episode)}: {title}"[:95]
     if part:
@@ -3409,7 +3432,11 @@ def main():
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
     host = ensure_mascot() or thumb_base
-    intro = [{"speaker": "narrator", "text": L["intro"].format(title=clean_title)}]
+    said_title = clean_title
+    if story.get("true_label"):                      # the narrator says it: based on true events
+        base = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", re.sub(r"\s*\|.*$", "", title)).strip()
+        said_title = f"{extras.TRUE_LABEL.get(lang, extras.TRUE_LABEL['bn'])}... {base}"
+    intro = [{"speaker": "narrator", "text": L["intro"].format(title=said_title)}]
     if str(story.get("mithu_intro", "")).strip():
         intro.append({"speaker": "Mithu", "emotion": "excited", "text": str(story["mithu_intro"]).strip()})
     parts = [{"image": host, "lines": intro, "host_part": True,

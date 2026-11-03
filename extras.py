@@ -1387,14 +1387,15 @@ def last_post(history, key=None, min_hours=1.5):
 # ----------------------------------------------------------------- which time slot is this run for?
 def current_slot(triggers, now=None):
     """triggers: [(start_hour, start_minute, post_hour)] in India time, e.g. [(11, 55, 13), (19, 55, 21)].
-    A run belongs to the LAST slot that has already started (10 minutes early allowed), so a late
+    A run belongs to the LAST slot that has already started (up to 90 minutes early allowed), so a late
     backup run still knows which slot it is for. Returns e.g. '2026-10-22@13'."""
     now = now or dt.datetime.now(IST)
     best = None
     for add in (0, -1):
         day = (now + dt.timedelta(days=add)).date()
         for h, m, post in triggers:
-            start = dt.datetime(day.year, day.month, day.day, h, m, tzinfo=IST) - dt.timedelta(minutes=10)
+            start = dt.datetime(day.year, day.month, day.day, h, m, tzinfo=IST) - \
+                dt.timedelta(minutes=int(env("EARLY_MINUTES") or 90))   # a start up to 1.5 h early still counts
             if start <= now and (best is None or start > best[0]):
                 best = (start, f"{day.isoformat()}@{post}")
     return best[1] if best else None
@@ -1973,7 +1974,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= 6 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 650):
+        if cur and (len(spk) > 2 or len(cur) >= 8 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 900):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2176,7 +2177,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= 6 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 650):
+        if cur and (len(spk) > 2 or len(cur) >= 8 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 900):
             groups.append(cur)
             cur = []
         cur.append(it)

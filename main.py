@@ -55,7 +55,7 @@ LANGS = {
         "font_family": "Noto Sans Devanagari", "font_glob": "NotoSansDevanagari",
         "male": ["hi-IN-MadhurNeural"], "female": ["hi-IN-SwaraNeural"],
         "narrator": ("hi-IN-SwaraNeural", "-4%", "+2Hz"), "gtts": "hi",
-        "intro": "नमस्ते प्यारे बच्चों! मैं हूँ आपकी लूमी दीदी। आज की कहानी है... {title}।",
+        "intro": "नमस्ते बच्चों! आज की कहानी... {title}।",
         "outro": "कहानी अच्छी लगी तो लाइक कीजिए, शेयर कीजिए, और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो ज़रूर कीजिए!",
         "page_default": "हमारे पेज",
         "share_cta": "🔁 कहानी पसंद आई? दोस्तों और बच्चों को शेयर करें और पेज फ़ॉलो करें - रोज़ नई मज़ेदार कहानी!",
@@ -103,7 +103,7 @@ LANGS = {
         "male": ["bn-IN-BashkarNeural", "bn-IN-BashkarNeural"],
         "female": ["bn-IN-TanishaaNeural", "bn-IN-TanishaaNeural"],
         "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
-        "intro": "নমস্কার বন্ধুরা! আমি লুমি দিদি। আজকের গল্প... {title}।",
+        "intro": "নমস্কার বন্ধুরা! আজকের গল্প... {title}।",
         "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
         "page_default": "আমাদের পেজ",
         "share_cta": "🔁 গল্পটা ভালো লাগলে বন্ধুদের শেয়ার করুন আর পেজটা ফলো করুন - রোজ নতুন মজার গল্প!",
@@ -786,6 +786,37 @@ def puppet_scene(s, rig):
     first = {r: k for k, r in enumerate(order)}
     order.sort(key=lambda r: (sum(score.get(r, [1])) / len(score.get(r, [1])), first[r]))
     return {"cast": order, "set": s.get("set"), "place": s.get("place", "")}
+
+
+def pick_hook(scenes):
+    """Facebook: most viewers leave in 2-3 seconds. So the video opens with ONE funny / exciting moment from
+    the middle of the story (a funny reply, a shout, a surprise) - never the ending. (scene index, lines) or None."""
+    n = len(scenes)
+    if n < 4:
+        return None
+    best, bs = None, -9
+    for i in range(max(1, n // 4), max(2, int(n * 0.7))):
+        lines = scenes[i].get("lines") or []
+        for j, ln in enumerate(lines):
+            tx = extras.strip_tags(str(ln.get("text", ""))).strip()
+            if not 10 <= len(tx) <= 100:
+                continue
+            spk = str(ln.get("speaker", "narrator")).lower()
+            sc = ((0 if spk.startswith("narrat") or spk.startswith("lumi") else 3)
+                  + (1 if any(ch in tx for ch in "!?") else 0) + (1 if ln.get("sfx") else 0)
+                  + (2 if str(ln.get("emotion", "")).lower() in ("laughing", "excited", "shocked", "surprised",
+                                                                    "angry", "scared", "funny", "mischievous") else 0))
+            if sc > bs:
+                best, bs = (i, j), sc
+    if not best or bs < 4:
+        return None
+    i, j = best
+    lines = scenes[i]["lines"]
+    take = [dict(lines[j])]
+    if j + 1 < len(lines) and len(str(lines[j + 1].get("text", ""))) <= 70 and \
+            not str(lines[j + 1].get("speaker", "narrator")).lower().startswith(("narrat", "lumi")):
+        take.append(dict(lines[j + 1]))                 # the funny answer that follows it
+    return i, take
 
 
 def puppet_lines(sp, pz):
@@ -3091,7 +3122,7 @@ def main():
     if env("MODE") == "compilation":
         return make_compilation(history)
     # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
-    if (env("EVENT") == "schedule" or env("MODE") == "auto") and (extras.slot_done(history, SLOT) or recently_posted(history, hours=2)):
+    if (env("EVENT") == "schedule" or env("MODE") == "auto") and (extras.slot_done(history, SLOT) or (not SLOT and recently_posted(history, hours=2))):
         log("A video for this time slot was already posted - this backup run has nothing to do.")
         return
     if not MOCK:
@@ -3463,7 +3494,16 @@ def main():
 
     # COLD OPEN: people decide in 3 seconds - start INSIDE the story (its first, funniest/most gripping scene),
     # then Lumi Didi greets and says the title, then the rest of the story
-    cold = env("COLD_OPEN") != "0" and len(parts) > 2 and not parts[1].get("host_part") and parts[0].get("host_part")
+    hk = None if env("HOOK_OPEN") == "0" else pick_hook(scenes)
+    if hk and parts[0].get("host_part"):         # 1) a funny moment (5 s), 2) Lumi Didi + title, 3) the story
+        hi, hlines = hk
+        himg = shots_per_scene[hi][0] if shots_per_scene[hi] else imgs[hi]
+        parts.insert(0, {"image": himg, "lines": hlines, "sounds": [], "mood": scenes[hi].get("mood", "happy"),
+                         "puppet": pups[hi], "voices": voices, "hook_part": True})
+        log(f"Hook at the start (from scene {hi + 1}): {str(hlines[0].get('text', ''))[:80]}")
+        cold = False
+    else:
+        cold = env("COLD_OPEN") != "0" and len(parts) > 2 and not parts[1].get("host_part") and parts[0].get("host_part")
     if cold:
         parts[0], parts[1] = parts[1], parts[0]
     first_host = True

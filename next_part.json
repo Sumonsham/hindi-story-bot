@@ -1,0 +1,46 @@
+{
+ "detective": {
+  "created": "2026-11-03T13:40:55.435077+00:00",
+  "category": "detective",
+  "idea": "the footprints that walked backwards",
+  "title": "উল্টো পায়ের ছাপের রহস্য! 🔍 (পর্ব ১)",
+  "done": 1,
+  "total": 2,
+  "series_id": "2026-11-03T11:53+00:00",
+  "summary": " On a rainy morning in a quiet town near Kolkata, elderly Roy Moshai's antique silver compass goes missing from his study room. Young detectives Jhontu and Mini, along with their elder cousin Saheb, arrive to investigate the wet garden courtyard. They discover bizarre footprints in the damp mud: the toe marks face towards the house window, but the heel deepness suggests the person was walking away backwards! They identify two suspects: Haru the gardener, who was fixing the roof, and Nabin the neighbour, who dropped off a heavy bag earlier. While investigating the backyard dark shed for clues, Jhontu and Mini hear a strange creaking noise inside, and suddenly a shadow looms over them as the door begins to slam shut.",
+  "part2_plan": "In Part 2, Jhontu and Mini will inspect the shed to find a pair of modified reverse-soled muddy shoes, proving the mystery trick. They will test both suspects' footsteps in the garden mud to see whose gait matches the heel pressure. Mini will spot a stray jalebi thread near the mud, revealing Nabin babu's accidental involvement while trying to retrieve a lost bird cage. The stolen compass will be found unharmed, the culprit will apologize, and the kids will solve the mystery with warm family forgiveness.",
+  "characters": [
+   {
+    "name": "Jhontu",
+    "gender": "male",
+    "age": "child",
+    "kind": "human",
+    "look": "sharp 12-year-old Bengali boy, messy black hair, round glasses, blue striped short-sleeved t-shirt, dark shorts, holding a plastic magnifying glass."
+   },
+   {
+    "name": "Mini",
+    "gender": "female",
+    "age": "child",
+    "kind": "human",
+    "look": "brave 11-year-old Bengali girl, hair tied in two neat plaits with yellow ribbons, bright yellow frock, carrying a small cardboard notebook and pencil."
+   },
+   {
+    "name": "Saheb",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), wheat-brown skin, teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
+   },
+   {
+    "name": "Roy Moshai",
+    "gender": "male",
+    "age": "old",
+    "kind": "human",
+    "look": "kind elderly Bengali man around 68 years old, thin white hair, circular spectacles, beige cotton kurta, white dhoti, looking puzzled and worried."
+   }
+  ],
+  "last_lines": "ঠিক তখনই! বাইরের বড় গাছে হাওয়া দিল, আর গুদামঘরের ভারী কাঠের দরজাটা দুম করে বন্ধ হতে শুরু করল! / কে... কে বাইরে? দাঁড়া! ঝন্টু, সাবধানে! / দরজাটার ওপাশে ওটা কার ছায়া? মিনি ধরে থাক! / দরজার বাইরে কে এসে দাঁড়াল? মালী হারু কাকা? নাকি মিষ্টির থলি হাতে নবীনবাবু? নাকি আসল রহস্য অন্য কিছু? জানতে চোখ রাখো কালকের পর্বে!",
+  "setting": "A cosy rainy day in a quiet suburb near Kolkata, damp green garden, mud path soaked in light drizzle, misty greyish-blue sky, 26 degrees Celsius calm weather, yellow brick houses with vintage green wooden window shutters.",
+  "updated": "2026-11-03T13:40:55.435123+00:00"
+ }
+}

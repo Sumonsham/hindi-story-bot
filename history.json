@@ -44,7 +44,7 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -57,7 +57,8 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 221,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -70,7 +71,8 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 255,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -83,7 +85,8 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 168,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -97,7 +100,11 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 190,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -111,7 +118,11 @@
    "likes": 2,
    "comments": 0,
    "views": 1,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 202,
+   "yt_views": 1,
+   "yt_avg_s": 10,
+   "yt_avg_pct": 5.0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -125,7 +136,11 @@
    "likes": 1,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 253,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -139,7 +154,11 @@
    "likes": 2,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 161,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -153,7 +172,11 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 172,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -167,7 +190,11 @@
    "likes": 0,
    "comments": 0,
    "views": 0,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 562,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -183,7 +210,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 572,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -295,7 +326,11 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 748,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -317,7 +352,11 @@
    "likes": 0,
    "comments": 1,
    "views": 2,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 542,
+   "yt_views": 2,
+   "yt_avg_s": 2,
+   "yt_avg_pct": 0.4,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -338,7 +377,11 @@
    "likes": 2,
    "comments": 1,
    "views": 2,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 602,
+   "yt_views": 2,
+   "yt_avg_s": 7,
+   "yt_avg_pct": 1.2,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -359,7 +402,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 542,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -382,7 +429,11 @@
    "likes": 2,
    "comments": 1,
    "views": 1,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 505,
+   "yt_views": 1,
+   "yt_avg_s": 48,
+   "yt_avg_pct": 9.7,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -403,8 +454,13 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 263,
-   "checked": "2026-10-31T10:50+00:00"
+   "views": 265,
+   "length_s": 718,
+   "yt_views": 264,
+   "yt_avg_s": 55,
+   "yt_avg_pct": 7.8,
+   "yt_drop_at": 3,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -560,7 +616,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 653,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -593,7 +653,11 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 650,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -623,7 +687,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "length_s": 492,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -668,7 +736,11 @@
    "likes": 0,
    "comments": 1,
    "views": 1,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 512,
+   "yt_views": 1,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -696,7 +768,11 @@
    "likes": 0,
    "comments": 1,
    "views": 3,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 566,
+   "yt_views": 3,
+   "yt_avg_s": 16,
+   "yt_avg_pct": 2.9,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -904,8 +980,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
-   "checked": "2026-10-31T05:02+00:00"
+   "views": 1,
+   "length_s": 360,
+   "yt_views": 1,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -936,7 +1016,11 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-10-31T10:50+00:00"
+   "length_s": 390,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
   }
  },
  {
@@ -1185,7 +1269,17 @@
   "youtube": "fMvg3-aKtxU",
   "fb_reel": "29740458992218103",
   "fb_story": "1323591823152811",
-  "yt_short": "3TnqZOxEJlQ"
+  "yt_short": "3TnqZOxEJlQ",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "length_s": 570,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-03T11:02+00:00"
+  }
  },
  {
   "date": "2026-11-03T05:50+00:00",
@@ -1220,5 +1314,33 @@
    "q": "এক পায়ে দাঁড়িয়ে থাকে, কিন্তু সে মানুষ নয়! মাথায় আছে সবুজ চুল, সে কী বলুন তো?",
    "a": "গাছ"
   }
+ },
+ {
+  "date": "2026-11-03T13:40+00:00",
+  "lang": "bn",
+  "slot": "2026-11-03@19",
+  "pending_comments": [],
+  "category": "detective",
+  "idea": "the footprints that walked backwards",
+  "episode": null,
+  "part": 1,
+  "continues": true,
+  "series_id": "2026-11-03T11:53+00:00",
+  "title": "উল্টো পায়ের ছাপের রহস্য! 🔍 (পর্ব ১) | পর্ব 1",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "উল্টো পায়ের ছাপ"
+  },
+  "title_b": "কাদা রাস্তায় উল্টো পায়ের ছাপ দিল কে? 👣 (পর্ব ১)",
+  "question_post": null,
+  "facebook": "1602903361636210",
+  "youtube": "UGga-MtXeec",
+  "fb_reel": "2040413736674975",
+  "fb_story": "1102638149314468",
+  "fb_reel2": "1805322134003974",
+  "yt_short": "soYZWizVB4Y"
  }
 ]

@@ -73,7 +73,7 @@ LANGS = {
                           "divine": "भगवान की लीला", "birbal": "अकबर-बीरबल", "betal": "विक्रम-बेताल",
                           "ramayan": "रामायण", "mahabharat": "महाभारत", "gita": "गीता ज्ञान"},
         "part": "भाग {n}", "episode": "{name} भाग {n}",
-        "outro_part1": "कहानी का अगला भाग कल शाम 7 बजे... मिस मत कीजिए, अभी {page} को फॉलो कीजिए!",
+        "outro_part1": "कहानी का अगला भाग कल शाम... मिस मत कीजिए, अभी {page} को फॉलो कीजिए!",
         "vote_line": "अब आपकी बारी! कल शाम की कहानी कौन सी हो? {o1} चाहिए तो कमेंट में 1 लिखिए, {o2} चाहिए तो 2 लिखिए!",
         "vote_thanks": "आज की कहानी आपने ही वोट देकर चुनी थी। धन्यवाद!",
         "viewer_chars": "आज की कहानी के कुछ किरदारों के नाम हमारे दर्शक {names} के नाम से हैं। धन्यवाद!",
@@ -123,7 +123,7 @@ LANGS = {
                           "lok": "বাংলার লোককথা", "ramayan": "রামায়ণ", "mahabharat": "মহাভারত", "gita": "গীতার জ্ঞান",
                           "rhyme": "ছড়ার দেশে"},
         "part": "পর্ব {n}", "episode": "{name} পর্ব {n}",
-        "outro_part1": "গল্পের পরের পর্ব আসছে কাল সন্ধ্যা ৭টায়... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন!",
+        "outro_part1": "গল্পের পরের পর্ব আসছে কাল সন্ধ্যায়... মিস করতে না চাইলে এখনই {page} ফলো করে রাখুন!",
         "vote_line": "এবার আপনার পালা! কাল সন্ধ্যার গল্প কোনটা হবে? {o1} শুনতে চাইলে কমেন্টে লিখুন ১, আর {o2} শুনতে চাইলে লিখুন ২। বেশি ভোট যেটা পাবে, সেটাই আসবে!",
         "vote_thanks": "আজকের গল্পটা আপনারাই ভোট দিয়ে বেছে নিয়েছিলেন। ধন্যবাদ বন্ধুরা!",
         "viewer_chars": "আজকের গল্পের কয়েকটা চরিত্রের নাম এসেছে আমাদের দর্শক বন্ধু {names}-এর নাম থেকে। ধন্যবাদ!",
@@ -414,7 +414,14 @@ def load_history():
 
 # cron-job.org starts each video about 1 hour before it should be online (India time):
 # (start hour, start minute, the hour the video should be out)
-TRIGGERS = [(5, 0, 8), (10, 0, 13), (16, 0, 19)]   # three videos a day: start 3 hours early; 8 AM, 1 PM, 7 PM
+# three videos a day: 8 AM, 1 PM, 7 PM. The free voice model is slow (~2 minutes a line), so each run starts
+# about 4.5 hours before its post time (cron-job.org: 3:30, 8:30, 14:30 India time)
+TRIGGERS = [(3, 30, 8), (8, 30, 13), (14, 30, 19)]
+JOB_START = time.time()                          # GitHub stops a job after 6 hours
+
+
+def job_minutes_left():
+    return (float(env("JOB_LIMIT_MINUTES") or 350) * 60 - (time.time() - JOB_START)) / 60
 SLOT = None
 
 
@@ -1214,9 +1221,9 @@ PIC_W, PIC_H = 1024, 576        # 16:9; scaled up to 1280x720 for the video
 
 
 def cf_accounts():
-    """All Cloudflare accounts given: CF_ACCOUNT_ID/CF_API_TOKEN, then ..._2, ..._3 (each has its own free limit)."""
+    """The one Cloudflare account (CF_ACCOUNT_ID / CF_API_TOKEN) - one free account, no extra accounts."""
     out = []
-    for suf in ("", "_2", "_3", "_4"):
+    for suf in ("",):
         a, t = env("CF_ACCOUNT_ID" + suf), env("CF_API_TOKEN" + suf)
         if a and t:
             out.append((a, t))
@@ -1515,7 +1522,7 @@ def _voice_all(todo, make, label, max_minutes):
         GEMINI_CACHE[(i, j)] = p
         if k == 0 or (k + 1) % 5 == 0:
             log(f"  {label}: {k + 1}/{len(todo)} lines done ({(time.time() - t0) / 60:.1f} min)")
-        if k >= 2 and (time.time() - t0) / (k + 1) * len(todo) > max_minutes * 60:
+        if k >= 5 and (time.time() - t0) / (k + 1) * len(todo) > max_minutes * 60 * 1.1:   # (the first line also loads the model)
             log(f"  {label} too slow to finish the whole video today")
             break
     else:
@@ -1564,11 +1571,13 @@ def prepare_voices(parts_lines, voices, lang):
         log(f"Free voice model for all {len(todo)} lines")
         return _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
                                                                  ln.get("emotion", "normal"), p, SR),
-                          "free voice model", int(env("FREE_VOICE_MINUTES") or 200))
+                          "free voice model", min(int(env("FREE_VOICE_MINUTES") or 260), max(30, job_minutes_left() - 70)))
 
     # cartoons: the free voice model first (the Gemini voice limit is kept for the horror stories);
     # Gemini only as a backup if the free model fails. USE_GEMINI_VOICE=1 puts Gemini first again.
-    order = (gemini_all, free_all) if env("USE_GEMINI_VOICE") == "1" else (free_all, gemini_all)
+    # CARTOONS: ONLY the free voice model - never Gemini (its free voice limit is kept for the horror stories)
+    extras.TTS_STATE["off"] = True               # no Gemini voice call anywhere in this video
+    order = (free_all,)
     for engine in order:
         if engine():
             GEMINI_READY = True
@@ -1582,9 +1591,9 @@ def prepare_voices(parts_lines, voices, lang):
 
 def no_voice_stop():
     """No good voice today (Gemini limit over, free model failed): no robotic Microsoft voice - skip this video."""
-    log("STOPPED: no expressive voice available today (Gemini free limit used up and the free voice model "
-        "failed). Nothing was posted - the next run will try again. (Microsoft voices are switched off.)")
-    extras.telegram("⚠️ Little Lumi: today's voices could not be made (Gemini limit over, free voice model failed) "
+    log("STOPPED: the free voice model failed today. Nothing was posted - the next run will try again. "
+        "(Cartoons use only the free voice; Microsoft voices are switched off.)")
+    extras.telegram("⚠️ Little Lumi: today's voices could not be made (the free voice model failed) "
                     "- this video was skipped. The next run will try again.")
     sys.exit(0)
 
@@ -3480,8 +3489,8 @@ def main():
         days_bn = ["সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার", "রবিবার"]
         days_hi = ["सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार", "रविवार"]
         tday = (dt.datetime.now(extras.IST) + dt.timedelta(days=nd)).weekday()
-        t_bn = {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়"}.get(slot_hour, "")
-        t_hi = {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे"}.get(slot_hour, "")
+        t_bn = {8: "সকালে", 13: "দুপুরে", 19: "সন্ধ্যায়"}.get(slot_hour, "")
+        t_hi = {8: "सुबह", 13: "दोपहर", 19: "शाम"}.get(slot_hour, "")
         when_ = (("কাল " if nd == 1 else days_bn[tday] + " ") + t_bn) if lang == "bn" else \
                 (("कल " if nd == 1 else days_hi[tday] + " ") + t_hi)
         end_lines.append({"speaker": "narrator", "text": (

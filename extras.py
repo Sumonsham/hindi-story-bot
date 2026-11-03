@@ -893,8 +893,8 @@ def yt_upload_captions(video_id, srt_path, language="en", name="English"):
 
 # ----------------------------------------------------------------- "coming soon" post before a video
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
-TIME_WORDS = {"bn": {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়", 21: "রাত ৯টায়"},
-              "hi": {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे", 21: "रात 9 बजे"}}
+TIME_WORDS = {"bn": {8: "সকালে", 13: "দুপুরে", 19: "সন্ধ্যায়", 21: "রাতে", 14: "দুপুরে", 20: "রাতে", 10: "সকালে"},
+              "hi": {8: "सुबह", 13: "दोपहर", 19: "शाम", 21: "रात", 14: "दोपहर", 20: "रात", 10: "सुबह"}}
 DAY_WORDS = {"bn": ("আজ", "কাল"), "hi": ("आज", "कल")}
 
 
@@ -1460,7 +1460,9 @@ def tts_tags(text):
 
 
 def tts_keys():
-    keys = [k for k in (env("GEMINI_TTS_KEY" + s) for s in ("", "_2", "_3", "_4", "_5")) if k]
+    # ONE free key only (Google's free limit is meant per person / project - using extra keys to get round it
+    # breaks Google's rules and can get the accounts blocked)
+    keys = [k for k in (env("GEMINI_TTS_KEY"),) if k]
     if env("TTS_PAID") == "1" and env("GEMINI_API_KEY"):
         keys.append(env("GEMINI_API_KEY"))          # your paid key, only if you switched it on
     return keys
@@ -1974,7 +1976,8 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= 8 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 900):
+        if cur and (len(spk) > 2 or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
+                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2177,7 +2180,8 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= 8 or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > 900):
+        if cur and (len(spk) > 2 or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
+                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2299,7 +2303,7 @@ def hq_image(prompt, out, seed=0, w=1280, h=720):
     import base64 as _b64
     if env("HQ_THUMB") == "0":
         return False
-    accounts = [(env("CF_ACCOUNT_ID" + s), env("CF_API_TOKEN" + s)) for s in ("", "_2", "_3", "_4")]
+    accounts = [(env("CF_ACCOUNT_ID"), env("CF_API_TOKEN"))]
     for acc, tok in [a for a in accounts if a[0] and a[1]]:
         try:
             r = requests.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{HQ_THUMB_MODEL}",

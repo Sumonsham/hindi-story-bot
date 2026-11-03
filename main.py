@@ -503,6 +503,28 @@ def pick_theme(history):
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
 
+TEXT_DAY_OUT = set()          # writing models whose free DAILY limit is used up (not tried again this run)
+_post = requests.post
+
+
+def _post_watch(url, *a, **k):
+    """A writing model that answers 'daily limit reached' is skipped for the rest of the run."""
+    r = _post(url, *a, **k)
+    try:
+        if r.status_code == 429 and ":generateContent" in str(url) and "tts" not in str(url):
+            if re.search(r"PerDay|per_day|daily", r.text, re.I):
+                mdl = str(url).split("/models/")[1].split(":")[0]
+                if mdl not in TEXT_DAY_OUT:
+                    TEXT_DAY_OUT.add(mdl)
+                    log(f"  {mdl}: today's free limit is used up - the next model writes")
+    except Exception:
+        pass
+    return r
+
+
+requests.post = _post_watch
+
+
 def gemini_models(key):
     tries = [env("GEMINI_MODEL")] if env("GEMINI_MODEL") else []
     tries.append("gemini-flash-latest")
@@ -525,9 +547,9 @@ def gemini_models(key):
     tries += ["gemini-2.5-flash"]
     out = []
     for t in tries:
-        if t and t not in out:
+        if t and t not in out and t not in TEXT_DAY_OUT:
             out.append(t)
-    return out
+    return out or tries[-1:]
 
 
 # ---- SAHEB: the channel's own hero, in (almost) every story. Never inside the scriptures (Ramayan, Mahabharat,
@@ -1099,6 +1121,8 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
             log(f"All Gemini models busy - waiting {wait} s (round {round_no + 1}/{len(waits)})")
             time.sleep(wait)
         for model in list(models):
+            if model in TEXT_DAY_OUT:
+                continue                              # its free limit is over for today
             try:
                 log(f"Writing story with {model} ...")
                 r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent",

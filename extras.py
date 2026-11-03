@@ -1779,10 +1779,20 @@ def performed(ln):
 KEY_COOL, KEY_LAST, KEY_DEAD, DAY_OUT = {}, {}, set(), set()
 
 
+MODEL_LAST = {}
+
+
 def _pick_key(model):
     keys = [k for k in tts_keys() if k not in KEY_DEAD and (k, model) not in DAY_OUT]
     if not keys:
         return None
+    # the free voice models allow only 3 requests a minute each: keep a steady gap instead of hitting the
+    # limit (every refused request is wasted time and also counts against the day)
+    gap = 60.0 / max(1.0, float(env("TTS_RPM") or 3)) + 0.5
+    wait = MODEL_LAST.get(model, 0) + gap - time.time()
+    if wait > 0:
+        time.sleep(wait)
+    MODEL_LAST[model] = time.time()
     now = time.time()
     ready = [k for k in keys if KEY_COOL.get(k, 0) <= now]
     if not ready:                                     # every key is cooling down: wait for the first one
@@ -1985,7 +1995,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         groups.append(cur)
     log(f"  {len(items)} lines in {len(groups)} voice requests (keys: {len(tts_keys())})")
     done = 0
-    for gi, g in enumerate(groups):
+    gi = -1
+    while gi + 1 < len(groups):
+        gi += 1
+        g = groups[gi]
         if TTS_STATE["off"]:
             return False
         el = time.time() - t0
@@ -2189,7 +2202,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         groups.append(cur)
     log(f"  {len(items)} lines in {len(groups)} voice requests (keys: {len(tts_keys())})")
     done = 0
-    for gi, g in enumerate(groups):
+    gi = -1
+    while gi + 1 < len(groups):
+        gi += 1
+        g = groups[gi]
         if TTS_STATE["off"]:
             return False
         el = time.time() - t0
@@ -2221,6 +2237,13 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
                         _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
                         os.remove(x["out"] + ".seg.wav")
                     ok = True
+        if not ok and len(g) > 3 and env("TTS_HALVE") != "0":
+            # the long recording could not be cut into its lines: try it as TWO halves (2 requests) instead of
+            # one request per line - the free limit is only about 10 requests a day per voice model
+            half = len(g) // 2
+            groups[gi + 1:gi + 1] = [g[:half], g[half:]]
+            log(f"  voices: {len(g)} lines did not split cleanly - trying as two halves")
+            continue
         if not ok:
             for x in g:
                 if not _line_until_quota_ends(lambda: tts_gemini(

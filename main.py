@@ -762,13 +762,27 @@ class RigMap:
     """story character names -> character packs"""
 
     def __init__(self, story, av):
-        self.av, self.m = av, {}
+        self.av, self.m, self.g = av, {}, {}
         for c in story.get("characters", []):
+            if c.get("name"):
+                self.g[ascii_text(c["name"]).lower().strip()] = str(c.get("gender", "male")).lower()
             rid = re.sub(r"[^a-z_0-9]", "", str(c.get("rig") or "").lower())
             if rid not in av:
                 rid = puppet.rig_for(c.get("name", ""), c.get("look", ""), av)
             if rid and c.get("name"):
                 self.m[ascii_text(c["name"]).lower().strip()] = rid
+
+    def fallback(self, name, used=()):
+        """a side character the story invented (a courtier, a guard, a village woman ...): played by one of our
+        extra characters of the same kind, so the scene still gets our animated cast instead of plain pictures"""
+        k = ascii_text(str(name or "")).lower().strip()
+        fem = self.g.get(k, "").startswith("f") or bool(re.search(r"\b(woman|wife|girl|lady|mother|bou|didi|rani|queen)\b", k))
+        pool = (["gramer_bou", "rani"] if fem else ["sabhasad_1", "sabhasad_2", "paharadar", "chashi", "bonik", "pandit"])
+        for r in pool:
+            if r in self.av and r not in used:
+                self.m[k] = r
+                return r
+        return None
 
     def __call__(self, name):
         k = ascii_text(str(name or "")).lower().strip()
@@ -782,15 +796,19 @@ class RigMap:
         return puppet.rig_for(k, "", self.av)
 
 
+PUPPET_MISS = set()          # speaking characters we have no animated character for (for the log)
+
+
 def puppet_scene(s, rig):
     """which characters stand where in this scene - or None if somebody in it has no ready-made character"""
-    names, where = [], {}
+    names, where, speakers = [], {}, set()
     for n in s.get("characters") or []:
         names.append(n)
     for ln in s.get("lines") or []:
         sp = str(ln.get("speaker", ""))
         if sp and not sp.lower().startswith("narrat"):
             names.append(sp)
+            speakers.add(sp)
         pic = ln.get("image") if isinstance(ln.get("image"), dict) else {}
         for x in pic.get("people") or []:
             if isinstance(x, dict) and x.get("name"):
@@ -801,8 +819,13 @@ def puppet_scene(s, rig):
     order = []
     for n in names:
         r = rig(n)
+        if not r and n in speakers and hasattr(rig, "fallback"):
+            r = rig.fallback(n, order)                 # a speaking side character: one of our extra characters
         if not r:
-            return None
+            if n in speakers:
+                PUPPET_MISS.add(str(n))
+                return None
+            continue                                   # only seen in the picture: simply not shown
         if r not in order:
             order.append(r)
     if not order or len(order) > 5:
@@ -3326,7 +3349,10 @@ def main():
         if p:
             p["rig"] = rig
     if pup:
-        log(f"Our own cartoon characters act {sum(1 for p in pups if p)} of {len(scenes)} scenes")
+        log(f"Our own cartoon characters act {sum(1 for p in pups if p)} of {len(scenes)} scenes"
+            + (f" (no animated character for: {', '.join(sorted(PUPPET_MISS))[:200]})" if PUPPET_MISS else ""))
+    elif category in PUPPET_SERIES:
+        log(f"  our animated characters are not available for {category} - check the 'characters' folder")
     log("Cast reference picture")
     if pups and all(pups):
         log("  not needed - every scene uses our ready-made characters")

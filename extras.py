@@ -1991,7 +1991,9 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
+        # ONE character per request: a cut that lands a little off can then never put one person's words into
+        # another person's voice
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
                     or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
             groups.append(cur)
             cur = []
@@ -2155,8 +2157,9 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     if len(sc["speakers"]) == 1:      # the API wants exactly 2 voices listed; the 2nd one simply never speaks
         sc["speakers"].append({"speaker": "Unused", "voice": "Puck" if speakers[0][1] != "Puck" else "Kore"})
     for model in NEW_TTS:
-        blocks = [{"type": "text", "text": tts_tags(t) + (" ... ..." if k < len(turns) - 1 else ""),
-                   "annotations": [{"type": "speech_metadata", "speaker": s, "style": (st + " " + extra_note)[:900]}]}
+        blocks = [{"type": "text", "text": tts_tags(t) + (" ... ... ..." if k < len(turns) - 1 else ""),
+                   "annotations": [{"type": "speech_metadata", "speaker": s, "style": (
+                       st + ". Finish this line completely, then a full one-second silence. " + extra_note)[:900]}]}
                   for k, (s, t, st) in enumerate(turns)]
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
                     {"model": model, "input": [{"type": "user_input", "content": blocks}],
@@ -2196,7 +2199,9 @@ def tts_groups(items):
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
-        if cur and (len(spk) > 2 or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
+        # ONE character per request: a cut that lands a little off can then never put one person's words into
+        # another person's voice
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
                     or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
             groups.append(cur)
             cur = []
@@ -2204,6 +2209,73 @@ def tts_groups(items):
     if cur:
         groups.append(cur)
     return groups
+
+
+def _align_split(wav, plains):
+    """Cuts one recording of several lines exactly in the silences BETWEEN the lines: every silence is a
+    candidate, and the cuts are the ones that best match where each line should end (by its length), in order.
+    Returns None when it is not sure (then the lines are asked for again in smaller groups)."""
+    import numpy as np
+    from scipy.io import wavfile
+    sr, a = wavfile.read(wav)
+    a = a.astype("float32")
+    n = len(plains)
+    if n == 1:
+        return [a], sr
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+    if rms.size < 10:
+        return None
+    quiet = rms < max(np.percentile(rms, 95) * 0.06, 1e-6)
+    cand, i = [], 0                                   # (centre frame, length in frames)
+    while i < len(quiet):
+        if quiet[i]:
+            j = i
+            while j < len(quiet) and quiet[j]:
+                j += 1
+            if (j - i) * 0.02 >= 0.12 and i > 0 and j < len(quiet):
+                cand.append(((i + j) // 2, j - i))
+            i = j
+        else:
+            i += 1
+    if len(cand) < n - 1:
+        return None
+    tot = sum(max(1, len(p)) for p in plains)
+    exp, acc = [], 0
+    for p in plains[:-1]:
+        acc += max(1, len(p))
+        exp.append(len(rms) * acc / tot)
+    # dynamic programming: pick n-1 silences in order, close to the expected ends, longer silences preferred
+    C, K = len(cand), n - 1
+    INF = float("inf")
+    cost = [[INF] * C for _ in range(K)]
+    back = [[-1] * C for _ in range(K)]
+    for c in range(C):
+        cost[0][c] = abs(cand[c][0] - exp[0]) - 3 * cand[c][1]
+    for k in range(1, K):
+        best, bi = INF, -1
+        for c in range(C):
+            if c > 0 and cost[k - 1][c - 1] < best:
+                best, bi = cost[k - 1][c - 1], c - 1
+            if bi >= 0:
+                cost[k][c] = best + abs(cand[c][0] - exp[k]) - 3 * cand[c][1]
+                back[k][c] = bi
+    c = min(range(C), key=lambda x: cost[K - 1][x])
+    if cost[K - 1][c] == INF:
+        return None
+    picks = [c]
+    for k in range(K - 1, 0, -1):
+        c = back[k][c]
+        picks.append(c)
+    cuts = [cand[c][0] for c in reversed(picks)]
+    bounds = [0] + [c * hop for c in cuts] + [len(a)]
+    segs = [a[bounds[k]:bounds[k + 1]] for k in range(n)]
+    total = len(a) / sr
+    for seg, p in zip(segs, plains):                  # every piece must fit its own line's length
+        want = total * max(1, len(p)) / tot
+        if not (0.5 * want <= len(seg) / sr <= 1.9 * want + 0.5):
+            return None
+    return segs, sr
 
 
 def _soft_split(wav, plains):
@@ -2245,7 +2317,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
     groups = tts_groups(items)
     log(f"  {len(items)} lines in {len(groups)} voice requests")
     done = 0
-    for g in groups:
+    gi = -1
+    while gi + 1 < len(groups):
+        gi += 1
+        g = groups[gi]
         if TTS_STATE["off"] or not gemini_quota_left():
             log("  expressive voices: today's free limit is over")
             return False
@@ -2281,11 +2356,19 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         tmp = g[0]["out"] + ".group.wav"
         _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
-        cut = _split_at_pauses(tmp, plains) if len(g) > 1 else None
+        cut = (_split_at_pauses(tmp, plains) or _align_split(tmp, plains)) if len(g) > 1 else None
+        if not cut and len(g) > 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
+            # not sure where one line ends and the next begins: ask again as two smaller groups - a line is
+            # NEVER cut in the middle of a sentence
+            os.remove(tmp)
+            half = len(g) // 2
+            groups[gi + 1:gi + 1] = [g[:half], g[half:]]
+            log(f"  voices: {len(g)} lines - not sure where each line ends, asking again in two smaller groups")
+            continue
         if not cut:
             cut = _soft_split(tmp, plains)
             if len(g) > 1:
-                log(f"  voices: {len(g)} lines cut by their length (no extra request)")
+                log(f"  voices: {len(g)} lines cut at the quietest moments (no requests left to ask again)")
         os.remove(tmp)
         segs, rate = cut
         for x, seg in zip(g, segs):

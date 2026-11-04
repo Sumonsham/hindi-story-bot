@@ -1880,8 +1880,11 @@ def _audio_file(data, out_wav, sr, trim=True):
                   "silenceremove=start_periods=1:start_threshold=-50dB,areverse"] if trim else [])
     _run(["ffmpeg", "-y", "-loglevel", "error"] + inp + af + ["-ac", "1", "-ar", str(sr), out_wav])
     os.remove(raw)
-    return float(_run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
-                       "default=nw=1:nk=1", out_wav]).strip() or 0)
+    try:
+        return float(_run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
+                           "default=nw=1:nk=1", out_wav]).strip() or 0)
+    except (ValueError, RuntimeError):
+        return 0.0                                    # an empty / broken piece: the caller treats it as missing
 
 
 def _single_body(model, text, voice, style, lang_label):
@@ -2288,9 +2291,18 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         for x, seg in zip(g, segs):
             if len(seg) < rate * 0.15:                  # nothing left for this line: it gets the backup voice
                 continue
-            wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
-            _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
-            os.remove(x["out"] + ".seg.wav")
+            try:
+                wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
+                if _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True) < 0.2 \
+                        and os.path.exists(x["out"]):
+                    os.remove(x["out"])                 # (almost) silent: this line gets the backup voice
+            except Exception as ex:
+                log(f"    one piece could not be used ({str(ex)[:80]}) - that line gets the backup voice")
+                if os.path.exists(x["out"]):
+                    os.remove(x["out"])
+            finally:
+                if os.path.exists(x["out"] + ".seg.wav"):
+                    os.remove(x["out"] + ".seg.wav")
         done += len(g)
         log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min, {TTS_USED[0]} requests)")
     return all(os.path.exists(x["out"]) and os.path.getsize(x["out"]) > 2000 for x in items)

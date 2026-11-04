@@ -237,7 +237,11 @@
    "likes": 3,
    "comments": 3,
    "views": 1,
-   "checked": "2026-11-01T05:02+00:00"
+   "length_s": 618,
+   "yt_views": 1,
+   "yt_avg_s": 11,
+   "yt_avg_pct": 1.9,
+   "checked": "2026-11-04T11:45+00:00"
   }
  },
  {
@@ -260,7 +264,11 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T05:02+00:00"
+   "length_s": 747,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T11:45+00:00"
   }
  },
  {
@@ -483,7 +491,11 @@
    "likes": 0,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T05:02+00:00"
+   "length_s": 665,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T11:45+00:00"
   }
  },
  {
@@ -809,7 +821,11 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T05:02+00:00"
+   "length_s": 476,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T11:45+00:00"
   }
  },
  {
@@ -1072,7 +1088,11 @@
    "likes": 1,
    "comments": 1,
    "views": 1,
-   "checked": "2026-11-01T05:02+00:00"
+   "length_s": 440,
+   "yt_views": 1,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T11:45+00:00"
   }
  },
  {
@@ -1323,6 +1343,10 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-04T04:02+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 1
   }
  },
  {
@@ -1351,7 +1375,17 @@
   "fb_reel": "2040413736674975",
   "fb_story": "1102638149314468",
   "fb_reel2": "1805322134003974",
-  "yt_short": "soYZWizVB4Y"
+  "yt_short": "soYZWizVB4Y",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 1,
+   "length_s": 430,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T11:45+00:00"
+  }
  },
  {
   "date": "2026-11-04T02:31+00:00",
@@ -1410,5 +1444,33 @@
   "fb_story": "29012681781718377",
   "fb_reel2": "1103526969226275",
   "yt_short": "CAbLLMh-fZM"
+ },
+ {
+  "date": "2026-11-04T13:24+00:00",
+  "lang": "bn",
+  "slot": "2026-11-04@19",
+  "pending_comments": [],
+  "category": "birbal",
+  "idea": "Birbal and the mango tree's real owner",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "আসল মালিক কে? আমের গাছের মজার বিচার! 🥭",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "গ",
+   "text": "বুড়ো রমেশ"
+  },
+  "title_b": "আম গাছের মালিকানা কার? বীরবলের বুদ্ধি! 🌳",
+  "question_post": null,
+  "facebook": "1602870967652767",
+  "youtube": "UaaPFK0sAXc",
+  "fb_reel": "1781783273125883",
+  "fb_story": "1644385647067563",
+  "fb_reel2": "2630934067425526",
+  "coloring": "122137617962735948"
  }
 ]

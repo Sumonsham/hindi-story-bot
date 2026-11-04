@@ -1776,7 +1776,7 @@ def performed(ln):
 #  1) on a per-minute limit we do not wait - the next key is used at once (each key has its own limit);
 #  2) several lines (one or two speakers) are voiced in ONE request, then cut apart at the pauses -
 #     about 4x fewer requests per story, so the daily limit covers whole stories.
-KEY_COOL, KEY_LAST, KEY_DEAD, DAY_OUT = {}, {}, set(), set()
+KEY_COOL, KEY_LAST, KEY_DEAD, DAY_OUT, HITS = {}, {}, set(), set(), {}
 
 
 MODEL_LAST = {}
@@ -1843,11 +1843,13 @@ def _tts_call(requests_to_try):
                 continue
             if r.status_code == 429:
                 kind, wait = _429_kind(r)
-                if kind == "day":
+                HITS[model] = HITS.get(model, 0) + 1
+                if kind == "day" or HITS[model] >= 3:     # 3 refusals in a row: its limit is over for today
                     DAY_OUT.add((key, model))
-                else:
-                    KEY_COOL[key] = time.time() + min(wait, 65) + 1
+                    break
+                KEY_COOL[key] = time.time() + min(wait, 65) + 1
                 continue
+            HITS[model] = 0
             if r.status_code in (401, 403):
                 KEY_DEAD.add(key)
                 continue
@@ -2109,11 +2111,13 @@ def _tts_call(requests_to_try):
                 continue
             if r.status_code == 429:
                 kind, wait = _429_kind(r)
-                if kind == "day":
+                HITS[model] = HITS.get(model, 0) + 1
+                if kind == "day" or HITS[model] >= 3:     # 3 refusals in a row: its limit is over for today
                     DAY_OUT.add((key, model))
-                else:
-                    KEY_COOL[key] = time.time() + min(wait, 65) + 1
+                    break
+                KEY_COOL[key] = time.time() + min(wait, 65) + 1
                 continue
+            HITS[model] = 0
             if r.status_code in (401, 403):
                 KEY_DEAD.add(key)
                 continue
@@ -2184,12 +2188,8 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
     return False
 
 
-def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
-    """items (story order): dict(text, plain, voice, who, feel, spk, out, lang). Up to 6 lines and 2 speakers per
-    request, each line with its own feeling; cut apart at the pauses. All lines or none."""
-    import numpy as np
-    from scipy.io import wavfile
-    t0 = time.time()
+def tts_groups(items):
+    """How the lines are sent: up to 12 lines / 1400 characters and max 2 speakers per request."""
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
@@ -2200,18 +2200,56 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         cur.append(it)
     if cur:
         groups.append(cur)
-    log(f"  {len(items)} lines in {len(groups)} voice requests (keys: {len(tts_keys())})")
+    return groups
+
+
+def _soft_split(wav, plains):
+    """When the clean pause-cut is unsure: cut near where each line SHOULD end (by its length), at the quietest
+    moment close to that point - never a new request (the free limit is only ~10 requests a day per model)."""
+    import numpy as np
+    from scipy.io import wavfile
+    sr, a = wavfile.read(wav)
+    a = a.astype("float32")
+    n = len(plains)
+    if n == 1 or len(a) < sr:
+        return [a] + [a[:0]] * (n - 1), sr
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+    tot = sum(max(1, len(p)) for p in plains)
+    cuts, acc, prev = [], 0, 0
+    for p in plains[:-1]:
+        acc += max(1, len(p))
+        want = int(len(rms) * acc / tot)
+        w = max(5, int(len(rms) * 0.06))
+        lo, hi = max(prev + 5, want - w), min(len(rms) - 5, want + w)
+        c = want if hi <= lo else lo + int(np.argmin(rms[lo:hi]))
+        cuts.append(c)
+        prev = c
+    bounds = [0] + [c * hop for c in cuts] + [len(a)]
+    return [a[bounds[k]:bounds[k + 1]] for k in range(n)], sr
+
+
+TTS_USED = [0]                  # voice requests sent in this run (each one counts against the day)
+
+
+def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None):
+    """items: dict(text, plain, voice, who, feel, spk, out, lang). One request per group of lines, cut apart at
+    the pauses (or near where each line should end). Stops AT ONCE when the daily limit is over - it never waits
+    for hours and never sends a line alone again. Returns True when every line is done."""
+    import numpy as np
+    from scipy.io import wavfile
+    t0 = time.time()
+    groups = tts_groups(items)
+    log(f"  {len(items)} lines in {len(groups)} voice requests")
     done = 0
-    gi = -1
-    while gi + 1 < len(groups):
-        gi += 1
-        g = groups[gi]
-        if TTS_STATE["off"]:
+    for g in groups:
+        if TTS_STATE["off"] or not gemini_quota_left():
+            log("  expressive voices: today's free limit is over")
             return False
-        el = time.time() - t0
-        # slow is fine - Gemini is still the fastest good voice. We only stop when its free limit is really
-        # over (TTS_STATE off / a failed line) or after a hard safety cap so the GitHub job is never killed.
-        if el > float(env("TTS_MAX_MINUTES") or 180) * 60:
+        if max_requests is not None and TTS_USED[0] >= max_requests:
+            log("  expressive voices: today's planned share is used")
+            return False
+        if time.time() - t0 > float(env("TTS_MAX_MINUTES") or 75) * 60:
             log("  expressive voices: safety time limit reached")
             return False
         spk = []
@@ -2221,38 +2259,64 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         labels = {s[0]: f"Speaker{k + 1}" for k, s in enumerate(spk)}
         lang = g[0].get("lang", "bn")
         note = " ".join(f"{labels[s[0]]} is {s[2]}." for s in spk) + " " + PRONOUNCE.get(lang, "")
-        turns = [(labels[x["spk"]], x["text"], x["feel"]) for x in g]
-        ok = False
-        if len(g) > 1:
-            data = _tts_call(_requests_for(turns, [(labels[s[0]], s[1]) for s in spk], lang_label, note))
-            if data:
-                tmp = g[0]["out"] + ".group.wav"
-                _audio_file(data, tmp, sr, trim=True)
-                cut = _split_at_pauses(tmp, [x["plain"] for x in g])
-                os.remove(tmp)
-                if cut:
-                    segs, rate = cut
-                    for x, seg in zip(g, segs):
-                        wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
-                        _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
-                        os.remove(x["out"] + ".seg.wav")
-                    ok = True
-        if not ok and len(g) > 3 and env("TTS_HALVE") != "0":
-            # the long recording could not be cut into its lines: try it as TWO halves (2 requests) instead of
-            # one request per line - the free limit is only about 10 requests a day per voice model
-            half = len(g) // 2
-            groups[gi + 1:gi + 1] = [g[:half], g[half:]]
-            log(f"  voices: {len(g)} lines did not split cleanly - trying as two halves")
-            continue
-        if not ok:
-            for x in g:
-                if not _line_until_quota_ends(lambda: tts_gemini(
-                        x["text"], x["voice"], f"{x['who']}. {x['feel']}. " + PRONOUNCE.get(lang, ""),
-                        lang_label, x["out"], sr)):
-                    return False
+        data = None
+        for attempt in range(2):                      # one quiet retry for a busy server, never more
+            TTS_USED[0] += 1
+            if len(g) > 1:
+                turns = [(labels[x["spk"]], x["text"], x["feel"]) for x in g]
+                data = _tts_call(_requests_for(turns, [(labels[s[0]], s[1]) for s in spk], lang_label, note))
+            else:
+                x = g[0]
+                data = _tts_call([_single_body(mm, x["text"], x["voice"], f"{x['who']}. {x['feel']}. "
+                                               + PRONOUNCE.get(lang, ""), lang_label) for mm in NEW_TTS + OLD_TTS])
+            if data or not gemini_quota_left():
+                break
+            time.sleep(45)
+        if not data:
+            log("  expressive voices: no answer (limit over or server busy) - the rest gets the backup voice")
+            return False
+        tmp = g[0]["out"] + ".group.wav"
+        _audio_file(data, tmp, sr, trim=True)
+        plains = [x["plain"] for x in g]
+        cut = _split_at_pauses(tmp, plains) if len(g) > 1 else None
+        if not cut:
+            cut = _soft_split(tmp, plains)
+            if len(g) > 1:
+                log(f"  voices: {len(g)} lines cut by their length (no extra request)")
+        os.remove(tmp)
+        segs, rate = cut
+        for x, seg in zip(g, segs):
+            if len(seg) < rate * 0.15:                  # nothing left for this line: it gets the backup voice
+                continue
+            wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
+            _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True)
+            os.remove(x["out"] + ".seg.wav")
         done += len(g)
-        log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min)")
-    return True
+        log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min, {TTS_USED[0]} requests)")
+    return all(os.path.exists(x["out"]) and os.path.getsize(x["out"]) > 2000 for x in items)
+
+
+def _pacific_day():
+    try:
+        from zoneinfo import ZoneInfo
+        return dt.datetime.now(ZoneInfo("America/Los_Angeles")).date().isoformat()
+    except Exception:
+        return (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=8)).date().isoformat()
+
+
+def tts_budget_left(path):
+    """Google's free voice limit is counted per day (it starts again at midnight in California = about 1:30 PM
+    India time): how many requests are still free today, from what this bot used (assets/tts_usage.json)."""
+    d = _jl(path, {})
+    used = int(d.get("used", 0)) if d.get("day") == _pacific_day() else 0
+    return max(0, int(env("TTS_DAY_BUDGET") or 36) - used)
+
+
+def tts_budget_use(path):
+    d = _jl(path, {})
+    used = int(d.get("used", 0)) if d.get("day") == _pacific_day() else 0
+    _js(path, {"day": _pacific_day(), "used": used + TTS_USED[0]})
+    TTS_USED[0] = 0
 
 
 # ===================== v10: hooks that keep people watching + truly frightening horror =====================

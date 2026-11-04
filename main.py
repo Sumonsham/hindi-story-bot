@@ -1704,7 +1704,9 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
         hz = int(pitch.replace("Hz", "")) if pitch.replace("Hz", "").lstrip("+-").isdigit() else 0
         male = voice in LANGS["hi"]["male"] + LANGS["bn"]["male"]
         f = max(0.72, min(1.3, (0.80 if male else 1.0) * (1 + hz / 160)))
-        af = f"asetrate=44100*{f:.3f},aresample=44100,atempo={min(2.0, max(0.5, 1 / f)):.3f}"
+        # (the Google voice comes at 24000 Hz: first make it 44100 Hz, THEN change its pitch - without this every
+        # line came out ~1.8x too high and too fast, like a cartoon child)
+        af = f"aresample=44100,asetrate=44100*{f:.3f},aresample=44100,atempo={min(2.0, max(0.5, 1 / f)):.3f}"
     if efx:
         af += "," + efx
     if ghost:

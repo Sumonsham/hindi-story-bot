@@ -2185,9 +2185,12 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     if len(sc["speakers"]) == 1:      # the API wants exactly 2 voices listed; the 2nd one simply never speaks
         sc["speakers"].append({"speaker": "Unused", "voice": "Puck" if speakers[0][1] != "Puck" else "Kore"})
     for model in NEW_TTS:
+        # the long accent / speaker note goes with the FIRST line only (it holds for the whole recording) - repeated
+        # on all 16 lines it used up the 10,000-tokens-a-minute limit of the free voice models
         blocks = [{"type": "text", "text": tts_tags(t) + (" ... ... ..." if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (
-                       st + ". Finish this line completely, then a full one-second silence. " + extra_note)[:900]}]}
+                       st + ". Finish this line completely, then a full one-second silence."
+                       + (" " + extra_note if k == 0 else ""))[:1500]}]}
                   for k, (s, t, st) in enumerate(turns)]
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
                     {"model": model, "input": [{"type": "user_input", "content": blocks}],
@@ -2384,7 +2387,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         tmp = g[0]["out"] + ".group.wav"
         _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
-        cut = (_split_at_pauses(tmp, plains) or _align_split(tmp, plains)) if len(g) > 1 else None
+        cut = _align_split(tmp, plains) if len(g) > 1 else None
         if not cut and len(g) > 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
             # not sure where one line ends and the next begins: ask again as two smaller groups - a line is
             # NEVER cut in the middle of a sentence

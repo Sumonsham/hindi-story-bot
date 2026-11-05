@@ -1646,7 +1646,34 @@ def parler_cast(chars, lang, narrator_gender="male"):
     return out
 
 
+def protobuf_shim():
+    """Some newer helper files (made with protobuf 5) import google.protobuf.runtime_version, which the older
+    protobuf on the runner (needed by mediapipe) does not have -> 'cannot import name runtime_version' and the
+    free voice failed. The check it does is only a version check, so a tiny stand-in is enough."""
+    try:
+        from google.protobuf import runtime_version  # noqa: F401
+        return
+    except Exception:
+        pass
+    try:
+        import types
+        import google.protobuf as _gp
+        mod = types.ModuleType("google.protobuf.runtime_version")
+
+        class Domain:
+            PUBLIC = 0
+            GOOGLE_INTERNAL = 1
+        mod.Domain = Domain
+        mod.ValidateProtobufRuntimeVersion = lambda *a, **k: None
+        sys.modules["google.protobuf.runtime_version"] = mod
+        _gp.runtime_version = mod
+        log("  (protobuf: added the small runtime_version stand-in for the free voice model)")
+    except Exception as e:
+        log("  protobuf stand-in failed:", str(e)[:100])
+
+
 def _parler_load():
+    protobuf_shim()
     if PARLER["model"] is None:
         import warnings
         os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")   # no pages of model settings in the log
@@ -1993,8 +2020,8 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         spk = {x["spk"] for x in cur} | {it["spk"]}
         # ONE character per request: a cut that lands a little off can then never put one person's words into
         # another person's voice
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
-                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 16)
+                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1900)):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2066,6 +2093,7 @@ def parler_ok():          # the free on-GitHub model (slow, but no daily limit):
 
 def ensure_parler():
     """Install the free voice model's tools only on the days they are needed (saves time on normal days)."""
+    protobuf_shim()
     try:
         import torch, torchaudio  # noqa: F401
         from parler_tts import ParlerTTSForConditionalGeneration  # noqa: F401
@@ -2201,8 +2229,8 @@ def tts_groups(items):
         spk = {x["spk"] for x in cur} | {it["spk"]}
         # ONE character per request: a cut that lands a little off can then never put one person's words into
         # another person's voice
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
-                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1400)):
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 16)
+                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1900)):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2397,6 +2425,17 @@ def _pacific_day():
         return dt.datetime.now(ZoneInfo("America/Los_Angeles")).date().isoformat()
     except Exception:
         return (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=8)).date().isoformat()
+
+
+def seconds_until_reset():
+    """Seconds until Google's free limits start again (midnight in California)."""
+    try:
+        from zoneinfo import ZoneInfo
+        now = dt.datetime.now(ZoneInfo("America/Los_Angeles"))
+    except Exception:
+        now = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=8)
+    nxt = (now + dt.timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return (nxt - now).total_seconds()
 
 
 def tts_budget_left(path):

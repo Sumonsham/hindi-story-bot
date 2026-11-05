@@ -290,7 +290,11 @@
    "likes": 6,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T12:10+00:00"
+   "length_s": 626,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -311,7 +315,11 @@
    "likes": 2,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T12:10+00:00"
+   "length_s": 645,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -516,8 +524,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-11-01T12:10+00:00"
+   "views": 2,
+   "length_s": 653,
+   "yt_views": 1,
+   "yt_avg_s": 15,
+   "yt_avg_pct": 2.3,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -530,8 +542,12 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 5,
-   "checked": "2026-11-01T12:10+00:00"
+   "views": 6,
+   "length_s": 6942,
+   "yt_views": 5,
+   "yt_avg_s": 10,
+   "yt_avg_pct": 0.1,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -564,7 +580,11 @@
    "likes": 2,
    "comments": 1,
    "views": 2,
-   "checked": "2026-11-01T12:10+00:00"
+   "length_s": 689,
+   "yt_views": 2,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -856,7 +876,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-01T12:10+00:00"
+   "length_s": 556,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -1124,7 +1148,11 @@
    "likes": 1,
    "comments": 1,
    "views": 1,
-   "checked": "2026-11-01T12:10+00:00"
+   "length_s": 403,
+   "yt_views": 2,
+   "yt_avg_s": 16,
+   "yt_avg_pct": 4.0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -1385,6 +1413,10 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-04T11:45+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 1
   }
  },
  {
@@ -1418,6 +1450,16 @@
   "riddle": {
    "q": "কোন জিনিস নিজে জ্বলে, আর অন্যকে আলো দেয়?",
    "a": "মোমবাতি"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 455,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-04T23:02+00:00"
   }
  },
  {
@@ -1472,5 +1514,39 @@
   "fb_story": "1644385647067563",
   "fb_reel2": "2630934067425526",
   "coloring": "122137617962735948"
+ },
+ {
+  "date": "2026-11-05T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-05@8",
+  "pending_comments": [],
+  "category": "fairy",
+  "idea": "the star that fell into a village garden",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "বাগানে খসে পড়া ছোট তারা ও সাহেবের জাদু! 🌟✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "পদ্ম-ঘুড়ি"
+  },
+  "title_b": "মিষ্টি মেয়ে মিশি আর মিটমিটে তারা শিশুর গল্প 🌌",
+  "question_post": "2026-11-05",
+  "facebook": "2000173323997545",
+  "youtube": "Yflig0BAb48",
+  "fb_reel": "1127414910151119",
+  "fb_story": "1039224389212883",
+  "fb_reel2": "1107438345449386",
+  "coloring": "122137680062735948",
+  "yt_short": "8Zv-dR-TrXw",
+  "riddle_post": "122137689512735948",
+  "riddle": {
+   "q": "আকাশে থাকি কিন্তু পাখি নই, রাতে জ্বলি কিন্তু প্রদীপ নই! আমি কে?",
+   "a": "তারা"
+  }
  }
 ]

@@ -1204,8 +1204,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 1,
-   "checked": "2026-11-02T04:02+00:00"
+   "views": 0,
+   "length_s": 434,
+   "yt_views": 1,
+   "yt_avg_s": 444,
+   "yt_avg_pct": 102.2,
+   "checked": "2026-11-05T04:02+00:00"
   }
  },
  {
@@ -1460,6 +1464,11 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-04T23:02+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-05T04:03+00:00"
   }
  },
  {
@@ -1485,7 +1494,17 @@
   "fb_reel": "1457900622966053",
   "fb_story": "29012681781718377",
   "fb_reel2": "1103526969226275",
-  "yt_short": "CAbLLMh-fZM"
+  "yt_short": "CAbLLMh-fZM",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 384,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-05T04:02+00:00"
+  }
  },
  {
   "date": "2026-11-04T13:24+00:00",
@@ -1548,5 +1567,48 @@
    "q": "আকাশে থাকি কিন্তু পাখি নই, রাতে জ্বলি কিন্তু প্রদীপ নই! আমি কে?",
    "a": "তারা"
   }
+ },
+ {
+  "date": "2026-11-05T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-05@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "Gopal and the king's lost golden ring",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রাজার হারানো সোনার আংটি ও গোপালের বুদ্ধি! 💍",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "betal",
+     "the four brothers who made a lion alive"
+    ],
+    [
+     "betal",
+     "the generous merchant and the sacrifice"
+    ]
+   ],
+   "labels": [
+    "সিংহ বাঁচানোর গল্প",
+    "দয়ালু বণিকের ত্যাগ"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "জাদুকরী কাঠি"
+  },
+  "title_b": "গোপাল ভাঁড় ও মহারাজার সোনার আংটি রহস্য! 👑",
+  "question_post": null,
+  "facebook": "969729272425178",
+  "youtube": "X7S8MmvIKYU",
+  "fb_reel": "1130074873148571",
+  "fb_story": "1393173189270805",
+  "fb_reel2": "2208881636729119",
+  "yt_short": "ssTDRdgZcKY"
  }
 ]

@@ -619,7 +619,11 @@
    "likes": 1,
    "comments": 1,
    "views": 0,
-   "checked": "2026-11-02T11:02+00:00"
+   "length_s": 576,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-05T11:02+00:00"
   }
  },
  {
@@ -933,7 +937,11 @@
    "likes": 1,
    "comments": 1,
    "views": 1,
-   "checked": "2026-11-02T11:02+00:00"
+   "length_s": 461,
+   "yt_views": 1,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-05T11:02+00:00"
   }
  },
  {
@@ -1222,8 +1230,12 @@
   "stats": {
    "likes": 1,
    "comments": 0,
-   "views": 2,
-   "checked": "2026-11-02T11:02+00:00"
+   "views": 4,
+   "length_s": 5645,
+   "yt_views": 1,
+   "yt_avg_s": 7,
+   "yt_avg_pct": 0.1,
+   "checked": "2026-11-05T11:02+00:00"
   }
  },
  {
@@ -1254,7 +1266,11 @@
    "likes": 0,
    "comments": 1,
    "views": 1,
-   "checked": "2026-11-02T11:02+00:00"
+   "length_s": 439,
+   "yt_views": 1,
+   "yt_avg_s": 8,
+   "yt_avg_pct": 1.8,
+   "checked": "2026-11-05T11:02+00:00"
   }
  },
  {
@@ -1504,6 +1520,11 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-05T04:02+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-05T11:03+00:00"
   }
  },
  {
@@ -1532,7 +1553,17 @@
   "fb_reel": "1781783273125883",
   "fb_story": "1644385647067563",
   "fb_reel2": "2630934067425526",
-  "coloring": "122137617962735948"
+  "coloring": "122137617962735948",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 423,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-05T11:02+00:00"
+  }
  },
  {
   "date": "2026-11-05T02:31+00:00",

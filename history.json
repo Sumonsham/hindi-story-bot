@@ -1563,6 +1563,11 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-05T11:02+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-05T22:02+00:00"
   }
  },
  {
@@ -1641,5 +1646,38 @@
   "fb_story": "1393173189270805",
   "fb_reel2": "2208881636729119",
   "yt_short": "ssTDRdgZcKY"
+ },
+ {
+  "date": "2026-11-06T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-06@8",
+  "pending_comments": [],
+  "category": "jataka",
+  "idea": "the deer king who offered himself",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রাজকীয় আত্মত্যাগ ও সোনার হরিণ 🦌",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "সোনালি"
+  },
+  "title_b": "দয়ালু হরিণ রাজ ও বারাণসীর রাজা 👑",
+  "question_post": "2026-11-06",
+  "facebook": "2579820345864737",
+  "youtube": "mPNBUnbp6vM",
+  "fb_reel": "1008602615625517",
+  "fb_story": "2164485124441862",
+  "fb_reel2": "1166901926018513",
+  "coloring": "122137835648735948",
+  "riddle_post": "122137846466735948",
+  "riddle": {
+   "q": "পা নেই তবু চলে, মুখ নেই তবু বলে। আমি কে?",
+   "a": "চিঠি"
+  }
  }
 ]

@@ -2003,8 +2003,9 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
             log("  expressive voice: free limit used up on all keys")
             return False
         d = _audio_file(data, out_wav, sr)
-        if max(0.4, plain_len / 40) <= d <= plain_len / 3 + 6:
+        if max(0.4, plain_len / 40) <= d <= plain_len / 7 + 3:     # longer = something extra was said
             return True
+        log(f"    single line: {d:.1f} s for {plain_len} letters - not used")
     return False
 
 
@@ -2172,6 +2173,11 @@ def _tts_call(requests_to_try):
     return None
 
 
+SHORT_ACCENT = {"Kolkata (West Bengal, India) Bengali": "Standard Kolkata Bengali accent, every word exactly as written",
+                "Bengali": "Standard Kolkata Bengali accent, every word exactly as written",
+                "Hindi": "Natural Hindi, every word exactly as written"}
+
+
 def _requests_for(turns, speakers, lang_label, extra_note=""):
     """turns: [(speaker_label, text_with_<tags>, style)], speakers: [(label, voice)] (1 or 2).
     Returns every way of asking, best first."""
@@ -2187,23 +2193,26 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
     for model in NEW_TTS:
         # the long accent / speaker note goes with the FIRST line only (it holds for the whole recording) - repeated
         # on all 16 lines it used up the 10,000-tokens-a-minute limit of the free voice models
+        # ONLY the story's own words are in the text the model speaks; how to say it goes in a SHORT style note
+        # (long English notes were sometimes read out loud in English in the middle of a Bengali story)
         blocks = [{"type": "text", "text": tts_tags(t) + (" ... ... ..." if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (
-                       st + ". Finish this line completely, then a full one-second silence."
-                       + (" " + extra_note if k == 0 else ""))[:1500]}]}
+                       str(st).split(" Accent:")[0][:200]
+                       + ((" " + str(extra_note).split(" Accent:")[0][:200] + " " + SHORT_ACCENT.get(lang_label, ""))
+                          if k == 0 else ""))[:500]}]}
                   for k, (s, t, st) in enumerate(turns)]
         out.append((model + "#blocks", model, f"{GEMINI_BASE}/interactions",
                     {"model": model, "input": [{"type": "user_input", "content": blocks}],
                      "response_format": {"type": "audio"}, "generation_config": {"speech_config": sc}}, API_REV))
     for model in OLD_TTS:
         plain = "\n".join((f"{s}: " if multi else "") + strip_tags(t) for s, t, st in turns)
-        notes = " ".join(f"Line {k + 1}: {st}." for k, (s, t, st) in enumerate(turns))
         cfg = ({"multiSpeakerVoiceConfig": {"speakerVoiceConfigs": [
             {"speaker": s, "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": v}}} for s, v in speakers]}}
             if multi else {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": speakers[0][1]}}})
+        # the older models speak EVERYTHING in the prompt: one short lead-in ending in a colon, then only the lines
         out.append((model + ("#multi" if multi else "#single"), model, f"{GEMINI_BASE}/models/{model}:generateContent",
-                    {"contents": [{"parts": [{"text": f"You are voice actors in a {lang_label} audio drama. {extra_note} "
-                                                      f"{notes} Leave a clear pause between lines.\n{plain}"}]}],
+                    {"contents": [{"parts": [{"text": f"Read aloud slowly in {lang_label}, as a radio drama, with a "
+                                                      f"pause after every line:\n{plain}"}]}],
                      "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": cfg}}, {}))
     return out
 
@@ -2385,8 +2394,20 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
             log("  expressive voices: no answer (limit over or server busy) - the rest gets the backup voice")
             return False
         tmp = g[0]["out"] + ".group.wav"
-        _audio_file(data, tmp, sr, trim=True)
+        got = _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
+        chars = sum(len(p) for p in plains)
+        expect = chars / 12.0 + 1.0 * (len(g) - 1)      # ~12 Bengali letters a second + the pauses
+        if got > expect * 1.7 + 3 or got < expect * 0.4:
+            # something was said that is not in the story (e.g. the instructions, in English) or words were left
+            # out: never use it - ask again in smaller groups, or leave these lines for a single-line request
+            log(f"  voices: a recording of {got:.0f} s for ~{expect:.0f} s of words - not used "
+                f"({'extra words' if got > expect else 'words missing'})")
+            os.remove(tmp)
+            if len(g) > 1 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
+                half = max(1, len(g) // 2)
+                groups[gi + 1:gi + 1] = [g[:half], g[half:]]
+            continue
         cut = _align_split(tmp, plains) if len(g) > 1 else None
         if not cut and len(g) > 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
             # not sure where one line ends and the next begins: ask again as two smaller groups - a line is
@@ -2397,9 +2418,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
             log(f"  voices: {len(g)} lines - not sure where each line ends, asking again in two smaller groups")
             continue
         if not cut:
-            cut = _soft_split(tmp, plains)
-            if len(g) > 1:
-                log(f"  voices: {len(g)} lines cut at the quietest moments (no requests left to ask again)")
+            os.remove(tmp)
+            log(f"  voices: {len(g)} lines could not be cut cleanly and no request is left to ask again - they "
+                "stay open")
+            continue
         os.remove(tmp)
         segs, rate = cut
         for x, seg in zip(g, segs):

@@ -1602,6 +1602,21 @@
   "riddle": {
    "q": "আকাশে থাকি কিন্তু পাখি নই, রাতে জ্বলি কিন্তু প্রদীপ নই! আমি কে?",
    "a": "তারা"
+  },
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "length_s": 458,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-06T03:02+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-06T03:02+00:00"
   }
  },
  {

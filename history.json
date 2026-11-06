@@ -976,7 +976,7 @@
    "yt_views": 0,
    "yt_avg_s": 362,
    "yt_avg_pct": 65.3,
-   "checked": "2026-11-03T04:02+00:00"
+   "checked": "2026-11-06T09:02+00:00"
   }
  },
  {
@@ -1311,7 +1311,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-03T04:02+00:00"
+   "checked": "2026-11-06T09:02+00:00"
   }
  },
  {
@@ -1660,7 +1660,22 @@
   "fb_reel": "1130074873148571",
   "fb_story": "1393173189270805",
   "fb_reel2": "2208881636729119",
-  "yt_short": "ssTDRdgZcKY"
+  "yt_short": "ssTDRdgZcKY",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 444,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-06T09:02+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-06T09:02+00:00"
+  }
  },
  {
   "date": "2026-11-06T02:31+00:00",

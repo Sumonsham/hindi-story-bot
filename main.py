@@ -2883,6 +2883,7 @@ def build_video(scene_parts, lang, out):
     with open(alst, "w") as f:
         f.writelines(f"file '{os.path.basename(a)}'\n" for a in wavs)
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", alst, "-c", "pcm_s16le", os.path.join(WORK, "full.wav")])
+    extras.normalize_loudness(os.path.join(WORK, "full.wav"))    # as loud as big channels, quiet parts kept
     write_ass(segs, os.path.join(WORK, "subs.ass"), LANGS[lang]["font_family"])
     vf = f"ass=subs.ass:fontsdir={os.path.dirname(FONT)}:shaping=complex,tpad=stop_mode=clone:stop_duration=3"
     total = duration(os.path.join(WORK, "full.wav"))
@@ -3668,6 +3669,7 @@ def main():
                     "title_b": str(story.get("title_b") or "").strip()[:95] or None,
                     "question_post": extras.fb_question_post(history, "cartoon", lang) if not (MOCK or DRY_RUN) else None,
                     **results})
+    CREATOR["posted_now"] = True
     if not MOCK:
         save_history(history)
         if continues:                                # the next part comes on this category's next day
@@ -4013,5 +4015,15 @@ def mock_image(path, seed):
     return True
 
 
+def day_report():
+    """After the evening cartoon: the day's report on Telegram."""
+    try:
+        if str(SLOT or "").endswith("@19") and CREATOR.get("posted_now"):
+            extras.daily_report(load_history(), "Little Lumi (cartoon)")
+    except Exception as e:
+        log("  daily report skipped:", str(e)[:120])
+
+
 if __name__ == "__main__":
     main()
+    day_report()

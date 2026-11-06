@@ -2833,6 +2833,229 @@ def poster_thumbnail(base_img, title, subtitle, out, style, fallback_font, size=
     return out
 
 
+# ===================== v49: the horror poster in the channel's own style (the reference the owner chose) ===========
+# LEFT: a stack of words - a small white place word on a red brush stroke, a huge worn YELLOW name, a white
+# connecting line, two dripping BLOOD-RED / white words, and at the bottom a red brush banner with yellow words
+# ("সত্য ঘটনা অবলম্বনে"). RIGHT / BEHIND: the haunted place at night, a full moon, fog, the ghost on the right and
+# a giant ghost face looming in the sky. Only the words and the picture change from story to story.
+POSTER_FONTS = {
+    "brush": "https://raw.githubusercontent.com/google/fonts/main/ofl/galada/Galada-Regular.ttf",
+    "bold": "https://raw.githubusercontent.com/google/fonts/main/ofl/atma/Atma-Bold.ttf",
+}
+
+
+def _poster_font(kind, size, fallback):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "work", f"poster_{kind}.ttf")
+    try:
+        if not os.path.exists(path) and env("MOCK") != "1":
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            r = requests.get(POSTER_FONTS[kind], timeout=60)
+            if r.ok and len(r.content) > 50000:
+                open(path, "wb").write(r.content)
+        if os.path.exists(path):
+            return ImageFont.truetype(path, size)
+    except Exception as e:
+        log(f"  poster font: {str(e)[:80]}")
+    return ImageFont.truetype(fallback, size)
+
+
+def _brush_band(img, box, color=(196, 18, 24), seed=1, tails=True):
+    """A rough red brush stroke behind words (ragged edges, darker streaks, tapering tails)."""
+    import numpy as np
+    rnd = np.random.default_rng(seed)
+    x0, y0, x1, y1 = box
+    h = y1 - y0
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    for k in range(7):                                # several overlapping strokes = a painted look
+        jy = rnd.integers(-h // 8, h // 8 + 1)
+        pts_top = [(x, y0 + jy + rnd.integers(-h // 7, h // 7 + 1)) for x in range(x0, x1 + 1, 18)]
+        pts_bot = [(x, y1 + jy + rnd.integers(-h // 7, h // 7 + 1)) for x in range(x1, x0 - 1, -18)]
+        a = int(150 + 105 * (k == 0))
+        c = tuple(max(0, v - int(rnd.integers(0, 40))) for v in color)
+        d.polygon(pts_top + pts_bot, fill=c + (a,))
+    if tails:                                         # a few thin dry-brush tails out of both ends
+        for side in (-1, 1):
+            xs = x0 if side < 0 else x1
+            for t in range(2):
+                yy = y0 + h * (0.35 + 0.3 * t)
+                ln = int(h * (0.5 + 0.4 * rnd.random()))
+                d.polygon([(xs, yy - h * 0.07), (xs + side * ln, yy + side * h * 0.03), (xs, yy + h * 0.07)],
+                          fill=color + (150,))
+    streak = Image.new("L", img.size, 0)
+    sd = ImageDraw.Draw(streak)
+    for _ in range(40):                               # dry-brush streaks
+        yy = int(rnd.integers(y0, y1))
+        sd.line([(int(rnd.integers(x0, x1)), yy), (int(rnd.integers(x0, x1)), yy)], fill=90, width=2)
+    dark = Image.new("RGBA", img.size, (60, 0, 0, 0))
+    dark.putalpha(Image.fromarray((np.array(streak) * (np.array(layer)[:, :, 3] > 0)).astype("uint8")))
+    base = Image.alpha_composite(img.convert("RGBA"), layer)
+    return Image.alpha_composite(base, dark).convert("RGB")
+
+
+def _drip_text(img, xy, text, font, fill, stroke=(10, 0, 0), stroke_w=6, drips=True, white_top=False, seed=3):
+    """Words that bleed: dark outline, shadow, worn fill, and blood drips running down from the letters."""
+    import numpy as np
+    rnd = np.random.default_rng(seed)
+    mask = Image.new("L", img.size, 0)
+    ImageDraw.Draw(mask).text(xy, text, font=font, fill=255)
+    m = np.array(mask)
+    dr = Image.new("L", img.size, 0)
+    if drips:
+        ys, xs = np.nonzero(m > 128)
+        if xs.size:
+            d = ImageDraw.Draw(dr)
+            cols = rnd.choice(np.unique(xs), size=min(16, np.unique(xs).size), replace=False)
+            for cx in cols:
+                bottom = int(ys[xs == cx].max())
+                ln = int(rnd.integers(font.size // 8, font.size // 2 + 1))
+                wdt = int(rnd.integers(max(3, font.size // 30), max(5, font.size // 14) + 1))
+                d.rectangle([cx - wdt // 2, bottom - 4, cx + wdt // 2, bottom + ln], fill=255)
+                d.ellipse([cx - wdt, bottom + ln - wdt, cx + wdt, bottom + ln + wdt], fill=255)
+    full = Image.fromarray(np.maximum(m, np.array(dr)))
+    outl = full.filter(ImageFilter.MaxFilter(stroke_w * 2 + 1)) if stroke_w else full
+    base = img.convert("RGBA")
+    sh = outl.filter(ImageFilter.GaussianBlur(9))
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    layer.putalpha(sh.point(lambda v: int(v * 0.8)))
+    base = Image.alpha_composite(base, layer.transform(img.size, Image.AFFINE, (1, 0, -5, 0, 1, -7)))
+    st = Image.new("RGBA", img.size, stroke + (0,))
+    st.putalpha(outl)
+    base = Image.alpha_composite(base, st)
+    W_, H_ = img.size
+    bbox = full.getbbox() or (0, 0, W_, H_)
+    if white_top:                                     # white letters that turn blood red towards the bottom
+        t = np.clip((np.arange(H_) - bbox[1]) / max(1, bbox[3] - bbox[1]), 0, 1)[:, None, None]
+        top_c, bot_c = np.array((250, 250, 250)), np.array(fill)
+        grad = (top_c * (1 - t ** 1.1) + bot_c * t ** 1.1)[:, :, :] * np.ones((1, W_, 1))
+        col = Image.fromarray(grad.astype("uint8"), "RGB").convert("RGBA")
+    else:
+        col = Image.new("RGBA", img.size, fill + (255,))
+    # a light worn-paint texture (fine specks, never holes you can see from afar)
+    noise = 1.0 - (rnd.random((H_, W_)) > 0.93).astype("float32") * 0.45
+    noise = np.array(Image.fromarray((noise * 255).astype("uint8")).filter(ImageFilter.GaussianBlur(0.6))).astype("float32")
+    col.putalpha(Image.fromarray((np.array(full).astype("float32") * noise / 255).astype("uint8")))
+    return Image.alpha_composite(base, col).convert("RGB")
+
+
+def _fit_size(text, kind, fallback, max_w, start, low=30):
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    sz = start
+    while sz > low:
+        if probe.textlength(text, font=_poster_font(kind, sz, fallback)) <= max_w:
+            return sz
+        sz -= 4
+    return low
+
+
+def horror_poster(base_img, words, banner, out, fallback_font, portrait=False):
+    """words: dict(top, main, mid, hook1, hook2) - the poster's word stack. banner: the bottom line."""
+    from PIL import ImageEnhance
+    W_, H_ = (1080, 1920) if portrait else (1280, 720)
+    src = Image.open(base_img).convert("RGB")
+    if portrait:                                      # the 16:9 picture, cut to its right / middle part
+        s = H_ / src.height
+        big = src.resize((int(src.width * s), H_))
+        x = max(0, min(big.width - W_, int(big.width * 0.62) - W_ // 2))
+        img = big.crop((x, 0, x + W_, H_))
+    else:
+        img = src.resize((W_, H_))
+    img = ImageEnhance.Contrast(img).enhance(1.15)
+    img = ImageEnhance.Color(img).enhance(1.1)
+    blue = Image.new("RGB", img.size, (10, 30, 70))   # the cold blue night of the reference
+    img = Image.blend(img, blue, 0.18)
+    shade = Image.new("L", img.size, 0)               # darkness where the words go
+    d = ImageDraw.Draw(shade)
+    if portrait:
+        for i in range(120):
+            d.rectangle([0, 0, W_, int(H_ * 0.52 * (1 - i / 120))], fill=int(170 * i / 120))
+        d.rectangle([0, int(H_ * 0.86), W_, H_], fill=150)
+    else:
+        for i in range(120):
+            d.rectangle([0, 0, int(W_ * 0.62 * (1 - i / 120)), H_], fill=int(185 * i / 120))
+    shade = shade.filter(ImageFilter.GaussianBlur(35))
+    img = Image.composite(Image.new("RGB", img.size, (4, 6, 14)), img, shade)
+
+    col_w = int(W_ * (0.86 if portrait else 0.52))
+    x0 = int(W_ * (0.07 if portrait else 0.035))
+    scale = 1.75 if portrait else 1.0
+    y = int(H_ * 0.03) + 14
+    top, main, mid = str(words.get("top", "")).strip(), str(words.get("main", "")).strip(), str(words.get("mid", "")).strip()
+    h1, h2 = str(words.get("hook1", "")).strip(), str(words.get("hook2", "")).strip()
+    probe = ImageDraw.Draw(img)
+    if top:                                           # 1) small white place word on a red brush stroke
+        sz = _fit_size(top, "bold", fallback_font, col_w * 0.7, int(58 * scale))
+        f = _poster_font("bold", sz, fallback_font)
+        tw = probe.textlength(top, font=f)
+        img = _brush_band(img, (x0 + 10, y + int(sz * 0.25), x0 + int(tw) + 50, y + int(sz * 1.25)), seed=11)
+        img = _drip_text(img, (x0 + 30, y), top, f, (255, 255, 255), stroke_w=3, drips=False, seed=12)
+        y += int(sz * 1.25)
+    if main:                                          # 2) the huge worn yellow name
+        sz = _fit_size(main, "brush", fallback_font, col_w, int(170 * scale))
+        f = _poster_font("brush", sz, fallback_font)
+        img = _drip_text(img, (x0, y - int(sz * 0.02)), main, f, (255, 214, 0), stroke_w=7, drips=False, seed=13)
+        y += int(sz * 1.08)
+    if mid:                                           # 3) white connecting words
+        sz = _fit_size(mid, "bold", fallback_font, col_w * 0.9, int(62 * scale))
+        f = _poster_font("bold", sz, fallback_font)
+        img = _drip_text(img, (x0 + 30, y), mid, f, (255, 255, 255), stroke_w=4, drips=False, seed=14)
+        y += int(sz * 1.2)
+    for k, hw in enumerate((h1, h2)):                 # 4) the dripping blood words
+        if not hw:
+            continue
+        sz = _fit_size(hw, "brush", fallback_font, col_w, int(130 * scale))
+        f = _poster_font("brush", sz, fallback_font)
+        img = _drip_text(img, (x0 + (0 if k == 0 else int(col_w * 0.12)), y - int(sz * 0.2)), hw, f,
+                         (229, 16, 20), stroke_w=6, drips=True, white_top=(k == 1), seed=20 + k)
+        y += int(sz * 0.92)
+    if banner:                                        # 5) the bottom brush banner with yellow words
+        sz = _fit_size(banner, "bold", fallback_font, (W_ * 0.8 if portrait else W_ * 0.5), int(60 * scale))
+        f = _poster_font("bold", sz, fallback_font)
+        tw = probe.textlength(banner, font=f)
+        bx = (W_ - tw) // 2 if portrait else x0 + int(col_w * 0.08)
+        by = H_ - int(sz * 1.6)
+        img = _brush_band(img, (int(bx) - 30, by + int(sz * 0.12), int(bx + tw) + 30, by + int(sz * 1.25)), seed=31)
+        img = _drip_text(img, (bx, by), banner, f, (255, 220, 0), stroke_w=4, drips=False, seed=32)
+    img.save(out, quality=95)
+    return out
+
+
+def poster_words(title, place, ghost, lang, key=None, models=None):
+    """The poster's word stack for THIS story, e.g. {'top': 'দুর্গাপুরের', 'main': 'চিত্রালয়', 'mid': 'সিনেমা হলের',
+    'hook1': 'অভিশপ্ত', 'hook2': 'ছায়ামূর্তি'} - asked from Gemini, else cut from the title."""
+    import re as _re
+    t0 = _re.sub(r"\s*\|.*$", "", str(title))
+    t0 = t0.split(":", 1)[1] if ":" in t0 else t0          # 'ভৈরব ঠাকুরের কেস #2: ...' -> only the story's own name
+    clean = _re.sub(r"[^\w\s\u0980-\u09FF\u0900-\u097F'-]", " ", t0).strip()
+    if key and models and env("MOCK") != "1":
+        prompt = (f"A {'Bengali' if lang == 'bn' else 'Hindi'} horror video is called: {clean}. Place: {place}. "
+                  f"Ghost: {ghost}. Write the words of its YouTube poster, in {'Bengali' if lang == 'bn' else 'Hindi'} "
+                  "only, like this example: {\"top\": \"দুর্গাপুরের\", \"main\": \"চিত্রালয়\", \"mid\": \"সিনেমা হলের\", "
+                  "\"hook1\": \"অভিশপ্ত\", \"hook2\": \"ছায়ামূর্তি\"} - top = 1 word (the town / village, ending "
+                  "in -er), main = 1 word (the haunted place's own name or the key thing), mid = 2 words (what kind of "
+                  "place), hook1 + hook2 = one word each (a frightening adjective + the ghost). Answer ONLY that JSON.")
+        for mdl in models[:4]:
+            try:
+                r = requests.post(f"{GEMINI_BASE}/models/{mdl}:generateContent", headers={"x-goog-api-key": key},
+                                  json={"contents": [{"parts": [{"text": prompt}]}],
+                                        "generationConfig": {"temperature": 0.6, "responseMimeType": "application/json"}},
+                                  timeout=90)
+                if r.ok:
+                    w = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                    if isinstance(w, dict) and w.get("main") and w.get("hook2"):
+                        return {k: str(w.get(k, ""))[:22] for k in ("top", "main", "mid", "hook1", "hook2")}
+            except Exception:
+                continue
+    ws = clean.split()                                # no answer: the title itself, cut into the stack
+    if len(ws) <= 2:
+        return {"main": ws[0] if ws else clean, "hook2": ws[1] if len(ws) > 1 else ""}
+    n = len(ws)
+    if ws[0].endswith(("ের", "র")) and n >= 4:       # 'দুর্গাপুরের চিত্রালয় ... অভিশপ্ত ছায়ামূর্তি'
+        return {"top": ws[0], "main": ws[1], "mid": " ".join(ws[2:n - 2]), "hook1": ws[-2], "hook2": ws[-1]}
+    head = ws[:n - 2]                                 # the last two words drip, the rest is the big name
+    return {"top": "", "main": " ".join(head[:2]), "mid": " ".join(head[2:]), "hook1": ws[-2], "hook2": ws[-1]}
+
+
 THUMB_PROMPT = {
     "cartoon": ("Use case: thumbnail-art. Cinematic 16:9 YouTube episode thumbnail for an original {series} cartoon "
                 "episode. A polished, dramatic yet playful hand-painted 2D cartoon scene in {place}. {hero} is the "
@@ -2842,6 +3065,14 @@ THUMB_PROMPT = {
                 "large and readable at small thumbnail size, clean dark negative space at the upper-left for a title, no faces in the upper-left third. "
                 "No text, no letters, no watermark, no logo, no modern objects, no extra foreground characters, no "
                 "distorted faces, no malformed hands."),
+    "horror_poster": ("Cinematic 16:9 horror movie poster art, photorealistic, deep cold-blue night with a full moon and "
+                      "thick fog. In the MIDDLE and RIGHT: {place}, clearly visible, old, stained and haunted, a few "
+                      "warm lights. On the RIGHT side, large in the foreground, {second} - a terrifying pale ghost with "
+                      "long tangled black hair and glowing white eyes looking straight at the viewer. Above, in the dark "
+                      "sky at the top centre, a GIANT faint ghostly face with pale glowing eyes looming over the place. "
+                      "Bare twisted branches at the edges. The whole LEFT HALF is darker and empty (space for big "
+                      "title words). High contrast, rich detail, eerie but not gory. No text, no letters, no watermark, "
+                      "no logo."),
     "horror": ("Create a cinematic 16:9 horror thumbnail for an original Bengali folk-horror episode. {hero} in the "
                "foreground, {hero_action}, in {place}. {second} Make it unsettling and ghostly but "
                "non-graphic. Visual story: {moment}. Twisted banyan branches, thick mist, dim oil lamps, cold blue "
@@ -2868,6 +3099,8 @@ def poster_prompt(style, ti, cast_describe, series, place):
     pl = ti.get("place") or place or "the story's place"
     if style == "horror" and "night" not in pl.lower():
         pl += " at night"
+    if style == "horror" and env("POSTER_STYLE") != "old":
+        return " ".join(THUMB_PROMPT["horror_poster"].format(place=pl, second=sec_desc or "the ghost").split())
     return " ".join(THUMB_PROMPT[style].format(series=series or "Bengali", place=pl,
                                       hero=hero_desc, hero_action=ti.get("hero_action") or "with a strong expression",
                                       second=sec_txt, moment=ti.get("moment") or ti.get("action") or "").split())
@@ -3722,3 +3955,68 @@ def mark_true_story(story, lang):
 def true_title(title, lang):
     lab = TRUE_LABEL.get(lang, TRUE_LABEL["bn"])
     return title if lab in title else f"{title} | {lab}"[:100]
+
+
+# ===================== v51: the same loudness as big channels (-14 LUFS, true peak -1.5 dB) =====================
+def normalize_loudness(wav, target=-14.0):
+    """Two-pass, LINEAR loudness correction: the whole sound track is made exactly as loud as YouTube / Facebook
+    expect, without squashing the quiet moments (the silence before a scare stays a silence)."""
+    if env("LOUDNORM") == "0" or env("MOCK") == "1":
+        return wav
+    try:
+        r = subprocess.run(["ffmpeg", "-hide_banner", "-i", wav, "-af",
+                            f"loudnorm=I={target}:TP=-1.5:LRA=20:print_format=json", "-f", "null", "-"],
+                           capture_output=True, text=True, timeout=900)
+        js = r.stderr[r.stderr.rfind("{"):r.stderr.rfind("}") + 1]
+        mv = json.loads(js)
+        out = wav.replace(".wav", "_ln.wav")
+        flt = (f"loudnorm=I={target}:TP=-1.5:LRA=20:measured_I={mv['input_i']}:measured_TP={mv['input_tp']}:"
+               f"measured_LRA={mv['input_lra']}:measured_thresh={mv['input_thresh']}:offset={mv['target_offset']}:"
+               "linear=true")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-af", flt, "-ar", "44100", "-c:a",
+                        "pcm_s16le", out], check=True, timeout=900)
+        os.replace(out, wav)
+        log(f"  loudness: {float(mv['input_i']):.1f} -> {target:.0f} LUFS")
+    except Exception as e:
+        log("  loudness step skipped:", str(e)[:120])
+    return wav
+
+
+# ===================== v51: a short daily report on Telegram (no need to open the logs) =====================
+DAY_NOTES = []          # things worth telling the owner from this run (backups used etc.)
+
+
+def note(text):
+    if text not in DAY_NOTES:
+        DAY_NOTES.append(text)
+
+
+def daily_report(history, bot_label, extra=""):
+    """After the day's last video: what went out today, how the last days' videos are doing, anything unusual."""
+    import re
+    if env("MOCK") == "1" or env("DAILY_REPORT") == "0" or not env("TELEGRAM_BOT_TOKEN"):
+        return
+    today = dt.datetime.now(IST).date()
+    rows, olds = [], []
+    for h in history[-40:]:
+        try:
+            t = dt.datetime.fromisoformat(str(h.get("date"))).astimezone(IST)
+        except Exception:
+            continue
+        name = re.sub(r"\s*\|.*$", "", str(h.get("title", "")))[:60]
+        if t.date() == today and h.get("kind") not in ("compilation",):
+            links = " ".join(x for x in (f"YT youtu.be/{h['youtube']}" if h.get("youtube") else "",
+                                         "FB ✓" if h.get("facebook") else "") if x)
+            rows.append(f"• {name} {links}".strip())
+        elif 1 <= (today - t.date()).days <= 3 and h.get("stats"):
+            st = h["stats"]
+            olds.append((st.get("views", 0), f"• {name}: 👁 {st.get('views', 0)} · 👍 {st.get('likes', 0)} · "
+                                                f"💬 {st.get('comments', 0)}"))
+    olds = [r for _v, r in sorted(olds, reverse=True)[:5]]
+    msg = (f"📊 {bot_label} - আজকের হিসেব ({today.strftime('%d %b')})\n\n"
+           + ("আজ যা গেছে:\n" + "\n".join(rows) if rows else "আজ কোনো ভিডিও যায়নি ⚠️")
+           + ("\n\nগত ৩ দিনের ভিডিও:\n" + "\n".join(olds) if olds else "")
+           + (f"\n\n{extra}" if extra else "")
+           + ("\n\nলক্ষ্য করুন:\n" + "\n".join(f"• {n}" for n in DAY_NOTES) if DAY_NOTES else "\n\nসব ঠিকঠাক চলেছে ✅"))
+    if telegram(msg):
+        log("Daily report sent on Telegram")

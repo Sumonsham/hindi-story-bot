@@ -2482,6 +2482,94 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
     return all(os.path.exists(x["out"]) and os.path.getsize(x["out"]) > 2000 for x in items)
 
 
+# ===================== v57: Google Cloud "Chirp 3 HD" - the backup voice when Gemini's free day is used up =====================
+# The 30 Chirp 3 HD Bengali voices carry the SAME names as the Gemini voices (Charon, Kore, Puck ...), so a character
+# keeps (nearly) the same voice. 1 million letters a month are free; the bot stops itself at CHIRP_MONTH_CAP.
+# One line per request: nothing has to be cut apart, so no word can go missing.
+CHIRP_VOICES = ("Achernar", "Aoede", "Autonoe", "Callirrhoe", "Despina", "Erinome", "Gacrux", "Kore", "Laomedeia",
+                "Leda", "Pulcherrima", "Sulafat", "Vindemiatrix", "Zephyr", "Achird", "Algenib", "Algieba",
+                "Alnilam", "Charon", "Enceladus", "Fenrir", "Iapetus", "Orus", "Puck", "Rasalgethi", "Sadachbia",
+                "Sadaltager", "Schedar", "Umbriel", "Zubenelgenubi")
+CHIRP_STATE = {"off": False, "rate_ok": True}
+
+
+def _month():
+    return dt.datetime.now(IST).strftime("%Y-%m")
+
+
+def chirp_used(path):
+    d = _jl(path, {}) if path else {}
+    c = (d.get("chirp") or {}) if isinstance(d, dict) else {}
+    return int(c.get("chars", 0)) if c.get("month") == _month() else 0
+
+
+def chirp_left(path):
+    return max(0, int(env("CHIRP_MONTH_CAP") or 900000) - chirp_used(path))
+
+
+def chirp_ok(path):
+    return bool(env("GOOGLE_TTS_KEY")) and env("CHIRP") != "0" and not CHIRP_STATE["off"] and chirp_left(path) > 2000
+
+
+def _chirp_add(path, n):
+    d = _jl(path, {})
+    d = d if isinstance(d, dict) else {}
+    used = chirp_used(path)
+    d["chirp"] = {"month": _month(), "chars": used + int(n)}
+    _js(path, d)
+
+
+def chirp_tts(text, voice, out_wav, sr, usage_path, lang="bn"):
+    """One line in the Chirp 3 HD voice of the same name. Returns True when the line is ready."""
+    import base64 as _b64
+    if not chirp_ok(usage_path):
+        return False
+    text = re.sub(r"\s{2,}", " ", strip_tags(str(text))).strip()
+    if not text:
+        return False
+    if len(text) > chirp_left(usage_path):
+        CHIRP_STATE["off"] = True
+        log("  Chirp voice: this month's free share is used up")
+        return False
+    name = voice if voice in CHIRP_VOICES else "Charon"
+    code = {"bn": "bn-IN", "hi": "hi-IN"}.get(lang, "bn-IN")
+    body = {"input": {"text": text[:1500]},
+            "voice": {"languageCode": code, "name": f"{code}-Chirp3-HD-{name}"},
+            "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": 24000}}
+    if CHIRP_STATE["rate_ok"]:
+        body["audioConfig"]["speakingRate"] = float(env("CHIRP_RATE") or 0.9)   # a grave, unhurried telling
+    for attempt in range(3):
+        try:
+            r = requests.post("https://texttospeech.googleapis.com/v1/text:synthesize",
+                              params={"key": env("GOOGLE_TTS_KEY")}, json=body, timeout=90)
+        except Exception as e:
+            log(f"  Chirp voice: {str(e)[:100]}")
+            time.sleep(5)
+            continue
+        if r.status_code == 400 and "speakingRate" in body["audioConfig"]:
+            CHIRP_STATE["rate_ok"] = False            # this voice type does not take a speed: plain speed then
+            body["audioConfig"].pop("speakingRate", None)
+            continue
+        if r.status_code == 429:
+            time.sleep(20)
+            continue
+        if r.status_code in (401, 403):
+            log(f"  Chirp voice refused ({r.status_code}): {r.text[:200]} - check GOOGLE_TTS_KEY / billing on the project")
+            CHIRP_STATE["off"] = True
+            note("Chirp গলা কাজ করছে না - GOOGLE_TTS_KEY বা bhut project-এর billing দেখুন")
+            return False
+        if not r.ok:
+            log(f"  Chirp voice: {r.status_code} {r.text[:150]}")
+            time.sleep(5)
+            continue
+        audio = r.json().get("audioContent")
+        if not audio:
+            return False
+        _chirp_add(usage_path, len(text))
+        return _audio_file(_b64.b64decode(audio), out_wav, sr, trim=True) > 0.2
+    return False
+
+
 def _pacific_day():
     try:
         from zoneinfo import ZoneInfo

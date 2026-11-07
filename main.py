@@ -3180,9 +3180,12 @@ def main():
             log("  earlier comments skipped:", str(e)[:120])
     if not MOCK and not DRY_RUN and env("MY_STORIES") != "0":
         try:                                         # every run collects the stories you sent on Telegram
-            extras.creator_inbox(os.path.join(HERE, "assets", "my_stories.json"), "cartoon")             # (Telegram keeps a message only 24 hours)
+            extras.creator_inbox(MY_STORIES, "cartoon", bot_status)   # (Telegram keeps a message 24 h) + commands
         except Exception as e:
             log("  Telegram stories not read:", str(e)[:120])
+    if extras.bot_paused(MY_STORIES) and not MOCK:
+        log("PAUSED from Telegram ('বন্ধ') - no video this time. Send 'চালু' to start again.")
+        return
     global SLOT
     SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
     extras.plan_publish(SLOT)
@@ -3195,7 +3198,7 @@ def main():
     if not MOCK:
         try:
             extras.refresh_stats(history)            # learn which kinds of stories people liked
-            if extras.yt_title_test(history):        # a weak video gets its second title (once)
+            if extras.yt_title_test(history, thumb_dir=THUMB_B):   # a weak video gets its 2nd thumbnail (once)
                 save_history(history)
         except Exception as e:
             log("  stats skipped:", str(e)[:150])
@@ -3461,6 +3464,15 @@ def main():
                  "para": "Bengali family comedy"}.get(category, "Bengali family story")
     t_prompt = extras.poster_prompt("cartoon", {**ti, "hero": hero, "second": second}, describe, series_en,
                                     cast.setting)
+    tkind = extras.thumb_kind("cartoon", category)
+    if env("POSTER_STYLE") != "old":                 # YOUR thumbnail formula (7 Nov 2026)
+        subj = " and ".join(x for x in (describe(hero) if hero else "", describe(second) if second else "") if x) \
+            or "charming cartoon characters"
+        if category in MYTH or category == "divine":
+            subj += " (a respectful, devotional scene)"
+        t_prompt = extras.user_thumb_prompt(tkind, subj, ti.get("place") or cast.setting,
+                                            " ".join(x for x in (ti.get("hero_action"), ti.get("moment") or ti.get("action")) if x))
+        log(f"Thumbnail formula: {tkind}")
     poster_done = False
     if rig and rig(hero):                            # poster from our own characters: they look exactly like the video
         try:
@@ -3481,11 +3493,36 @@ def main():
     big = re.sub(r"[^\w\sঀ-৿ऀ-ॿ!?,।'’-]", " ", re.sub(r"\s*\|.*$", "", title))   # the title on the thumbnail
     big = re.sub(r"\s{2,}", " ", re.sub(r"[0-9০-৯०-९]+", " ", big)).strip()   # the poster font has no digits
     sub = str(story.get("tagline") or story.get("thumbnail_text") or story.get("episode_name") or "").strip()   # ... + tag line
-    try:
-        extras.poster_thumbnail(thumb_base, big, sub, thumb, "cartoon", FONT)
+    own = re.sub(r"\s*\|.*$", "", title).strip()   # ONLY the title on the picture (your formula)
+    if ":" in own:
+        own = own.split(":", 1)[1].strip() or own
+    small = ""
+    if part:
+        small = L.get("part_word", "পর্ব" if lang == "bn" else "भाग") + " " + (
+            str(part).translate(str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")) if lang == "bn" else str(part))
+    if story.get("true_label"):
+        small = " · ".join(x for x in (extras.TRUE_LABEL.get(lang, extras.TRUE_LABEL["bn"]), small) if x)
+    done_ = False
+    if env("POSTER_STYLE") != "old":
+        try:
+            extras.title_poster(thumb_base, own, thumb, tkind, small=small, fallback_font=FONT)
+            done_ = True
+            log(f"Thumbnail: '{own}'" + (f" + '{small}'" if small else ""))
+        except Exception as e:
+            log("  thumbnail title failed, the older poster:", str(e)[:120])
+    if not done_:
+        try:
+            extras.poster_thumbnail(thumb_base, big, sub, thumb, "cartoon", FONT)
+        except Exception as e:
+            log("  poster thumbnail failed, simple one:", str(e)[:120])
+            make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
+    try:                                             # a SECOND thumbnail (used only if the video gets few views):
+        mir = os.path.join(WORK, "thumb_base_b.jpg")  # the picture mirrored, the title in the other colours
+        Image.open(thumb_base).convert("RGB").transpose(Image.FLIP_LEFT_RIGHT).save(mir, quality=92)
+        other = {"c_3d": "c_funny", "c_funny": "c_adventure", "c_adventure": "c_3d"}.get(tkind, "c_3d")
+        extras.title_poster(mir, own, os.path.join(WORK, "thumbnail_b.jpg"), other, small=small, fallback_font=FONT)
     except Exception as e:
-        log("  poster thumbnail failed, simple one:", str(e)[:120])
-        make_thumbnail(thumb_base, story.get("thumbnail_text") or title, thumb, L["labels"][category])
+        log("  second thumbnail skipped:", str(e)[:100])
 
     clean_title = re.sub(r"[^\w\sऀ-ॿঀ-৿,।!?-]", "", title).strip()
     page = env(f"PAGE_NAME_{lang.upper()}") or env("PAGE_NAME") or L["page_default"]
@@ -3653,8 +3690,16 @@ def main():
                 results["youtube_error"] = str(e)[:200]
         else:
             log("YouTube secrets not set - skipping YouTube")
+        extras.alert_post_errors(results, "কার্টুন bot", title)
         if not results.get("facebook") and not results.get("youtube"):
             raise SystemExit("Posting failed everywhere - see messages above.")
+        if results.get("youtube"):                   # the second thumbnail, kept for the weak-video test
+            try:
+                tb = os.path.join(WORK, "thumbnail_b.jpg")
+                if os.path.exists(tb):
+                    extras.keep_thumb_b(THUMB_B, results["youtube"], tb)
+            except Exception as e:
+                log("  second thumbnail not kept:", str(e)[:100])
 
     first = [str(story.get("comment_question", "")).strip()]
     if shout_names:
@@ -4020,15 +4065,43 @@ def mock_image(path, seed):
     return True
 
 
+MY_STORIES = os.path.join(HERE, "assets", "my_stories.json")      # stories YOU send on Telegram
+THUMB_B = os.path.join(HERE, "assets", "thumb_b")                   # second thumbnails (for weak videos)
+
+
+def bot_status():
+    """What 'অবস্থা' on Telegram answers for this bot."""
+    hist = load_history()
+    last = next((h for h in reversed(hist) if h.get("facebook") or h.get("youtube")), None)
+    if not last:
+        return []
+    try:
+        when = dt.datetime.fromisoformat(str(last.get("date"))).astimezone(extras.IST).strftime("%d %b %I:%M %p")
+    except Exception:
+        when = ""
+    return [f"শেষ ভিডিও: {re.sub(r'[|].*$', '', str(last.get('title', '')))[:50].strip()} ({when}) "
+            + ("FB ✓ " if last.get("facebook") else "FB ✗ ") + ("YT ✓" if last.get("youtube") else "YT ✗")]
+
+
 def day_report():
     """After the evening cartoon: the day's report on Telegram."""
     try:
         if str(SLOT or "").endswith("@19") and CREATOR.get("posted_now"):
-            extras.daily_report(load_history(), "Little Lumi (cartoon)")
+            hist = load_history()
+            kinds = extras.best_kinds(hist, (LANGS.get("bn") or {}).get("labels") or {})
+            extras.daily_report(hist, "Little Lumi (cartoon)", kinds)
     except Exception as e:
         log("  daily report skipped:", str(e)[:120])
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit as e:                          # a stop with a reason -> the reason in Bengali on Telegram
+        if e.code not in (None, 0):
+            extras.fail_note(HERE, str(e.code), "কার্টুন bot")
+        raise
+    except BaseException as e:
+        extras.fail_note(HERE, f"{type(e).__name__}: {e}", "কার্টুন bot")
+        raise
     day_report()

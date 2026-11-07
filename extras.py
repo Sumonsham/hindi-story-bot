@@ -13,6 +13,7 @@ import datetime as dt
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import time
@@ -3047,6 +3048,270 @@ def horror_poster(base_img, words, banner, out, fallback_font, portrait=False):
     return out
 
 
+# ===================== v55: YOUR thumbnail formulas (7 Nov 2026) =====================
+# The picture is made from your prompt (subject, place, light, mood, composition). The Bengali title is NOT drawn
+# by the picture model (it cannot spell Bengali) - the bot writes it itself with a real Bengali font, in your
+# colours and effects, so it is always correctly spelled and readable on a phone.
+USER_THUMB = {
+    "h_cinematic": (
+        "Ultra-realistic cinematic supernatural horror movie poster image, 16:9 landscape. {subject}: a highly "
+        "detailed, frightening supernatural entity with terrifying facial details and realistic textures, visually "
+        "dominant, on the RIGHT side of the frame. Behind it {place}: abandoned buildings, dark shadows, thick fog, "
+        "eerie lighting and a dramatic, mysterious background. {moment} Strong contrast, dramatic cinematic lighting, "
+        "extremely suspenseful atmosphere, professional Indian horror movie poster quality, designed to attract "
+        "clicks on mobile screens. The LEFT 45% of the frame is darker and simpler - fog and shadow only, no face "
+        "there (space for a big title). Frightening but not gory, no blood. No text, no letters, no words, no "
+        "watermark, no logo."),
+    "h_closeup": (
+        "Visually shocking, high-impact horror movie poster image, 16:9 landscape. An intense close-up of {subject}: "
+        "an extremely terrifying and mysterious supernatural face or haunted figure, on the RIGHT half of the frame, "
+        "staring straight at the viewer. Deep black background, dark crimson red lighting, cold blue highlights, "
+        "cinematic smoke, realistic textures and dramatic shadows - the viewer feels something horrifying is about "
+        "to happen. {moment} Clean composition, not overcrowded. The LEFT 45% is deep black smoke only (space for a "
+        "big title). Emotionally powerful, impossible to ignore, not gory, no blood. No text, no letters, no words, "
+        "no watermark, no logo."),
+    "h_real": (
+        "Premium photorealistic paranormal mystery image, horror documentary poster aesthetic, 16:9 landscape. A "
+        "believable haunted location: {place}, at night - cinematic night photography, realistic fog, moonlight, "
+        "abandoned surroundings, mysterious silhouettes and an unsettling atmosphere. A mysterious ghostly presence "
+        "({subject}) hidden somewhere in the scene - half-seen in a window, a doorway or between the trees - so the "
+        "viewer immediately wonders what happened at this place. {moment} The place and the presence fill the "
+        "MIDDLE and RIGHT; the LEFT 40% is darker sky and fog (space for a big title). Dramatic, professional, "
+        "highly clickable, no gore. No text, no letters, no words, no watermark, no logo."),
+    "c_3d": (
+        "Stunning, colorful, high-quality 3D animated cartoon movie poster image, premium animated film quality, "
+        "16:9 landscape. {subject}: expressive cartoon characters with beautiful facial expressions, exaggerated "
+        "emotions and appealing poses, {moment}, in {place} - a magical, playful environment with vibrant colors, "
+        "beautiful lighting and cinematic depth. The main characters are LARGE and expressive on the RIGHT side; "
+        "the LEFT 45% is a simple, softly blurred bright background (space for a big title). Bright and attractive "
+        "for children and family audiences. No horror, no ghosts, no scary elements, no text, no letters, no "
+        "words, no watermark, no logo."),
+    "c_funny": (
+        "Extremely engaging, funny 3D animated comedy movie poster image, 16:9 landscape. A hilarious animated "
+        "moment: {subject}, {moment}, in {place}. Funny cartoon characters with exaggerated facial expressions, big "
+        "expressive eyes, humorous body language and entertaining poses, LARGE on the RIGHT side - the viewer is "
+        "curious about the funny situation. Vibrant colorful background, bright lighting, rich 3D textures, "
+        "professional animated comedy film look, energetic and entertaining. The LEFT 45% is a simple, bright, "
+        "softly blurred background (space for a big title). No horror, no ghosts, no frightening visuals, no text, "
+        "no letters, no words, no watermark, no logo."),
+    "c_adventure": (
+        "Premium cinematic 3D cartoon adventure movie poster image, big-budget animated film look, 16:9 landscape. "
+        "Charming animated characters exploring an amazing world: {subject}, {moment}, in {place} - adventure, "
+        "surprise, discovery or action. Beautiful vibrant colors, a magical environment, cinematic lighting, "
+        "detailed 3D characters with expressive faces and a visually stunning background. The characters are LARGE "
+        "on the RIGHT; the LEFT 45% is open, simpler sky or landscape (space for a big title). Instantly attractive "
+        "to children and family audiences, no dark frightening atmosphere, no horror, no ghosts, no text, no "
+        "letters, no words, no watermark, no logo."),
+}
+HORROR_THUMB_KIND = {"sotti": "h_real", "jayga": "h_real", "shohor": "h_closeup", "rohoshyo": "h_closeup",
+                     "karna": "h_closeup"}             # every other kind: h_cinematic
+CARTOON_THUMB_KIND = {**{c: "c_funny" for c in ("gopal", "birbal", "funny", "witty", "para", "school")},
+                      **{c: "c_adventure" for c in ("adventure", "fairy", "detective", "betal", "folk", "lok")}}
+
+
+def thumb_kind(bot, category, true_story=False):
+    if env("THUMB_KIND") in USER_THUMB:
+        return env("THUMB_KIND")
+    if bot == "horror":
+        return "h_real" if true_story else HORROR_THUMB_KIND.get(str(category or ""), "h_cinematic")
+    return CARTOON_THUMB_KIND.get(str(category or ""), "c_3d")
+
+
+def user_thumb_prompt(kind, subject, place, moment=""):
+    """Your formula, filled with THIS story's subject, place and moment (picture only, no words)."""
+    mo = str(moment or "").strip()
+    if mo and kind.startswith("h_"):
+        mo = f"The moment: {mo}."
+    return " ".join(USER_THUMB[kind].format(subject=str(subject or "the ghost").strip(),
+                                            place=str(place or "a haunted old place").strip(),
+                                            moment=mo or ("a fun, surprising moment" if kind.startswith("c_") else ""))
+                    .split())[:1990]
+
+
+TITLE_FONTS = {   # massive Bengali display fonts (Google Fonts, free): file, weight, width
+    "horror": ("https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifbengali/NotoSerifBengali%5Bwdth,wght%5D.ttf",
+               "title_horror.ttf", 900, 87.5),
+    "real": ("https://raw.githubusercontent.com/google/fonts/main/ofl/anekbangla/AnekBangla%5Bwdth,wght%5D.ttf",
+             "title_real.ttf", 800, 100),
+    "cartoon": ("https://raw.githubusercontent.com/google/fonts/main/ofl/balooda2/BalooDa2%5Bwght%5D.ttf",
+                "title_cartoon.ttf", 800, None),
+}
+
+
+def _title_font(style, size, fallback):
+    url, name, wght, wdth = TITLE_FONTS[style]
+    path = os.path.join(os.path.expanduser("~"), ".cache", "bot_fonts", name)    # kept for the whole run
+    try:
+        if not os.path.exists(path) and env("MOCK") != "1":
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            r = requests.get(url, timeout=60)
+            if r.ok and len(r.content) > 100000:
+                open(path, "wb").write(r.content)
+        if os.path.exists(path):
+            f = _font(path, size)
+            try:                                      # variable font: the heaviest weight
+                axes = f.get_variation_axes()
+                vals = []
+                for ax in axes:
+                    nm = str(ax.get("name", b"")).lower()
+                    if "weight" in nm or "wght" in nm:
+                        vals.append(max(ax["minimum"], min(ax["maximum"], wght)))
+                    elif ("width" in nm or "wdth" in nm) and wdth:
+                        vals.append(max(ax["minimum"], min(ax["maximum"], wdth)))
+                    else:
+                        vals.append(ax.get("default", ax["minimum"]))
+                if vals:
+                    f.set_variation_by_axes(vals)
+            except Exception:
+                pass
+            return f, path
+    except Exception as e:
+        log(f"  title font: {str(e)[:80]}")
+    return _font(fallback, size), fallback
+
+
+def _title_lines(text, n):
+    w = text.split()
+    if n <= 1 or len(w) <= 1:
+        return [text]
+    best, bs = [text], 1e9
+    import itertools
+    for cuts in itertools.combinations(range(1, len(w)), min(n, len(w)) - 1):
+        parts = [" ".join(w[a:b]) for a, b in zip((0,) + cuts, cuts + (len(w),))]
+        s = max(len(x) for x in parts)
+        if s < bs:
+            best, bs = parts, s
+    return best
+
+
+def _fx_line(img, xy, text, font, top, bottom, stroke, sw, depth, ext, glow, glow_r):
+    """One title line: soft glow, 3D depth, thick outline and a top-to-bottom colour gradient."""
+    x, y = xy
+    W_, H_ = img.size
+    mask = Image.new("L", (W_, H_), 0)
+    ImageDraw.Draw(mask).text((x, y), text, font=font, fill=255)
+    out = img.convert("RGBA")
+    if glow:
+        gm = Image.new("L", (W_, H_), 0)
+        ImageDraw.Draw(gm).text((x, y), text, font=font, fill=255, stroke_width=sw + glow_r // 3, stroke_fill=255)
+        gm = gm.filter(ImageFilter.GaussianBlur(glow_r))
+        out = Image.composite(Image.new("RGBA", (W_, H_), glow + (255,)), out, gm.point(lambda v: int(v * 0.85)))
+    d = ImageDraw.Draw(out)
+    for i in range(depth, 0, -1):                     # the 3D depth: darker copies, down and to the right
+        d.text((x + i * 0.6, y + i), text, font=font, fill=ext + (255,), stroke_width=sw, stroke_fill=ext + (255,))
+    d.text((x, y), text, font=font, fill=stroke + (255,), stroke_width=sw, stroke_fill=stroke + (255,))
+    bb = mask.getbbox() or (0, 0, W_, H_)
+    grad = Image.new("RGBA", (W_, H_), top + (255,))
+    gd = ImageDraw.Draw(grad)
+    for yy in range(bb[1], bb[3] + 1):
+        t = (yy - bb[1]) / max(1, bb[3] - bb[1])
+        gd.line([(0, yy), (W_, yy)], fill=tuple(int(top[k] + (bottom[k] - top[k]) * t) for k in range(3)) + (255,))
+    out = Image.composite(grad, out, mask)
+    return out.convert("RGB")
+
+
+def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_font=None):
+    """Your thumbnail: the picture + ONLY the Bengali title, huge, on the side away from the ghost / characters
+    (blood-red and glowing white for horror, yellow-white or blood-red for a real incident, bright colourful 3D
+    letters with a thick white outline for cartoons). small = an optional little line (part number / true story)."""
+    from PIL import ImageEnhance
+    W_, H_ = (1080, 1920) if portrait else (1280, 720)
+    src = Image.open(base_img).convert("RGB")
+    if portrait:
+        s = H_ / src.height
+        big = src.resize((int(src.width * s), H_))
+        x = max(0, min(big.width - W_, int(big.width * 0.62) - W_ // 2))
+        img = big.crop((x, 0, x + W_, H_))
+    else:
+        img = src.resize((W_, H_))
+    horror = kind.startswith("h_")
+    img = ImageEnhance.Contrast(img).enhance(1.12 if horror else 1.06)
+    img = ImageEnhance.Color(img).enhance(1.08 if horror else 1.15)
+    if horror:                                        # darkness behind the words (readable on a phone)
+        shade = Image.new("L", img.size, 0)
+        d = ImageDraw.Draw(shade)
+        if portrait:
+            for i in range(100):
+                d.rectangle([0, 0, W_, int(H_ * 0.5 * (1 - i / 100))], fill=int(165 * i / 100))
+        else:
+            for i in range(100):
+                d.rectangle([0, 0, int(W_ * 0.6 * (1 - i / 100)), H_], fill=int(175 * i / 100))
+        shade = shade.filter(ImageFilter.GaussianBlur(30))
+        img = Image.composite(Image.new("RGB", img.size, (3, 3, 8)), img, shade)
+    style = "real" if kind == "h_real" else ("horror" if horror else "cartoon")
+    hindi = bool(re.search(r"[\u0900-\u097F]", str(title))) and fallback_font
+
+    def tf(sz):                                       # Hindi titles: the Hindi font (the display fonts are Bengali)
+        return (_font(fallback_font, sz), fallback_font) if hindi else _title_font(style, sz, fallback_font)
+    probe_font, fpath = tf(100)
+    raw = re.sub(r"#\s*[0-9০-৯]*", " ", re.sub(r"\s*\|.*$", "", str(title))).strip()
+    text = re.sub(r"\s{2,}", " ", fit_glyphs(raw, fpath)).strip()
+    letters = lambda s: len(re.sub(r"[\W_]", "", s))
+    if letters(text) < 0.7 * letters(no_tofu(raw)):      # this font cannot write this title - never draw boxes
+        raise RuntimeError("the title font cannot write this title")
+    col_w = int(W_ * (0.9 if portrait else 0.5))
+    max_h = int(H_ * (0.42 if portrait else 0.74))
+    probe = ImageDraw.Draw(img)
+    best = None
+    def block_h(lines, f, size):                      # real height, with the signs above and below the letters
+        sw_, dp_ = max(4, size // (9 if style == "cartoon" else 12)), max(3, size // (13 if style == "cartoon" else 16))
+        return sum(f.getbbox(l)[3] - f.getbbox(l)[1] + 2 * sw_ + dp_ for l in lines) + int(size * 0.06) * (len(lines) - 1)
+    for n in (1, 2, 3):
+        lines = _title_lines(text, n)
+        size = int(260 if portrait else 190)
+        while size >= 40:
+            f, _p = tf(size)
+            widths = [probe.textlength(l, font=f) for l in lines]
+            if max(widths) <= col_w and block_h(lines, f, size) + (int(size * 0.5) if small else 0) <= max_h:
+                break
+            size -= 6
+        if not best or size > best[1] * 1.08:         # fewer lines unless more lines make the letters clearly bigger
+            best = (lines, size)
+    lines, size = best
+    f, _p = tf(size)
+    sw = max(4, size // (9 if style == "cartoon" else 12))
+    depth = max(3, size // (13 if style == "cartoon" else 16))
+    if horror:
+        looks = ([((255, 255, 250), (225, 225, 220), (0, 0, 0), (60, 0, 0), (200, 0, 0)),     # glowing white
+                  ((235, 16, 16), (130, 0, 0), (0, 0, 0), (25, 0, 0), (255, 255, 255))]        # blood red
+                 if style == "horror" else
+                 [((255, 246, 175), (255, 214, 60), (0, 0, 0), (40, 25, 0), (0, 0, 0)),        # yellow-white
+                  ((235, 16, 16), (130, 0, 0), (0, 0, 0), (25, 0, 0), (0, 0, 0))])             # blood red
+    else:
+        looks = [((255, 235, 60), (255, 140, 0), (255, 255, 255), (120, 40, 0), (0, 0, 0)),
+                 ((255, 110, 190), (215, 25, 120), (255, 255, 255), (100, 0, 60), (0, 0, 0)),
+                 ((90, 220, 255), (0, 120, 235), (255, 255, 255), (0, 40, 110), (0, 0, 0)),
+                 ((150, 240, 80), (40, 170, 40), (255, 255, 255), (0, 70, 0), (0, 0, 0))]
+    total = block_h(lines, f, size) + (int(size * 0.5) if small else 0)
+    top_y = int(H_ * 0.06) if portrait else max(int(H_ * 0.05), (H_ - total) // 2)
+    x0 = int(W_ * (0.05 if portrait else 0.04))
+    y = top_y
+    for k, ln in enumerate(lines):
+        top, bot, stroke, ext, glow = looks[k % len(looks)]
+        tw = probe.textlength(ln, font=f)
+        bb = f.getbbox(ln)
+        x = (W_ - tw) / 2 if portrait else x0 + max(0, (col_w - tw) / 2)
+        ty = y - bb[1] + sw                           # the line's highest sign starts exactly at y
+        img = _fx_line(img, (x, ty), ln, f, top, bot, stroke, sw, depth, ext,
+                       glow if horror and style == "horror" else (0, 0, 0) if not horror else None,
+                       max(8, size // 7) if horror else max(6, size // 10))
+        y = ty + bb[3] + sw + depth + int(size * 0.06)  # below its lowest sign (e.g. the ra-phala of ট্র)
+    if small:                                         # the little line under the title
+        sf, _p2 = tf(max(28, int(size * 0.34)))
+        st = fit_glyphs(small, _p2)
+        tw = probe.textlength(st, font=sf)
+        x = (W_ - tw) / 2 if portrait else x0 + max(0, (col_w - tw) / 2)
+        pad = int(sf.size * 0.35)
+        dd = ImageDraw.Draw(img)
+        sb = sf.getbbox(st)
+        y += pad // 2
+        dd.rounded_rectangle([x - pad, y, x + tw + pad, y + (sb[3] - sb[1]) + 2 * pad], radius=pad,
+                             fill=(160, 0, 0) if horror else (255, 255, 255))
+        dd.text((x, y + pad - sb[1]), st, font=sf, fill=(255, 255, 255) if horror else (200, 20, 90))
+    img.save(out, quality=95)
+    return out
+
+
 def poster_words(title, place, ghost, lang, key=None, models=None):
     """The poster's word stack for THIS story, e.g. {'top': 'দুর্গাপুরের', 'main': 'চিত্রালয়', 'mid': 'সিনেমা হলের',
     'hook1': 'অভিশপ্ত', 'hook2': 'ছায়ামূর্তি'} - asked from Gemini, else cut from the title."""
@@ -3779,9 +4044,39 @@ def yt_retention(video_id):
     return out
 
 
-def yt_title_test(history, max_checks=6):
+def yt_set_thumbnail(video_id, path):
+    hdr = yt_token()
+    with open(path, "rb") as f:
+        t = requests.post(f"https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={video_id}",
+                          headers={**hdr, "Content-Type": "image/jpeg"}, data=f, timeout=120)
+    if not t.ok:
+        raise RuntimeError(_yt_err(t))
+    return True
+
+
+def keep_thumb_b(thumb_dir, video_id, path):
+    """Keeps the video's SECOND thumbnail (same picture, other words, mirrored) for a few days: if the video gets
+    few views, it replaces the first one. Old ones are deleted, so the repo stays small."""
+    if not (video_id and path and os.path.exists(path)):
+        return None
+    os.makedirs(thumb_dir, exist_ok=True)
+    now = time.time()
+    for f in os.listdir(thumb_dir):
+        fp = os.path.join(thumb_dir, f)
+        try:
+            if now - os.path.getmtime(fp) > 6 * 86400:
+                os.remove(fp)
+        except OSError:
+            pass
+    out = os.path.join(thumb_dir, f"{video_id}.jpg")
+    Image.open(path).convert("RGB").save(out, quality=86)
+    return out
+
+
+def yt_title_test(history, max_checks=6, thumb_dir=None):
     """A day after a video goes up: if it gets clearly fewer views than our usual videos, its second title
-    (made at writing time) replaces the first - once. Which title style wins is kept in history."""
+    (made at writing time) and its second thumbnail replace the first ones - once. Which one wins is kept in
+    history (and the story writer learns from it)."""
     if not env("YT_REFRESH_TOKEN") or env("TITLE_TEST") == "0":
         return False
     now = dt.datetime.now(dt.timezone.utc)
@@ -3791,7 +4086,9 @@ def yt_title_test(history, max_checks=6):
     median = seen[len(seen) // 2]
     changed = False
     for h in history[-12:]:
-        if not h.get("youtube") or not h.get("title_b") or h.get("title_test"):
+        tb = os.path.join(thumb_dir, f"{h.get('youtube')}.jpg") if thumb_dir and h.get("youtube") else ""
+        tb = tb if tb and os.path.exists(tb) else ""
+        if not h.get("youtube") or not (h.get("title_b") or tb) or h.get("title_test"):
             continue
         try:
             age = (now - dt.datetime.fromisoformat(str(h["date"]))).total_seconds() / 3600
@@ -3811,6 +4108,18 @@ def yt_title_test(history, max_checks=6):
             changed = True
             continue
         sn = items[0]["snippet"]
+        thumb_ok = False
+        if tb:
+            try:
+                thumb_ok = yt_set_thumbnail(h["youtube"], tb)
+                log(f"  YouTube thumbnail test: a weak video ({views} views, usual {median}) got its second thumbnail")
+            except Exception as e:
+                log("  second thumbnail not set:", str(e)[:120])
+        if not h.get("title_b"):
+            h["title_test"] = {"result": "thumb_swapped" if thumb_ok else "failed", "views_before": views,
+                               "at": now.isoformat(timespec="minutes")}
+            changed = True
+            continue
         new = {"id": h["youtube"], "snippet": {"title": str(h["title_b"])[:100], "description": sn.get("description", ""),
                                                 "categoryId": sn.get("categoryId", "24"), "tags": sn.get("tags", []),
                                                 "defaultLanguage": sn.get("defaultLanguage"),
@@ -3819,7 +4128,8 @@ def yt_title_test(history, max_checks=6):
         u = requests.put(f"{YT}/videos", headers={**hdr, "Content-Type": "application/json"}, params={"part": "snippet"},
                          data=json.dumps(new), timeout=30)
         if u.ok:
-            h["title_test"] = {"result": "swapped", "views_before": views, "at": now.isoformat(timespec="minutes")}
+            h["title_test"] = {"result": "swapped", "views_before": views, "at": now.isoformat(timespec="minutes"),
+                               "thumb": thumb_ok}
             log(f"  YouTube title test: '{sn.get('title', '')[:40]}' had {views} views (usual {median}) - "
                 f"now '{str(h['title_b'])[:40]}'")
         else:
@@ -3905,7 +4215,109 @@ def _creator_since():
         return CREATOR_SINCE, dt.datetime.fromisoformat(CREATOR_SINCE).timestamp()
 
 
-def creator_inbox(path, kind="horror"):
+BOT_NAME = {"horror": "ভূতের bot", "cartoon": "কার্টুন bot"}
+CMD_WORDS = {"status": ("অবস্থা", "/status", "status", "/অবস্থা", "খবর"),
+             "pause": ("বন্ধ", "/pause", "pause", "/বন্ধ"),
+             "resume": ("চালু", "/resume", "resume", "/চালু"),
+             "skip": ("বাদ", "/skip", "skip", "/বাদ"),
+             "help": ("সাহায্য", "/help", "help", "/start", "কমান্ড")}
+
+
+def _command(text):
+    """'অবস্থা', 'বন্ধ ভূত ২ দিন', 'চালু', 'বাদ কার্টুন ১' ... -> (name, target, number) or None"""
+    t = norm_digits(str(text or "").strip().lower()).rstrip("?।!.। ")
+    for name, words in CMD_WORDS.items():
+        for w in words:
+            if t == w or t.startswith(w + " ") or t.startswith(w + "\n"):
+                rest = t[len(w):]
+                target = ("horror" if any(x in rest for x in ("ভূত", "ভুত", "horror", "হরর")) else
+                          "cartoon" if any(x in rest for x in ("কার্টুন", "cartoon", "কার্টূন")) else "all")
+                num = re.search(r"\d+", rest)
+                return name, target, int(num.group()) if num else None
+    return None
+
+
+def bot_paused(path):
+    """True while YOU paused this bot from Telegram ('বন্ধ'); the pause ends by itself on its date, or with 'চালু'."""
+    d = _jl(path, {})
+    return bot_paused_data(d) if isinstance(d, dict) else False
+
+
+def _run_commands(data, cmds, kind, status):
+    """Your Telegram commands, answered at this bot's next run (both bots read the same chat)."""
+    me = BOT_NAME.get(kind, kind)
+    for name, target, num in cmds:
+        mine = target in ("all", kind)
+        if name == "help":
+            if kind == "horror":                      # one answer is enough
+                telegram("🤖 Telegram থেকে bot চালানোর কথা (উত্তর আসে bot-এর পরের run-এ):\n"
+                         "• অবস্থা - দুটো bot-এর খবর, লাইনে কোন গল্প\n"
+                         "• বন্ধ / বন্ধ ভূত / বন্ধ কার্টুন - post বন্ধ (যেমন: বন্ধ ভূত ৩ দিন)\n"
+                         "• চালু / চালু ভূত / চালু কার্টুন - আবার চালু\n"
+                         "• বাদ ভূত ১ / বাদ কার্টুন ২ - লাইনের সেই গল্প বাদ")
+        elif name == "status" and mine:
+            q = data.get("queue") or []
+            lines = [f"📋 {me}:"]
+            if bot_paused_data(data):
+                u = data["paused"].get("until")
+                lines.append("⏸️ এখন বন্ধ" + ("" if u == "forever" else f" ({str(u)[:10]} পর্যন্ত)") + " - 'চালু' লিখলে চলবে")
+            else:
+                lines.append("▶️ চালু আছে")
+            try:
+                lines += [str(x) for x in (status() if status else [])]
+            except Exception as e:
+                lines.append(f"(খবর আনা গেল না: {str(e)[:60]})")
+            pre = "ভূত" if kind == "horror" else "কার্টুন"
+            lines.append(f"লাইনে আপনার গল্প: {bn_num(len(q))}টা" + ("" if not q else ":"))
+            lines += [f"  {pre}-{bn_num(i + 1)}: {_short(s.get('text', ''), 45)}…" for i, s in enumerate(q[:8])]
+            telegram("\n".join(lines))
+        elif name == "pause" and mine:
+            until = "forever"
+            if num:
+                until = (dt.datetime.now(IST) + dt.timedelta(days=min(num, 60))).isoformat(timespec="minutes")
+            data["paused"] = {"until": until, "since": dt.datetime.now(IST).isoformat(timespec="minutes")}
+            telegram(f"⏸️ {me} বন্ধ" + ("" if until == "forever" else f" {bn_num(min(num, 60))} দিনের জন্য") +
+                     " - কোনো নতুন ভিডিও যাবে না। আবার চালাতে লিখুন: চালু")
+        elif name == "resume" and mine:
+            was = bool(data.pop("paused", None))
+            telegram(f"▶️ {me} চালু" + ("" if was else " (বন্ধ ছিল না)") + " - পরের সময় থেকে আবার ভিডিও যাবে।")
+        elif name == "skip":
+            q = data.get("queue") or []
+            if target == "all":
+                if kind == "horror":
+                    telegram("কোন গল্প বাদ দেবেন? লিখুন যেমন: বাদ ভূত ১  বা  বাদ কার্টুন ১ ('অবস্থা' লিখলে নম্বর দেখবেন)")
+            elif mine:
+                if num and 1 <= num <= len(q):
+                    s = q.pop(num - 1)
+                    data["used"] = (data.get("used") or [])[-49:] + [{"id": s.get("id"), "skipped": True}]
+                    telegram(f"🗑️ {me}: লাইনের {bn_num(num)} নম্বর গল্প বাদ দিলাম ({_short(s.get('text', ''), 40)}…)। "
+                             f"লাইনে বাকি: {bn_num(len(q))}টা")
+                else:
+                    telegram(f"{me}: লাইনে {bn_num(num) if num else '?'} নম্বর গল্প নেই (লাইনে আছে {bn_num(len(q))}টা)।")
+
+
+def bn_num(n):
+    return str(n).translate(str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯"))
+
+
+def _short(text, n):
+    return re.sub(r"\s+", " ", str(text or "")).strip()[:n]
+
+
+def bot_paused_data(data):
+    p = data.get("paused")
+    if not p:
+        return False
+    u = p.get("until")
+    if u and u != "forever":
+        try:
+            return dt.datetime.now(IST) < dt.datetime.fromisoformat(u)
+        except ValueError:
+            return False
+    return True
+
+
+def creator_inbox(path, kind="horror", status=None):
     """Stories YOU paste to the Telegram bot (one or more messages sent within 20 minutes = one story).
     Only YOUR chat (TELEGRAM_CHAT_ID) is read. A story that starts with the word 'কার্টুন' goes to the cartoon
     bot, every other story to the horror bot. Starting with 'কাল্পনিক' = no 'based on true events' label.
@@ -3933,7 +4345,7 @@ def creator_inbox(path, kind="horror"):
     except Exception as e:
         log("  your Telegram stories: could not read -", str(e)[:100])
         return data
-    seen, msgs = set(data.get("seen") or []), []
+    seen, msgs, cmds = set(data.get("seen") or []), [], []
     for u in r.get("result", []):
         uid = u.get("update_id")
         if uid in seen:
@@ -3945,7 +4357,9 @@ def creator_inbox(path, kind="horror"):
         t = str(msg.get("text") or "").strip()
         if int(msg.get("date") or 0) < since:
             continue                                  # sent before the clean start: never made
-        if len(t) >= 150:                             # a story (short messages are just chat)
+        if len(t) < 150 and _command(t):              # a command: অবস্থা / বন্ধ / চালু / বাদ
+            cmds.append((int(msg.get("date") or 0), _command(t)))
+        elif len(t) >= 150:                           # a story (short messages are just chat)
             msgs.append((int(msg.get("date") or 0), uid, t))
     groups = []
     starts = lambda t: any(t[:40].lower().startswith(w) for w in CARTOON_WORDS + FICTION_WORDS)
@@ -3980,8 +4394,13 @@ def creator_inbox(path, kind="horror"):
         telegram(f"✅ আপনার {'কার্টুন ' if kind == 'cartoon' else 'ভূতের '}গল্পটা পেয়েছি ({len(text)} অক্ষর)। "
                  f"এই গল্প দিয়েই পরের ফাঁকা {when}"
                  + (" - 'সত্য ঘটনা অবলম্বনে' লেখা থাকবে।" if true else " (কাল্পনিক গল্প হিসেবে)।")
-                 + f" লাইনে আছে: {len(data['queue'])}টা গল্প।")
+                 + f" লাইনে আছে: {bn_num(len(data['queue']))}টা গল্প।")
         log(f"Your own story received on Telegram ({len(text)} characters)")
+    if cmds:
+        try:
+            _run_commands(data, [c for _d, c in sorted(cmds)], kind, status)
+        except Exception as e:
+            log("  Telegram commands failed:", str(e)[:120])
     data["seen"] = sorted(seen)[-400:]
     _js(path, data)
     return data
@@ -4046,6 +4465,77 @@ DAY_NOTES = []          # things worth telling the owner from this run (backups 
 def note(text):
     if text not in DAY_NOTES:
         DAY_NOTES.append(text)
+
+
+def explain_error(text):
+    """A problem in plain Bengali, with what to do."""
+    t = str(text or "")
+    tl = t.lower()
+    rules = [
+        (("error validating access token", "session has expired", "has expired", "code\': 190", '"code": 190',
+          "fb_page_token", "invalid oauth access token"),
+         "Facebook token-এর মেয়াদ শেষ বা বাতিল - নতুন Page token বানিয়ে GitHub Secret FB_PAGE_TOKEN বদলান "
+         "(Facebook_Token_Renewal.pdf-এর ধাপ)"),
+        (("invalid_grant", "token has been expired or revoked"),
+         "YouTube-এর অনুমতি বাতিল হয়ে গেছে - নতুন YT_REFRESH_TOKEN বানাতে হবে"),
+        (("quotaexceeded", "uploadlimitexceeded", "dailylimitexceeded", "youtube daily limit"),
+         "YouTube-এর আজকের limit শেষ - কাল নিজে ঠিক হয়ে যাবে"),
+        (("secret ", "is missing"), "একটা GitHub Secret নেই: " + t[:120]),
+        (("resource_exhausted", "429", "rate limit", "quota"),
+         "Gemini / Google-এর আজকের limit শেষ - কাল আবার নিজে চলবে"),
+        (("neuron", "4006", "cloudflare"), "Cloudflare-এর আজকের ছবির limit শেষ - কাল নিজে ঠিক হবে"),
+        (("no space left",), "GitHub-এর কম্পিউটারে জায়গা শেষ - পরের run-এ নিজে ঠিক হওয়ার কথা"),
+        (("posting failed everywhere",), "Facebook আর YouTube দুটোতেই post হয়নি - কারণ আগের message-এ লেখা আছে"),
+        (("timed out", "timeout", "connectionerror", "connection reset", "max retries", "503", "502", "500 server"),
+         "ইন্টারনেট বা সার্ভারের সাময়িক সমস্যা - পরের run-এ নিজে ঠিক হয়ে যেতে পারে"),
+        (("no chapter written", "could not write", "story too short", "no story"),
+         "গল্প লেখা যায়নি (Gemini ব্যস্ত বা limit শেষ) - পরের run-এ আবার চেষ্টা হবে"),
+    ]
+    for keys, why in rules:
+        if all(k in tl for k in keys) if keys == ("secret ", "is missing") else any(k in tl for k in keys):
+            return why
+    return "অজানা সমস্যা: " + re.sub(r"\s+", " ", t)[:160]
+
+
+def fail_note(here, text, bot_label):
+    """Written when the run stops with an error: the GitHub step 'tell me on Telegram' sends it in Bengali."""
+    try:
+        with open(os.path.join(here, "fail_reason.txt"), "w", encoding="utf-8") as f:
+            f.write(explain_error(text))
+    except Exception:
+        pass
+
+
+def alert_post_errors(results, bot_label, title=""):
+    """The video went to one place but not the other: tell YOU now, with the reason (no log reading needed)."""
+    bad = [(k.split("_")[0], v) for k, v in (results or {}).items() if k.endswith("_error") and v]
+    if not bad or env("MOCK") == "1":
+        return
+    names = {"facebook": "Facebook", "youtube": "YouTube"}
+    telegram(f"⚠️ {bot_label}: '{str(title)[:50]}' " + "; ".join(
+        f"{names.get(w, w)}-এ যায়নি - {explain_error(v)}" for w, v in bad))
+
+
+def best_kinds(history, label_of=None, days=30):
+    """Which kinds of story our viewers watch most (last 30 days) - for the daily report."""
+    now = dt.datetime.now(dt.timezone.utc)
+    sums, counts = {}, {}
+    for h in history[-120:]:
+        st, k = h.get("stats") or {}, h.get("category") or h.get("special")
+        try:
+            age = (now - dt.datetime.fromisoformat(str(h.get("date")))).days
+        except Exception:
+            continue
+        if not k or not st or age > days:
+            continue
+        sums[k] = sums.get(k, 0) + score(st)
+        counts[k] = counts.get(k, 0) + 1
+    rows = sorted(((sums[k] / counts[k], k) for k in counts if counts[k] >= 2), reverse=True)
+    if len(rows) < 2:
+        return ""
+    name = (lambda k: (label_of or {}).get(k, k))
+    return ("সবচেয়ে বেশি দেখা হচ্ছে (৩০ দিন): " + ", ".join(name(k) for _s, k in rows[:3])
+            + " | সবচেয়ে কম: " + name(rows[-1][1]))
 
 
 def daily_report(history, bot_label, extra=""):

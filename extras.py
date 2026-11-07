@@ -2003,7 +2003,7 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
             log("  expressive voice: free limit used up on all keys")
             return False
         d = _audio_file(data, out_wav, sr)
-        if max(0.4, plain_len / 40) <= d <= plain_len / 7 + 3:     # longer = something extra was said
+        if max(0.4, plain_len / 40) <= d <= plain_len / 4 + 4:     # far longer = something extra was said
             return True
         log(f"    single line: {d:.1f} s for {plain_len} letters - not used")
     return False
@@ -2397,8 +2397,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         got = _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
         chars = sum(len(p) for p in plains)
-        expect = chars / 12.0 + 1.0 * (len(g) - 1)      # ~12 Bengali letters a second + the pauses
-        if got > expect * 1.7 + 3 or got < expect * 0.4:
+        # our grave storyteller speaks SLOWLY (a real episode: ~7 Bengali letters a second, pauses included), so
+        # the check is wide: it only catches a recording that is clearly twice too long or far too short
+        expect = chars / 8.0 + 1.0 * (len(g) - 1)
+        if got > expect * 2.0 + 4 or got < expect * 0.33:
             # something was said that is not in the story (e.g. the instructions, in English) or words were left
             # out: never use it - ask again in smaller groups, or leave these lines for a single-line request
             log(f"  voices: a recording of {got:.0f} s for ~{expect:.0f} s of words - not used "
@@ -2474,7 +2476,10 @@ def tts_budget_left(path):
 def tts_budget_use(path):
     d = _jl(path, {})
     used = int(d.get("used", 0)) if d.get("day") == _pacific_day() else 0
-    _js(path, {"day": _pacific_day(), "used": used + TTS_USED[0]})
+    if not isinstance(d, dict):
+        d = {}
+    d.update({"day": _pacific_day(), "used": used + TTS_USED[0]})    # other saved keys (the story length) stay
+    _js(path, d)
     TTS_USED[0] = 0
 
 
@@ -3887,11 +3892,35 @@ def _js(path, data):
         json.dump(data, f, ensure_ascii=False)
 
 
+# Stories sent on Telegram BEFORE this moment are never made into videos (your wish of 7 Nov 2026): only the
+# stories you send from now on. (A different start can be set with the CREATOR_SINCE variable.)
+CREATOR_SINCE = "2026-11-07T11:30:00+05:30"
+
+
+def _creator_since():
+    s = env("CREATOR_SINCE") or CREATOR_SINCE
+    try:
+        return s, dt.datetime.fromisoformat(s).timestamp()
+    except ValueError:
+        return CREATOR_SINCE, dt.datetime.fromisoformat(CREATOR_SINCE).timestamp()
+
+
 def creator_inbox(path, kind="horror"):
     """Stories YOU paste to the Telegram bot (one or more messages sent within 20 minutes = one story).
     Only YOUR chat (TELEGRAM_CHAT_ID) is read. A story that starts with the word 'কার্টুন' goes to the cartoon
-    bot, every other story to the horror bot. Starting with 'কাল্পনিক' = no 'based on true events' label."""
+    bot, every other story to the horror bot. Starting with 'কাল্পনিক' = no 'based on true events' label.
+    Only stories sent AFTER CREATOR_SINCE count - the older ones are dropped once and never made."""
     data = _jl(path, {"queue": [], "seen": []})
+    if not isinstance(data, dict):
+        data = {"queue": [], "seen": []}
+    since_txt, since = _creator_since()
+    if data.get("fresh_from") != since_txt:          # ONE clean start: every older story leaves the line
+        q = data.get("queue") or []
+        keep = [s for s in q if int(s.get("date") or 0) >= since]
+        data["queue"], data["seen"], data["fresh_from"] = keep, [], since_txt
+        _js(path, data)
+        log(f"  your Telegram stories: {len(q) - len(keep)} older stories removed - only stories sent from now on "
+            "will be made")
     tok, chat = env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID")
     if env("MOCK") == "1" or not tok:
         return data
@@ -3914,6 +3943,8 @@ def creator_inbox(path, kind="horror"):
         if str((msg.get("chat") or {}).get("id")) != str(chat):
             continue                                  # never anyone else's messages
         t = str(msg.get("text") or "").strip()
+        if int(msg.get("date") or 0) < since:
+            continue                                  # sent before the clean start: never made
         if len(t) >= 150:                             # a story (short messages are just chat)
             msgs.append((int(msg.get("date") or 0), uid, t))
     groups = []
@@ -3925,8 +3956,11 @@ def creator_inbox(path, kind="horror"):
             groups[-1]["text"] += "\n" + t
             groups[-1]["last"] = d
         else:
-            groups.append({"id": uid, "text": t, "last": d})
+            groups.append({"id": uid, "text": t, "last": d, "date": d})
+    had = {s.get("id") for s in data.get("queue") or []} | {s.get("id") for s in data.get("used") or []}
     for g in groups:
+        if g["id"] in had:
+            continue                                  # already in the line or already made
         text = g["text"].strip()
         head = text[:40].lower()
         is_cartoon = any(head.startswith(w) for w in CARTOON_WORDS)
@@ -3939,11 +3973,12 @@ def creator_inbox(path, kind="horror"):
         for w in FICTION_WORDS:
             if text.lower().startswith(w):
                 text, true = text[len(w):].lstrip(" :-—\n"), False
-        data.setdefault("queue", []).append({"id": g["id"], "text": text[:15000], "true": true,
+        data.setdefault("queue", []).append({"id": g["id"], "text": text[:15000], "true": true, "date": g["date"],
                                              "got": dt.datetime.now(IST).isoformat(timespec="minutes")})
-        when = "দুপুরে বা রাতে" if kind == "horror" else "সকালে বা সন্ধ্যায়"
+        when = ("দুপুর ২টোর ভিডিও হবে (দিনে একটা করে)" if kind == "horror" else
+                "সকাল ৮টা বা সন্ধ্যা ৭টার ভিডিও হবে (একবারে একটা করে)")
         telegram(f"✅ আপনার {'কার্টুন ' if kind == 'cartoon' else 'ভূতের '}গল্পটা পেয়েছি ({len(text)} অক্ষর)। "
-                 f"পরের ফাঁকা সময়ে ({when}) এই গল্প দিয়েই পুরো ভিডিও হবে"
+                 f"এই গল্প দিয়েই পরের ফাঁকা {when}"
                  + (" - 'সত্য ঘটনা অবলম্বনে' লেখা থাকবে।" if true else " (কাল্পনিক গল্প হিসেবে)।")
                  + f" লাইনে আছে: {len(data['queue'])}টা গল্প।")
         log(f"Your own story received on Telegram ({len(text)} characters)")

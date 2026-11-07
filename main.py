@@ -56,9 +56,9 @@ LANGS = {
         "male": ["hi-IN-MadhurNeural"], "female": ["hi-IN-SwaraNeural"],
         "narrator": ("hi-IN-SwaraNeural", "-4%", "+2Hz"), "gtts": "hi",
         "intro": "नमस्ते बच्चों! आज की कहानी... {title}।",
-        "outro": "कहानी अच्छी लगी तो लाइक कीजिए, शेयर कीजिए, और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो ज़रूर कीजिए!",
+        "outro": "कहानी कैसी लगी, कमेंट में बताइए। और ऐसी ही प्यारी कहानियों के लिए {page} को फॉलो कीजिए!",
         "page_default": "हमारे पेज",
-        "share_cta": "🔁 कहानी पसंद आई? दोस्तों और बच्चों को शेयर करें और पेज फ़ॉलो करें - रोज़ नई मज़ेदार कहानी!",
+        "share_cta": "📌 रोज़ नई मज़ेदार कहानी - पेज फ़ॉलो करके रखिए!",
         "ai_note": "🎨 यह कहानी और तस्वीरें AI की मदद से बनाई गई हैं।",
         "moral_intro": "तो बच्चों, इस कहानी से हमें यह सीख मिलती है:",
         "labels": {"moral": "नैतिक कहानी", "animal": "जानवरों की कहानी", "funny": "मज़ेदार कहानी",
@@ -81,7 +81,7 @@ LANGS = {
         "riddle_title": "आज की पहेली", "riddle_msg": "🧩 आज की पहेली:\n\n{q}\n\nजवाब कमेंट में लिखिए! सही जवाब कल बताएँगे 😉",
         "riddle_prev": "✅ कल की पहेली का जवाब: {a}",
         "example_tags": "#HindiKahani #MoralStories #CartoonStory",
-        "badge": "लाइक • शेयर • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
+        "badge": "रोज़ नई कहानी • फॉलो", "ch_intro": "शुरुआत", "ch_end": "सीख", "chapters": "⏱️ अध्याय",
         "cta": "पूरी कहानी देखने के लिए नीचे लिखे लिंक पर क्लिक करें 👇", "playlist_tail": "Hindi Kids Stories", "full_link": "👉 पूरी कहानी सुनने के लिए इस लिंक पर क्लिक करें:",
         "quiz_title": "क्विज़ टाइम!", "quiz_labels": ["क", "ख", "ग"],
         "quiz_intro": "अब एक छोटा सा सवाल, बच्चों!", "quiz_count": "सोचो... तीन... दो... एक...",
@@ -104,9 +104,9 @@ LANGS = {
         "female": ["bn-IN-TanishaaNeural", "bn-IN-TanishaaNeural"],
         "narrator": ("bn-IN-TanishaaNeural", "-4%", "+2Hz"), "gtts": "bn",
         "intro": "নমস্কার বন্ধুরা! আজকের গল্প... {title}।",
-        "outro": "গল্পটা ভালো লাগলে লাইক করুন, শেয়ার করুন, আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করতে ভুলবেন না!",
+        "outro": "গল্পটা কেমন লাগল কমেন্টে জানাবেন। আর এমন আরও মিষ্টি গল্পের জন্য {page} ফলো করে রাখুন!",
         "page_default": "আমাদের পেজ",
-        "share_cta": "🔁 গল্পটা ভালো লাগলে বন্ধুদের শেয়ার করুন আর পেজটা ফলো করুন - রোজ নতুন মজার গল্প!",
+        "share_cta": "📌 রোজ নতুন মজার গল্প - পেজটা ফলো করে রাখুন!",
         "ai_note": "🎨 এই গল্প ও ছবি AI-এর সাহায্যে তৈরি।",
         "moral_intro": "তাহলে বন্ধুরা, এই গল্প থেকে আমরা শিখলাম:",
         "labels": {"moral": "নীতিকথার গল্প", "animal": "পশুপাখির গল্প", "funny": "মজার গল্প",
@@ -131,7 +131,7 @@ LANGS = {
         "riddle_title": "আজকের ধাঁধা", "riddle_msg": "🧩 আজকের ধাঁধা:\n\n{q}\n\nউত্তর কমেন্টে লিখুন! ঠিক উত্তর জানাব কাল 😉",
         "riddle_prev": "✅ গতকালের ধাঁধার উত্তর: {a}",
         "example_tags": "#বাংলাগল্প #RupkotharGolpo #CartoonStory",
-        "badge": "লাইক • শেয়ার • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
+        "badge": "রোজ নতুন গল্প • ফলো", "ch_intro": "শুরু", "ch_end": "শিক্ষা", "chapters": "⏱️ অধ্যায়",
         "cta": "পুরো গল্প দেখতে নিচের লেখার লিংকে ক্লিক করুন 👇", "playlist_tail": "Bangla Kids Stories", "full_link": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে:",
         "quiz_title": "কুইজ টাইম!", "quiz_labels": ["ক", "খ", "গ"],
         "quiz_intro": "এবার একটা ছোট্ট প্রশ্ন, বন্ধুরা!", "quiz_count": "ভাবুন... তিন... দুই... এক...",
@@ -3178,6 +3178,11 @@ def main():
                 save_history(history)
         except Exception as e:
             log("  earlier comments skipped:", str(e)[:120])
+    if not MOCK and not DRY_RUN and env("MY_STORIES") != "0":
+        try:                                         # every run collects the stories you sent on Telegram
+            extras.creator_inbox(os.path.join(HERE, "assets", "my_stories.json"), "cartoon")             # (Telegram keeps a message only 24 hours)
+        except Exception as e:
+            log("  Telegram stories not read:", str(e)[:120])
     global SLOT
     SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
     extras.plan_publish(SLOT)

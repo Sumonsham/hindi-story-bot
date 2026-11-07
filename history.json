@@ -1387,10 +1387,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 484,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-04T04:02+00:00"
+   "yt_views": 1,
+   "yt_avg_s": 4,
+   "yt_avg_pct": 0.9,
+   "checked": "2026-11-07T09:02+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1815,5 +1815,32 @@
   "fb_reel2": "1757667615337711",
   "coloring": "122138008700735948",
   "yt_short": "xtpR7E6EIoo"
+ },
+ {
+  "date": "2026-11-07T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-07@19",
+  "pending_comments": [],
+  "category": "para",
+  "idea": "the power cut during the big football final",
+  "episode": null,
+  "part": 1,
+  "continues": true,
+  "series_id": "2026-11-07T09:54+00:00",
+  "title": "ফুটবল ফাইনাল ও লোডশেডিংয়ের রহস্য! ⚽⚡ (পর্ব ১) | পর্ব 1",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "ফিলিপস"
+  },
+  "title_b": "পাড়ার ফুটবল ম্যাচ আর অন্ধকার রাতের গোলমাল! ⚽",
+  "question_post": null,
+  "facebook": "1407220564516987",
+  "youtube": "-_Rbq9kFI24",
+  "fb_reel": "1662146882115258",
+  "fb_story": "2003929543613218",
+  "fb_reel2": "1697368661997014"
  }
 ]

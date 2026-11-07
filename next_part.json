@@ -42,5 +42,56 @@
   "last_lines": "ঠিক তখনই! বাইরের বড় গাছে হাওয়া দিল, আর গুদামঘরের ভারী কাঠের দরজাটা দুম করে বন্ধ হতে শুরু করল! / কে... কে বাইরে? দাঁড়া! ঝন্টু, সাবধানে! / দরজাটার ওপাশে ওটা কার ছায়া? মিনি ধরে থাক! / দরজার বাইরে কে এসে দাঁড়াল? মালী হারু কাকা? নাকি মিষ্টির থলি হাতে নবীনবাবু? নাকি আসল রহস্য অন্য কিছু? জানতে চোখ রাখো কালকের পর্বে!",
   "setting": "A cosy rainy day in a quiet suburb near Kolkata, damp green garden, mud path soaked in light drizzle, misty greyish-blue sky, 26 degrees Celsius calm weather, yellow brick houses with vintage green wooden window shutters.",
   "updated": "2026-11-03T13:40:55.435123+00:00"
+ },
+ "para": {
+  "created": "2026-11-07T13:31:47.860141+00:00",
+  "category": "para",
+  "idea": "the power cut during the big football final",
+  "title": "ফুটবল ফাইনাল ও লোডশেডিংয়ের রহস্য! ⚽⚡ (পর্ব ১)",
+  "done": 1,
+  "total": 2,
+  "series_id": "2026-11-07T09:54+00:00",
+  "summary": " It is the evening of the big local football cup final, and the entire neighborhood has gathered in Kaku's living room to watch the match on his big television. Tensions run high as the match reaches the 89th minute tied at 1-1. Suddenly, the entire neighborhood goes pitch black due to a transformer fault. Dadu, Bhombol-da, Mashima, and Kaku panic while Kaku's phone battery dies. The clever young Saheb-da suggests searching for Dadu's old battery-operated radio in the dusty attic to listen to the live commentary. Saheb and Bhombol-da head upstairs and fetch the vintage radio, but discover it lacks heavy-duty batteries. Saheb goes outside to search for batteries at the local club. Outside in the dark street, Saheb hears a suspicious metallic snip near the street transformer and spots a shadowy figure in a raincoat holding wire cutters. Saheb realizes the power cut wasn't an accident, but before he can confront the stranger, a massive cheering shout erupts from the neighboring alley.",
+  "part2_plan": "In Part 2, Saheb confronts the mysterious sabotager who turns out to be a mischievous rival fan from the neighboring para trying to delay the match. Saheb clever-mindedly resolves the fuse issue with the help of the local electrician. Meanwhile, Bhombol-da and Dadu manage to power the vintage radio using flashlight batteries using a bent paperclip hack Saheb taught them. The family reunites around the radio just in time to hear the legendary final goal and celebrate their para's victory together with hot tea and snacks.",
+  "characters": [
+   {
+    "name": "Saheb",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven, wheat-brown skin, teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
+   },
+   {
+    "name": "Bhombol-da",
+    "gender": "male",
+    "age": "young",
+    "kind": "human",
+    "look": "plump cheerful young man around 26, mop of wild curly black hair, bright red t-shirt, green checkered lungi, bare feet"
+   },
+   {
+    "name": "Dadu",
+    "gender": "male",
+    "age": "old",
+    "kind": "human",
+    "look": "thin energetic old grandfather, bald top with white hair on sides, round metal-framed glasses, traditional white cotton dhoti-kurta, carrying a polished wooden walking stick"
+   },
+   {
+    "name": "Mashima",
+    "gender": "female",
+    "age": "adult",
+    "kind": "human",
+    "look": "plump kind middle-aged aunt, short black hair tied in a bun, wearing a white cotton sari with a thick red border, big round red bindi on forehead"
+   },
+   {
+    "name": "Kaku",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "bald middle-aged uncle, thick black moustache, round stomach, wearing a blue checked short-sleeved shirt and gray trousers, always holding a smartphone"
+   }
+  ],
+  "last_lines": "ঠিক তখনই পাশের পাড়া থেকে একসাথে শতেক মানুষের গগনবিদারী চিল চিৎকার ভেসে এল! / গোল! পাশের পাড়ায় কি গোল হয়ে গেল সাহেবদা? নাকি ফিউজ খোলা রহস্যময় লোকটা ওদের লোক? / কে কাটল পাড়ার কারেন্ট? আর শেষ পর্যন্ত ফাইনাল কাপ কার ঘরে গেল? জানতে দেখুন আগামীকাল দ্বিতীয় পর্ব!",
+  "setting": "A bustling narrow Kolkata neighborhood lane (para) in the evening, with vintage brick houses, open balconies, glowing street lamps before power cut, colorful football flags hanging across trees, and Kaku's traditional cozy living room decorated with football posters.",
+  "updated": "2026-11-07T13:31:47.863597+00:00"
  }
 }

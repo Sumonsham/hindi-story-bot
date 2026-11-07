@@ -2179,6 +2179,17 @@ SHORT_ACCENT = {"Kolkata (West Bengal, India) Bengali": "Standard Kolkata Bengal
                 "Hindi": "Natural Hindi, every word exactly as written"}
 
 
+def _calm(text):
+    """A line inside a multi-line recording: its own dramatic pauses ('...', '…', '—') become short comma pauses.
+    Only the pause BETWEEN two lines stays long - that is where the recording is cut, so a cut can never land
+    inside a sentence (a long '...' in the middle of a line was taken for the end of the line, and the rest of
+    the sentence went missing or into the next line). The scene itself adds the dramatic silences back."""
+    t = re.sub(r"\s*(?:\.\s*){2,}|\s*…+\s*|\s+[—–]\s+", ", ", str(text))
+    t = re.sub(r"(,\s*){2,}", ", ", t)
+    t = re.sub(r"^[,\s]+", "", t)
+    return re.sub(r"[,\s]+$", "", t) + ("" if re.search(r"[।!?.]$", t.strip()) else "।")
+
+
 def _requests_for(turns, speakers, lang_label, extra_note=""):
     """turns: [(speaker_label, text_with_<tags>, style)], speakers: [(label, voice)] (1 or 2).
     Returns every way of asking, best first."""
@@ -2196,7 +2207,9 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
         # on all 16 lines it used up the 10,000-tokens-a-minute limit of the free voice models
         # ONLY the story's own words are in the text the model speaks; how to say it goes in a SHORT style note
         # (long English notes were sometimes read out loud in English in the middle of a Bengali story)
-        blocks = [{"type": "text", "text": tts_tags(t) + (" ... ... ..." if k < len(turns) - 1 else ""),
+        many = len(turns) > 1
+        blocks = [{"type": "text", "text": (_calm(tts_tags(t)) if many else tts_tags(t))
+                   + (" ... ... ..." if k < len(turns) - 1 else ""),
                    "annotations": [{"type": "speech_metadata", "speaker": s, "style": (
                        str(st).split(" Accent:")[0][:200]
                        + ((" " + str(extra_note).split(" Accent:")[0][:200] + " " + SHORT_ACCENT.get(lang_label, ""))
@@ -2206,7 +2219,8 @@ def _requests_for(turns, speakers, lang_label, extra_note=""):
                     {"model": model, "input": [{"type": "user_input", "content": blocks}],
                      "response_format": {"type": "audio"}, "generation_config": {"speech_config": sc}}, API_REV))
     for model in OLD_TTS:
-        plain = "\n".join((f"{s}: " if multi else "") + strip_tags(t) for s, t, st in turns)
+        plain = "\n".join((f"{s}: " if multi else "") + (_calm(strip_tags(t)) + " ... ... ..." if len(turns) > 1
+                                                           else strip_tags(t)) for s, t, st in turns)
         cfg = ({"multiSpeakerVoiceConfig": {"speakerVoiceConfigs": [
             {"speaker": s, "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": v}}} for s, v in speakers]}}
             if multi else {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": speakers[0][1]}}})
@@ -2267,14 +2281,14 @@ def _align_split(wav, plains):
     rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
     if rms.size < 10:
         return None
-    quiet = rms < max(np.percentile(rms, 95) * 0.06, 1e-6)
+    quiet = rms < max(np.percentile(rms, 95) * 0.03, 1e-6)     # real silence only - a whisper is still speech
     cand, i = [], 0                                   # (centre frame, length in frames)
     while i < len(quiet):
         if quiet[i]:
             j = i
             while j < len(quiet) and quiet[j]:
                 j += 1
-            if (j - i) * 0.02 >= 0.12 and i > 0 and j < len(quiet):
+            if (j - i) * 0.02 >= 0.2 and i > 0 and j < len(quiet):
                 cand.append(((i + j) // 2, j - i))
             i = j
         else:
@@ -2286,20 +2300,38 @@ def _align_split(wav, plains):
     for p in plains[:-1]:
         acc += max(1, len(p))
         exp.append(len(rms) * acc / tot)
-    # dynamic programming: pick n-1 silences in order, close to the expected ends, longer silences preferred
+    total = len(a) / sr
+
+    def pieces(cuts):
+        bounds = [0] + [c * hop for c in cuts] + [len(a)]
+        segs = [a[bounds[k]:bounds[k + 1]] for k in range(n)]
+        for seg, p in zip(segs, plains):              # every piece must fit its own line's length
+            want = total * max(1, len(p)) / tot
+            lo, hi = (0.55, 1.75) if len(p) >= 30 else (0.33, 2.6)   # a long line with a sentence missing = too short
+            if not (lo * want <= len(seg) / sr <= hi * want + 0.6):
+                return None
+        return segs
+    # FIRST CHOICE: the pauses BETWEEN lines are the longest silences of the recording (inside a line there are only
+    # short comma pauses) - when the n-1 longest silences stand clearly apart from all the others, they are the cuts
+    by_len = sorted(range(len(cand)), key=lambda c: -cand[c][1])
+    if len(cand) == n - 1 or cand[by_len[n - 2]][1] >= 1.45 * cand[by_len[n - 1]][1]:
+        segs = pieces(sorted(cand[c][0] for c in by_len[:n - 1]))
+        if segs:
+            return segs, sr
+    # else dynamic programming: pick n-1 silences in order, close to the expected ends, longer silences preferred
     C, K = len(cand), n - 1
     INF = float("inf")
     cost = [[INF] * C for _ in range(K)]
     back = [[-1] * C for _ in range(K)]
     for c in range(C):
-        cost[0][c] = abs(cand[c][0] - exp[0]) - 3 * cand[c][1]
+        cost[0][c] = abs(cand[c][0] - exp[0]) - 12 * cand[c][1]
     for k in range(1, K):
         best, bi = INF, -1
         for c in range(C):
             if c > 0 and cost[k - 1][c - 1] < best:
                 best, bi = cost[k - 1][c - 1], c - 1
             if bi >= 0:
-                cost[k][c] = best + abs(cand[c][0] - exp[k]) - 3 * cand[c][1]
+                cost[k][c] = best + abs(cand[c][0] - exp[k]) - 12 * cand[c][1]
                 back[k][c] = bi
     c = min(range(C), key=lambda x: cost[K - 1][x])
     if cost[K - 1][c] == INF:
@@ -2308,15 +2340,8 @@ def _align_split(wav, plains):
     for k in range(K - 1, 0, -1):
         c = back[k][c]
         picks.append(c)
-    cuts = [cand[c][0] for c in reversed(picks)]
-    bounds = [0] + [c * hop for c in cuts] + [len(a)]
-    segs = [a[bounds[k]:bounds[k + 1]] for k in range(n)]
-    total = len(a) / sr
-    for seg, p in zip(segs, plains):                  # every piece must fit its own line's length
-        want = total * max(1, len(p)) / tot
-        if not (0.5 * want <= len(seg) / sr <= 1.9 * want + 0.5):
-            return None
-    return segs, sr
+    segs = pieces([cand[c][0] for c in reversed(picks)])
+    return (segs, sr) if segs else None
 
 
 def _soft_split(wav, plains):
@@ -2346,6 +2371,7 @@ def _soft_split(wav, plains):
 
 
 TTS_USED = [0]                  # voice requests sent in this run (each one counts against the day)
+SPK_RATE = {}                   # seconds per letter of every voice, learned from its clean recordings
 
 
 def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None):
@@ -2401,7 +2427,13 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         # our grave storyteller speaks SLOWLY (a real episode: ~7 Bengali letters a second, pauses included), so
         # the check is wide: it only catches a recording that is clearly twice too long or far too short
         expect = chars / 8.0 + 1.0 * (len(g) - 1)
-        if got > expect * 2.0 + 4 or got < expect * 0.33:
+        vk = f"{g[0]['voice']}|{g[0]['who']}"
+        missing = False
+        if SPK_RATE.get(vk) and chars >= 120:         # this voice's own speed is known: words left out show up
+            missing = got < chars * SPK_RATE[vk] * 0.72
+            if missing:
+                log(f"  voices: {got:.0f} s where this voice needs ~{chars * SPK_RATE[vk]:.0f} s - words were left out")
+        if missing or got > expect * 2.0 + 4 or got < expect * 0.33:
             # something was said that is not in the story (e.g. the instructions, in English) or words were left
             # out: never use it - ask again in smaller groups, or leave these lines for a single-line request
             log(f"  voices: a recording of {got:.0f} s for ~{expect:.0f} s of words - not used "
@@ -2426,6 +2458,9 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
                 "stay open")
             continue
         os.remove(tmp)
+        if chars >= 60:                               # a clean recording: remember how fast this voice speaks
+            r_ = got / chars
+            SPK_RATE[vk] = r_ if vk not in SPK_RATE else SPK_RATE[vk] * 0.6 + r_ * 0.4
         segs, rate = cut
         for x, seg in zip(g, segs):
             if len(seg) < rate * 0.15:                  # nothing left for this line: it gets the backup voice

@@ -241,7 +241,7 @@
    "yt_views": 1,
    "yt_avg_s": 11,
    "yt_avg_pct": 1.9,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -268,7 +268,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -294,7 +294,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -319,7 +319,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -503,7 +503,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -524,12 +524,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 2,
+   "views": 3,
    "length_s": 653,
-   "yt_views": 1,
+   "yt_views": 3,
    "yt_avg_s": 15,
    "yt_avg_pct": 2.3,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -542,12 +542,12 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 6,
+   "views": 7,
    "length_s": 6942,
-   "yt_views": 5,
-   "yt_avg_s": 10,
+   "yt_views": 7,
+   "yt_avg_s": 5,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -584,7 +584,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -849,7 +849,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -884,7 +884,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -1119,12 +1119,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
+   "views": 2,
    "length_s": 440,
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -1157,10 +1157,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 403,
-   "yt_views": 2,
-   "yt_avg_s": 16,
-   "yt_avg_pct": 4.0,
-   "checked": "2026-11-04T23:02+00:00"
+   "yt_views": 1,
+   "yt_avg_s": 12,
+   "yt_avg_pct": 3.0,
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -1214,10 +1214,10 @@
    "comments": 1,
    "views": 0,
    "length_s": 434,
-   "yt_views": 1,
-   "yt_avg_s": 444,
-   "yt_avg_pct": 102.2,
-   "checked": "2026-11-05T04:02+00:00"
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-08T07:29+00:00"
   }
  },
  {
@@ -1427,12 +1427,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 1,
+   "views": 3,
    "length_s": 430,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T11:45+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1474,12 +1474,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 2,
    "length_s": 455,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-04T23:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1514,12 +1514,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 384,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-05T04:02+00:00"
+   "checked": "2026-11-08T07:29+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1752,7 +1752,21 @@
   "fb_reel": "1731640831710239",
   "fb_story": "3718775174940394",
   "fb_reel2": "1548236957338804",
-  "yt_short": "jhZkOpDXS60"
+  "yt_short": "jhZkOpDXS60",
+  "stats": {
+   "likes": 3,
+   "comments": 1,
+   "views": 1,
+   "length_s": 533,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-08T07:29+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 1
+  }
  },
  {
   "date": "2026-11-07T02:31+00:00",
@@ -1785,6 +1799,22 @@
   "riddle": {
    "q": "সারা রাত জ্বলে থাকে, কোনো কথা না বলে আলোর পথ দেখায়, জিনিসটা কী?",
    "a": "প্রদীপ"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 526,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-08T07:29+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-08T07:31+00:00",
+   "thumb": false
   }
  },
  {
@@ -1814,7 +1844,23 @@
   "fb_story": "2273533083189576",
   "fb_reel2": "1757667615337711",
   "coloring": "122138008700735948",
-  "yt_short": "xtpR7E6EIoo"
+  "yt_short": "xtpR7E6EIoo",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 473,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-08T07:29+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-08T07:31+00:00",
+   "thumb": false
+  }
  },
  {
   "date": "2026-11-07T13:31+00:00",
@@ -1842,5 +1888,53 @@
   "fb_reel": "1662146882115258",
   "fb_story": "2003929543613218",
   "fb_reel2": "1697368661997014"
+ },
+ {
+  "date": "2026-11-08T10:11+00:00",
+  "lang": "bn",
+  "slot": "2026-11-08@13",
+  "pending_comments": [],
+  "category": "divine",
+  "idea": "Ma Kali's blessing and the Diwali lamp for a lonely grandmother",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "মা কালীর বরদান ও একলা ঠাকুমার অমাবস্যার প্রদীপ! 🪔✨",
+  "festival": "Kali Puja / Diwali",
+  "vote": {
+   "ideas": [
+    [
+     "folk",
+     "a poor farmer's son and the sleeping princess"
+    ],
+    [
+     "folk",
+     "the king's lost ring and the honest fisherman"
+    ]
+   ],
+   "labels": [
+    "১) গরিব কৃষকের ছেলে ও ঘুমন্ত রাজকন্যা",
+    "২) রাজার হারানো আংটি ও সৎ জেলে"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "ঠাকুমার খাঁটি ভক্তি ও দয়ার জন্য"
+  },
+  "title_b": "আঁধার রাতে মা কালীর আগমন! একলা ঠাকুমার ভক্তি 🕯️✨",
+  "question_post": "2026-11-08",
+  "facebook": "1641811470979651",
+  "youtube": "gK3qI-D7FkY",
+  "fb_reel": "1127872099963442",
+  "fb_story": "2246905256205295",
+  "fb_reel2": "2012647889374868",
+  "yt_short": "e6MLuRCTugk",
+  "riddle_post": "122138198294735948",
+  "riddle": {
+   "q": "আকাশে উড়াল দেয়, কিন্তু পাখি তো নয়! পেটে তার আলো থাকে, জ্বলজ্বল করে সে তো নয় কোনো তারা! বলো তো আমি কে?",
+   "a": "জোনাকি (Firefly)"
+  }
  }
 ]

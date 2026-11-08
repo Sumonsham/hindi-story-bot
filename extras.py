@@ -14,6 +14,7 @@ import json
 import os
 import random
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -1460,6 +1461,34 @@ def tts_tags(text):
     return _re.sub(r"\s{2,}", " ", out).strip()
 
 
+_TEXT_MODELS = []
+
+
+def text_models(key):
+    """The Gemini writing models this key can use RIGHT NOW (Google retires old names - 'gemini-2.5-flash'
+    answered 404 on 8 Nov 2026), newest first; the '-latest' names always point to a live model."""
+    if not _TEXT_MODELS:
+        names = []
+        try:
+            r = requests.get(f"{GEMINI_BASE}/models", headers={"x-goog-api-key": key}, params={"pageSize": 200},
+                             timeout=30)
+            for mo in r.json().get("models", []):
+                n = mo.get("name", "").replace("models/", "")
+                if ("generateContent" in mo.get("supportedGenerationMethods", []) and "flash" in n
+                        and not any(x in n for x in ("image", "tts", "audio", "live", "embed", "exp"))):
+                    names.append(n)
+        except Exception:
+            pass
+
+        def ver(n):
+            nums = re.findall(r"\d+(?:\.\d+)?", n)
+            return (float(nums[0]) if nums else 0, "lite" not in n, "preview" not in n)
+        for n in ["gemini-flash-latest"] + sorted(names, key=ver, reverse=True) + ["gemini-flash-lite-latest"]:
+            if n not in _TEXT_MODELS:
+                _TEXT_MODELS.append(n)
+    return list(_TEXT_MODELS)
+
+
 def tts_keys():
     # ONE free key only (Google's free limit is meant per person / project - using extra keys to get round it
     # breaks Google's rules and can get the accounts blocked)
@@ -1693,6 +1722,31 @@ def _parler_load():
         dtok = AutoTokenizer.from_pretrained(m.config.text_encoder._name_or_path)
         PARLER["model"] = (m, tok, dtok)
     return PARLER["model"]
+
+
+def machine_room():
+    """' (memory free 9.1 GB, disk free 21 GB)' - written next to every scene in the log, so if GitHub's computer
+    ever runs out of room again we see it coming (8 Nov 2026: 'the hosted runner lost communication')."""
+    try:
+        mem = {}
+        for ln in open("/proc/meminfo"):
+            k, v = ln.split(":", 1)
+            mem[k] = int(v.split()[0])
+        free_gb = (mem.get("MemAvailable", 0) + mem.get("SwapFree", 0)) / 1048576
+        disk_gb = shutil.disk_usage(os.path.expanduser("~")).free / 1e9
+        return f" (memory free {free_gb:.1f} GB, disk free {disk_gb:.0f} GB)"
+    except Exception:
+        return ""
+
+
+def parler_unload():
+    """The free voice model needs ~4 GB of memory; once every line is voiced it is closed, so the heavy video
+    work after it (pictures, 19 clips, the final film) never runs out of memory."""
+    if PARLER["model"] is not None:
+        PARLER["model"] = None
+        import gc
+        gc.collect()
+        log("  free voice model closed - memory freed for the video")
 
 
 def parler_line(text, spec, emotion, out_wav, sr=44100, extra=""):
@@ -3975,7 +4029,7 @@ def trending_topics(kind, lang, cache_dir):
               "Hindi and English, each starting with #], \"keywords\": [8 exact phrases people type in YouTube search "
               "for this, in the story language and in English letters]}")
     topics, tags_, kws = [], [], []
-    for model in ("gemini-flash-latest", "gemini-2.5-flash"):
+    for model in text_models(key)[:3]:
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": [{"text": prompt}]}], "tools": [{"google_search": {}}],
@@ -4101,7 +4155,7 @@ def learn_lessons(history, kind, lang, cache_dir):
                 "that the numbers really support], \"titles\": [3 lessons about titles / hooks that got more clicks], "
                 "\"requests\": [up to 6 concrete things viewers asked for in the comments: a ghost, a place, a "
                 "character, a kind of story]}. Be honest - if the numbers are too few to tell, say less.")
-    for model in ("gemini-flash-latest", "gemini-2.5-flash"):
+    for model in text_models(key)[:3]:
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": [{"text": prompt}]}],

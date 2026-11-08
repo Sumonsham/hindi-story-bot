@@ -2076,7 +2076,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45):
         spk = {x["spk"] for x in cur} | {it["spk"]}
         # ONE character per request: a cut that lands a little off can then never put one person's words into
         # another person's voice
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 16)
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 24)
                     or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1900)):
             groups.append(cur)
             cur = []
@@ -2239,6 +2239,7 @@ def _calm(text):
     inside a sentence (a long '...' in the middle of a line was taken for the end of the line, and the rest of
     the sentence went missing or into the next line). The scene itself adds the dramatic silences back."""
     t = re.sub(r"\s*(?:\.\s*){2,}|\s*…+\s*|\s+[—–]\s+", ", ", str(text))
+    t = re.sub(r"[।.]\s+(?=\S)", ", ", t.strip())       # a sentence end INSIDE the line: a short pause only
     t = re.sub(r"(,\s*){2,}", ", ", t)
     t = re.sub(r"^[,\s]+", "", t)
     return re.sub(r"[,\s]+$", "", t) + ("" if re.search(r"[।!?.]$", t.strip()) else "।")
@@ -2310,7 +2311,7 @@ def tts_groups(items):
         spk = {x["spk"] for x in cur} | {it["spk"]}
         # ONE character per request: a cut that lands a little off can then never put one person's words into
         # another person's voice
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 16)
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 24)
                     or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1900)):
             groups.append(cur)
             cur = []

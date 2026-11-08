@@ -148,10 +148,13 @@ def chapters_text(part_times, names, heading):
 
 
 # ----------------------------------------------------------------- teaser (Reel / Short)
-def pick_window(segs, part_times, scene_no, max_len=55.0, min_len=25.0):
+def pick_window(segs, part_times, scene_no, max_len=None, min_len=None):
     """segs: [(start, dur, ...)] of every spoken line in the final video.
     Start at the beginning of the chosen story scene (part index = scene_no, part 0 is the intro)
-    and end at the end of a line, before max_len seconds."""
+    and end at the end of a line, before max_len seconds. Reels are 25-30 seconds (Meta, 8 Nov 2026: shorter
+    Reels are watched to the end, so Facebook shows them to more people)."""
+    max_len = float(max_len or env("REEL_SECONDS") or 30)
+    min_len = float(min_len or min(18.0, max_len * 0.6))
     if not segs:
         return 0.0, max_len
     k = max(1, min(int(scene_no or 1), len(part_times) - 1)) if len(part_times) > 1 else 0
@@ -3287,6 +3290,13 @@ CARTOON_THUMB_KIND = {**{c: "c_funny" for c in ("gopal", "birbal", "funny", "wit
                       **{c: "c_adventure" for c in ("adventure", "fairy", "detective", "betal", "folk", "lok")}}
 
 
+CTR_HORROR = (" CLICK-WORTHY ON A PHONE: one single strong focal point (the ghost's face, a glowing lantern, an eerie "
+              "silhouette in a lit doorway), uncluttered; bright rim light and high contrast with ONE vivid colour "
+              "accent (crimson red, sickly green or cold blue glow) - never a muddy, all-dark picture.")
+CTR_CARTOON = (" CLICK-WORTHY ON A PHONE: one single clear focal point (the main character's big expressive face), "
+               "uncluttered, very bright and high contrast.")
+
+
 def thumb_kind(bot, category, true_story=False):
     if env("THUMB_KIND") in USER_THUMB:
         return env("THUMB_KIND")
@@ -3300,7 +3310,12 @@ def user_thumb_prompt(kind, subject, place, moment=""):
     mo = str(moment or "").strip()
     if mo and kind.startswith("h_"):
         mo = f"The moment: {mo}."
-    return " ".join(USER_THUMB[kind].format(subject=str(subject or "the ghost").strip(),
+    tmpl = USER_THUMB[kind]
+    mm = re.search(r"(,\s*|\.?\s+)[Nn]o text, no letters", tmpl)
+    if mm:                                            # the click-worthy clause goes just before 'No text ...'
+        tmpl = (tmpl[:mm.start()] + "." + (CTR_HORROR if kind.startswith("h_") else CTR_CARTOON)
+                + " No text, no letters" + tmpl[mm.end():])
+    return " ".join(tmpl.format(subject=str(subject or "the ghost").strip(),
                                             place=str(place or "a haunted old place").strip(),
                                             moment=mo or ("a fun, surprising moment" if kind.startswith("c_") else ""))
                     .split())[:1990]
@@ -3403,18 +3418,27 @@ def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_
     else:
         img = src.resize((W_, H_))
     horror = kind.startswith("h_")
-    img = ImageEnhance.Contrast(img).enhance(1.12 if horror else 1.06)
-    img = ImageEnhance.Color(img).enhance(1.08 if horror else 1.15)
-    if horror:                                        # darkness behind the words (readable on a phone)
+    # BRIGHT AND CLEAR (YouTube's advice, 8 Nov 2026: 'horror thumbnails fail when they are too dark'): a dark
+    # picture is lifted, then more contrast, colour and sharpness - the picture must read on a small phone
+    from PIL import ImageStat
+    lum = ImageStat.Stat(img.convert("L")).mean[0]
+    if lum < 100:
+        import math
+        g = max(0.55, min(1.0, math.log(108 / 255) / math.log(max(lum, 8) / 255)))
+        img = img.point(lambda v: int(255 * ((v / 255) ** g)))
+    img = ImageEnhance.Contrast(img).enhance(1.2 if horror else 1.08)
+    img = ImageEnhance.Color(img).enhance(1.22 if horror else 1.15)
+    img = ImageEnhance.Sharpness(img).enhance(1.4)
+    if horror:                                        # a soft shadow only right behind the words
         shade = Image.new("L", img.size, 0)
         d = ImageDraw.Draw(shade)
         if portrait:
             for i in range(100):
-                d.rectangle([0, 0, W_, int(H_ * 0.5 * (1 - i / 100))], fill=int(165 * i / 100))
+                d.rectangle([0, 0, W_, int(H_ * 0.46 * (1 - i / 100))], fill=int(140 * i / 100))
         else:
             for i in range(100):
-                d.rectangle([0, 0, int(W_ * 0.6 * (1 - i / 100)), H_], fill=int(175 * i / 100))
-        shade = shade.filter(ImageFilter.GaussianBlur(30))
+                d.rectangle([0, 0, int(W_ * 0.54 * (1 - i / 100)), H_], fill=int(140 * i / 100))
+        shade = shade.filter(ImageFilter.GaussianBlur(40))
         img = Image.composite(Image.new("RGB", img.size, (3, 3, 8)), img, shade)
     style = "real" if kind == "h_real" else ("horror" if horror else "cartoon")
     hindi = bool(re.search(r"[\u0900-\u097F]", str(title))) and fallback_font
@@ -3436,7 +3460,7 @@ def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_
         return sum(f.getbbox(l)[3] - f.getbbox(l)[1] + 2 * sw_ + dp_ for l in lines) + int(size * 0.06) * (len(lines) - 1)
     for n in (1, 2, 3):
         lines = _title_lines(text, n)
-        size = int(260 if portrait else 190)
+        size = int(300 if portrait else 230)
         while size >= 40:
             f, _p = tf(size)
             widths = [probe.textlength(l, font=f) for l in lines]
@@ -3450,11 +3474,13 @@ def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_
     sw = max(4, size // (9 if style == "cartoon" else 12))
     depth = max(3, size // (13 if style == "cartoon" else 16))
     if horror:
-        looks = ([((255, 255, 250), (225, 225, 220), (0, 0, 0), (60, 0, 0), (200, 0, 0)),     # glowing white
-                  ((235, 16, 16), (130, 0, 0), (0, 0, 0), (25, 0, 0), (255, 255, 255))]        # blood red
+        # high contrast on a phone: glowing white letters with a blood-red outline, and blood-red letters with a
+        # white outline (red on black alone was hard to read)
+        looks = ([((255, 255, 255), (232, 232, 226), (175, 0, 0), (45, 0, 0), (255, 30, 30)),   # glowing white
+                  ((255, 46, 46), (175, 0, 0), (255, 255, 255), (60, 0, 0), (0, 0, 0))]       # blood red
                  if style == "horror" else
-                 [((255, 246, 175), (255, 214, 60), (0, 0, 0), (40, 25, 0), (0, 0, 0)),        # yellow-white
-                  ((235, 16, 16), (130, 0, 0), (0, 0, 0), (25, 0, 0), (0, 0, 0))])             # blood red
+                 [((255, 246, 140), (255, 205, 0), (0, 0, 0), (60, 30, 0), (255, 40, 40)),      # bright yellow
+                  ((255, 46, 46), (175, 0, 0), (255, 255, 255), (60, 0, 0), (0, 0, 0))])        # blood red
     else:
         looks = [((255, 235, 60), (255, 140, 0), (255, 255, 255), (120, 40, 0), (0, 0, 0)),
                  ((255, 110, 190), (215, 25, 120), (255, 255, 255), (100, 0, 60), (0, 0, 0)),
@@ -3470,8 +3496,7 @@ def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_
         bb = f.getbbox(ln)
         x = (W_ - tw) / 2 if portrait else x0 + max(0, (col_w - tw) / 2)
         ty = y - bb[1] + sw                           # the line's highest sign starts exactly at y
-        img = _fx_line(img, (x, ty), ln, f, top, bot, stroke, sw, depth, ext,
-                       glow if horror and style == "horror" else (0, 0, 0) if not horror else None,
+        img = _fx_line(img, (x, ty), ln, f, top, bot, stroke, sw, depth, ext, glow,
                        max(8, size // 7) if horror else max(6, size // 10))
         y = ty + bb[3] + sw + depth + int(size * 0.06)  # below its lowest sign (e.g. the ra-phala of ট্র)
     if small:                                         # the little line under the title
@@ -3488,6 +3513,90 @@ def title_poster(base_img, title, out, kind, small="", portrait=False, fallback_
         dd.text((x, y + pad - sb[1]), st, font=sf, fill=(255, 255, 255) if horror else (200, 20, 90))
     img.save(out, quality=95)
     return out
+
+
+def thumb_words(story, title):
+    """2-4 big words for the thumbnail that ADD to the title (YouTube: 'thumbnail text should complement - not
+    repeat - the title'): the story's own thumbnail_text, else the first words of the title."""
+    from difflib import SequenceMatcher
+    t = re.sub(r"\s*\|.*$", "", str(title)).strip()
+    w = re.sub(r"\s{2,}", " ", no_tofu(str(story.get("thumbnail_text") or ""))).strip(" -|")
+    k = lambda s: re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", s)
+    if 1 <= len(w.split()) <= 5 and len(w) <= 34 and SequenceMatcher(None, k(w), k(t)).ratio() < 0.6:
+        return w
+    return t.split(":", 1)[1].strip() if ":" in t else t      # (no good words: the story's own title)
+
+
+SEARCH_WORDS = {   # what people really type in YouTube search (first lines of every description)
+    "horror": {"bn": ["ভূতের গল্প", "ভৌতিক গল্প", "Bengali Horror Audio Story", "রহস্য রোমাঞ্চ", "Bhuter Golpo"],
+               "hi": ["भूतिया कहानी", "डरावनी कहानी", "Hindi Horror Story", "Bhoot Ki Kahani"]},
+    "cartoon": {"bn": ["বাংলা কার্টুন", "রূপকথার গল্প", "Bangla Cartoon Golpo", "বাচ্চাদের গল্প", "নীতিকথার গল্প"],
+                "hi": ["हिंदी कार्टून", "बच्चों की कहानी", "Hindi Cartoon Story", "Moral Stories Hindi"]},
+}
+
+
+def search_head(kind, lang, synopsis, seo=()):
+    """The first 2-3 lines of a YouTube description: a short summary, then the search words."""
+    s = re.split(r"(?<=[।.!?])\s+", str(synopsis or "").strip())
+    head = " ".join(s[:3]).strip()[:320]
+    words = []
+    for w in list(SEARCH_WORDS.get(kind, {}).get(lang, [])) + [str(x) for x in seo or []]:
+        if w and w.lower() not in [x.lower() for x in words]:
+            words.append(w)
+    return (head + "\n" if head else "") + "🔎 " + " · ".join(words[:8])
+
+
+LOCALIZE = {}
+
+
+def yt_localizations(title, description, lang, key):
+    """The same video's title and a short summary in English and Hindi (or Bengali) for YouTube: people who
+    search in those languages see it in their own language - the video itself stays the same."""
+    if env("YT_LOCALIZE") == "0" or env("MOCK") == "1" or not key:
+        return {}
+    base = re.sub(r"\s*#Shorts\s*$", "", str(title)).strip()
+    ck = re.sub(r"\s*\|.*$", "", base).strip()            # the story's title: the video and its Shorts share it
+    if ck in LOCALIZE:
+        return LOCALIZE[ck]
+    names = {"en": "English", "hi": "Hindi", "bn": "Bengali"}
+    targets = [x for x in ("en", "hi", "bn") if x != lang][:2]
+    summary = re.split(r"\n\s*\n", str(description).strip())
+    summary = next((p for p in summary if len(p) > 40 and not p.startswith(("🔎", "http", "#"))), summary[0] if summary else "")
+    prompt = (f"A {names.get(lang, lang)} horror/story video on YouTube. Translate its title and summary for viewers "
+              f"who speak {' and '.join(names[x] for x in targets)}: natural, gripping, easy to find in search, keep "
+              "the emojis, no quotes, title at most 90 characters, summary at most 3 sentences.\n"
+              f"TITLE: {base}\nSUMMARY: {summary[:700]}\n"
+              "Answer ONLY JSON: {" + ", ".join(f'"{x}": {{"title": "", "summary": ""}}' for x in targets) + "}")
+    out = {}
+    for model in text_models(key)[:3]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}],
+                                    "generationConfig": {"temperature": 0.4, "responseMimeType": "application/json"}},
+                              timeout=90)
+            if not r.ok:
+                continue
+            js = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            for x in targets:
+                v = js.get(x) or {}
+                t = re.sub(r"[<>]", "", str(v.get("title") or "")).strip()[:100]
+                sm = re.sub(r"[<>]", "", str(v.get("summary") or "")).strip()
+                if t:
+                    out[x] = {"title": t, "description": ((sm + "\n\n") if sm else "") + str(description)[:4500]}
+            if out:
+                break
+        except Exception:
+            continue
+    LOCALIZE[ck] = out
+    if out:
+        log(f"  YouTube title also in {', '.join(out)}: " + " | ".join(v['title'][:40] for v in out.values()))
+    return out
+
+
+def shorts_localizations(loc, description):
+    """The same translations for the story's Short (title + #Shorts)."""
+    return {x: {"title": (v["title"][:88] + " #Shorts"), "description": str(description)[:4800]}
+            for x, v in (loc or {}).items()}
 
 
 def poster_words(title, place, ghost, lang, key=None, models=None):
@@ -4320,8 +4429,10 @@ def yt_title_test(history, max_checks=6, thumb_dir=None):
 
 
 # ----------------------------------------------------------------- Facebook: a second Reel, a daily question
-def fb_question_post(history, kind, lang, page_name=""):
-    """Once a day a short question on the page (people answer -> Facebook shows the page to more people)."""
+def fb_question_post(history, kind, lang, page_name="", photo=None, link=""):
+    """Once a day a short question on the page (people answer -> Facebook shows the page to more people).
+    Once a week (Wednesday) for horror: 'Spot the ghost' - a picture of the newest story with its ghost hidden
+    in it (Meta's advice, 8 Nov 2026: keeps the followers taking part)."""
     page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
     if not (page and token) or env("FB_QUESTION") == "0":
         return None
@@ -4329,17 +4440,17 @@ def fb_question_post(history, kind, lang, page_name=""):
     if any(h.get("question_post") == today for h in history[-8:]):
         return None
     qs = {("horror", "bn"): ["আপনার জীবনের সবচেয়ে ভয়ের রাত কোনটা? কমেন্টে লিখুন - সেরা অভিজ্ঞতা গল্প হয়ে আসবে 👻",
-                             "আপনি কি ভূতে বিশ্বাস করেন? হ্যাঁ হলে 1, না হলে 2 লিখুন 👇",
+                             "ছোটবেলায় ঠাকুমা-দিদিমার কাছে কোন ভূতের গল্প শুনেছিলেন? 🕯️",
                              "কোন ভূতের গল্প শুনতে চান? শাঁকচুন্নি, ব্রহ্মদৈত্য, নিশির ডাক, না অন্য কিছু? কমেন্টে লিখুন",
                              "রাতে একা থাকলে কোন শব্দে সবচেয়ে ভয় লাগে? 🕯️",
                              "আপনার গ্রামে বা পাড়ায় কোন ভুতুড়ে জায়গার গল্প শোনা যায়? কমেন্টে বলুন",
                              "আজকের গল্পে সবচেয়ে ভয়ের মুহূর্ত কোনটা ছিল? 👇",
-                             "কাকে ট্যাগ করবেন যে একা ভূতের গল্প শুনতে ভয় পায়? 😅"],
+                             "কখনো এমন কিছু দেখেছেন বা শুনেছেন, যার কোনো ব্যাখ্যা পাননি? 👀"],
           ("horror", "hi"): ["आपकी ज़िंदगी की सबसे डरावनी रात कौन सी थी? कमेंट में लिखिए 👻",
-                             "क्या आप भूतों पर विश्वास करते हैं? हाँ तो 1, नहीं तो 2 लिखिए 👇",
+                             "बचपन में दादी-नानी से कौन सी भूतिया कहानी सुनी थी? 🕯️",
                              "कौन सी भूतिया कहानी सुनना चाहते हैं? कमेंट में लिखिए",
                              "रात में अकेले हों तो किस आवाज़ से सबसे ज़्यादा डर लगता है? 🕯️",
-                             "उस दोस्त को टैग कीजिए जो अकेले भूत की कहानी नहीं सुन सकता 😅"],
+                             "कभी कुछ ऐसा देखा या सुना जिसकी कोई वजह नहीं मिली? 👀"],
           ("cartoon", "bn"): ["আপনার ছোটবেলার সবচেয়ে প্রিয় গল্প কোনটা? কমেন্টে লিখুন 📚",
                               "গোপাল ভাঁড়ের কোন গল্পটা আবার দেখতে চান? 😄",
                               "বাচ্চারা কোন গল্প শুনতে সবচেয়ে ভালোবাসে - রূপকথা, পশুপাখি, না গোয়েন্দা? 👇",
@@ -4351,6 +4462,17 @@ def fb_question_post(history, kind, lang, page_name=""):
                               "दादी-नानी से सुनी कौन सी कहानी आज भी याद है? 🌙"]}.get((kind, lang)) or []
     if not qs:
         return None
+    if (kind == "horror" and photo and os.path.exists(photo) and env("SPOT_GHOST") != "0"
+            and dt.datetime.now(IST).weekday() == int(env("SPOT_GHOST_DAY") or 2)):
+        cap = ({"bn": "👻 খুঁজে দেখুন তো: এই ছবির কোথাও একটা ভূত লুকিয়ে আছে। কোথায় দেখলেন? 👀",
+                "hi": "👻 ढूँढिए: इस तस्वीर में कहीं एक भूत छिपा है। कहाँ दिखा? 👀"}.get(lang, "")
+               + (f"\n\n{'পুরো গল্প' if lang == 'bn' else 'पूरी कहानी'}: {link}" if link else ""))
+        try:
+            fb_photo(photo, cap)
+            log("  weekly 'spot the ghost' picture posted on Facebook")
+            return today
+        except Exception as e:
+            log("  'spot the ghost' skipped:", str(e)[:150])
     msg = qs[dt.datetime.now(IST).timetuple().tm_yday % len(qs)]
     r = requests.post(f"{GRAPH}/{page}/feed", data={"message": msg, "access_token": token}, timeout=30).json()
     if r.get("id"):

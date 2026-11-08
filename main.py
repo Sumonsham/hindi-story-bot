@@ -3018,7 +3018,7 @@ def youtube_ready():
     return all(env(k) for k in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"))
 
 
-def post_to_youtube(video, thumb, title, description, tags, lang):
+def post_to_youtube(video, thumb, title, description, tags, lang, localizations=None):
     r = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": env("YT_CLIENT_ID"), "client_secret": env("YT_CLIENT_SECRET"),
         "refresh_token": env("YT_REFRESH_TOKEN"), "grant_type": "refresh_token"}, timeout=60)
@@ -3038,10 +3038,18 @@ def post_to_youtube(video, thumb, title, description, tags, lang):
         meta["status"]["publishAt"] = at.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         log(f"  YouTube: scheduled for {at.strftime('%H:%M')} India time")
     size = os.path.getsize(video)
-    r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
-                      headers={**hdr, "Content-Type": "application/json; charset=UTF-8",
-                               "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(size)},
-                      data=json.dumps(meta), timeout=60)
+    if localizations:                                 # the title and summary in English / Hindi too (search reach)
+        meta["localizations"] = localizations
+    for attempt in range(2):
+        parts = "snippet,status" + (",localizations" if meta.get("localizations") else "")
+        r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=" + parts,
+                          headers={**hdr, "Content-Type": "application/json; charset=UTF-8",
+                                   "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(size)},
+                          data=json.dumps(meta), timeout=60)
+        if r.ok or not meta.get("localizations"):
+            break
+        log("  YouTube did not take the translated titles - uploading without them:", r.text[:150])
+        meta.pop("localizations", None)
     if not r.ok:
         raise RuntimeError("YouTube start failed: " + r.text[:400])
     with open(video, "rb") as f:
@@ -3504,11 +3512,12 @@ def main():
     if story.get("true_label"):
         small = " · ".join(x for x in (extras.TRUE_LABEL.get(lang, extras.TRUE_LABEL["bn"]), small) if x)
     done_ = False
+    tw = own if env("THUMB_WORDS") == "title" else extras.thumb_words(story, title)
     if env("POSTER_STYLE") != "old":
         try:
-            extras.title_poster(thumb_base, own, thumb, tkind, small=small, fallback_font=FONT)
+            extras.title_poster(thumb_base, tw, thumb, tkind, small=small, fallback_font=FONT)
             done_ = True
-            log(f"Thumbnail: '{own}'" + (f" + '{small}'" if small else ""))
+            log(f"Thumbnail words: '{tw}'" + (f" + '{small}'" if small else ""))
         except Exception as e:
             log("  thumbnail title failed, the older poster:", str(e)[:120])
     if not done_:
@@ -3521,7 +3530,8 @@ def main():
         mir = os.path.join(WORK, "thumb_base_b.jpg")  # the picture mirrored, the title in the other colours
         Image.open(thumb_base).convert("RGB").transpose(Image.FLIP_LEFT_RIGHT).save(mir, quality=92)
         other = {"c_3d": "c_funny", "c_funny": "c_adventure", "c_adventure": "c_3d"}.get(tkind, "c_3d")
-        extras.title_poster(mir, own, os.path.join(WORK, "thumbnail_b.jpg"), other, small=small, fallback_font=FONT)
+        extras.title_poster(mir, own if own != tw else tw, os.path.join(WORK, "thumbnail_b.jpg"), other, small=small,
+                            fallback_font=FONT)
     except Exception as e:
         log("  second thumbnail skipped:", str(e)[:100])
 
@@ -3665,8 +3675,9 @@ def main():
     _lab = [_lab[0], L["ch_intro"]] + _lab[1:] if cold else [L["ch_intro"]] + _lab
     chap = extras.chapters_text(part_times, _lab + [L["ch_end"]], L["chapters"])
     yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
-    if seo_words:                                    # YouTube: what people type in search, first in the text
-        yt_description = "🔎 " + " · ".join(seo_words[:6]) + "\n\n" + yt_description
+    # YouTube: the first lines are what search shows - a short summary and the words people search for
+    yt_description = extras.search_head("cartoon", lang, story.get("description", ""), seo_words[:4]) + "\n\n" + \
+        yt_description.replace(f"\n\n{story.get('description', '').strip()}\n\n", "\n\n", 1)
     kw = next((w for w in seo_words if w.lower() not in title.lower() and len(title) + 3 + len(w) <= 100), "")
     yt_title = f"{title} | {kw}" if kw else title
     yt_tags = list(seo_words) + tags
@@ -3684,7 +3695,8 @@ def main():
             results["facebook_error"] = str(e)[:200]
         if youtube_ready():
             try:
-                results["youtube"] = post_to_youtube(video, thumb, yt_title, yt_description, yt_tags, lang)
+                loc = extras.yt_localizations(yt_title, yt_description, lang, env("GEMINI_API_KEY"))
+                results["youtube"] = post_to_youtube(video, thumb, yt_title, yt_description, yt_tags, lang, loc)
                 log("Posted to YouTube:", results["youtube"])
             except Exception as e:
                 log("YOUTUBE FAILED:", e)
@@ -3948,7 +3960,9 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
                 and extras.shorts_today(history) < int(env("YT_SHORTS_PER_DAY") or 2)):
             try:
                 desc = f"{L['full_link']} https://youtu.be/{results['youtube']}\n\n{title}\n{' '.join(tags[:5])}"
-                out["yt_short"] = post_to_youtube(teaser, None, f"{title[:80]} #Shorts", desc, tags, lang)
+                loc = extras.shorts_localizations(extras.yt_localizations(title, desc, lang, env("GEMINI_API_KEY")),
+                                                  desc)
+                out["yt_short"] = post_to_youtube(teaser, None, f"{title[:80]} #Shorts", desc, tags, lang, loc)
                 log("Posted YouTube Short:", out["yt_short"])
             except Exception as e:
                 log("  YouTube Short skipped:", str(e)[:200])

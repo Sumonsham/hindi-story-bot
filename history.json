@@ -623,7 +623,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-05T11:02+00:00"
+   "checked": "2026-11-08T22:03+00:00"
   }
  },
  {
@@ -941,7 +941,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-05T11:02+00:00"
+   "checked": "2026-11-08T22:03+00:00"
   }
  },
  {
@@ -1230,12 +1230,12 @@
   "stats": {
    "likes": 1,
    "comments": 0,
-   "views": 4,
+   "views": 8,
    "length_s": 5645,
-   "yt_views": 1,
-   "yt_avg_s": 7,
+   "yt_views": 4,
+   "yt_avg_s": 5,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-05T11:02+00:00"
+   "checked": "2026-11-08T22:03+00:00"
   }
  },
  {
@@ -1270,7 +1270,7 @@
    "yt_views": 1,
    "yt_avg_s": 8,
    "yt_avg_pct": 1.8,
-   "checked": "2026-11-05T11:02+00:00"
+   "checked": "2026-11-08T22:03+00:00"
   }
  },
  {
@@ -1562,7 +1562,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-05T11:02+00:00"
+   "checked": "2026-11-08T22:03+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1887,7 +1887,23 @@
   "youtube": "-_Rbq9kFI24",
   "fb_reel": "1662146882115258",
   "fb_story": "2003929543613218",
-  "fb_reel2": "1697368661997014"
+  "fb_reel2": "1697368661997014",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "length_s": 414,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-08T22:03+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-08T22:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-08T10:11+00:00",
@@ -1944,5 +1960,38 @@
   "title": "90 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1482826780629493",
   "youtube": "EUwGrkKfEt0"
+ },
+ {
+  "date": "2026-11-09T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-09@8",
+  "pending_comments": [],
+  "category": "panchatantra",
+  "idea": "the foolish lion and the jackal's cave",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "কথা বলা গুহার গোপন রহস্য! 🦁🕳️",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "ভেতরে যাওয়ার পায়ের ছাপ দেখে"
+  },
+  "title_b": "বোকা সিংহ আর চতুর শিয়ালের লড়াই! 🦊✨",
+  "question_post": "2026-11-09",
+  "facebook": "1022050604251810",
+  "youtube": "kTB6wvty-44",
+  "fb_reel": "1444320121167643",
+  "fb_story": "1113287934815726",
+  "fb_reel2": "1172732518745941",
+  "yt_short": "A-RddG2b_VM",
+  "riddle_post": "122138293880735948",
+  "riddle": {
+   "q": "এক পায়ে দাঁড়িয়ে থাকে, কিন্তু সে তো গাছ নয়। বৃষ্টি এলে মাথায় ওঠে, রোদ উঠলেও ভয় নয়! বল তো কী?",
+   "a": "ছাতা"
+  }
  }
 ]

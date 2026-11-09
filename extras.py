@@ -2303,19 +2303,29 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
             return False
         d = _audio_file(data, out_wav, sr)
         if max(0.4, plain_len / 40) <= d <= plain_len / 3 + 6:
-            return True
+            try:
+                twice = _said_twice(out_wav, [voice_text])
+            except Exception:
+                twice = ""
+            if not twice:
+                return True
+            log(f"    one line: Gemini said something twice ({twice}) - asked again")
+    if os.path.exists(out_wav):
+        os.remove(out_wav)
     return False
 
 
 def tts_groups(items):
-    """How the lines are sent: up to 12 lines / 1400 characters and max 2 speakers per request."""
+    """How the lines are sent: up to 12 sentences / 1100 characters of ONE speaker per request."""
     groups, cur = [], []
     for it in items:
         spk = {x["spk"] for x in cur} | {it["spk"]}
         # ONE character per request: a cut that lands a little off can then never put one person's words into
         # another person's voice
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 24)
-                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1900)):
+        # (9 Nov 2026: a recording of 24 sentences was NEVER cut cleanly - 0 of 3 - and each failure cost extra
+        # requests; 12 sentences mostly were: smaller first groups waste far fewer of the day's few requests)
+        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
+                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1100)):
             groups.append(cur)
             cur = []
         cur.append(it)
@@ -2400,6 +2410,163 @@ def _align_split(wav, plains):
         picks.append(c)
     segs = pieces([cand[c][0] for c in reversed(picks)])
     return (segs, sr) if segs else None
+
+
+def _pause_note(wav, n):
+    """Why a recording of n sentences could not be cut - for the log: how many clear pauses Gemini made and how
+    long the deciding ones are."""
+    try:
+        import numpy as np
+        from scipy.io import wavfile
+        sr, a = wavfile.read(wav)
+        a = a.astype("float32")
+        hop = int(sr * 0.02)
+        rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+        quiet = rms < max(np.percentile(rms, 95) * 0.03, 1e-6)
+        runs, i = [], 0
+        while i < len(quiet):
+            if quiet[i]:
+                j = i
+                while j < len(quiet) and quiet[j]:
+                    j += 1
+                if (j - i) * 0.02 >= 0.2 and i > 0 and j < len(quiet):
+                    runs.append((j - i) * 0.02)
+                i = j
+            else:
+                i += 1
+        runs.sort(reverse=True)
+        if len(runs) < n - 1:
+            return f"only {len(runs)} pauses for {n} sentences"
+        if len(runs) == n - 1:
+            return f"{len(runs)} pauses as needed, but a piece did not fit its sentence's length"
+        return (f"{len(runs)} pauses for {n} sentences; the {n - 1}th longest {runs[n - 2]:.2f} s, the next "
+                f"{runs[n - 1]:.2f} s - too alike or a piece did not fit")
+    except Exception:
+        return "?"
+
+
+def _mel_feats(a, sr):
+    """speech features every 10 ms: 20 MFCCs without the loudness term (what is said and how it sounds, not how
+    loud), normalised over the speech of this recording only (silence would squash the differences)"""
+    import numpy as np
+    win, hop = int(sr * 0.025), int(sr * 0.01)
+    if len(a) < win * 4:
+        return None
+    nfft = 1
+    while nfft < win:
+        nfft *= 2
+    idx = np.arange(win)[None, :] + hop * np.arange((len(a) - win) // hop + 1)[:, None]
+    frames = a[idx] * np.hanning(win)[None, :]
+    spec = np.abs(np.fft.rfft(frames, n=nfft)) ** 2
+    mel = lambda f: 2595 * np.log10(1 + f / 700.0)
+    imel = lambda m: 700 * (10 ** (m / 2595.0) - 1)
+    pts = imel(np.linspace(mel(60), mel(min(7600, sr / 2 - 200)), 42))
+    bins = np.floor((nfft + 1) * pts / sr).astype(int)
+    fb = np.zeros((40, nfft // 2 + 1))
+    for k in range(40):
+        l, c, r = bins[k], bins[k + 1], bins[k + 2]
+        if c > l:
+            fb[k, l:c] = (np.arange(l, c) - l) / (c - l)
+        if r > c:
+            fb[k, c:r] = (r - np.arange(c, r)) / (r - c)
+    p = spec @ fb.T
+    p = np.log(np.maximum(p, p.max() * 1e-8))
+    n = np.arange(40)
+    dct = np.cos(np.pi / 40 * (n[None, :] + 0.5) * np.arange(1, 21)[:, None])      # c1..c20 (no c0 = loudness)
+    m = p @ dct.T
+    loud = p.mean(axis=1)
+    sp = loud > np.percentile(loud, 35)               # the speech frames
+    mu, sd = m[sp].mean(axis=0), m[sp].std(axis=0) + 1e-6
+    return (m - mu) / sd
+
+
+def _dtw(A, B):
+    """average frame distance along the best time-warped path (within a band of 35% of the length) - one numpy
+    step per frame: D[i, j] = S[j] + min over k <= j of (T[k] - S[k])"""
+    import numpy as np
+    n, m = len(A), len(B)
+    if not n or not m:
+        return float("inf")
+    band = max(abs(n - m) + 2, int(0.35 * max(n, m)))
+    prev = np.full(m + 1, np.inf)
+    prev[0] = 0.0
+    for i in range(1, n + 1):
+        jc = int(round(i * m / n))
+        lo, hi = max(1, jc - band), min(m, jc + band)
+        cur = np.full(m + 1, np.inf)
+        c = np.sqrt(((B[lo - 1:hi] - A[i - 1]) ** 2).sum(axis=1))
+        T = c + np.minimum(prev[lo - 1:hi], prev[lo:hi + 1])
+        S = np.cumsum(c)
+        cur[lo:hi + 1] = S + np.minimum.accumulate(T - S)
+        prev = cur
+    return float(prev[m] / (n + m))
+
+
+def _said_twice(wav, plains):
+    """Gemini sometimes says a sentence TWICE in one recording (9 Nov 2026: 'many lines are said twice').
+    The text has no such repeat, so two stretches of speech that sound the same = a repeat -> do not use it.
+    Returns a short note when a repeat is heard, else ''."""
+    import numpy as np
+    from scipy.io import wavfile
+    from difflib import SequenceMatcher
+    keys = [re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", strip_tags(p)) for p in plains]
+    for x in range(len(keys)):                        # the story itself repeats something here: nothing to check
+        for y in range(x + 1, len(keys)):
+            if keys[x] and keys[y] and SequenceMatcher(None, keys[x], keys[y]).ratio() >= 0.6:
+                return ""
+    words = re.sub(r"[^\wঀ-৿ऀ-ॿ]+", " ", " ".join(strip_tags(p) for p in plains)).split()
+    grams = [" ".join(words[k:k + 2]) for k in range(len(words) - 1)]
+    if any(len(g_) >= 10 and grams.count(g_) > 1 for g_ in grams):
+        return ""                                     # ('ওরে পল্টু, ওরে পল্টু' - the words themselves come twice)
+    sr, a = wavfile.read(wav)
+    a = a.astype("float32")
+    if a.ndim > 1:
+        a = a.mean(axis=1)
+    if sr != 16000:                                   # 16 kHz is plenty to hear what is said (with a proper
+        from math import gcd                          # low-pass - a plain resample made the two copies differ)
+        from scipy.signal import resample_poly
+        g_ = gcd(int(sr), 16000)
+        a = resample_poly(a, 16000 // g_, int(sr) // g_).astype("float32")
+        sr = 16000
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+    if rms.size < 50:
+        return ""
+    quiet = rms < max(np.percentile(rms, 95) * 0.05, 1e-6)
+    marks, i = [0], 0                                 # pauses of 0.2 s or more split the speech
+    while i < len(quiet):
+        if quiet[i]:
+            j = i
+            while j < len(quiet) and quiet[j]:
+                j += 1
+            if j - i >= 10:
+                marks += [i, j]
+            i = j
+        else:
+            i += 1
+    marks.append(len(quiet))
+    chunks = [(marks[k] * hop, marks[k + 1] * hop) for k in range(0, len(marks) - 1, 2)
+              if (marks[k + 1] - marks[k]) * 0.02 >= 1.3]
+    if len(chunks) < 3:
+        return ""
+    F = _mel_feats(a, sr)
+    if F is None:
+        return ""
+    fr = lambda s: int(s / (sr * 0.01))
+    feats = [F[fr(s):max(fr(s) + 5, fr(e))] for s, e in chunks]
+    pairs = []
+    for x in range(len(chunks)):
+        for y in range(x + 1, min(len(chunks), x + 5)):
+            dx, dy = chunks[x][1] - chunks[x][0], chunks[y][1] - chunks[y][0]
+            if 0.7 <= dx / dy <= 1.43:
+                pairs.append((x, y, _dtw(feats[x], feats[y])))
+    if len(pairs) < 4:
+        return ""
+    med = float(np.median([p[2] for p in pairs]))
+    x, y, d = min(pairs, key=lambda p: p[2])
+    if d < float(env("REPEAT_LIKENESS") or 0.75) * med:      # (two different sentences: 0.95+; a repeat: ~0.5)
+        return f"{(chunks[x][1] - chunks[x][0]) / sr:.1f} s of speech heard twice (likeness {d / med:.2f})"
+    return ""
 
 
 def _soft_split(wav, plains):
@@ -2501,19 +2668,39 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
                 half = max(1, len(g) // 2)
                 groups[gi + 1:gi + 1] = [g[:half], g[half:]]
             continue
-        cut = _align_split(tmp, plains) if len(g) > 1 else None
-        if not cut and len(g) > 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
+        # (a single sentence needs no cutting at all - before 10 Nov 2026 its recording was thrown away by mistake)
+        cut = _align_split(tmp, plains)
+        if not cut and len(g) >= 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
             # not sure where one line ends and the next begins: ask again as two smaller groups - a line is
             # NEVER cut in the middle of a sentence
+            why = _pause_note(tmp, len(g))
             os.remove(tmp)
             half = len(g) // 2
             groups[gi + 1:gi + 1] = [g[:half], g[half:]]
-            log(f"  voices: {len(g)} lines - not sure where each line ends, asking again in two smaller groups")
+            log(f"  voices: {len(g)} lines - not sure where each line ends ({why}), asking again in two smaller groups")
             continue
         if not cut:
             os.remove(tmp)
             log(f"  voices: {len(g)} lines could not be cut cleanly and no request is left to ask again - they "
                 "stay open")
+            continue
+        twice = ""
+        try:                                          # (9 Nov 2026: 'many lines are said twice')
+            twice = _said_twice(tmp, plains)
+        except Exception as ex:
+            log(f"    repeat check skipped: {str(ex)[:80]}")
+        if twice:
+            os.remove(tmp)
+            if len(g) >= 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
+                half = len(g) // 2
+                groups[gi + 1:gi + 1] = [g[:half], g[half:]]
+                log(f"  voices: Gemini said something twice ({twice}) - not used, {len(g)} lines asked again in two "
+                    "smaller groups")
+            elif len(g) == 1 and (max_requests is None or TTS_USED[0] + 1 <= max_requests):
+                groups.insert(gi + 1, g)
+                log(f"  voices: Gemini said something twice ({twice}) - not used, asked once more")
+            else:
+                log(f"  voices: Gemini said something twice ({twice}) - not used; no request left - they stay open")
             continue
         os.remove(tmp)
         if chars >= 60:                               # a clean recording: remember how fast this voice speaks
@@ -4348,15 +4535,23 @@ def keep_thumb_b(thumb_dir, video_id, path):
         return None
     os.makedirs(thumb_dir, exist_ok=True)
     now = time.time()
+    idx_path = os.path.join(thumb_dir, "kept.json")   # when each one was kept (a file's own date is no help:
+    idx = _jl(idx_path, {})                            # every GitHub run makes all files 'new' - none ever got old)
+    idx = idx if isinstance(idx, dict) else {}
     for f in os.listdir(thumb_dir):
-        fp = os.path.join(thumb_dir, f)
+        if not f.endswith(".jpg"):
+            continue
+        vid = f[:-4]
         try:
-            if now - os.path.getmtime(fp) > 6 * 86400:
-                os.remove(fp)
-        except OSError:
+            if now - float(idx.setdefault(vid, now)) > 6 * 86400:
+                os.remove(os.path.join(thumb_dir, f))
+                idx.pop(vid, None)
+        except (OSError, TypeError, ValueError):
             pass
     out = os.path.join(thumb_dir, f"{video_id}.jpg")
     Image.open(path).convert("RGB").save(out, quality=86)
+    idx[str(video_id)] = now
+    _js(idx_path, {k: v for k, v in idx.items() if os.path.exists(os.path.join(thumb_dir, f"{k}.jpg"))})
     return out
 
 

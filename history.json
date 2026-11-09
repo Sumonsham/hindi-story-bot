@@ -1611,7 +1611,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-06T03:02+00:00"
+   "checked": "2026-11-09T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1993,5 +1993,49 @@
    "q": "এক পায়ে দাঁড়িয়ে থাকে, কিন্তু সে তো গাছ নয়। বৃষ্টি এলে মাথায় ওঠে, রোদ উঠলেও ভয় নয়! বল তো কী?",
    "a": "ছাতা"
   }
+ },
+ {
+  "date": "2026-11-09T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-09@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "Gopal finds the middle of the earth",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "পৃথিবীর আসল কেন্দ্র কোথায়? গোপালের নতুন কারসাজি! 🌍",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "detective",
+     "who took Thakuma's gold locket?"
+    ],
+    [
+     "detective",
+     "the secret of the locked attic"
+    ]
+   ],
+   "labels": [
+    "ঠাকুমার সোনার লকেট চুরি?",
+    "বন্ধ চিলেকোঠার রহস্য!"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "একটি কাঠের খুঁটি"
+  },
+  "title_b": "রাজার কঠিন প্রশ্ন আর গোপালের মহা বুদ্ধি! 🧠",
+  "question_post": null,
+  "facebook": "1795604791659663",
+  "youtube": "gt7kLBtrwzE",
+  "fb_reel": "1124436536969897",
+  "fb_story": "1490785646257347",
+  "fb_reel2": "4515746765361391",
+  "coloring": "122138312498735948",
+  "yt_short": "RcqOIBbWcMY"
  }
 ]

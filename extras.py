@@ -4433,6 +4433,15 @@ def learn_lessons(history, kind, lang, cache_dir):
                      "comments": st.get("comments"), "yt_watched_pct": st.get("yt_avg_pct"),
                      "yt_most_leave_at_pct": st.get("yt_drop_at"), "title_b": h.get("title_b"),
                      "title_test": (h.get("title_test") or {}).get("result")})
+        tl = h.get("timeline") or {}                  # v68: the CHAPTER where most viewers left (not just a %)
+        if st.get("yt_drop_at") is not None and tl.get("len") and tl.get("parts"):
+            try:
+                sec = float(tl["len"]) * float(st["yt_drop_at"]) / 100
+                lab = next((l_ for t_, l_ in reversed(tl["parts"]) if t_ <= sec), None)
+                if lab:
+                    rows[-1]["most_leave_in_chapter"] = f"{lab} ({int(sec // 60)}:{int(sec % 60):02d})"
+            except (TypeError, ValueError):
+                pass
     if not key or len(rows) < 5:
         return old
     comments = []
@@ -4443,7 +4452,8 @@ def learn_lessons(history, kind, lang, cache_dir):
             pass
     prompt = (f"You analyse a {kind} video page (Facebook + YouTube, {'Bengali' if lang == 'bn' else 'Hindi'}). "
               "Here are our recent videos with their numbers (watched_pct / yt_watched_pct = average share of the video "
-              "watched; yt_most_leave_at_pct = where in the video most viewers leave; title_test swapped = the first "
+              "watched; yt_most_leave_at_pct = where in the video most viewers leave, most_leave_in_chapter = the chapter "
+              "they left in - make such chapters tighter and more gripping; title_test swapped = the first "
               "title got few views and title_b replaced it):\n"
               + json.dumps(rows, ensure_ascii=False) + "\nAnd recent viewer comments:\n"
               + json.dumps(comments[:120], ensure_ascii=False)[:6000]

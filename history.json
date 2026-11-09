@@ -974,9 +974,9 @@
    "views": 0,
    "length_s": 554,
    "yt_views": 0,
-   "yt_avg_s": 362,
-   "yt_avg_pct": 65.3,
-   "checked": "2026-11-06T09:02+00:00"
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-09T09:04+00:00"
   }
  },
  {
@@ -1311,7 +1311,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-06T09:02+00:00"
+   "checked": "2026-11-09T09:04+00:00"
   }
  },
  {
@@ -1669,7 +1669,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-06T09:02+00:00"
+   "checked": "2026-11-09T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1951,6 +1951,16 @@
   "riddle": {
    "q": "আকাশে উড়াল দেয়, কিন্তু পাখি তো নয়! পেটে তার আলো থাকে, জ্বলজ্বল করে সে তো নয় কোনো তারা! বলো তো আমি কে?",
    "a": "জোনাকি (Firefly)"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 472,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-09T09:04+00:00"
   }
  },
  {
@@ -1959,7 +1969,17 @@
   "kind": "compilation",
   "title": "90 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1482826780629493",
-  "youtube": "EUwGrkKfEt0"
+  "youtube": "EUwGrkKfEt0",
+  "stats": {
+   "likes": 0,
+   "comments": 0,
+   "views": 4,
+   "length_s": 5374,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-09T09:04+00:00"
+  }
  },
  {
   "date": "2026-11-09T02:31+00:00",
@@ -2036,6 +2056,34 @@
   "fb_story": "1490785646257347",
   "fb_reel2": "4515746765361391",
   "coloring": "122138312498735948",
-  "yt_short": "RcqOIBbWcMY"
+  "yt_short": "RcqOIBbWcMY",
+  "vote_used": true
+ },
+ {
+  "date": "2026-11-09T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-09@19",
+  "pending_comments": [],
+  "category": "folk",
+  "idea": "the magic birds Byangoma and Byangomi who give advice",
+  "episode": null,
+  "part": 1,
+  "continues": true,
+  "series_id": "2026-11-09T10:21+00:00",
+  "title": "রূপোলি গাছের ডালে গোপন রহস্য? 🌳✨ (পর্ব ১) | পর্ব 1",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ছায়ার ধাঁধা"
+  },
+  "title_b": "ব্যাঙ্গমা-ব্যাঙ্গমীর রহস্যময় বার্তা! 🕊️✨ (পর্ব ১)",
+  "question_post": null,
+  "facebook": "2162883927640780",
+  "youtube": "KmDmltH5srk",
+  "fb_reel": "2431448477674537",
+  "fb_story": "1671266151212968",
+  "fb_reel2": "29691938483743476"
  }
 ]

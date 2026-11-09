@@ -93,5 +93,56 @@
   "last_lines": "ঠিক তখনই পাশের পাড়া থেকে একসাথে শতেক মানুষের গগনবিদারী চিল চিৎকার ভেসে এল! / গোল! পাশের পাড়ায় কি গোল হয়ে গেল সাহেবদা? নাকি ফিউজ খোলা রহস্যময় লোকটা ওদের লোক? / কে কাটল পাড়ার কারেন্ট? আর শেষ পর্যন্ত ফাইনাল কাপ কার ঘরে গেল? জানতে দেখুন আগামীকাল দ্বিতীয় পর্ব!",
   "setting": "A bustling narrow Kolkata neighborhood lane (para) in the evening, with vintage brick houses, open balconies, glowing street lamps before power cut, colorful football flags hanging across trees, and Kaku's traditional cozy living room decorated with football posters.",
   "updated": "2026-11-07T13:31:47.863597+00:00"
+ },
+ "folk": {
+  "created": "2026-11-09T13:31:47.390245+00:00",
+  "category": "folk",
+  "idea": "the magic birds Byangoma and Byangomi who give advice",
+  "title": "রূপোলি গাছের ডালে গোপন রহস্য? 🌳✨ (পর্ব ১)",
+  "done": 1,
+  "total": 2,
+  "series_id": "2026-11-09T10:21+00:00",
+  "summary": " Prince Neel sets out on a dangerous journey to the magical Demon Realm to find the Golden Lotus that can wake his father, King Bikram, from a mysterious sleeping curse. On his way, he meets Saheb, a calm and clever young traveler who guides him to the ancient Banyan Tree where the legendary magic birds, Byangoma and Byangomi, reside. Overhearing the birds' secret conversation, Neel and Saheb learn that touching the Demon River turns anyone to stone unless protected by a magic golden feather. After solving the birds' tricky riddle, Byangomi gifts them a shining feather and warns them of the Rakkhosh's sleeping flute. Part 1 ends at midnight at the misty riverbank, where a terrifying Demon Guard suddenly rises from the roaring waters to crush them.",
+  "part2_plan": "In Part 2, Saheb uses his wits and the golden feather's magic to outsmart the Demon Guard without fighting. They sneak into the Demon Queen's palace using the sleeping flute's charm in reverse. Neel retrieves the Golden Lotus with Saheb's clever distractions. Returning to Rupnagar, Neel touches his father with the Lotus, reviving the King and restoring light to the kingdom.",
+  "characters": [
+   {
+    "name": "Prince Neel",
+    "gender": "male",
+    "age": "young",
+    "kind": "human",
+    "look": "brave handsome young prince around 18 years old, slender athletic build, fair skin, large expressive dark brown eyes, neat black shoulder-length hair, wearing a royal blue silk angrakha kurta with golden embroidery, white pyjamas, a small gold crown on his head"
+   },
+   {
+    "name": "Saheb",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), wheat-brown skin, maroon kurta with small gold buttons, cream dhoti, cream shawl with a thin gold border over the left shoulder, small brown cloth shoulder bag, brown nagra shoes"
+   },
+   {
+    "name": "Byangoma",
+    "gender": "male",
+    "age": "adult",
+    "kind": "animal",
+    "look": "majestic magical male bird, golden and crimson feathers, sharp intelligent eyes, glowing crown of feathers, larger than an eagle"
+   },
+   {
+    "name": "Byangomi",
+    "gender": "female",
+    "age": "adult",
+    "kind": "animal",
+    "look": "gentle magical female bird, silver and sapphire blue feathers, soft bright eyes, graceful posture, glowing aura around her feathers"
+   },
+   {
+    "name": "Demon Guard",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "tall shadowy mythical demon figure with dark purple skin, glowing yellow eyes, pointed ears, wearing brass shoulder guards and holding a huge wooden club"
+   }
+  ],
+  "last_lines": "হঠাৎই নদীর বুক চিরে উঠে দাঁড়াল এক বিশাল দানব 'রক্তনেত্র'! তার চোখ দুটি জ্বলন্ত আগুনের গোলা আর হাতে বিরাট কাঁটাওয়ালা গদা! / হাহা হা! কার এত বড় সাহস যে আমার অনুমতি ছাড়া রাক্ষসপুরীর সীমানায় পা দেয়? তোদের এখানেই পিষে মারব! / সাহেব ভাই! দানবের ভয়ে আমার হাত কেঁপে পালকটা খসে যাচ্ছে! বাঁচাও! / বিশাল গদা তেড়ে আসছে নিচে! সোনার পালকও হাত থেকে নদীর গভীরে খসে পড়ার মুখে! কিন্তু চতুর সাহেব কি পারবে এই ভয়ঙ্কর দানবকে নিজের বুদ্ধি দিয়ে পরাস্ত করতে? জানতে হলে অপেক্ষা করুন আগামী পর্বের জন্য!",
+  "setting": "Ancient magical forest bordering Rupnagar, twilight shifting to midnight, giant banyan tree with glowing leaves, deep misty river, starry sky",
+  "updated": "2026-11-09T13:31:47.390664+00:00"
  }
 }

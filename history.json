@@ -1385,12 +1385,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 1,
+   "views": 2,
    "length_s": 484,
-   "yt_views": 1,
-   "yt_avg_s": 4,
-   "yt_avg_pct": 0.9,
-   "checked": "2026-11-07T09:02+00:00"
+   "yt_views": 2,
+   "yt_avg_s": 2,
+   "yt_avg_pct": 0.4,
+   "checked": "2026-11-10T09:03+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2077,7 +2077,23 @@
   "fb_reel2": "4515746765361391",
   "coloring": "122138312498735948",
   "yt_short": "RcqOIBbWcMY",
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 435,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-10T09:03+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-10T09:03+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-09T13:31+00:00",
@@ -2182,5 +2198,32 @@
   "fb_story": "1592229949325168",
   "fb_reel2": "1926049385437216",
   "yt_short": "e0Lg1VmTzdE"
+ },
+ {
+  "date": "2026-11-10T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-10@19",
+  "pending_comments": [],
+  "category": "detective",
+  "idea": "the footprints that walked backwards",
+  "episode": null,
+  "part": 2,
+  "continues": false,
+  "series_id": "2026-11-03T11:53+00:00",
+  "title": "উল্টো পায়ের ছাপের শেষ রহস্য! 🔍 | পর্ব 2",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "পাখি ধরতে গিয়ে পড়েছিল"
+  },
+  "title_b": "কে ছড়াল বাগানে উল্টো পায়ের ছাপ? 👣",
+  "question_post": null,
+  "facebook": "2171980667526454",
+  "youtube": "idfExtBYwQE",
+  "fb_reel": "1650889190088843",
+  "fb_story": "1643519823953391",
+  "fb_reel2": "1482760390411262"
  }
 ]

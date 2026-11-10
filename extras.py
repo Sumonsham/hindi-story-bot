@@ -2315,6 +2315,7 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
     return False
 
 
+MARK_STATS = [0, 0]             # recordings cut by their marker words / by their pauses (this run)
 TTS_PLAN = {"pieces": 20, "chars": 1700}     # how full one voice request is made (main.py sets it from the day's limit)
 
 
@@ -2797,6 +2798,157 @@ def _tight(seg, rate, thr, over=0.36, keep=0.26):
     return np.concatenate(out)
 
 
+# ===================== v71: a MARKER WORD in another voice between the lines =====================
+# 10 Nov 2026, the first real run of the line-keeping voicer: in every recording about a third of the lines had an
+# uncertain end (the pauses Gemini makes between lines are simply not reliable), each of them cost another request,
+# and the night's share was gone after two characters. So the line ends are no longer GUESSED from pauses: between two
+# lines a second speaker with a clearly different voice (a woman for a man's lines, a man for a woman's) says one short
+# word. Where that other voice is heard is found by its pitch - the lines lie exactly between the markers. The count
+# must fit exactly (lines - 1), else the old way with the pauses is used for that recording.
+MARK_TEXT = {"bn": "আচ্ছা।", "hi": "अच्छा।"}
+MARK_STYLE = "one short flat word, quiet, no feeling"
+
+
+def _marker_voice(voice):
+    return "Charon" if voice in CHIRP_VOICES[:14] else "Leda"      # (the first 14 names are the women's voices)
+
+
+def _f0_frames(a, sr):
+    """the pitch (Hz) of every 20 ms of a recording, 0 where no clear voice is heard; returns (pitch, samples/frame)"""
+    import numpy as np
+    a = np.asarray(a, dtype="float32")
+    if sr != 16000:
+        from math import gcd
+        from scipy.signal import resample_poly
+        g_ = gcd(16000, int(sr))
+        x = resample_poly(a, 16000 // g_, int(sr) // g_).astype("float32")
+    else:
+        x = a
+    n, hop = 640, 320
+    if len(x) < n * 3:
+        return np.zeros(0), sr * 0.02
+    idx = np.arange(n)[None, :] + hop * np.arange((len(x) - n) // hop + 1)[:, None]
+    out = np.zeros(len(idx))
+    win = np.hanning(n).astype("float32")
+    lo, hi = 16000 // 420, 16000 // 70
+    wac = np.fft.irfft(np.abs(np.fft.rfft(win, 2048)) ** 2)[:n]
+    wac = (wac / wac[0])[lo:hi]                       # (what the window alone does to a perfect tone)
+    energy = np.zeros(len(idx))
+    for s in range(0, len(idx), 3000):
+        fr = x[idx[s:s + 3000]]
+        fr = (fr - fr.mean(axis=1, keepdims=True)) * win
+        sp = np.fft.rfft(fr, 2048, axis=1)
+        ac = np.fft.irfft(sp.real ** 2 + sp.imag ** 2, axis=1)[:, :n]
+        e = ac[:, 0] + 1e-9
+        seg = ac[:, lo:hi] / e[:, None] / wac[None, :]
+        # the SHORTEST period that repeats nearly as well as the best one (else a high voice is often read an
+        # octave too low: twice its period repeats just as well)
+        top = seg.max(axis=1)
+        peak = np.zeros_like(seg, dtype=bool)
+        peak[:, 1:-1] = (seg[:, 1:-1] > seg[:, :-2]) & (seg[:, 1:-1] >= seg[:, 2:])
+        good = peak & (seg >= 0.85 * top[:, None])
+        k = np.where(good.any(axis=1), good.argmax(axis=1), seg.argmax(axis=1))
+        st = seg[np.arange(len(seg)), k]
+        f = 16000.0 / (k + lo)
+        f[st < 0.42] = 0
+        out[s:s + 3000] = f
+        energy[s:s + 3000] = e
+    out[energy < np.percentile(energy, 95) * 0.004] = 0          # (too soft to be a voice)
+    return out, sr * 0.02
+
+
+def _marker_split(a, sr, lchars, high, thr):
+    """Where each line lies in a recording with a marker word between the lines: [(start, end)] in samples, or None
+    when the markers cannot be counted with certainty. high: the marker voice is higher than the line's voice."""
+    import numpy as np
+    n = len(lchars)
+    f0, step = _f0_frames(a, sr)
+    if n < 2 or f0.size < 50:
+        return None, "too short"
+    voiced = f0 > 0
+    if voiced.sum() < 30:
+        return None, "no voice found"
+    main = float(np.median(f0[voiced]))
+    like = voiced & ((f0 >= main * 1.3) if high else (f0 <= main * 0.77))
+    runs, i = [], 0                                   # stretches in the other voice (a gap of 0.18 s = one word still)
+    while i < len(like):
+        if like[i]:
+            j, last = i, i
+            while j < len(like) and (like[j] or (j - last <= 9 and not (voiced[j] and not like[j]))):
+                if like[j]:
+                    last = j
+                j += 1
+            runs.append((i, last + 1))
+            i = last + 1
+        else:
+            i += 1
+    # a whole word in the other voice (one high syllable of a shout is too short to be the marker)
+    cand = [(s, e) for s, e in runs if 0.26 <= (e - s) * 0.02 <= 1.7 and like[s:e].sum() >= 9]
+    if not cand:
+        return None, "no marker word was heard"
+    if len(cand) > n - 1:                             # a shout of the speaker can sound high too: the markers are all
+        if len(cand) - (n - 1) > max(2, n // 4):      # the same word - keep those most alike in length and pitch
+            return None, f"{len(cand)} marker-like sounds for {n} lines"
+        dur = np.array([e - s for s, e in cand], dtype=float)
+        pit = np.array([np.median(f0[s:e][like[s:e]]) for s, e in cand])
+        score = np.abs(dur - np.median(dur)) / max(1.0, np.median(dur)) + np.abs(pit - np.median(pit)) / np.median(pit)
+        keep = sorted(np.argsort(score)[:n - 1])
+        cand = [cand[k] for k in keep]
+    dur = np.array([e - s for s, e in cand], dtype=float)         # the SAME word in the SAME voice every time
+    pit = np.array([np.median(f0[s:e][like[s:e]]) for s, e in cand])
+    if len(cand) >= 3 and ((np.abs(pit / np.median(pit) - 1) > 0.2).any() or (dur > np.median(dur) * 2.2).any()
+                           or (dur < np.median(dur) * 0.45).any()):
+        return None, "the marker words are not alike"
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop].astype("float32") ** 2).mean()) for i in range(0, max(1, len(a) - hop), hop)])
+    quiet = rms < thr
+    F = len(rms)
+
+    def edge(fr, d):                                  # from a marker outwards to the nearest quiet moment (<= 0.5 s)
+        for k in range(26):
+            p_ = fr + d * k
+            if 0 <= p_ < F and quiet[p_]:
+                return p_
+        return min(max(fr + d * 2, 0), F - 1)
+    segs, start = [], 0                               # the stretches between the marker words
+    for s, e in cand:
+        segs.append((start, edge(s - 1, -1)))
+        start = edge(e, 1)
+    segs.append((start, F))
+    m = len(segs)
+    speech = np.array([float((~quiet[s:e]).sum()) * 0.02 for s, e in segs])
+    rate = speech.sum() / max(1, sum(lchars))
+    csum = np.concatenate([[0], np.cumsum(lchars)]) * rate
+    fits = lambda sp, want: max(0.5, want) * 0.4 - 0.4 <= sp <= max(0.5, want) * 2.3 + 1.0
+    # which lines lie in which stretch: all in order, every stretch at least one line (a marker Gemini left out
+    # = two lines in one stretch) - the split whose lengths fit the words best
+    INF = float("inf")
+    cost = [[INF] * (n + 1) for _ in range(m + 1)]
+    back = [[0] * (n + 1) for _ in range(m + 1)]
+    cost[0][0] = 0.0
+    for j in range(1, m + 1):
+        for k in range(j, n - (m - j) + 1):
+            for i in range(j - 1, k):
+                if cost[j - 1][i] == INF:
+                    continue
+                want = csum[k] - csum[i]
+                c_ = cost[j - 1][i] + abs(speech[j - 1] - want) / max(0.5, want)
+                if c_ < cost[j][k]:
+                    cost[j][k], back[j][k] = c_, i
+    if cost[m][n] == INF:
+        return None, "the marker words do not fit the lines"
+    out, k = [None] * n, n
+    for j in range(m, 0, -1):
+        i = back[j][k]
+        if k - i == 1 and fits(speech[j - 1], csum[k] - csum[i]) and speech[j - 1] >= 0.2:
+            out[i] = (int(segs[j - 1][0] * hop), int(min(len(a), segs[j - 1][1] * hop)))   # ONE line between two markers
+        k = i
+    sure = sum(1 for x in out if x)
+    if not sure:
+        return None, "no line lies clearly between two marker words"
+    return out, ("" if sure == n else f"{len(cand)} marker words for {n} lines")
+
+
 SPK_VOICED = {}                 # seconds of speech per letter of every voice (pauses not counted)
 
 
@@ -2852,11 +3004,18 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         lang = x0.get("lang", "bn")
         note = f"Speaker1 is {x0['who']}. " + PRONOUNCE.get(lang, "")
         data = None
+        marked = len(lines_of(g)) > 1 and env("TTS_MARKERS") != "0"
+        mark = MARK_TEXT.get(lang, MARK_TEXT["bn"])
+        turns = []
+        for k, x in enumerate(g):
+            if marked and k and x["line"] != g[k - 1]["line"]:
+                turns.append(("Speaker2", mark, MARK_STYLE))
+            turns.append(("Speaker1", x["text"], x["feel"]))
+        spk = [("Speaker1", x0["voice"])] + ([("Speaker2", _marker_voice(x0["voice"]))] if marked else [])
         for attempt in range(2):                      # one quiet retry for a busy server, never more
             TTS_USED[0] += 1
             if len(g) > 1:
-                data = _tts_call(_requests_for([("Speaker1", x["text"], x["feel"]) for x in g],
-                                               [("Speaker1", x0["voice"])], lang_label, note))
+                data = _tts_call(_requests_for(turns, spk, lang_label, note))
             else:
                 data = _tts_call([_single_body(mm, x0["text"], x0["voice"], f"{x0['who']}. {x0['feel']}. "
                                                + PRONOUNCE.get(lang, ""), lang_label) for mm in NEW_TTS + OLD_TTS])
@@ -2869,11 +3028,13 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         tmp = x0["out"] + ".group.wav"
         got = _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
+        plains0 = list(plains)
         keys = [x["line"] for x in g]
         lines = lines_of(g)
         chars = sum(len(p) for p in plains)
         vk = f"{x0['voice']}|{x0['who']}"
-        expect = chars / 8.0 + 1.0 * (len(g) - 1)
+        n_mark = len(lines) - 1 if marked else 0
+        expect = chars / 8.0 + 1.0 * (len(g) - 1) + 1.6 * n_mark
         missing = bool(SPK_RATE.get(vk)) and chars >= 120 and got < chars * SPK_RATE[vk] * 0.72
         if missing or got > expect * 2.0 + 4 or got < expect * 0.33:
             # something was said that is not in the story (e.g. the instructions) or words were left out
@@ -2888,26 +3049,49 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         fr = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, max(1, len(a) - hop), hop)])
         thr = max(float(np.percentile(fr, 95)) * 0.05, 1e-6) if fr.size else 1e-6
         psegs = None
+        lchars = [sum(len(plains[k]) for k, kk in enumerate(keys) if kk == ln) for ln in lines]
+        by_marker = None
+        if marked:
+            try:
+                by_marker, m_why = _marker_split(a, rate, lchars, x0["voice"] not in CHIRP_VOICES[:14], thr)
+            except Exception as ex:
+                by_marker, m_why = None, str(ex)[:80]
         if len(lines) == 1:
             segs, ok = [a], [True]
             bounds = [(0, len(a))]
+        elif by_marker:                               # a line lies exactly between two marker words; where a
+            bounds = [b_ or (0, 0) for b_ in by_marker]             # marker is missing, its two lines are asked again
+            segs, ok = [a[s:e] for s, e in bounds], [bool(b_) for b_ in by_marker]
+            MARK_STATS[0] += 1
+            if m_why:
+                log(f"  voices: {m_why} - {sum(ok)} lines are certain")
         else:
+            if marked:                                # the old way: by the pauses (the marker words are pieces too
+                MARK_STATS[1] += 1                    # and are thrown away)
+                log(f"  voices: the marker words could not be counted ({m_why}) - this recording is cut by its pauses")
+                plains, keys, k_ = [], [], 0
+                for q, x in enumerate(g):
+                    if q and x["line"] != g[q - 1]["line"]:
+                        k_ += 1
+                        plains.append(mark)
+                        keys.append(f"#mark{k_}")
+                    plains.append(x["plain"])
+                    keys.append(x["line"])
             cut = _align_lines(tmp, plains, keys, partial=True)
             if not cut:
-                why = _pause_note(tmp, len(g))
+                why = _pause_note(tmp, len(plains))
                 os.remove(tmp)
                 again(g, lines, f"no line end was certain: {why}")
                 continue
             psegs, _r, pok = cut
-            segs, ok, bounds, pos = [], [], [], 0
+            segs, ok, bounds = [], [], []
+            starts = np.concatenate([[0], np.cumsum([len(s_) for s_ in psegs])])
             for ln in lines:
                 idx = [k for k, kk in enumerate(keys) if kk == ln]
-                seg = np.concatenate([psegs[k] for k in idx])
-                segs.append(seg)
-                ok.append(all(pok[k] for k in idx))
-                bounds.append((pos, pos + len(seg)))
-                pos += len(seg)
-        lchars = [sum(len(plains[k]) for k, kk in enumerate(keys) if kk == ln) for ln in lines]
+                nb = [k for k in (idx[0] - 1, idx[-1] + 1) if 0 <= k < len(keys)]       # (its marker words)
+                segs.append(np.concatenate([psegs[k] for k in idx]))
+                ok.append(all(pok[k] for k in idx + nb))
+                bounds.append((int(starts[idx[0]]), int(starts[idx[-1] + 1])))
         voiced = [_voiced(s_, rate, thr) for s_ in segs]
         why_bad = {}
         for k, ln in enumerate(lines):
@@ -2935,7 +3119,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
                         why_bad.setdefault(keys[k], f"a sentence took {pv[k]:.1f} s of speech instead of "
                                                     f"{len(p_) * pref:.1f} s - said twice?")
         try:                                          # (9 Nov 2026: 'many lines are said twice')
-            if _said_twice(tmp, plains) and TWICE_AT[0]:
+            if _said_twice(tmp, plains0) and TWICE_AT[0]:
                 s1, e1, s2, e2 = [int(v * rate) for v in TWICE_AT[0]]
                 for k, ln in enumerate(lines):
                     b0, b1 = bounds[k]
@@ -2969,7 +3153,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
             v_ = sum(voiced[k] for k in clean) / c_
             SPK_VOICED[vk] = v_ if vk not in SPK_VOICED else SPK_VOICED[vk] * 0.6 + v_ * 0.4
             if good == len(lines) and chars >= 60:
-                r_ = got / chars
+                r_ = max(0.02, (got - 1.6 * n_mark) / chars)
                 SPK_RATE[vk] = r_ if vk not in SPK_RATE else SPK_RATE[vk] * 0.6 + r_ * 0.4
         bad = [ln for ln in lines if ln not in done_lines]
         if bad:

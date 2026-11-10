@@ -2315,20 +2315,31 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
     return False
 
 
+TTS_PLAN = {"pieces": 20, "chars": 1700}     # how full one voice request is made (main.py sets it from the day's limit)
+
+
 def tts_groups(items):
-    """How the lines are sent: up to 12 sentences / 1100 characters of ONE speaker per request."""
+    """How the lines are sent: ONE speaker per request, as full as TTS_PLAN allows, and a LINE is never split over
+    two requests (10 Nov 2026). Google's free limit is 10 requests a day for each voice model - about 36 in all - for
+    two stories and two teasers: with small requests of 12 sentences one story alone needed 14-16 requests, so the
+    second half of the cast always fell back to the Chirp voice. Fuller requests need 8-10."""
+    max_n = int(env("TTS_BATCH_LINES") or TTS_PLAN["pieces"])
+    max_c = int(env("TTS_BATCH_CHARS") or TTS_PLAN["chars"])
+    lines, last = [], object()
+    for it in items:                                  # the sentences of one line stay together
+        key = (it.get("line") or it["out"], it["spk"])
+        if key != last:
+            lines.append([])
+            last = key
+        lines[-1].append(it)
     groups, cur = [], []
-    for it in items:
-        spk = {x["spk"] for x in cur} | {it["spk"]}
-        # ONE character per request: a cut that lands a little off can then never put one person's words into
-        # another person's voice
-        # (9 Nov 2026: a recording of 24 sentences was NEVER cut cleanly - 0 of 3 - and each failure cost extra
-        # requests; 12 sentences mostly were: smaller first groups waste far fewer of the day's few requests)
-        if cur and (len(spk) > int(env("TTS_SPEAKERS_PER_REQUEST") or 1) or len(cur) >= int(env("TTS_BATCH_LINES") or 12)
-                    or sum(len(x["plain"]) for x in cur) + len(it["plain"]) > int(env("TTS_BATCH_CHARS") or 1100)):
+    for ln in lines:
+        n_c = sum(len(x["plain"]) for x in ln)
+        if cur and (cur[0]["spk"] != ln[0]["spk"] or len(cur) + len(ln) > max_n
+                    or sum(len(x["plain"]) for x in cur) + n_c > max_c):
             groups.append(cur)
             cur = []
-        cur.append(it)
+        cur = cur + ln
     if cur:
         groups.append(cur)
     return groups
@@ -2502,6 +2513,9 @@ def _dtw(A, B):
     return float(prev[m] / (n + m))
 
 
+TWICE_AT = [None]               # (start, end, start, end) in seconds of the two copies _said_twice heard
+
+
 def _said_twice(wav, plains):
     """Gemini sometimes says a sentence TWICE in one recording (9 Nov 2026: 'many lines are said twice').
     The text has no such repeat, so two stretches of speech that sound the same = a repeat -> do not use it.
@@ -2509,6 +2523,7 @@ def _said_twice(wav, plains):
     import numpy as np
     from scipy.io import wavfile
     from difflib import SequenceMatcher
+    TWICE_AT[0] = None
     keys = [re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", strip_tags(p)) for p in plains]
     for x in range(len(keys)):                        # the story itself repeats something here: nothing to check
         for y in range(x + 1, len(keys)):
@@ -2565,6 +2580,7 @@ def _said_twice(wav, plains):
     med = float(np.median([p[2] for p in pairs]))
     x, y, d = min(pairs, key=lambda p: p[2])
     if d < float(env("REPEAT_LIKENESS") or 0.75) * med:      # (two different sentences: 0.95+; a repeat: ~0.5)
+        TWICE_AT[0] = (chunks[x][0] / sr, chunks[x][1] / sr, chunks[y][0] / sr, chunks[y][1] / sr)
         return f"{(chunks[x][1] - chunks[x][0]) / sr:.1f} s of speech heard twice (likeness {d / med:.2f})"
     return ""
 
@@ -2599,16 +2615,226 @@ TTS_USED = [0]                  # voice requests sent in this run (each one coun
 SPK_RATE = {}                   # seconds per letter of every voice, learned from its clean recordings
 
 
+def _align_lines(wav, plains, keys=None, partial=True):
+    """Cuts one recording of several pieces exactly in the silences BETWEEN them: every silence is a candidate, and
+    the cuts are the ones that best match where each piece should end (by its length), in order.
+    keys: the line each piece belongs to - the sentences of one line are joined again afterwards, so only the cuts
+    BETWEEN two lines must be exact and a line is checked as a whole (10 Nov 2026: checking every single sentence
+    made the bot throw away good recordings and ask again and again - 17 requests for one storyteller).
+    partial=True: when the recording cannot be cut cleanly as a whole, the lines at its start and its end that ARE
+    certain are kept - returns (pieces, rate, ok) and only the pieces with ok=False are asked for again.
+    Returns None when nothing is certain."""
+    import numpy as np
+    from scipy.io import wavfile
+    sr, a = wavfile.read(wav)
+    a = a.astype("float32")
+    n = len(plains)
+    keys = list(keys) if keys and len(keys) == n else list(range(n))
+    if n == 1:
+        return ([a], sr, [True]) if partial else ([a], sr)
+    hop = int(sr * 0.02)
+    rms = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, len(a) - hop, hop)])
+    if rms.size < 10:
+        return None
+    p95 = max(float(np.percentile(rms, 95)), 1e-6)
+    soft = rms < p95 * 0.25                           # a breath is soft - speech is not
+
+    def pauses(frac):
+        """(cut frame, length) of every pause; a short soft breath INSIDE a pause belongs to it (a storyteller
+        often breathes in the pause between two sentences - that split one long pause into two short ones)"""
+        quiet = rms < p95 * frac
+        runs, i = [], 0
+        while i < len(quiet):
+            if quiet[i]:
+                j = i
+                while j < len(quiet) and quiet[j]:
+                    j += 1
+                runs.append([i, j])
+                i = j
+            else:
+                i += 1
+        merged = []
+        for r in runs:
+            if merged and r[0] - merged[-1][1] <= 15 and soft[merged[-1][1]:r[0]].all():
+                merged[-1][1] = r[1]
+                merged[-1][2].append(r)
+            else:
+                merged.append([r[0], r[1], [r]])
+        out = []
+        for st_, en_, parts in merged:
+            if (en_ - st_) * 0.02 >= 0.2 and st_ > 0 and en_ < len(quiet):
+                big = max(parts, key=lambda p: p[1] - p[0])    # cut in the quietest (longest silent) part
+                out.append(((big[0] + big[1]) // 2, en_ - st_))
+        return out
+    cand = []
+    for frac in (0.03, 0.06, 0.10):                   # real silence first; a pause with a soft breath only if needed
+        cand = pauses(frac)
+        if len(cand) >= n - 1:
+            break
+    if len(cand) < n - 1:
+        return None
+    tot = sum(max(1, len(p)) for p in plains)
+    exp, acc = [], 0
+    for p in plains[:-1]:
+        acc += max(1, len(p))
+        exp.append(len(rms) * acc / tot)
+    total = len(a) / sr
+    lines, s0 = [], 0                                 # (first piece, last piece + 1) of every line
+    for k in range(1, n + 1):
+        if k == n or keys[k] != keys[k - 1]:
+            lines.append((s0, k))
+            s0 = k
+
+    sil = {cf: ln for cf, ln in cand}
+
+    def sure(cuts, k):
+        """cut k is certain when its pause clearly stands out in its own neighbourhood (from the middle of the
+        piece before it to the middle of the piece after it): the longest there, 1.4x longer than any other"""
+        lo = (([0] + list(cuts))[k] + cuts[k]) // 2
+        hi = (cuts[k] + (list(cuts) + [len(rms)])[k + 1]) // 2
+        others = [ln for cf, ln in cand if lo <= cf <= hi and cf != cuts[k]]
+        return not others or sil[cuts[k]] >= 1.4 * max(others)
+
+    def check(cuts):
+        bounds = [0] + [c * hop for c in cuts] + [len(a)]
+        segs = [a[bounds[k]:bounds[k + 1]] for k in range(n)]
+        fit = []
+        for seg, p in zip(segs, plains):              # every piece must fit its own sentence's length
+            want = total * max(1, len(p)) / tot
+            lo, hi = (0.55, 1.75) if len(p) >= 30 else (0.33, 2.6)   # a long line with a sentence missing = too short
+            fit.append(lo * want <= len(seg) / sr <= hi * want + 0.6)
+        ok = [False] * n
+        for s, e in lines:                            # a line is certain when all its sentences fit AND so do the
+            good = (all(fit[s:e]) and (s == 0 or fit[s - 1]) and (e == n or fit[e]))   # pieces on both sides
+            for k in range(s, e):
+                ok[k] = good
+        return segs, ok
+
+    def result(segs, ok):
+        if all(ok):
+            return (segs, sr, ok) if partial else (segs, sr)
+        return None
+    # FIRST CHOICE: the pauses BETWEEN pieces are the longest silences of the recording (inside a piece there are only
+    # short comma pauses) - when the n-1 longest silences stand clearly apart from all the others, they are the cuts
+    by_len = sorted(range(len(cand)), key=lambda c: -cand[c][1])
+    if len(cand) == n - 1 or cand[by_len[n - 2]][1] >= 1.45 * cand[by_len[n - 1]][1]:
+        r = result(*check(sorted(cand[c][0] for c in by_len[:n - 1])))
+        if r:
+            return r
+    # else dynamic programming: pick n-1 silences in order, close to the expected ends, longer silences preferred
+    C, K = len(cand), n - 1
+    INF = float("inf")
+    cost = [[INF] * C for _ in range(K)]
+    back = [[-1] * C for _ in range(K)]
+    for c in range(C):
+        cost[0][c] = abs(cand[c][0] - exp[0]) - 12 * cand[c][1]
+    for k in range(1, K):
+        best, bi = INF, -1
+        for c in range(C):
+            if c > 0 and cost[k - 1][c - 1] < best:
+                best, bi = cost[k - 1][c - 1], c - 1
+            if bi >= 0:
+                cost[k][c] = best + abs(cand[c][0] - exp[k]) - 12 * cand[c][1]
+                back[k][c] = bi
+    c = min(range(C), key=lambda x: cost[K - 1][x])
+    if cost[K - 1][c] == INF:
+        return None
+    picks = [c]
+    for k in range(K - 1, 0, -1):
+        c = back[k][c]
+        picks.append(c)
+    segs, ok = check([cand[c][0] for c in reversed(picks)])
+    if all(ok) or not partial:
+        return result(segs, ok)
+    # PARTIAL: every line that is certain (its own length right, both its ends in a clear pause) is kept; only the
+    # others are asked for again
+    return (segs, sr, ok) if any(ok) else None
+
+
+def _voiced(seg, rate, thr):
+    """seconds of real speech in a piece (its pauses do not count) - what a text needs is far steadier than its
+    length with pauses"""
+    import numpy as np
+    hop = max(1, int(rate * 0.02))
+    if len(seg) < hop * 2:
+        return 0.0
+    n = len(seg) // hop
+    rms = np.sqrt((seg[:n * hop].astype("float32").reshape(n, hop) ** 2).mean(axis=1))
+    return float((rms >= thr).sum()) * 0.02
+
+
+def _tight(seg, rate, thr, over=0.36, keep=0.26):
+    """the long pauses INSIDE a line (the bot asks for one after every sentence, to find the line ends) are made
+    short again, so the storyteller does not drag"""
+    import numpy as np
+    hop = max(1, int(rate * 0.02))
+    n = len(seg) // hop
+    if n < 10:
+        return seg
+    rms = np.sqrt((seg[:n * hop].astype("float32").reshape(n, hop) ** 2).mean(axis=1))
+    quiet = rms < thr
+    out, i = [], 0
+    while i < n:
+        if quiet[i]:
+            j = i
+            while j < n and quiet[j]:
+                j += 1
+            ln = (j - i) * 0.02
+            if ln > over and i > 0 and j < n:
+                h = int(keep / 2 / 0.02)
+                out.append(seg[i * hop:(i + h) * hop])
+                out.append(seg[(j - h) * hop:j * hop])
+            else:
+                out.append(seg[i * hop:j * hop])
+            i = j
+        else:
+            j = i
+            while j < n and not quiet[j]:
+                j += 1
+            out.append(seg[i * hop:j * hop])
+            i = j
+    out.append(seg[n * hop:])
+    return np.concatenate(out)
+
+
+SPK_VOICED = {}                 # seconds of speech per letter of every voice (pauses not counted)
+
+
 def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None):
-    """items: dict(text, plain, voice, who, feel, spk, out, lang). One request per group of lines, cut apart at
-    the pauses (or near where each line should end). Stops AT ONCE when the daily limit is over - it never waits
-    for hours and never sends a line alone again. Returns True when every line is done."""
+    """items: dict(text, plain, voice, who, feel, spk, out, lang[, line]) - the sentences of the lines; "line" is the
+    voice file of the whole line a sentence belongs to. One request per group; every LINE whose two ends are certain
+    is kept, only the uncertain lines are asked for again (a line alone needs no cutting at all). 10 Nov 2026:
+    before, a recording with ONE unclear pause was thrown away whole and asked for again in halves - with only ~36
+    free requests a day, half the cast then lost the Gemini voice. Returns True when every line is done."""
     import numpy as np
     from scipy.io import wavfile
     t0 = time.time()
+    for x in items:
+        x.setdefault("line", x["out"])
     groups = tts_groups(items)
-    log(f"  {len(items)} lines in {len(groups)} voice requests")
-    done = 0
+    n_lines = len({x["line"] for x in items})
+    log(f"  {n_lines} lines ({len(items)} sentences) in {len(groups)} voice requests")
+    tries, done_lines = {}, set()
+    room = lambda n: max_requests is None or TTS_USED[0] + n <= max_requests
+    lines_of = lambda g: list(dict.fromkeys(x["line"] for x in g))
+
+    def again(g, bad, why):
+        """the uncertain lines once more - only they, never the whole recording"""
+        bad = [ln for ln in bad if tries.get(ln, 0) < 3]
+        if not bad:
+            return
+        for ln in bad:
+            tries[ln] = tries.get(ln, 0) + 1
+        per = [[x for x in g if x["line"] == ln] for ln in bad]
+        first = [p_ for p_ in per if tries[p_[0]["line"]] == 1]      # 1st time: together (a small recording is cut
+        alone = [p_ for p_ in per if tries[p_[0]["line"]] > 1]       # apart surely); after that: every line alone
+        if len(first) == len(lines_of(g)) and len(first) > 1:        # nothing of it was usable: two halves
+            new = [sum(first[:len(first) // 2], []), sum(first[len(first) // 2:], [])]
+        else:
+            new = [sum(first[k:k + 5], []) for k in range(0, len(first), 5)]
+        groups[gi + 1:gi + 1] = new + alone
+        log(f"  voices: {len(bad)} of {len(lines_of(g))} lines asked again ({why}) - the other lines are kept")
+
     gi = -1
     while gi + 1 < len(groups):
         gi += 1
@@ -2616,115 +2842,141 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         if TTS_STATE["off"] or not gemini_quota_left():
             log("  expressive voices: today's free limit is over")
             return False
-        if max_requests is not None and TTS_USED[0] >= max_requests:
+        if not room(1):
             log("  expressive voices: today's planned share is used")
             return False
         if time.time() - t0 > float(env("TTS_MAX_MINUTES") or 75) * 60:
             log("  expressive voices: safety time limit reached")
             return False
-        spk = []
-        for x in g:
-            if x["spk"] not in [s[0] for s in spk]:
-                spk.append((x["spk"], x["voice"], x["who"]))
-        labels = {s[0]: f"Speaker{k + 1}" for k, s in enumerate(spk)}
-        lang = g[0].get("lang", "bn")
-        note = " ".join(f"{labels[s[0]]} is {s[2]}." for s in spk) + " " + PRONOUNCE.get(lang, "")
+        x0 = g[0]
+        lang = x0.get("lang", "bn")
+        note = f"Speaker1 is {x0['who']}. " + PRONOUNCE.get(lang, "")
         data = None
         for attempt in range(2):                      # one quiet retry for a busy server, never more
             TTS_USED[0] += 1
             if len(g) > 1:
-                turns = [(labels[x["spk"]], x["text"], x["feel"]) for x in g]
-                data = _tts_call(_requests_for(turns, [(labels[s[0]], s[1]) for s in spk], lang_label, note))
+                data = _tts_call(_requests_for([("Speaker1", x["text"], x["feel"]) for x in g],
+                                               [("Speaker1", x0["voice"])], lang_label, note))
             else:
-                x = g[0]
-                data = _tts_call([_single_body(mm, x["text"], x["voice"], f"{x['who']}. {x['feel']}. "
+                data = _tts_call([_single_body(mm, x0["text"], x0["voice"], f"{x0['who']}. {x0['feel']}. "
                                                + PRONOUNCE.get(lang, ""), lang_label) for mm in NEW_TTS + OLD_TTS])
-            if data or not gemini_quota_left():
+            if data or not gemini_quota_left() or not room(1):
                 break
             time.sleep(45)
         if not data:
             log("  expressive voices: no answer (limit over or server busy) - the rest gets the backup voice")
             return False
-        tmp = g[0]["out"] + ".group.wav"
+        tmp = x0["out"] + ".group.wav"
         got = _audio_file(data, tmp, sr, trim=True)
         plains = [x["plain"] for x in g]
+        keys = [x["line"] for x in g]
+        lines = lines_of(g)
         chars = sum(len(p) for p in plains)
-        # our grave storyteller speaks SLOWLY (a real episode: ~7 Bengali letters a second, pauses included), so
-        # the check is wide: it only catches a recording that is clearly twice too long or far too short
+        vk = f"{x0['voice']}|{x0['who']}"
         expect = chars / 8.0 + 1.0 * (len(g) - 1)
-        vk = f"{g[0]['voice']}|{g[0]['who']}"
-        missing = False
-        if SPK_RATE.get(vk) and chars >= 120:         # this voice's own speed is known: words left out show up
-            missing = got < chars * SPK_RATE[vk] * 0.72
-            if missing:
-                log(f"  voices: {got:.0f} s where this voice needs ~{chars * SPK_RATE[vk]:.0f} s - words were left out")
+        missing = bool(SPK_RATE.get(vk)) and chars >= 120 and got < chars * SPK_RATE[vk] * 0.72
         if missing or got > expect * 2.0 + 4 or got < expect * 0.33:
-            # something was said that is not in the story (e.g. the instructions, in English) or words were left
-            # out: never use it - ask again in smaller groups, or leave these lines for a single-line request
+            # something was said that is not in the story (e.g. the instructions) or words were left out
             log(f"  voices: a recording of {got:.0f} s for ~{expect:.0f} s of words - not used "
-                f"({'extra words' if got > expect else 'words missing'})")
+                f"({'words missing' if missing or got < expect else 'extra words'})")
             os.remove(tmp)
-            if len(g) > 1 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
-                half = max(1, len(g) // 2)
-                groups[gi + 1:gi + 1] = [g[:half], g[half:]]
+            again(g, lines, "the recording was wrong")
             continue
-        # (a single sentence needs no cutting at all - before 10 Nov 2026 its recording was thrown away by mistake)
-        cut = _align_split(tmp, plains)
-        if not cut and len(g) >= 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
-            # not sure where one line ends and the next begins: ask again as two smaller groups - a line is
-            # NEVER cut in the middle of a sentence
-            why = _pause_note(tmp, len(g))
-            os.remove(tmp)
-            half = len(g) // 2
-            groups[gi + 1:gi + 1] = [g[:half], g[half:]]
-            log(f"  voices: {len(g)} lines - not sure where each line ends ({why}), asking again in two smaller groups")
-            continue
-        if not cut:
-            os.remove(tmp)
-            log(f"  voices: {len(g)} lines could not be cut cleanly and no request is left to ask again - they "
-                "stay open")
-            continue
-        twice = ""
+        rate, a = wavfile.read(tmp)
+        a = a.astype("float32")
+        hop = int(rate * 0.02)
+        fr = np.array([np.sqrt((a[i:i + hop] ** 2).mean()) for i in range(0, max(1, len(a) - hop), hop)])
+        thr = max(float(np.percentile(fr, 95)) * 0.05, 1e-6) if fr.size else 1e-6
+        psegs = None
+        if len(lines) == 1:
+            segs, ok = [a], [True]
+            bounds = [(0, len(a))]
+        else:
+            cut = _align_lines(tmp, plains, keys, partial=True)
+            if not cut:
+                why = _pause_note(tmp, len(g))
+                os.remove(tmp)
+                again(g, lines, f"no line end was certain: {why}")
+                continue
+            psegs, _r, pok = cut
+            segs, ok, bounds, pos = [], [], [], 0
+            for ln in lines:
+                idx = [k for k, kk in enumerate(keys) if kk == ln]
+                seg = np.concatenate([psegs[k] for k in idx])
+                segs.append(seg)
+                ok.append(all(pok[k] for k in idx))
+                bounds.append((pos, pos + len(seg)))
+                pos += len(seg)
+        lchars = [sum(len(plains[k]) for k, kk in enumerate(keys) if kk == ln) for ln in lines]
+        voiced = [_voiced(s_, rate, thr) for s_ in segs]
+        why_bad = {}
+        for k, ln in enumerate(lines):
+            if not ok[k]:
+                why_bad[ln] = "its end was not certain"
+        # how long a text takes to SAY is steady for one voice: a line that takes far longer has something said twice
+        # (or words that are not in the story); far shorter = words left out
+        rates = [v / c for v, c, o in zip(voiced, lchars, ok) if o and c >= 25 and v > 0]
+        ref = float(np.median(rates)) if len(rates) >= 3 else SPK_VOICED.get(vk)
+        if ref:
+            for k, ln in enumerate(lines):
+                if ln in why_bad or lchars[k] < 25:
+                    continue
+                if voiced[k] > lchars[k] * ref * 1.6 and voiced[k] - lchars[k] * ref >= 1.2:
+                    why_bad[ln] = f"{voiced[k]:.1f} s of speech for words that need {lchars[k] * ref:.1f} s - said twice?"
+                elif lchars[k] >= 40 and voiced[k] < lchars[k] * ref * 0.55:
+                    why_bad[ln] = "words were left out"
+        if psegs is not None:                         # the same for every single SENTENCE (a short one said twice)
+            pv = [_voiced(s_, rate, thr) for s_ in psegs]
+            pr = [v / len(p_) for v, p_, o in zip(pv, plains, pok) if o and len(p_) >= 20 and v > 0]
+            pref = float(np.median(pr)) if len(pr) >= 4 else ref
+            if pref:
+                for k, p_ in enumerate(plains):
+                    if len(p_) >= 12 and pv[k] > len(p_) * pref * 1.7 and pv[k] - len(p_) * pref >= 0.8:
+                        why_bad.setdefault(keys[k], f"a sentence took {pv[k]:.1f} s of speech instead of "
+                                                    f"{len(p_) * pref:.1f} s - said twice?")
         try:                                          # (9 Nov 2026: 'many lines are said twice')
-            twice = _said_twice(tmp, plains)
+            if _said_twice(tmp, plains) and TWICE_AT[0]:
+                s1, e1, s2, e2 = [int(v * rate) for v in TWICE_AT[0]]
+                for k, ln in enumerate(lines):
+                    b0, b1 = bounds[k]
+                    if (b0 < e1 and s1 < b1) or (b0 < e2 and s2 < b1):
+                        why_bad.setdefault(ln, "something was said twice")
         except Exception as ex:
             log(f"    repeat check skipped: {str(ex)[:80]}")
-        if twice:
-            os.remove(tmp)
-            if len(g) >= 2 and (max_requests is None or TTS_USED[0] + 2 <= max_requests):
-                half = len(g) // 2
-                groups[gi + 1:gi + 1] = [g[:half], g[half:]]
-                log(f"  voices: Gemini said something twice ({twice}) - not used, {len(g)} lines asked again in two "
-                    "smaller groups")
-            elif len(g) == 1 and (max_requests is None or TTS_USED[0] + 1 <= max_requests):
-                groups.insert(gi + 1, g)
-                log(f"  voices: Gemini said something twice ({twice}) - not used, asked once more")
-            else:
-                log(f"  voices: Gemini said something twice ({twice}) - not used; no request left - they stay open")
-            continue
         os.remove(tmp)
-        if chars >= 60:                               # a clean recording: remember how fast this voice speaks
-            r_ = got / chars
-            SPK_RATE[vk] = r_ if vk not in SPK_RATE else SPK_RATE[vk] * 0.6 + r_ * 0.4
-        segs, rate = cut
-        for x, seg in zip(g, segs):
-            if len(seg) < rate * 0.15:                  # nothing left for this line: it gets the backup voice
+        good = 0
+        for k, ln in enumerate(lines):
+            if ln in why_bad or len(segs[k]) < rate * 0.15:
                 continue
             try:
-                wavfile.write(x["out"] + ".seg.wav", rate, seg.astype(np.int16))
-                if _audio_file(open(x["out"] + ".seg.wav", "rb").read(), x["out"], sr, trim=True) < 0.2 \
-                        and os.path.exists(x["out"]):
-                    os.remove(x["out"])                 # (almost) silent: this line gets the backup voice
+                seg = _tight(segs[k], rate, thr)
+                wavfile.write(ln + ".seg.wav", rate, np.clip(seg, -32768, 32767).astype(np.int16))
+                if _audio_file(open(ln + ".seg.wav", "rb").read(), ln, sr, trim=True) < 0.2 and os.path.exists(ln):
+                    os.remove(ln)                       # (almost) silent: this line is asked again / backup voice
+                else:
+                    good += 1
+                    done_lines.add(ln)
             except Exception as ex:
-                log(f"    one piece could not be used ({str(ex)[:80]}) - that line gets the backup voice")
-                if os.path.exists(x["out"]):
-                    os.remove(x["out"])
+                log(f"    one line could not be used ({str(ex)[:80]})")
+                if os.path.exists(ln):
+                    os.remove(ln)
             finally:
-                if os.path.exists(x["out"] + ".seg.wav"):
-                    os.remove(x["out"] + ".seg.wav")
-        done += len(g)
-        log(f"  voices: {done}/{len(items)} lines ({(time.time() - t0) / 60:.1f} min, {TTS_USED[0]} requests)")
-    return all(os.path.exists(x["out"]) and os.path.getsize(x["out"]) > 2000 for x in items)
+                if os.path.exists(ln + ".seg.wav"):
+                    os.remove(ln + ".seg.wav")
+        clean = [k for k, ln in enumerate(lines) if ln in done_lines and lchars[k] >= 25]
+        if clean:                                     # remember how fast this voice speaks
+            c_ = sum(lchars[k] for k in clean)
+            v_ = sum(voiced[k] for k in clean) / c_
+            SPK_VOICED[vk] = v_ if vk not in SPK_VOICED else SPK_VOICED[vk] * 0.6 + v_ * 0.4
+            if good == len(lines) and chars >= 60:
+                r_ = got / chars
+                SPK_RATE[vk] = r_ if vk not in SPK_RATE else SPK_RATE[vk] * 0.6 + r_ * 0.4
+        bad = [ln for ln in lines if ln not in done_lines]
+        if bad:
+            reasons = sorted({why_bad.get(ln, "empty") for ln in bad})
+            again(g, bad, "; ".join(reasons)[:140])
+        log(f"  voices: {len(done_lines)}/{n_lines} lines ({(time.time() - t0) / 60:.1f} min, {TTS_USED[0]} requests)")
+    return len(done_lines) == n_lines
 
 
 # ===================== v57: Google Cloud "Chirp 3 HD" - the backup voice when Gemini's free day is used up =====================

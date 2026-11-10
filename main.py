@@ -474,6 +474,41 @@ MITHU = {"name": "Mithu", "gender": "male", "age": "child", "kind": "animal", "h
          "look": "a small cheeky bright-green parrot with a red beak and a tiny yellow cap"}
 
 
+def moral_card(bg, moral, lang, out):
+    """v70 'আজকের শিক্ষা': the story's lesson on a card (the last picture soft behind it) while it is told"""
+    from PIL import ImageEnhance, ImageFilter
+    base = Image.open(bg).convert("RGB").resize((W, H)) if bg and os.path.exists(bg) else Image.new("RGB", (W, H), (40, 60, 110))
+    base = ImageEnhance.Brightness(base.filter(ImageFilter.GaussianBlur(14))).enhance(0.55)
+    img = base.convert("RGBA")
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    x0, y0, x1, y1 = 150, 110, W - 150, H - 190
+    d.rounded_rectangle([x0 + 8, y0 + 10, x1 + 8, y1 + 10], radius=36, fill=(0, 0, 0, 110))        # soft shadow
+    d.rounded_rectangle([x0, y0, x1, y1], radius=36, fill=(255, 248, 225, 245), outline=(214, 150, 40, 255), width=6)
+    title = "আজকের শিক্ষা" if lang == "bn" else "आज की सीख"
+    ft = extras._font(FONT, 58)
+    tt = extras.fit_glyphs(title, FONT)
+    tw = d.textlength(tt, font=ft)
+    cx = (x0 + x1) // 2
+    for sx in (cx - tw / 2 - 52, cx + tw / 2 + 52):       # a little star on each side of the heading
+        pts = []
+        for k in range(10):
+            r_ = 22 if k % 2 == 0 else 9
+            a_ = -math.pi / 2 + k * math.pi / 5
+            pts.append((sx + r_ * math.cos(a_), y0 + 70 + r_ * math.sin(a_)))
+        d.polygon(pts, fill=(240, 170, 30, 255))
+    d.text((cx - tw / 2, y0 + 30), tt, font=ft, fill=(170, 50, 30, 255))
+    d.line([(x0 + 70, y0 + 122), (x1 - 70, y0 + 122)], fill=(214, 150, 40, 255), width=3)
+    rows, f, sz = extras._fit_text(d, extras.fit_glyphs(str(moral).strip(), FONT), FONT, x1 - x0 - 120, 54, lines_max=4)
+    y = y0 + 122 + ((y1 - y0 - 122) - len(rows) * sz * 1.4) / 2
+    for r in rows:
+        rw = d.textlength(r, font=f)
+        d.text((cx - rw / 2, y), r, font=f, fill=(45, 35, 30, 255))
+        y += sz * 1.4
+    Image.alpha_composite(img, lay).convert("RGB").save(out, quality=92)
+    return out
+
+
 def ensure_mascot():
     """Our host 'Lumi Didi' - made once, saved in the repo, the same in every video."""
     if os.path.exists(MASCOT):
@@ -1029,6 +1064,14 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
     if category in MYTH:
         kind_rules += (" Use these EXACT looks for the holy and epic characters who appear (same every time): "
                        + "; ".join(MYTH_LOOKS.values()) + ". Use 'Rama', 'Sita', 'Krishna', 'Arjuna' etc. as names.")
+    if category == "gopal" and part < 2 and env("GOPAL_RIDDLE") != "0" and \
+            dt.datetime.now(extras.IST).weekday() == int(env("GOPAL_RIDDLE_DAY") or 2):   # v70: every Wednesday
+        kind_rules += ("\nTODAY IS GOPAL'S RIDDLE DAY: in the MIDDLE of the story someone at the court (the king, a proud "
+                       "visiting pandit, or Gopal himself) asks ONE clever folk riddle (dhadha) out loud. Nobody can "
+                       "answer it and the story goes on. Near the END Gopal gives the answer with a funny explanation, "
+                       "and everybody laughs. The riddle must be fair (a child can understand the answer) and it is "
+                       "part of the plot. Put this SAME riddle and its answer in the \"riddle\" field.\n")
+        log("Gopal's riddle day: the riddle is asked in the story and answered at its end")
     kind_rules += saheb_rule(category)
     kind_rules += puppet_rules(category)
     prompt = f"""
@@ -3558,9 +3601,16 @@ def main():
     elif story.get("ending_line"):
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
     end_img = host if host != thumb_base else (shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1])
+    lesson_img = None
+    if moral and category != "funny" and env("MORAL_CARD") != "0":   # v70: the lesson on a card of its own
+        try:
+            lesson_img = moral_card(shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1], moral, lang,
+                                    os.path.join(WORK, "lesson_card.jpg"))
+        except Exception as e:
+            log("  lesson card skipped:", str(e)[:120])
     if end_lines:                                   # Lumi Didi tells the lesson, then the quiz, then goodbye
-        parts.append({"image": end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy", "voices": voices,
-                      "host_part": end_img == host})
+        parts.append({"image": lesson_img or end_img, "lines": end_lines, "sounds": ["birds"], "mood": "happy",
+                      "voices": voices, "host_part": (not lesson_img) and end_img == host})
         end_lines = []
     quiz = story.get("quiz") if isinstance(story.get("quiz"), dict) else {}
     qopts = [str(o).strip() for o in (quiz.get("options") or []) if str(o).strip()][:3]

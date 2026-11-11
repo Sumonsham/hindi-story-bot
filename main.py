@@ -3342,6 +3342,20 @@ def main():
                 elif re.search(r"[\u0900-\u097F]", mine["text"]) and "hi" in LANGS:
                     lang, L, FONT = "hi", LANGS["hi"], find_font("hi")
                 log(f"YOUR OWN STORY from Telegram is today's story ({len(mine['text'])} characters)")
+            # TREND STORY (v75): the morning story is built on what families watch MOST on YouTube this week
+            # (real YouTube search, sorted by views) - a new, original story on that topic, never a copy
+            if (not mine and slot_hour == 8 and cat not in MYTH and cat != "gopal" and env("TREND_STORY") != "0"
+                    and not MOCK):
+                try:
+                    tr_ = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
+                except Exception as e:
+                    tr_ = []
+                    log("  trend story skipped:", str(e)[:100])
+                done_ = {str(h.get("idea", "")).strip() for h in history} | {str(h.get("theme", "")).strip() for h in history}
+                tr_ = [x for x in tr_ if x.strip() and not any(d.startswith(x.strip()) for d in done_ if d)]
+                if tr_:
+                    theme = (cat, tr_[0].strip() + " (told as a " + cat + " story for children)")
+                    log(f"TREND STORY - what families watch most on YouTube this week: {tr_[0]}")
             if slot_hour == 19 and not mine:
                 win, n_votes = vote_winner(history)  # yesterday's 1 PM vote chose between two of today's stories
                 if win and win[0] == cat:
@@ -3375,6 +3389,11 @@ def main():
             tr = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
         except Exception:
             tr = []
+    if not MOCK:
+        try:                                         # title + thumbnail words in this week's winning style
+            extra += extras.trend_style_rule("cartoon", lang, os.path.join(HERE, "assets"))
+        except Exception:
+            pass
     if tr and category not in MYTH and category != "gopal" and part < 2:
             extra += ("\nTRENDING THIS WEEK (Indian families are watching these - if one fits today's kind of story, "
                       "build on it): " + " | ".join(tr) + "\n")

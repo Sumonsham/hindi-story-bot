@@ -4272,6 +4272,17 @@ def user_thumb_prompt(kind, subject, place, moment=""):
     if mm:                                            # the click-worthy clause goes just before 'No text ...'
         tmpl = (tmpl[:mm.start()] + "." + (CTR_HORROR if kind.startswith("h_") else CTR_CARTOON)
                 + " No text, no letters" + tmpl[mm.end():])
+    look = ""
+    try:
+        kk_ = "horror" if kind.startswith("h_") else "cartoon"
+        st_ = (trend_style_get(kk_, env("LANGUAGE")) if env("LANGUAGE") else
+               (trend_style_get(kk_, "bn") or trend_style_get(kk_, "hi")))
+        if st_.get("thumb_style"):
+            look = " This week's most clicked look (style only): " + st_["thumb_style"].replace("text", "lettering")[:400]
+            look = re.sub(r"(?i)[^.]*\blettering\b[^.]*\.?", "", look)     # (the words are added by the bot)
+    except Exception:
+        look = ""
+    tmpl = tmpl + look.replace("{", "(").replace("}", ")")
     return " ".join(tmpl.format(subject=str(subject or "the ghost").strip(),
                                             place=str(place or "a haunted old place").strip(),
                                             moment=mo or ("a fun, surprising moment" if kind.startswith("c_") else ""))
@@ -5067,6 +5078,211 @@ def series_put(path, key, state):
 
 
 # ----------------------------------------------------------------- what people are watching this week
+# ----------------------------------------------------------------- what is REALLY trending on YouTube (v75)
+TREND_QUERIES = {
+    ("horror", "bn"): ["ভূতের গল্প", "bhuter golpo", "ভৌতিক গল্প", "bhuter golpo sotti ghotona", "horror story bangla",
+                       "তান্ত্রিকের গল্প", "গ্রামের ভূতের গল্প"],
+    ("horror", "hi"): ["bhoot ki kahani", "भूत की कहानी", "horror story hindi", "sacchi bhutiya kahani",
+                       "tantrik ki kahani", "gaon ki bhutiya kahani"],
+    ("cartoon", "bn"): ["বাংলা কার্টুন গল্প", "bangla cartoon golpo", "thakurmar jhuli golpo", "gopal bhar cartoon",
+                        "rupkothar golpo", "bangla moral story cartoon"],
+    ("cartoon", "hi"): ["hindi kahaniya cartoon", "moral stories hindi", "panchatantra ki kahaniyan",
+                        "jadui kahani", "hindi cartoon story", "pari ki kahani"],
+}
+# other people's published stories / shows: we take only the TOPIC of a trend, never these stories
+TREND_SKIP = re.compile(r"(?i)sunday\s*suspense|mirchi|goppo\s*mirchi|সানডে\s*সাসপেন্স|মির্চি|golpo\s*kotha|"
+                        r"scary\s*mamma|bhoot\.?com|aahat|ssshhh|#?shorts?\b.*?\bmovie|full\s*movie|song|গান")
+
+
+def _views_num(s):
+    """'1.2M views' / '12,345 views' / '3.4K' -> number"""
+    m = re.search(r"([\d.,]+)\s*([KkMmBb]|lakh|crore)?", str(s or ""))
+    if not m:
+        return 0
+    try:
+        n = float(m.group(1).replace(",", ""))
+    except ValueError:
+        return 0
+    mul = {"k": 1e3, "m": 1e6, "b": 1e9, "lakh": 1e5, "crore": 1e7}.get((m.group(2) or "").lower(), 1)
+    return int(n * mul)
+
+
+def parse_yt_results(html):
+    """Titles, views and age of the videos on a YouTube search page (its ytInitialData). [] if the page changed."""
+    out = []
+    i = html.find("ytInitialData")
+    if i < 0:
+        return out
+    j = html.find("{", i)
+    k = html.find("};", j)
+    try:
+        data = json.loads(html[j:k + 1])
+    except Exception:
+        return out
+
+    def walk(x):
+        if isinstance(x, dict):
+            vr = x.get("videoRenderer")
+            if isinstance(vr, dict):
+                yield vr
+            for v in x.values():
+                yield from walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                yield from walk(v)
+    for vr in walk(data):
+        try:
+            title = "".join(r.get("text", "") for r in vr["title"]["runs"])
+        except Exception:
+            title = str((vr.get("title") or {}).get("simpleText", ""))
+        vc = vr.get("viewCountText") or {}
+        views = _views_num(vc.get("simpleText") or "".join(r.get("text", "") for r in vc.get("runs") or []))
+        age = str((vr.get("publishedTimeText") or {}).get("simpleText", ""))
+        if title and vr.get("videoId"):
+            out.append({"id": vr["videoId"], "title": title.strip()[:150], "views": views, "age": age})
+    return out
+
+
+def yt_trending(kind, lang, max_n=15):
+    """The most watched videos of THIS WEEK on YouTube for our kind of video (YouTube's own search, sorted by
+    views, uploaded this week) - real titles and real view counts, no API quota used. [] if YouTube says no."""
+    seen, out = set(), []
+    hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                         "Chrome/124.0 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
+    for q in TREND_QUERIES.get((kind, lang), [])[:6]:
+        try:
+            r = requests.get("https://www.youtube.com/results", headers=hdr, cookies={"CONSENT": "YES+1"}, timeout=25,
+                             params={"search_query": q, "sp": "CAMSAggD", "hl": "en", "gl": "IN"})  # this week, by views
+            rows = parse_yt_results(r.text) if r.ok else []
+        except Exception as e:
+            log(f"  YouTube trend search '{q}' failed: {str(e)[:80]}")
+            rows = []
+        for v in rows:
+            if v["id"] in seen or TREND_SKIP.search(v["title"]):
+                continue
+            seen.add(v["id"])
+            out.append(v)
+        time.sleep(1.5)
+    out.sort(key=lambda v: -v["views"])
+    if out:
+        log(f"  YouTube this week ({kind}): " + " | ".join(f"{v['title'][:50]} ({v['views']:,})" for v in out[:4]))
+    return out[:max_n]
+
+
+TREND_STYLE = {}          # kind_lang -> the week's style (titles, thumbnails, tags) of the most watched videos
+
+
+def yt_video_meta(vid):
+    """The public facts of one YouTube video page: its tags (keywords) and the hashtags in its description."""
+    hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                         "Chrome/124.0 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
+    r = requests.get("https://www.youtube.com/watch", params={"v": vid, "hl": "en", "gl": "IN"}, headers=hdr,
+                     cookies={"CONSENT": "YES+1"}, timeout=25)
+    html = r.text if r.ok else ""
+    tags, desc = [], ""
+    m = re.search(r'"keywords":(\[[^\]]*\])', html)
+    if m:
+        try:
+            tags = [str(x) for x in json.loads(m.group(1))][:30]
+        except Exception:
+            tags = []
+    m = re.search(r'"shortDescription":"((?:[^"\\]|\\.)*)"', html)
+    if m:
+        try:
+            desc = json.loads('"' + m.group(1) + '"')
+        except Exception:
+            desc = m.group(1)
+    return {"tags": tags, "hashtags": re.findall(r"#[^\s#,.!?।]+", desc)[:15]}
+
+
+def trend_style(kind, lang, cache_dir, real):
+    """Once a day: HOW this week's most watched videos look - their titles, thumbnails, tags and hashtags - so our
+    own title, thumbnail, tags and hashtags follow the same winning style (never a copy of anyone's picture/title)."""
+    key = env("GEMINI_API_KEY")
+    if not real or env("TREND_STYLE") == "0":
+        return {}
+    import base64 as _b64
+    from collections import Counter
+    tag_n, hash_n = Counter(), Counter()
+    for v in real[:6]:
+        try:
+            meta = yt_video_meta(v["id"])
+        except Exception:
+            continue
+        for x in meta["tags"]:
+            if not TREND_SKIP.search(x):
+                tag_n[x.strip().lower()] += 1
+        for x in meta["hashtags"]:
+            if not TREND_SKIP.search(x):
+                hash_n[x.strip()] += 1
+        time.sleep(1.0)
+    style = {"tags": [x for x, _n in tag_n.most_common(15)], "hashtags": [x for x, _n in hash_n.most_common(10)]}
+    parts = [{"text": (
+        f"These are this week's most watched YouTube videos in India for {kind} stories in "
+        f"{'Bengali' if lang == 'bn' else 'Hindi'} (titles with views), and below the thumbnails of the top ones:\n"
+        + "\n".join(f"- {v['title']} ({v['views']:,} views)" for v in real[:10]) +
+        "\n\nDescribe the WINNING STYLE only (we make our own original videos; never copy a title, a person, a "
+        "picture or a channel). Answer ONLY JSON: {\"title_style\": \"2-3 English sentences: how these titles are "
+        "built - length, words that pull clicks, use of '|', emoji, numbers, 'সত্য ঘটনা' etc.\", \"thumb_style\": "
+        "\"2-3 English sentences: what the thumbnails show - colours, light, faces / expressions, the ghost, the "
+        "composition, how big the text is and its colour\", \"thumb_text_style\": \"one English sentence: how "
+        "many words of text on the thumbnail and what kind\"}")}]
+    for v in real[:4]:
+        try:
+            im = requests.get(f"https://i.ytimg.com/vi/{v['id']}/hqdefault.jpg", timeout=20)
+            if im.ok and len(im.content) > 3000:
+                parts.append({"inline_data": {"mime_type": "image/jpeg", "data": _b64.b64encode(im.content).decode()}})
+        except Exception:
+            pass
+    for model in (text_models(key)[:3] if key else []):
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": parts}], "generationConfig": {"temperature": 0.3}},
+                              timeout=120)
+            if not r.ok:
+                continue
+            text = "\n".join(p_.get("text", "") for p_ in r.json()["candidates"][0]["content"]["parts"])
+            got = load_json_loose(text[text.find("{"):text.rfind("}") + 1]) if "{" in text else {}
+            if isinstance(got, dict) and got.get("title_style"):
+                style.update({k_: str(got.get(k_, ""))[:500] for k_ in ("title_style", "thumb_style", "thumb_text_style")})
+                break
+        except Exception as e:
+            log(f"  trend style ({model}) failed: {str(e)[:100]}")
+    if style.get("title_style") or style.get("tags"):
+        log(f"  this week's winning style ({kind}): tags {', '.join(style['tags'][:6])} | "
+            f"{str(style.get('thumb_style', ''))[:120]}")
+    return style
+
+
+def trend_style_get(kind, lang, cache_dir=None):
+    """the saved style of the last 3 days (also in a later run that only posts)"""
+    k = f"{kind}_{lang}"
+    if k in TREND_STYLE:
+        return TREND_STYLE[k]
+    st = {}
+    try:
+        with open(os.path.join(cache_dir or os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets"),
+                               "trends.json"), encoding="utf-8") as f:
+            d = json.load(f).get(k) or {}
+        age = (dt.datetime.now(IST).date() - dt.date.fromisoformat(d.get("date", "2000-01-01"))).days
+        if age <= 3:
+            st = d.get("style") or {}
+    except Exception:
+        st = {}
+    TREND_STYLE[k] = st
+    return st
+
+
+def trend_style_rule(kind, lang, cache_dir=None):
+    """the writer's rule: our title and thumbnail words in the style of this week's most watched videos"""
+    st = trend_style_get(kind, lang, cache_dir)
+    if not st.get("title_style"):
+        return ""
+    return ("\nTITLE AND THUMBNAIL TEXT IN THIS WEEK'S WINNING STYLE (measured on the most watched videos of our "
+            f"kind on YouTube this week - follow the STYLE, never copy a title): titles - {st['title_style']} "
+            f"Thumbnail text - {st.get('thumb_text_style', '')}\n")
+
+
 def trending_topics(kind, lang, cache_dir):
     """Once a day: what Bengali / Indian viewers are watching NOW in this kind of video on YouTube and Facebook
     (found with Google Search) - so our stories ride the trend. Cached for the day in cache_dir/trends.json.
@@ -5096,11 +5312,38 @@ def trending_topics(kind, lang, cache_dir):
               "Hindi and English, each starting with #], \"keywords\": [8 exact phrases people type in YouTube search "
               "for this, in the story language and in English letters]}")
     topics, tags_, kws = [], [], []
+    real = []
+    try:
+        real = yt_trending(kind, lang) if env("YT_TRENDS") != "0" else []
+    except Exception as e:
+        log("  YouTube trend list failed:", str(e)[:100])
+    auto = []
+    if not real:
+        try:
+            auto = yt_autocomplete(TREND_QUERIES.get((kind, lang), [])[:4], lang)
+        except Exception:
+            auto = []
+    if real or auto:
+        # (11 Nov 2026) the REAL list: what is most watched on YouTube this week -> our own new stories on those topics
+        seen_ = ("\n".join(f"- {v['title']} ({v['views']:,} views, {v['age']})" for v in real) if real else
+                 "People are typing these in YouTube search right now:\n" + "\n".join(f"- {a_}" for a_ in auto))
+        prompt = (f"These are the most watched {what} on YouTube in India THIS WEEK:\n{seen_}\n\n"
+                  "Find what they have in common: the kind of place, the fear / the hook, the kind of people, the "
+                  "situation. Then give NEW story ideas for OUR channel that ride exactly these trends. RULES: never "
+                  "retell or copy any of these videos' stories, characters or titles - only the TOPIC (a new, original "
+                  "story); nothing from Sunday Suspense, Mirchi or any published author's story; no channel names; no "
+                  "copyrighted characters (only folk / public-domain ones). Answer ONLY JSON: {\"topics\": [6 short "
+                  "English lines, each one concrete ORIGINAL story idea with its place, its people and its hook, most "
+                  "trending first], \"hashtags\": [10 hashtags these viewers really use, Bengali/Hindi and English, "
+                  "each starting with #], \"keywords\": [8 exact phrases people type in YouTube search for this, in "
+                  "the story language and in English letters]}")
     for model in text_models(key)[:3]:
         try:
+            body_ = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.6}}
+            if not (real or auto):
+                body_["tools"] = [{"google_search": {}}]
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
-                              json={"contents": [{"parts": [{"text": prompt}]}], "tools": [{"google_search": {}}],
-                                    "generationConfig": {"temperature": 0.4}}, timeout=120)
+                              json=body_, timeout=120)
             if not r.ok:
                 log(f"  trends: {model} answered {r.status_code} ({'busy / limit reached' if r.status_code in (429, 503) else r.text[:80]})")
                 continue
@@ -5119,7 +5362,17 @@ def trending_topics(kind, lang, cache_dir):
     if not topics:                            # not remembered - the next run today tries again
         log("  trends: nothing found this time - today's story is written without them")
         return []
-    data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws}
+    style = {}
+    try:
+        style = trend_style(kind, lang, cache_dir, real)
+    except Exception as e:
+        log("  trend style skipped:", str(e)[:100])
+    if style.get("hashtags"):                 # the hashtags those videos REALLY use come first
+        tags_ = (style["hashtags"] + [h_ for h_ in tags_ if h_.lower() not in [x.lower() for x in style["hashtags"]]])[:12]
+    TREND_STYLE[k] = style
+    data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws, "style": style,
+               "youtube_top": [f"{v['title']} ({v['views']:,})" for v in real[:10]], "from": "youtube" if real else
+               ("search" if auto else "google")}
     try:
         os.makedirs(cache_dir, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
@@ -5137,8 +5390,8 @@ def trend_extras(kind, lang, cache_dir):
     try:
         with open(os.path.join(cache_dir, "trends.json"), encoding="utf-8") as f:
             d = json.load(f).get(f"{kind}_{lang}") or {}
-        if d.get("date") == dt.datetime.now(IST).date().isoformat():
-            return d.get("hashtags") or [], d.get("keywords") or []
+        if (dt.datetime.now(IST).date() - dt.date.fromisoformat(d.get("date", "2000-01-01"))).days <= 2:
+            return d.get("hashtags") or [], d.get("keywords") or []    # (stories are written the night before)
     except Exception:
         pass
     return [], []
@@ -5162,6 +5415,7 @@ def yt_autocomplete(seeds, lang):
 def seo_pack(kind, lang, cache_dir, seeds):
     """search words for this video: today's trending phrases + YouTube's own search suggestions"""
     tags_, kws = trend_extras(kind, lang, cache_dir)
+    kws = list(kws) + list(trend_style_get(kind, lang, cache_dir).get("tags") or [])[:10]
     auto = yt_autocomplete(seeds, lang) if env("SEO") != "0" else []
     words = []
     for w in kws + auto:

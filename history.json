@@ -2170,6 +2170,22 @@
   "riddle": {
    "q": "পা নেই কিন্তু চলে বহুদূর, মুখ নেই কিন্তু গান গায় সুমধুর। বল তো আমি কে?",
    "a": "নদী"
+  },
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "length_s": 579,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-11T03:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-11T03:04+00:00",
+   "thumb": true
   }
  },
  {

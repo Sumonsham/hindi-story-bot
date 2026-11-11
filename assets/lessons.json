@@ -1,17 +1,17 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-08T10:19+00:00",
+  "made": "2026-11-11T09:07+00:00",
   "lessons": [
-   "Bedtime and imaginative concepts ('বালিশ হতে চাওয়া মেঘের গল্প') drive the highest reach (266 views), proving strong initial interest in cozy, whimsical themes.",
-   "Openings need urgent fixing: the top-viewed video lost most viewers at just 3% completion, showing the first 5-10 seconds fail to hook.",
-   "Relatable school-life conflicts ('বুবাইয়ের নকল খাতা') achieve the highest retention (65.3% watch time), proving grounded childhood stories keep viewers watching.",
-   "Compilations (94–116 mins) suffer near-zero watch time (0.1%), showing long marathons do not retain viewers on this channel.",
-   "Detective and multi-part mystery adventures ('উল্টো পায়ের ছাপের রহস্য', 'অজানা দ্বীপের রহস্যময় ঘুড়ি') consistently pull above-average baseline interest."
+   "Compilation videos generate the highest organic reach (4 to 8 views vs 0-1 for standard shorts), showing audiences prefer bingeable story bundles.",
+   "Mystery, detective, and adventure themes ('অজানা দ্বীপের রহস্যময় ঘুড়ি', 'উল্টো পায়ের ছাপের রহস্য') drive the highest individual video views (3 views) and retention (1.5% - 2.9%).",
+   "Gopal Bhar stories maintain steady but low baseline engagement (1-2 views); frequent duplication of the same plots ('ষাঁড়ের দুধ', 'সোনার আংটি') within days leads to zero views due to fatigue.",
+   "Audience retention across standard uploads is near zero (0% to 3.2%), indicating stories lack immediate hooks in the first 5-10 seconds to stop scrolling.",
+   "Overall numbers are too small to statistically evaluate chapter lengths or endings, but multi-part mystery adventures clearly outperform standalone folk/festival moral tales."
   ],
   "titles": [
-   "Poetic and emotionally evocative titles ('বালিশ হতে চাওয়া মেঘের গল্প') vastly outperform formulaic classical folktale titles.",
-   "Mystery-driven question hooks ('উল্টো পায়ের ছাপের রহস্য') perform better and survive title testing without needing swaps.",
-   "Generic repetitive Gopal Bhar tropes ('সোনার আংটি', 'কৃপণ মহাজন') repeatedly fail to get clicks and require title swaps."
+   "Specific mystery hooks with concrete physical clues ('অজানা দ্বীপের রহস্যময় ঘুড়ি', 'উল্টো পায়ের ছাপের রহস্য') outperform generic moral and festival titles.",
+   "B-test swaps show that vague atmospheric titles ('বৃষ্টিভেজা রাতের রহস্যময় সুর', 'বাগানে খসে পড়া ছোট তারা') underperform and require concrete character/conflict focus.",
+   "Action-oriented challenges and riddles ('ইলিশ মাছ আর রাজার পরীক্ষা', 'বেতাল ও জীবন্ত সিংহ') yield higher clicks and likes than passive devotional titles."
   ],
   "requests": []
  }

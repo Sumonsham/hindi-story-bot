@@ -1248,6 +1248,39 @@ def fit(img, w=W, h=H):
     return bg
 
 
+# (11 Nov 2026) a woman or girl ALWAYS gets a woman's voice, whatever gender the writer wrote
+FEMALE_STRONG = ("পিশাচিনী", "পেত্নী", "পেতনি", "শাকচুন্নি", "শাঁকচুন্নি", "ডাইনি", "ডাকিনী", "যোগিনী", "ভৈরবী", "চুড়েল",
+                 "সুন্দরী", "মহিলা", "নারী", "বুড়ি", "বৃদ্ধা", "কন্যা", "মেয়ে", "বউ", "বৌ", "বৌদি", "পিসি", "মাসি", "দিদি",
+                 "ঠাকুমা", "দিদিমা", "কাকিমা", "জেঠিমা", "রানি", "রাণী", "দেবী", "ঠাকরুন", "গিন্নি", "মা ",
+                 "pishachini", "pisachini", "pishachi", "petni", "petni", "shakchunni", "shankchunni", "daini", "dakini",
+                 "yogini", "jogini", "bhairavi", "chudail", "churel", "witch", "sundari", "woman", "women", "girl", "lady",
+                 "wife", "widow", "mother", "grandmother", "grandma", "daughter", "sister", "aunt", "queen", "bride",
+                 "nun", "she-", "female", "mrs", "miss ", "didi", "boudi", "pishi", "mashi", "thakuma", "didima",
+                 "kakima", "jethima", "rani", "devi", "thakrun", "ginni", "kanya", "nari", "mahila", "buri",
+                 "पिशाचिनी", "चुड़ैल", "डायन", "योगिनी", "औरत", "लड़की", "माँ", "दादी", "नानी", "चाची", "भाभी", "दीदी",
+                 "मौसी", "बुआ", "देवी", "रानी")
+FEMALE_SERIES = {"karna pishachini", "the karna pishachini", "pishachini", "madhusundari", "matu pagli"}
+
+
+def is_woman(c):
+    """The ONE rule for a character's voice gender: the words about the person decide before the gender field."""
+    name = f" {c.get('name', '')} {c.get('name_local', '')} ".lower()
+    key = re.sub(r"\s+", " ", re.sub(r"[^a-z ]", " ", name)).strip()
+    if key in FEMALE_SERIES or key.replace("the ", "", 1) in FEMALE_SERIES or "pishachini" in key:
+        return True
+    if any(w in name for w in FEMALE_STRONG):
+        return True
+    g = str(c.get("gender", "")).lower().strip()
+    if g.startswith("f") or g in ("woman", "girl", "she"):
+        return True
+    if any(w in name for w in ("dada", "chacha", "mama", "baba", "uncle", "king", "raja", "दादा", "चाचा", "राजा", "बाबा")):
+        return False
+    about = f" {c.get('look', '')} {c.get('intro_en', '')} {c.get('intro', '')} ".lower()
+    she = len(re.findall(r"\b(?:she|her|hers|woman|girl|lady)\b", about))
+    he = len(re.findall(r"\b(?:he|him|his|man|boy)\b", about))
+    return bool(she >= 2 and she > 2 * he)
+
+
 class Cast:
     def __init__(self, story):
         self.setting = ascii_text(story.get("setting", ""))
@@ -1256,7 +1289,7 @@ class Cast:
             if isinstance(c, dict) and c.get("name"):
                 k = ascii_text(c["name"]).lower()
                 self.chars[k] = {"name": ascii_text(c["name"]), "look": ascii_text(c.get("look", "")),
-                                 "gender": str(c.get("gender", "male")).lower(),
+                                 "gender": "female" if is_woman(c) else "male",
                                  "age": str(c.get("age", "adult")).lower(),
                                  "kind": str(c.get("kind", "human")).lower()}
         self.ref = None

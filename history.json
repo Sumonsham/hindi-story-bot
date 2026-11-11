@@ -2120,7 +2120,23 @@
   "youtube": "KmDmltH5srk",
   "fb_reel": "2431448477674537",
   "fb_story": "1671266151212968",
-  "fb_reel2": "29691938483743476"
+  "fb_reel2": "29691938483743476",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 433,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-10T22:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-10T22:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-10T02:31+00:00",
@@ -2225,5 +2241,39 @@
   "fb_reel": "1650889190088843",
   "fb_story": "1643519823953391",
   "fb_reel2": "1482760390411262"
+ },
+ {
+  "date": "2026-11-11T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-11@8",
+  "pending_comments": [],
+  "category": "nature",
+  "idea": "the river that got sick",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "কাজল নদীর গোপন কান্না ও সাহেবের ম্যাজিক 🌊✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "প্লাস্টিকের বস্তা ও নোংরা আবর্জনা"
+  },
+  "title_b": "কাজল নদী কেন হঠাৎ কেঁদে উঠল? 🌊🔍",
+  "question_post": "2026-11-11",
+  "facebook": "1160952413558799",
+  "youtube": "cI_zlDerN1o",
+  "fb_reel": "2350694269048805",
+  "fb_story": "2161571661062725",
+  "fb_reel2": "1356460186496992",
+  "coloring": "122138578958735948",
+  "yt_short": "qEzlKYR8N6g",
+  "riddle_post": "122138588486735948",
+  "riddle": {
+   "q": "পা নেই তবু ছুটে চলে দিনরাত, তেষ্টা মেটায় সবার কিন্তু নেই তার হাত! বলো তো কে সে?",
+   "a": "নদী বা জলের ধারা"
+  }
  }
 ]

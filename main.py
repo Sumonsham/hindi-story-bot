@@ -3311,6 +3311,147 @@ def growth_after_post(title, results, lang, thumb, slot_hour):
         log("  fan channel post skipped:", str(e)[:100])
 
 
+def weekly_live(history):
+    """SUNDAY MORNING LIVE on YouTube - 'গল্পের আসর': the week's best cartoon stories one after another, with
+    cards between them that greet the children / families in the live chat by name; the bot answers in the chat."""
+    global FONT
+    import threading
+    lang = next((h.get("lang") for h in reversed(history) if h.get("lang") and not h.get("kind")), None) \
+        or env("CHANNEL_LANG") or "bn"
+    lang = lang if lang in ("bn", "hi") else "bn"
+    FONT = find_font(lang)
+    BN = lang == "bn"
+    if MOCK or DRY_RUN or not youtube_ready() or env("YT_LIVE") == "0":
+        log("Live: not in this run")
+        return
+    hours = float(env("LIVE_HOURS") or 2.0)
+    now = dt.datetime.now(dt.timezone.utc)
+    cands = []
+    for h in history:
+        if h.get("kind") or not h.get("facebook") or not h.get("youtube"):
+            continue
+        try:
+            age = (now - dt.datetime.fromisoformat(str(h["date"]))).days
+        except Exception:
+            continue
+        if age <= 60:
+            cands.append(((age <= 7) * 1000 + extras.score(h.get("stats") or {}), h))
+    cands.sort(key=lambda x: -x[0])
+    clips, titles, total = [], [], 0.0
+    for _s, h in cands:
+        if total >= hours * 3600:
+            break
+        try:
+            src, _l = extras.fb_video_source(h["facebook"])
+            if not src:
+                continue
+            raw = extras.download(src, os.path.join(WORK, f"lraw_{len(clips)}.mp4"))
+            c = extras.live_clip(raw, os.path.join(WORK, f"l_{len(clips):02d}.mp4"))
+            os.remove(raw)
+            clips.append(c)
+            titles.append(re.sub(r"\s*[|].*$", "", str(h.get("title", ""))).strip())
+            total += duration(c)
+            log(f"  live: {titles[-1][:50]} ({duration(c) / 60:.0f} min)")
+        except Exception as e:
+            log("  live: a video skipped:", str(e)[:120])
+    if len(clips) < 2:
+        log("Live: not enough videos - no live tonight")
+        return
+    bg = os.path.join(WORK, "live_bg.jpg")
+    run(["ffmpeg", "-y", "-loglevel", "error", "-ss", "60", "-i", clips[0], "-frames:v", "1", bg])
+    names = []
+
+    def card(k, secs=10.0):
+        bn_ = [x for x in names[-8:] if re.search(r"[\u0980-\u09FF]", x)][-4:]
+        en_ = [x for x in names[-8:] if not re.search(r"[\u0980-\u09FF]", x)][-4:]
+        bn_ = [x for x in names[-8:] if re.search(r"[\u0900-\u09FF]", x)][-4:]
+        en_ = [x for x in names[-8:] if not re.search(r"[\u0900-\u09FF]", x)][-4:]
+        who = ([("লাইভে আছে" if BN else "लाइव में हैं")] + ([", ".join(bn_)] if bn_ else []) +
+               ([", ".join(en_)] if en_ else [])) if names else [("সবাই মিলে গল্প শুনি" if BN else "आओ मिलकर कहानी सुनें")]
+        lines = ([("গল্পের আসর - লাইভ" if BN else "कहानी का मेला - लाइव"), ("প্রথম গল্প" if BN else "पहली कहानी"),
+                  titles[0][:36]] if k == 0 else [("পরের গল্প" if BN else "अगली कहानी"), titles[k][:40]]) + who
+        sizes_ = [96, 64] + [56] * 4
+        img = extras.text_card(bg, lines, os.path.join(WORK, f"card_{k}.jpg"), FONT, sizes=sizes_)
+        tmp = os.path.join(WORK, f"c_{k:02d}.tmp.mp4")
+        extras.live_card(img, secs, tmp)
+        os.replace(tmp, os.path.join(WORK, f"c_{k:02d}.mp4"))
+    for k in range(len(clips)):
+        card(k)
+    lst = os.path.join(WORK, "live.txt")
+    with open(lst, "w") as f:
+        for k, c in enumerate(clips):
+            f.write(f"file 'c_{k:02d}.mp4'\nfile '{os.path.basename(c)}'\n")
+    title = ("✨ গল্পের আসর - লাইভ | একটানা ছোটদের গল্প | Bangla Cartoon Live" if BN else
+             "✨ कहानी का मेला - लाइव | लगातार बच्चों की कहानियाँ | Hindi Cartoon Live")
+    desc = (("আজ একটানা সপ্তাহের সেরা কার্টুন গল্প। চ্যাটে নাম লেখো - পরের গল্পের আগে পর্দায় তোমার নাম দেখাবে!" if BN else
+             "आज लगातार हफ़्ते की सबसे अच्छी कार्टून कहानियाँ। चैट में अपना नाम लिखो - अगली कहानी से पहले स्क्रीन पर "
+             "तुम्हारा नाम दिखेगा!") + "\n\n" + "\n".join(f"{k + 1}. {t}" for k, t in enumerate(titles)))
+    thumb = extras.text_card(bg, (["গল্পের আসর", "লাইভ", "একটানা ছোটদের গল্প"] if BN else
+                                  ["कहानी का मेला", "लाइव", "लगातार बच्चों की कहानियाँ"]),
+                             os.path.join(WORK, "live_thumb.jpg"), FONT)
+    try:
+        bid, rtmp, chat = extras.yt_live_create(title, desc, thumb)
+    except Exception as e:
+        msg = str(e)
+        log("Live could not start:", msg[:300])
+        if "liveStreamingNotEnabled" in msg or "not enabled" in msg.lower():
+            extras.telegram("⚠️ কার্টুন চ্যানেলে রবিবারের লাইভ হলো না: আপনার YouTube চ্যানেলে লাইভ এখনো চালু নয়। একবার YouTube Studio-তে "
+                            "'Create → Go live' টিপে ফোন নম্বর দিয়ে যাচাই করুন - ২৪ ঘণ্টা পরে লাইভ চালু হয়ে যাবে, তারপর "
+                            "bot নিজেই প্রতি রবিবার লাইভ করবে।")
+        return
+    link = f"https://www.youtube.com/watch?v={bid}"
+    log("LIVE:", link)
+    extras.telegram(f"🔴 কার্টুন লাইভ শুরু হচ্ছে: {link}")
+    live_txt = (f"🔴 এখন YouTube-এ লাইভ - গল্পের আসর! একটানা সপ্তাহের সেরা কার্টুন গল্প, চ্যাটে নাম লিখলে পর্দায় "
+                f"দেখাবে ✨\n{link}" if BN else
+                f"🔴 अभी YouTube पर लाइव - कहानी का मेला! लगातार हफ़्ते की सबसे अच्छी कार्टून कहानियाँ, चैट में नाम "
+                f"लिखो तो स्क्रीन पर दिखेगा ✨\n{link}")
+    extras.tg_channel_post(ASSETS, live_txt, thumb)
+    try:
+        if env("FB_PAGE_TOKEN"):
+            extras.fb_photo(thumb, live_txt)
+    except Exception:
+        pass
+    starts, t = [], 0.0
+    for c in clips:
+        starts.append(t)
+        t += 10.0 + duration(c)
+    stop = threading.Event()
+
+    def watcher():
+        tok, said, t0 = None, 0, time.time()
+        while not stop.is_set():
+            try:
+                if chat:
+                    msgs, tok = extras.yt_live_chat(chat, tok)
+                    for a, _m in msgs:
+                        if a and a not in names:
+                            names.append(a)
+                            if said < int(env("LIVE_REPLIES") or 8):
+                                said += extras.yt_live_say(chat, (f"স্বাগতম {a} ✨ পরের গল্পের আগে পর্দায় তোমার নাম থাকবে"
+                                                                  if BN else f"स्वागत है {a} ✨ अगली कहानी से पहले "
+                                                                  "स्क्रीन पर तुम्हारा नाम होगा"))
+                el = time.time() - t0
+                for k in range(1, len(clips)):        # the next card: made again with the newest names
+                    if starts[k] - 150 <= el < starts[k] - 40:
+                        card(k)
+            except Exception as e:
+                log("  live chat:", str(e)[:80])
+            stop.wait(int(env("LIVE_CHAT_SEC") or 120))
+    th = threading.Thread(target=watcher, daemon=True)
+    th.start()
+    try:
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-re", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy",
+                        "-f", "flv", rtmp], cwd=WORK, timeout=int(hours * 3600 + 3600))
+    finally:
+        stop.set()
+    log(f"Live finished ({t / 60:.0f} min, {len(names)} people in the chat)")
+    history.append({"date": now.isoformat(timespec="minutes"), "lang": lang, "kind": "live", "youtube": bid,
+                    "title": title, "people": len(names)})
+    save_history(history)
+    extras.telegram(f"✅ কার্টুন লাইভ শেষ: {t / 60:.0f} মিনিট, চ্যাটে {len(names)} জন। {link}")
+
+
 def main():
     global FONT
     pass
@@ -3335,6 +3476,8 @@ def main():
             growth_start(history)
         except Exception as e:
             log("  growth start skipped:", str(e)[:150])
+    if env("MODE") == "live":
+        return weekly_live(history)
     if extras.bot_paused(MY_STORIES) and not MOCK:
         log("PAUSED from Telegram ('বন্ধ') - no video this time. Send 'চালু' to start again.")
         return

@@ -623,7 +623,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   }
  },
  {
@@ -941,7 +941,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   }
  },
  {
@@ -1230,12 +1230,12 @@
   "stats": {
    "likes": 1,
    "comments": 0,
-   "views": 8,
+   "views": 10,
    "length_s": 5645,
-   "yt_views": 4,
-   "yt_avg_s": 5,
+   "yt_views": 9,
+   "yt_avg_s": 3,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   }
  },
  {
@@ -1270,7 +1270,7 @@
    "yt_views": 1,
    "yt_avg_s": 8,
    "yt_avg_pct": 1.8,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   }
  },
  {
@@ -1562,7 +1562,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1896,7 +1896,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-08T22:03+00:00"
+   "checked": "2026-11-11T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2272,7 +2272,21 @@
   "youtube": "idfExtBYwQE",
   "fb_reel": "1650889190088843",
   "fb_story": "1643519823953391",
-  "fb_reel2": "1482760390411262"
+  "fb_reel2": "1482760390411262",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 2,
+   "length_s": 431,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-11T22:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 2
+  }
  },
  {
   "date": "2026-11-11T02:31+00:00",
@@ -2306,6 +2320,39 @@
   "riddle": {
    "q": "পা নেই তবু ছুটে চলে দিনরাত, তেষ্টা মেটায় সবার কিন্তু নেই তার হাত! বলো তো কে সে?",
    "a": "নদী বা জলের ধারা"
+  }
+ },
+ {
+  "date": "2026-11-12T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-12@8",
+  "pending_comments": [],
+  "category": "fairy",
+  "idea": "the fairy queen's lost crown",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "পরীর রানীর হারানো মুকুট ও নদীর গোপন রহস্য! 👑✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "নরম পালক"
+  },
+  "title_b": "রাতের অন্ধকারে কোথায় গেল জাদুকরী মুকুট? 🌲🔍",
+  "question_post": "2026-11-12",
+  "facebook": "2377422969696811",
+  "youtube": "wwEZbTu0ZD8",
+  "fb_reel": "1809544676982366",
+  "fb_story": "1623626515408931",
+  "fb_reel2": "3403876549795534",
+  "yt_short": "VbcPgJblqtk",
+  "riddle_post": "122138763968735948",
+  "riddle": {
+   "q": "বলি তো দেখি ভাই—ডানা আছে কিন্তু পাখি নই, আলো ছড়াই রাতে কিন্তু তারা নই! আমি কে?",
+   "a": "জোনাকি"
   }
  }
 ]

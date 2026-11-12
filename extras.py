@@ -1493,6 +1493,16 @@ def text_models(key):
     return list(_TEXT_MODELS)
 
 
+def helper_models(key):
+    """(13 Nov 2026) the LIGHT models first, for the small helper jobs (trends, replies, translations, picking a
+    thumbnail, the voice notes ...): the strong models' small free daily limit is kept for WRITING THE STORIES - the
+    night run found every strong model 'used up for today' and the story came out short and weak."""
+    allm = text_models(key)
+    lite = [m for m in allm if "lite" in m]
+    rest = [m for m in allm if "lite" not in m]
+    return (lite[:3] + rest[-2:]) if lite else allm
+
+
 def tts_keys():
     # ONE free key only (Google's free limit is meant per person / project - using extra keys to get round it
     # breaks Google's rules and can get the accounts blocked)
@@ -4542,7 +4552,7 @@ def yt_localizations(title, description, lang, key):
               f"TITLE: {base}\nSUMMARY: {summary[:700]}\n"
               "Answer ONLY JSON: {" + ", ".join(f'"{x}": {{"title": "", "summary": ""}}' for x in targets) + "}")
     out = {}
-    for model in text_models(key)[:3]:
+    for model in helper_models(key)[:4]:
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": [{"text": prompt}]}],
@@ -5017,11 +5027,17 @@ def reply_fans(history, lang, max_n=5):
            "Return ONLY a JSON list of strings in the same order.\n" +
            "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
     try:
-        r = requests.post(f"{GEMINI_BASE}/models/gemini-flash-latest:generateContent", headers={"x-goog-api-key": key},
-                          json={"contents": [{"parts": [{"text": ask}]}],
-                                "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
-                          timeout=90)
-        replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+        replies = None
+        for model in helper_models(key)[:3]:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": ask}]}],
+                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
+                              timeout=90)
+            if r.ok:
+                replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                break
+        if replies is None:
+            raise RuntimeError("no model answered")
     except Exception as e:
         log("  fan replies skipped:", str(e)[:120])
         return False
@@ -5240,7 +5256,7 @@ def trend_style(kind, lang, cache_dir, real):
                 parts.append({"inline_data": {"mime_type": "image/jpeg", "data": _b64.b64encode(im.content).decode()}})
         except Exception:
             pass
-    for model in (text_models(key)[:3] if key else []):
+    for model in (helper_models(key)[:4] if key else []):
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": parts}], "generationConfig": {"temperature": 0.3}},
@@ -5304,8 +5320,9 @@ def trending_topics(kind, lang, cache_dir):
     except Exception:
         data = {}
     k = f"{kind}_{lang}"
-    if (data.get(k) or {}).get("date") == today:
-        return data[k].get("topics", [])
+    old = data.get(k) or {}
+    if old.get("date") == today and (old.get("topics") or int(old.get("tries") or 0) >= 2):
+        return old.get("topics", [])
     what = ("Bengali / Hindi horror audio stories (bhuter golpo, bhoot ki kahani, Sunday-suspense style radio "
             "dramas, true ghost experiences)" if kind == "horror" else
             "Bengali / Hindi children's cartoon and moral stories (Gopal Bhar, Thakurmar Jhuli, Panchatantra, "
@@ -5319,10 +5336,13 @@ def trending_topics(kind, lang, cache_dir):
               "for this, in the story language and in English letters]}")
     topics, tags_, kws = [], [], []
     real = []
-    try:
-        real = yt_trending(kind, lang) if env("YT_TRENDS") != "0" else []
-    except Exception as e:
-        log("  YouTube trend list failed:", str(e)[:100])
+    if old.get("date") == today and old.get("real"):
+        real = old["real"]                            # (searched once today already - not again)
+    else:
+        try:
+            real = yt_trending(kind, lang) if env("YT_TRENDS") != "0" else []
+        except Exception as e:
+            log("  YouTube trend list failed:", str(e)[:100])
     auto = []
     if not real:
         try:
@@ -5343,7 +5363,7 @@ def trending_topics(kind, lang, cache_dir):
                   "trending first], \"hashtags\": [10 hashtags these viewers really use, Bengali/Hindi and English, "
                   "each starting with #], \"keywords\": [8 exact phrases people type in YouTube search for this, in "
                   "the story language and in English letters]}")
-    for model in text_models(key)[:3]:
+    for model in helper_models(key)[:4]:
         try:
             body_ = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.6}}
             if not (real or auto):
@@ -5365,8 +5385,27 @@ def trending_topics(kind, lang, cache_dir):
                 break
         except Exception as e:
             log(f"  trends ({model}) failed: {str(e)[:100]}")
-    if not topics:                            # not remembered - the next run today tries again
+    if not topics and real:
+        # (13 Nov 2026: Gemini was busy at night and the YouTube list was thrown away) - without Gemini: the topics
+        # of the most watched titles themselves, as ORIGINAL new stories on the same topic
+        for v in real[:6]:
+            head = re.split(r"\s*(?:\|\||\||#|-{2,})\s*", v["title"])[0].strip()
+            head = re.sub(r"(?i)\b(?:bhuter cartoon|cartoon|horror thriller|bengali horror|full|episode \d+|ep \d+)\b", "",
+                          head).strip(" -:|")
+            if len(head) >= 4:
+                topics.append(f"an ORIGINAL new story on the same topic as this week's much-watched video '{head}' "
+                              "(only the topic - our own place, people, events and twist)")
+        if topics:
+            log("  trends: Gemini busy - the topics are taken from the most watched titles themselves")
+    if not topics:                            # not remembered - the next run today tries again (twice at most)
         log("  trends: nothing found this time - today's story is written without them")
+        data[k] = {"date": today, "topics": [], "real": real[:15],
+                   "tries": (int(old.get("tries") or 0) + 1) if old.get("date") == today else 1}
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=1)
+        except Exception:
+            pass
         return []
     style = {}
     try:
@@ -5376,7 +5415,7 @@ def trending_topics(kind, lang, cache_dir):
     if style.get("hashtags"):                 # the hashtags those videos REALLY use come first
         tags_ = (style["hashtags"] + [h_ for h_ in tags_ if h_.lower() not in [x.lower() for x in style["hashtags"]]])[:12]
     TREND_STYLE[k] = style
-    data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws, "style": style,
+    data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws, "style": style, "real": real[:15],
                "youtube_top": [f"{v['title']} ({v['views']:,})" for v in real[:10]], "from": "youtube" if real else
                ("search" if auto else "google")}
     try:
@@ -5492,7 +5531,7 @@ def learn_lessons(history, kind, lang, cache_dir):
                 "that the numbers really support], \"titles\": [3 lessons about titles / hooks that got more clicks], "
                 "\"requests\": [up to 6 concrete things viewers asked for in the comments: a ghost, a place, a "
                 "character, a kind of story]}. Be honest - if the numbers are too few to tell, say less.")
-    for model in text_models(key)[:3]:
+    for model in helper_models(key)[:4]:
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": [{"text": prompt}]}],
@@ -6182,7 +6221,7 @@ def yt_reply_fans(history, lang, kind="horror", max_n=5):
            "a JSON list of strings in the same order.\n"
            + "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
     replies = []
-    for model in text_models(key)[:3]:
+    for model in helper_models(key)[:4]:
         try:
             r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                               json={"contents": [{"parts": [{"text": ask}]}],
@@ -6466,7 +6505,7 @@ def viewer_voice_process(path_dir, max_n=2):
                    "(not a joke, not a request, not abuse)? Leave out any phone number, full address or full names "
                    "of private people. Answer ONLY JSON: {\"text\": \"...\", \"is_experience\": true/false}")
             got = {}
-            for model in text_models(key)[:3]:
+            for model in helper_models(key)[:4]:
                 r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
                                   json={"contents": [{"parts": [{"text": ask}, {"inline_data": {
                                       "mime_type": it.get("mime") or "audio/ogg",

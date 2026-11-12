@@ -320,9 +320,15 @@ EPIC = {
              "Chapter 17 - three kinds of faith", "Chapter 18 - surrender to Me (18.66)"],
 }
 MYTH = ("ramayan", "mahabharat", "gita")
+STYLE_3D = os.getenv("CARTOON_STYLE", "3d").lower() != "2d"     # v80: every cartoon in a bright 3D film look
 MYTH_STYLE = ("majestic, reverent, high quality 2D Indian devotional animation still for all ages, rich traditional "
               "Indian painting colours (gold, saffron, deep blue, red), divine soft golden light, graceful dignified "
               "faces, traditional iconography, cinematic composition, no text, no letters, no watermark")
+if STYLE_3D:
+    MYTH_STYLE = ("majestic, reverent, high quality 3D animated Indian devotional feature-film still for all ages, "
+                  "smooth stylized 3D characters with graceful dignified faces and gentle expressions, traditional "
+                  "iconography and costumes, rich gold, saffron, deep blue and red, divine soft golden light, warm glow, "
+                  "cinematic composition, clean and bright, no text, no letters, no watermark")
 MYTH_LOOKS = {
     "rama": "Lord Rama: divine young prince with a calm, compassionate face, soft dark-blue (shyam) complexion, long black "
             "hair, tall golden crown (mukut), tilak on the forehead, yellow silk dhoti and saffron-gold angavastram, "
@@ -354,9 +360,99 @@ MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman"
 # the weekly routine: the 1 PM story of each day is always this series (Mon=0 ... Sun=6)
 DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
 # the weekly programme (0 = Monday) - every day and time has its own kind of story, like a children's TV channel
-MORNING_GRID = {0: "panchatantra", 1: "moral", 2: "nature", 3: "fairy", 4: "jataka", 5: "animal", 6: "gita"}
-EVENING_GRID = {0: "folk", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "para", 6: "mahabharat"}
+MORNING_GRID = {0: "panchatantra", 1: "cnotun", 2: "nature", 3: "fairy", 4: "jataka", 5: "animal", 6: "gita"}
+EVENING_GRID = {0: "cnotun", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "cnotun", 6: "mahabharat"}
+# v80 ('cnotun'): our five NEW cartoon series take turns there (see CARTOON_SERIES)
 SERIES_CATS = ("adventure", "detective", "folk", "para")      # big stories told in 2-3 parts at 7 PM
+
+# v80: five ORIGINAL cartoon series with their own recurring children and friends, shaped after the kinds of
+# cartoons Indian families watch most on YouTube now (friendly-ghost cartoons, magic objects, kid detectives,
+# grandma's tales, a funny robot) - our own characters and stories only, never a copy of any show.
+CARTOON_SERIES = {
+    "bhutu": {"bn": "ভুতুর কাণ্ড", "hi": "भूतू के कारनामे",
+              "rule": ("OUR OWN SERIES 'BHUTU' (one complete episode): BHUTU is a tiny, round, friendly little ghost who "
+                       "lives in the old banyan tree of a Bengal village - funny, kind, never scary; he can float, turn "
+                       "invisible and get into silly trouble. His two human friends TUBLU and MINI keep his secret. Every "
+                       "episode Bhutu tries to help, makes a funny mess, and the friends fix it together with a lesson "
+                       "(kindness, honesty, courage). Absolutely nothing frightening for small children. Use EXACTLY "
+                       "these looks: [{\"name\": \"Bhutu\", \"gender\": \"male\", \"age\": \"child\", \"kind\": \"magic friend\", "
+                       "\"look\": \"a tiny round soft white friendly little ghost, glowing gently, big shiny black eyes, "
+                       "rosy cheeks, a happy wide smile, a tiny curl on top, a small orange scarf\"}, {\"name\": \"Tublu\", "
+                       "\"gender\": \"male\", \"age\": \"child\", \"kind\": \"human\", \"look\": \"a cheerful Bengali boy "
+                       "of about nine, messy black hair, a yellow T-shirt, blue shorts, a band-aid on one knee\"}, "
+                       "{\"name\": \"Mini\", \"gender\": \"female\", \"age\": \"child\", \"kind\": \"human\", \"look\": "
+                       "\"a clever Bengali girl of about eight, two pigtails with red ribbons, a pink frock with white dots, "
+                       "big round glasses\"}]. The TITLE starts with 'ভুতুর কাণ্ড: ' (Hindi: 'भूतू के कारनामे: ')."),
+              "ideas": ["Bhutu helps at the village fair", "Bhutu and the lost goat", "Bhutu learns to say sorry",
+                        "Bhutu and the school sports day", "Bhutu's first rainy day"],
+              "q": {"bn": ["ভূতের কার্টুন", "bhuter cartoon", "মজার ভূতের কার্টুন"], "hi": ["bhoot wala cartoon", "funny bhoot cartoon"]}},
+    "jadu": {"bn": "জাদু পেন্সিল", "hi": "जादुई पेंसिल",
+             "rule": ("OUR OWN SERIES 'THE MAGIC PENCIL' (one complete episode; the magic-brush idea is an old folk "
+                      "motif, our story and people are new): RIMLI, a kind village girl, has a magic pencil - whatever she "
+                      "draws becomes real for one day. Every episode she draws something to help someone, it goes "
+                      "funnily or a little wrong, and she learns to use it wisely; greedy people never get the pencil. "
+                      "Use EXACTLY these looks: [{\"name\": \"Rimli\", \"gender\": \"female\", \"age\": \"child\", "
+                      "\"kind\": \"human\", \"look\": \"a bright Bengali girl of about ten, long black braid with a yellow "
+                      "ribbon, a sky-blue frock, a small cloth school bag, holding a glowing golden pencil\"}, {\"name\": "
+                      "\"Bhola\", \"gender\": \"male\", \"age\": \"child\", \"kind\": \"animal\", \"look\": \"Rimli's "
+                      "fluffy brown-and-white puppy with floppy ears and a red collar\"}]. The TITLE starts with "
+                      "'জাদু পেন্সিল: ' (Hindi: 'जादुई पेंसिल: ')."),
+             "ideas": ["Rimli draws a bridge over the river", "Rimli draws rain for the dry village", "Rimli draws a friend for a lonely boy"],
+             "q": {"bn": ["জাদুর গল্প কার্টুন", "jadu pencil cartoon bangla"], "hi": ["jadui pencil cartoon", "जादुई पेंसिल"]}},
+    "tukai": {"bn": "টুকাই গোয়েন্দা", "hi": "टुकाई जासूस",
+              "rule": ("OUR OWN SERIES 'TUKAI THE DETECTIVE' (one complete case): TUKAI, a ten-year-old boy detective with a "
+                       "magnifying glass, and his clever dog BHULU solve a small mystery in their Kolkata para (a missing "
+                       "cricket ball, the sweet shop's vanished rasgullas ...). Fair clues the viewers can follow, no "
+                       "crime, nobody hurt, the culprit is forgiven. Use EXACTLY these looks: [{\"name\": \"Tukai\", "
+                       "\"gender\": \"male\", \"age\": \"child\", \"kind\": \"human\", \"look\": \"a smart Bengali boy of "
+                       "about ten, short neat hair, a brown checked cap, an orange half-sleeve shirt, khaki shorts, a big "
+                       "magnifying glass\"}, {\"name\": \"Bhulu\", \"gender\": \"male\", \"age\": \"young\", \"kind\": "
+                       "\"animal\", \"look\": \"a clever golden-brown street dog with one white ear and a blue collar\"}]. "
+                       "The TITLE starts with 'টুকাই গোয়েন্দা: ' (Hindi: 'टुकाई जासूस: ')."),
+              "ideas": ["the case of the missing cricket ball", "who ate the sweet shop's rasgullas", "the mystery of the midnight bell"],
+              "q": {"bn": ["গোয়েন্দা কার্টুন", "detective cartoon bangla"], "hi": ["jasoos cartoon hindi", "detective cartoon kids"]}},
+    "didima": {"bn": "দিদিমার ঝুলি", "hi": "नानी की पोटली",
+               "rule": ("OUR OWN SERIES 'GRANDMA'S BAG OF TALES' (one complete episode): at night grandma DIDIMA tells her "
+                        "grandchildren PUPU and TATAI a NEW fairy tale (রূপকথা - kings, queens, talking birds, magic, an "
+                        "old public-domain style but your own new story), and the children ask little questions in between; "
+                        "it ends with a warm lesson and the children falling asleep. Use EXACTLY these looks: [{\"name\": "
+                        "\"Didima\", \"gender\": \"female\", \"age\": \"old\", \"kind\": \"human\", \"look\": \"a sweet "
+                        "Bengali grandmother of about seventy, white hair in a bun, round glasses, a white saree with a thin "
+                        "red border, a warm shawl, a cloth bag of stories\"}, {\"name\": \"Pupu\", \"gender\": \"female\", "
+                        "\"age\": \"child\", \"kind\": \"human\", \"look\": \"a little Bengali girl of about seven, short bob "
+                        "hair, a purple night frock\"}, {\"name\": \"Tatai\", \"gender\": \"male\", \"age\": \"child\", "
+                        "\"kind\": \"human\", \"look\": \"a little Bengali boy of about nine, curly hair, green striped "
+                        "pyjamas\"}]. The TITLE starts with 'দিদিমার ঝুলি: ' (Hindi: 'नानी की पोटली: ')."),
+               "ideas": ["the princess who talked to the moon", "the seven-coloured bird of the king's garden", "the poor boy and the golden fish"],
+               "q": {"bn": ["ঠাকুরমার ঝুলি কার্টুন", "rupkothar golpo cartoon"], "hi": ["nani ki kahani cartoon", "dadi maa ki kahaniyan"]}},
+    "robi": {"bn": "রোবট রবি", "hi": "रोबोट रवि",
+             "rule": ("OUR OWN SERIES 'ROBOT ROBI' (one complete episode): ROBI, a small friendly home robot, lives with "
+                      "the Sen family in Kolkata and their girl JHILIK. Robi is clever with machines but does not understand "
+                      "people's feelings - every episode he gets something funny wrong and Jhilik teaches him a human "
+                      "value (sharing, patience, respect for elders); light science facts, lots of laughs. Use EXACTLY "
+                      "these looks: [{\"name\": \"Robi\", \"gender\": \"male\", \"age\": \"child\", \"kind\": \"robot\", "
+                      "\"look\": \"a small round friendly white-and-sky-blue robot with a screen face showing two big blue "
+                      "LED eyes and a smile, a little antenna with a red light, small wheels instead of feet\"}, {\"name\": "
+                      "\"Jhilik\", \"gender\": \"female\", \"age\": \"child\", \"kind\": \"human\", \"look\": \"a lively "
+                      "Bengali girl of about ten, ponytail, a yellow T-shirt with a star, denim dungarees\"}]. The TITLE "
+                      "starts with 'রোবট রবি: ' (Hindi: 'रोबोट रवि: ')."),
+             "ideas": ["Robi tries to cook luchi", "Robi and Grandpa's old radio", "Robi learns to share"],
+             "q": {"bn": ["রোবট কার্টুন বাংলা", "robot cartoon bangla"], "hi": ["robot cartoon hindi", "रोबोट कार्टून"]}},
+}
+for _k, _s in CARTOON_SERIES.items():
+    CATEGORIES[_k] = list(_s["ideas"])
+    LANGS["bn"]["labels"][_k] = _s["bn"]
+    LANGS["hi"]["labels"][_k] = _s["hi"]
+    extras.CAT_QUERIES[("cartoon", _k)] = _s["q"]
+
+
+def pick_cartoon_series(history):
+    """the next of our new cartoon series: the one not shown for the longest time"""
+    last = {k: "" for k in CARTOON_SERIES}
+    for h in history:
+        if h.get("category") in CARTOON_SERIES:
+            last[h["category"]] = max(last[h["category"]], str(h.get("date", "")))
+    return sorted(CARTOON_SERIES, key=lambda k: last[k])[0]
 NEXT_PART = os.path.join(HERE, "next_part.json")
 
 SOUND_TAGS = ["wind", "rain", "thunder", "crickets", "birds", "water", "footsteps", "creak", "knock",
@@ -367,6 +463,14 @@ EMOTIONS = ["normal", "happy", "excited", "laughing", "sad", "crying", "scared",
 ART_STYLE = ("high quality 2D cartoon animation still for all ages (family animated film), Indian storybook world, bright cheerful colors, "
              "soft lighting, clean outlines, cute expressive characters with big eyes, Pixar-like charm, "
              "no text, no letters, no watermark")
+if STYLE_3D:
+    # (13 Nov 2026) a bright, polished 3D animated-film look: rounded friendly characters, clean faces with big eyes,
+    # soft global light - the faces stay simple and clean, so they never look strange or 'uncanny'
+    ART_STYLE = ("high quality 3D animated family feature-film still for all ages, Indian storybook world, cute stylized "
+                 "3D characters with soft rounded shapes, big expressive eyes, clean simple faces and friendly smiles, "
+                 "smooth clean surfaces, bright vivid cheerful colours, soft warm global illumination, gentle rim light, "
+                 "soft shadows, shallow depth of field, cinematic composition, crisp and sharp, no text, no letters, "
+                 "no watermark, no distorted faces, no extra fingers")
 
 
 def log(*a):
@@ -461,13 +565,17 @@ def pick_language(history):
 
 DIVINE_FESTIVALS = {"Durga Puja", "Kojagari Lakshmi Puja", "Kali Puja / Diwali", "Saraswati Puja", "Maha Shivaratri",
                     "Sri Ramakrishna's birthday", "Holi / Dol Purnima", "Ram Navami", "Bhoot Chaturdashi"}
-MASCOT = os.path.join(HERE, "assets", "lumi_mithu.jpg")
+MASCOT = os.path.join(HERE, "assets", "lumi_mithu_3d.jpg" if os.getenv("CARTOON_STYLE", "3d").lower() != "2d"
+                      else "lumi_mithu.jpg")   # (the 3D Lumi Didi is made once, then kept)
 MASCOT_PROMPT = ("Lumi Didi, a warm friendly young Indian storyteller woman in high quality 2D cartoon style, big kind "
                  "sparkling eyes, gentle smile, long black braid with a small yellow flower, sky-blue saree with a "
                  "golden border, small star-shaped bindi, holding an open glowing storybook in one hand and waving "
                  "hello with the other, a small cheeky bright-green parrot with a red beak (Mithu) sitting on her "
                  "shoulder, sitting on a cozy colorful cushion, soft magical sparkles, bright cheerful "
                  "storybook background, Pixar-like charm, no text, no letters, no watermark")
+if os.getenv("CARTOON_STYLE", "3d").lower() != "2d":
+    MASCOT_PROMPT = MASCOT_PROMPT.replace("in high quality 2D cartoon style", "as a high quality stylized 3D animated "
+                                          "film character with soft rounded shapes and a clean friendly face, bright soft light")
 
 
 MITHU = {"name": "Mithu", "gender": "male", "age": "child", "kind": "animal", "host": True,
@@ -703,14 +811,15 @@ SETS = {   # the same set looks the same in every episode (made once, saved in a
 SET_DIR = os.path.join(HERE, "assets", "sets")
 SET_VER = {"gopal_home": 2}      # a new number = that set is painted again (once) with its new description
 SET_RULE = ("EMPTY place, nobody in the picture: no people, no animals, no throne, no chairs in the middle. "
-            "Eye-level wide view, the floor or ground clearly visible in the lower third, open space in front. "
-            "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, "
+            "Eye-level wide view, the floor or ground clearly visible in the lower third, open space in front. " +
+            ("Detailed 3D animated-film background, bright soft colours, " if STYLE_3D else
+             "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, ") +
             "no text, no letters, no watermark")
 
 
 def puppet_ready(category=None):
     """the character packs this video can use (empty = the old way)"""
-    if puppet is None or env("PUPPET") == "0":
+    if puppet is None or env("PUPPET") == "0" or (STYLE_3D and env("PUPPET") != "1"):
         return set()
     av = puppet.available()
     if category is not None and (category not in PUPPET_SERIES or "gopal" not in av):
@@ -1042,7 +1151,8 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                 "chapter and verse number) and explain its meaning in simple {lang}; never invent verses. Then show "
                 "the same teaching in a short, touching modern Bengali family example (a student before an exam, a "
                 "father who lost his job...). Deep reverence for Lord Krishna; uplifting and practical for all ages.",
-    }.get(category, "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
+    }.get(category, (CARTOON_SERIES.get(category) or {}).get("rule") or
+          "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
     kind_rules = kind_rules.replace("{lang}", L["name"])
     if part == 1:
         kind_rules += ("\nSERIES: this is PART 1 of a bigger story told in parts on following days. Introduce the "
@@ -2469,6 +2579,12 @@ def grade(frame_f32, f, sec, mood, rnd_flicker):
     np = _np()
     look = horror_look()
     gray = frame_f32.mean(axis=2, keepdims=True)
+    if STYLE_3D:                                               # brighter and livelier, never washed out
+        frame = gray + (frame_f32 - gray) * 1.16
+        frame = 255.0 * np.power(np.clip(frame / 255.0, 0, 1), 0.92)          # lift the dark parts a little
+        frame = (frame - 128.0) * 1.04 + 131.0                               # a touch of contrast and light
+        frame *= 0.94 + 0.06 * look["vignette"]
+        return frame
     frame = gray + (frame_f32 - gray) * 1.08                    # slightly richer colours
     frame *= 0.88 + 0.12 * look["vignette"]
     return frame
@@ -2619,7 +2735,7 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
                 fx, fy = W / 2, H / 2
                 bz = 1.04 + 0.06 * ease
             Mb = cv2.getRotationMatrix2D((fx, fy), 0, bz)
-            Mb[0, 2] += (W / 2 - fx) * (bz - 1) / bz * (1 if close else 0) + direction * (ease - 0.5) * 22 + shake
+            Mb[0, 2] += (W / 2 - fx) * (bz - 1) / bz * (1 if close else 0) + direction * (ease - 0.5) * (14 if STYLE_3D else 22) + shake
             Mb[1, 2] += (H / 2 - fy) * (bz - 1) / bz * (1 if close else 0) + shake * 0.6
             bg_src = _clean_bg(WALK_BG[img]) if img in WALK_BG and L.get("can_walk") else L["bg"]
             frame = cv2.warpAffine(bg_src, Mb, (W, H), borderMode=cv2.BORDER_REFLECT).astype("float32")
@@ -2679,7 +2795,7 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
                     elif len(faces_) == 1 and (not who or who[1] <= 1):
                         spk, spk_part = 0, faces_[0].get("part")
                 src = LL["fg"]
-                if animate is not None and faces_:
+                if animate is not None and faces_ and (not STYLE_3D or env("FACE_ANIM") == "1"):
                     pic = LL["fg_rgb"]
                     for fi, fc in enumerate(faces_):
                         # each face blinks at its own moments
@@ -2710,7 +2826,7 @@ def scene_clip_animated(segments, audio, out, idx, mood, talk=None, walks=None):
                     src = cv2.cvtColor(np.clip(pic, 0, 255).astype("float32"), cv2.COLOR_RGB2BGR)
                 fz = bz * (1.0 + 0.03 * ease) + 0.004 * math.sin(sec * 1.6)
                 Mf = cv2.getRotationMatrix2D((fx, fy), 0.3 * math.sin(sec * 0.9) + wt, fz)
-                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * 26 - (fz - bz) * fx + wdx
+                Mf[0, 2] = Mb[0, 2] + direction * (ease - 0.5) * (34 if STYLE_3D else 26) - (fz - bz) * fx + wdx
                 Mf[1, 2] = Mb[1, 2] - 2.0 * math.sin(sec * 1.1) - (fz - bz) * fy - wb
                 if align is not None:                               # put picture B's feet where A's are
                     Mf = (np.vstack([Mf, [0, 0, 1]]) @ np.vstack([align, [0, 0, 1]]))[:2].astype("float64")
@@ -3539,11 +3655,14 @@ def main():
     part, total, prev, episode, voted = 0, 2, None, None, None
     if not festival and env("ROUTINE") != "0":
         if slot_hour == 13:                          # every noon: the Gopal Bhar TV cartoon (our animated series)
-            cat = "gopal" if (env("GOPAL_DAILY") != "0" and puppet_ready("gopal")) else DAY_SPECIAL[weekday]
+            cat = "gopal" if (env("GOPAL_DAILY") != "0" and (puppet_ready("gopal") or STYLE_3D)) else DAY_SPECIAL[weekday]
         elif slot_hour == 8:
             cat = MORNING_GRID[weekday]
         else:
             cat = EVENING_GRID[weekday]
+        if cat == "cnotun":                          # v80: one of our new cartoon series (they take turns)
+            cat = pick_cartoon_series(history)
+            log(f"Today's cartoon series: {CARTOON_SERIES[cat]['bn']}")
         prev = extras.series_get(NEXT_PART, cat)     # this category's story that continues today
         if prev:
             part = int(prev.get("done", 1)) + 1
@@ -3629,7 +3748,7 @@ def main():
     vote_ideas = None
     if slot_hour == 13 and env("VOTE") != "0":      # viewers choose tomorrow evening's story
         tcat = EVENING_GRID[(weekday + 1) % 7]
-        if tcat in EPIC:                             # an epic goes in its order - no vote then
+        if tcat in EPIC or tcat == "cnotun":         # an epic goes in its order / a series has its own - no vote then
             tcat = None
         if tcat:
             i1, i2 = random.sample(CATEGORIES[tcat], 2)

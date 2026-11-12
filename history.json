@@ -1611,7 +1611,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-09T03:05+00:00"
+   "checked": "2026-11-12T09:03+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2411,5 +2411,32 @@
   "fb_reel2": "1905361097295866",
   "coloring": "122138775458735948",
   "yt_short": "iOwkcVHJqEg"
+ },
+ {
+  "date": "2026-11-12T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-12@19",
+  "pending_comments": [],
+  "category": "ramayan",
+  "idea": "Ratnakar the robber becomes the sage Valmiki and the first verse is born",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রামায়ণ পর্ব 1: রত্নাকরের রূপান্তর ও প্রথম শ্লোকের জন্ম 🏹✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "বল্মীকা"
+  },
+  "title_b": "প্রথম শ্লোকের সৃষ্টি ও মহর্ষি বাল্মীকি 📜",
+  "question_post": null,
+  "facebook": "4139636003008510",
+  "youtube": "6xOzVDe8dGg",
+  "fb_reel": "4587365018162238",
+  "fb_story": "1124646633307774",
+  "fb_reel2": "28992977013654864"
  }
 ]

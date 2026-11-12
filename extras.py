@@ -5870,10 +5870,14 @@ def creator_inbox(path, kind="horror", status=None):
         return data
     try:
         r = requests.get(f"https://api.telegram.org/bot{tok}/getUpdates",
-                         params={"allowed_updates": json.dumps(["message"])}, timeout=30).json()
+                         params={"allowed_updates": json.dumps(TG_UPDATES)}, timeout=30).json()
     except Exception as e:
         log("  your Telegram stories: could not read -", str(e)[:100])
         return data
+    try:                                             # v76: our fan channel + viewers' voice stories
+        tg_scan(r.get("result", []), os.path.dirname(os.path.abspath(path)), chat, kind)
+    except Exception as e:
+        log("  Telegram channel / viewer voices skipped:", str(e)[:100])
     seen, msgs, cmds = set(data.get("seen") or []), [], []
     for u in r.get("result", []):
         uid = u.get("update_id")
@@ -6096,3 +6100,668 @@ def daily_report(history, bot_label, extra=""):
            + ("\n\nলক্ষ্য করুন:\n" + "\n".join(f"• {n}" for n in DAY_NOTES) if DAY_NOTES else "\n\nসব ঠিকঠাক চলেছে ✅"))
     if telegram(msg):
         log("Daily report sent on Telegram")
+
+
+# =====================================================================================================================
+# v76 (12 Nov 2026): growth - YouTube replies, milestones, Telegram fan channel + viewers' voice stories, Facebook
+# photo-story countdown, the story as text, story web pages + podcast feed, YouTube Live, old-video shorts
+# =====================================================================================================================
+TG_UPDATES = ["message", "channel_post", "my_chat_member"]   # (Telegram remembers this list - every reader asks the same)
+BN_DIG = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+
+
+def _here_assets():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+
+
+# ----------------------------------------------------------------- 1) answers under the YouTube comments
+_MY_YT = {}
+
+
+def yt_my_channel():
+    if "id" not in _MY_YT:
+        try:
+            r = requests.get(f"{YT}/channels", headers=yt_token(), params={"part": "id,statistics", "mine": "true"},
+                             timeout=30).json()
+            it = (r.get("items") or [{}])[0]
+            _MY_YT.update(id=it.get("id", ""), stats=it.get("statistics") or {})
+        except Exception:
+            _MY_YT.update(id="", stats={})
+    return _MY_YT
+
+
+def yt_reply_fans(history, lang, kind="horror", max_n=5):
+    """Each run: a short, warm reply under the first few NEW YouTube comments of our last 2 days' videos (YouTube
+    shows a video to more people when its comments get answers). Never more than max_n a run, never twice."""
+    key = env("GEMINI_API_KEY")
+    if not (env("YT_REFRESH_TOKEN") and key) or env("REPLY_FANS") == "0" or env("YT_REPLIES") == "0":
+        return False
+    me = yt_my_channel().get("id")
+    now = dt.datetime.now(dt.timezone.utc)
+    todo = []
+    for h in reversed(history[-8:]):
+        if not h.get("youtube") or not h.get("date") or len(todo) >= max_n:
+            continue
+        try:
+            age = (now - dt.datetime.fromisoformat(h["date"])).total_seconds() / 3600
+        except Exception:
+            continue
+        if not 1 <= age <= 60:
+            continue
+        try:
+            r = requests.get(f"{YT}/commentThreads", headers=yt_token(), timeout=30, params={
+                "part": "snippet", "videoId": h["youtube"], "maxResults": 50, "order": "time",
+                "textFormat": "plainText"})
+            items = r.json().get("items", []) if r.ok else []
+        except Exception:
+            continue
+        done = set(h.get("yt_replied") or [])
+        for it in items:
+            sn = it["snippet"]["topLevelComment"]["snippet"]
+            msg = str(sn.get("textDisplay", "")).strip()
+            if (it["id"] in done or it["snippet"].get("totalReplyCount") or len(msg) < 2 or len(todo) >= max_n
+                    or (sn.get("authorChannelId") or {}).get("value") == me):
+                continue
+            name = str(sn.get("authorDisplayName", "")).lstrip("@").split(" ")[0][:20]
+            todo.append((h, it["id"], name, msg[:300], str(h.get("title", ""))[:80]))
+    if not todo:
+        return False
+    lang = todo[0][0].get("lang") or lang
+    lang_name = "Bengali (pure Kolkata cholit bhasha)" if lang == "bn" else "Hindi"
+    who = ("the grave, warm storyteller of a horror-story channel" if kind == "horror" else
+           "the friendly storyteller of a children's story channel")
+    ask = (f"You are {who}. Write a short, warm, natural reply (max 18 words, 0-1 emoji) to each viewer comment in "
+           f"{lang_name}: thank them by name, answer a question if there is one (never spoil a twist), mention the "
+           "next story if it fits. No links, no hashtags, never ask for likes, shares or subscriptions. Return ONLY "
+           "a JSON list of strings in the same order.\n"
+           + "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
+    replies = []
+    for model in text_models(key)[:3]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": ask}]}],
+                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
+                              timeout=90)
+            if r.ok:
+                replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                if isinstance(replies, list) and replies:
+                    break
+        except Exception:
+            continue
+    n = 0
+    for (h, cid, name, msg, t), text in zip(todo, replies if isinstance(replies, list) else []):
+        text = str(text).strip()
+        if not text:
+            continue
+        try:
+            rr = requests.post(f"{YT}/comments", headers=yt_token(), params={"part": "snippet"}, timeout=30,
+                               json={"snippet": {"parentId": cid, "textOriginal": text[:500]}})
+            n += bool(rr.ok)
+        except Exception:
+            pass
+        h["yt_replied"] = (list(h.get("yt_replied") or []) + [cid])[-200:]
+    log(f"  replied to {n} YouTube comments")
+    return n > 0
+
+
+# ----------------------------------------------------------------- 5) milestones (subscribers / followers)
+MILESTONES = [100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000]
+
+
+def channel_counts():
+    out = {}
+    if env("YT_REFRESH_TOKEN"):
+        try:
+            out["yt"] = int(yt_my_channel().get("stats", {}).get("subscriberCount") or 0)
+        except Exception:
+            pass
+    if env("FB_PAGE_TOKEN") and env("FB_PAGE_ID"):
+        try:
+            r = requests.get(f"{GRAPH}/{env('FB_PAGE_ID')}", timeout=30, params={
+                "fields": "followers_count,fan_count", "access_token": env("FB_PAGE_TOKEN")}).json()
+            out["fb"] = int(r.get("followers_count") or r.get("fan_count") or 0)
+        except Exception:
+            pass
+    return out
+
+
+def milestone_check(path):
+    """Once a day: a NEW milestone passed? -> dict(platform, n) to celebrate (the first check only remembers)."""
+    data = _jl(path, {})
+    data = data if isinstance(data, dict) else {}
+    today = dt.datetime.now(IST).date().isoformat()
+    if data.get("checked") == today or env("MILESTONES") == "0":
+        return None
+    data["checked"] = today
+    got = None
+    for pf, n in channel_counts().items():
+        passed = max([m for m in MILESTONES if m <= n] or [0])
+        last = data.get(pf)
+        if last is None:
+            data[pf] = passed                         # first time: what is already reached is not news
+        elif passed > int(last):
+            data[pf] = passed
+            got = got or {"platform": pf, "n": passed, "count": n}
+        data[f"{pf}_now"] = n
+    if got:
+        data["pending"] = got
+    _js(path, data)
+    return got
+
+
+def milestone_take(path):
+    """the milestone the next story's storyteller thanks the viewers for (once)"""
+    data = _jl(path, {})
+    if not isinstance(data, dict) or not data.get("pending"):
+        return None
+    got = data.pop("pending")
+    _js(path, data)
+    return got
+
+
+def milestone_card(bg, n, platform, lang, out, font_path):
+    word = ({"yt": "সাবস্ক্রাইবার", "fb": "ফলোয়ার"} if lang == "bn" else {"yt": "सब्सक्राइबर", "fb": "फ़ॉलोअर"})[platform]
+    num = str(n).translate(BN_DIG) if lang == "bn" else f"{n:,}"
+    lines = (["ধন্যবাদ!", f"{num} জন {word}", "আপনারাই আমাদের পরিবার 🕯️"] if lang == "bn" else
+             ["धन्यवाद!", f"{num} {word}", "आप ही हमारा परिवार हैं 🕯️"])
+    return text_card(bg, lines, out, font_path)
+
+
+def latin_font():
+    for p in ("/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+              "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"):
+        if os.path.exists(p):
+            return p
+    return ""
+
+
+def text_card(bg, lines, out, font_path, size=(1280, 720), sizes=None):
+    """a dark picture with big centred lines of text (Bengali / Hindi shaped correctly)"""
+    W, H = size
+    try:
+        im = Image.open(bg).convert("RGB")
+        s = max(W / im.width, H / im.height)
+        im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1))
+        l, t = (im.width - W) // 2, (im.height - H) // 2
+        im = im.crop((l, t, l + W, t + H)).filter(ImageFilter.GaussianBlur(3))
+    except Exception:
+        im = Image.new("RGB", (W, H), (10, 8, 14))
+    im = Image.blend(im, Image.new("RGB", (W, H), (0, 0, 0)), 0.55)
+    d = ImageDraw.Draw(im)
+    sizes = sizes or [int(H * 0.13)] + [int(H * 0.085)] * (len(lines) - 1)
+    sizes = (list(sizes) + [sizes[-1]] * len(lines))[:len(lines)]
+    # a line in English letters only (viewers' names) gets a font WITH English letters - the Bengali font has none
+    paths = [latin_font() if (re.search(r"[A-Za-z]", str(x)) and not re.search(r"[\u0900-\u09FF]", str(x))
+                               and latin_font()) else font_path for x in lines]
+    fonts = [_font(pp, sz) for pp, sz in zip(paths, sizes)]
+    shown = [fit_glyphs(str(x), pp) for x, pp in zip(lines, paths)]
+    hs = [f.getbbox(x or " ")[3] - f.getbbox(x or " ")[1] for f, x in zip(fonts, shown)]
+    y = (H - sum(hs) - 30 * (len(lines) - 1)) // 2
+    for k, (f, x, h) in enumerate(zip(fonts, shown, hs)):
+        while d.textlength(x, font=f) > W * 0.9 and f.size > 20:
+            f = _font(paths[k], f.size - 4)
+        w = d.textlength(x, font=f)
+        d.text(((W - w) / 2, y), x, font=f, fill=(255, 214, 90) if k == 0 else (245, 245, 245),
+               stroke_width=4, stroke_fill=(0, 0, 0))
+        y += h + 30
+    im.save(out, quality=92)
+    return out
+
+
+# ----------------------------------------------------------------- 6) Telegram fan channel  +  11) viewers' voice
+def tg_get(path_dir):
+    return _jl(os.path.join(path_dir, "tg_channel.json"), {}) or {}
+
+
+def tg_scan(updates, path_dir, owner_chat, kind="horror"):
+    """From Telegram's updates: (a) the channel the bot was made admin of = our fan channel; (b) VOICE messages
+    that viewers sent to the bot (their own ghost experience) - horror only. Nothing else of anyone is kept."""
+    ch = tg_get(path_dir)
+    changed = False
+    for u in updates:
+        mcm = u.get("my_chat_member") or {}
+        chat = mcm.get("chat") or {}
+        ttl = str(chat.get("title", "")).lower()
+        is_cartoon_ch = any(w in ttl for w in ("কার্টুন", "cartoon", "kids", "বাচ্চা", "ছোটদের", "बच्चों", "कार्टून",
+                                                 "রূপকথা", "kahani", "story time"))
+        if chat.get("type") == "channel" and is_cartoon_ch == (kind == "cartoon"):   # (each bot its own channel)
+            status = (mcm.get("new_chat_member") or {}).get("status")
+            if status == "administrator" and str(ch.get("id")) != str(chat.get("id")):
+                ch = {"id": chat.get("id"), "title": chat.get("title", ""), "username": chat.get("username", ""),
+                      "queue": ch.get("queue") or []}
+                changed = True
+                telegram(f"✅ {'কার্টুন' if kind == 'cartoon' else 'ভূতের'} bot-এর ফ্যান চ্যানেল পেয়েছি: "
+                         f"{chat.get('title', '')}। এখন থেকে প্রতিটা নতুন গল্পের খবর এই চ্যানেলে যাবে।")
+            elif status in ("left", "kicked") and str(ch.get("id")) == str(chat.get("id")):
+                ch, changed = {}, True
+    if changed:
+        _js(os.path.join(path_dir, "tg_channel.json"), ch)
+    if kind != "horror" or env("VIEWER_VOICE") == "0":
+        return
+    vpath = os.path.join(path_dir, "viewer_voice.json")
+    vv = _jl(vpath, {"raw": [], "stories": [], "seen": []})
+    seen = set(vv.get("seen") or [])
+    added = 0
+    for u in updates:
+        msg = u.get("message") or {}
+        chat = msg.get("chat") or {}
+        voice = msg.get("voice") or msg.get("audio")
+        if not voice or chat.get("type") != "private" or str(chat.get("id")) == str(owner_chat):
+            continue
+        if u.get("update_id") in seen:
+            continue
+        seen.add(u.get("update_id"))
+        if int(voice.get("duration") or 0) < 20 or int(voice.get("file_size") or 0) > 19_000_000:
+            tg_send(chat.get("id"), "🙏 ধন্যবাদ! কমপক্ষে আধ মিনিট ধরে আপনার আসল ভৌতিক অভিজ্ঞতাটা গলায় বলে পাঠান - "
+                                    "সেটা নিয়েই আমাদের 'সত্যি ঘটনা' গল্প হবে।")
+            continue
+        frm = msg.get("from") or {}
+        vv.setdefault("raw", []).append({"file_id": voice["file_id"], "chat": chat.get("id"), "date": msg.get("date"),
+                                         "name": str(frm.get("first_name") or "")[:20], "uid": u.get("update_id"),
+                                         "mime": voice.get("mime_type") or "audio/ogg"})
+        added += 1
+    vv["seen"] = sorted(seen)[-500:]
+    if added or vv.get("raw"):
+        _js(vpath, vv)
+
+
+def tg_send(chat_id, text, photo=None):
+    tok = env("TELEGRAM_BOT_TOKEN")
+    if not tok or not chat_id or env("MOCK") == "1":
+        return False
+    try:
+        if photo and os.path.exists(photo):
+            with open(photo, "rb") as f:
+                r = requests.post(f"https://api.telegram.org/bot{tok}/sendPhoto", timeout=60,
+                                  data={"chat_id": chat_id, "caption": text[:1024]}, files={"photo": f})
+        else:
+            r = requests.post(f"https://api.telegram.org/bot{tok}/sendMessage", timeout=30,
+                              data={"chat_id": chat_id, "text": text[:4000], "disable_web_page_preview": "false"})
+        return r.ok
+    except Exception:
+        return False
+
+
+_TG_ME = {}
+
+
+def tg_bot_link():
+    tok = env("TELEGRAM_BOT_TOKEN")
+    if not tok or env("MOCK") == "1":
+        return ""
+    if "u" not in _TG_ME:
+        try:
+            _TG_ME["u"] = requests.get(f"https://api.telegram.org/bot{tok}/getMe", timeout=20).json()["result"]["username"]
+        except Exception:
+            _TG_ME["u"] = ""
+    return f"https://t.me/{_TG_ME['u']}" if _TG_ME["u"] else ""
+
+
+def tg_channel_link(path_dir):
+    u = tg_get(path_dir).get("username")
+    return f"https://t.me/{u}" if u else ""
+
+
+def tg_channel_post(path_dir, text, photo=None, at=None):
+    """our fan channel: now (photo + text), or queued for a later time (sent by the first run after it)"""
+    ch = tg_get(path_dir)
+    if not ch.get("id") or env("TG_CHANNEL") == "0":
+        return False
+    if at and at > dt.datetime.now(dt.timezone.utc):
+        ch.setdefault("queue", []).append({"at": at.isoformat(), "text": text})
+        _js(os.path.join(path_dir, "tg_channel.json"), ch)
+        return True
+    return tg_send(ch["id"], text, photo)
+
+
+def tg_channel_flush(path_dir):
+    ch = tg_get(path_dir)
+    if not ch.get("id") or not ch.get("queue"):
+        return False
+    now = dt.datetime.now(dt.timezone.utc)
+    keep, sent = [], 0
+    for q in ch["queue"]:
+        try:
+            due = dt.datetime.fromisoformat(q["at"]) <= now
+        except Exception:
+            due = True
+        if due:
+            sent += tg_send(ch["id"], q["text"])
+        else:
+            keep.append(q)
+    ch["queue"] = keep[-20:]
+    _js(os.path.join(path_dir, "tg_channel.json"), ch)
+    if sent:
+        log(f"  fan channel: {sent} message(s) sent")
+    return sent > 0
+
+
+def viewer_voice_process(path_dir, max_n=2):
+    """Viewers' voice messages -> written experiences (Gemini listens and writes them down in Bengali). Only real
+    ghost experiences are kept; the viewer gets a thank-you on Telegram."""
+    vpath = os.path.join(path_dir, "viewer_voice.json")
+    vv = _jl(vpath, {"raw": [], "stories": [], "seen": []})
+    tok, key = env("TELEGRAM_BOT_TOKEN"), env("GEMINI_API_KEY")
+    if not vv.get("raw") or not tok or not key:
+        return 0
+    import base64 as _b64
+    done = 0
+    rest = []
+    for it in vv["raw"]:
+        if done >= max_n:
+            rest.append(it)
+            continue
+        try:
+            fp = requests.get(f"https://api.telegram.org/bot{tok}/getFile", params={"file_id": it["file_id"]},
+                              timeout=30).json()["result"]["file_path"]
+            audio = requests.get(f"https://api.telegram.org/file/bot{tok}/{fp}", timeout=120).content
+            ask = ("This is a voice message from a viewer of our Bengali horror-story channel. 1) Write down exactly "
+                   "what they say, in Bengali script. 2) Decide: is it a real personal ghost / paranormal experience "
+                   "(not a joke, not a request, not abuse)? Leave out any phone number, full address or full names "
+                   "of private people. Answer ONLY JSON: {\"text\": \"...\", \"is_experience\": true/false}")
+            got = {}
+            for model in text_models(key)[:3]:
+                r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                                  json={"contents": [{"parts": [{"text": ask}, {"inline_data": {
+                                      "mime_type": it.get("mime") or "audio/ogg",
+                                      "data": _b64.b64encode(audio).decode()}}]}],
+                                      "generationConfig": {"responseMimeType": "application/json"}}, timeout=180)
+                if r.ok:
+                    got = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                    if isinstance(got, dict) and got.get("text"):
+                        break
+            text = str((got or {}).get("text") or "").strip()
+            if got and got.get("is_experience") and len(text) >= 120:
+                vv.setdefault("stories", []).append({"id": f"tg_{it['uid']}", "chat": it["chat"], "name": it["name"],
+                                                     "text": text[:3000], "date": it["date"]})
+                tg_send(it["chat"], "🙏 আপনার অভিজ্ঞতাটা পেয়েছি, অনেক ধন্যবাদ! এটা নিয়ে আমাদের 'সত্যি ঘটনা' গল্প হবে "
+                                    "- আপনার নাম থাকবে (ঠিকানা বা ফোন নম্বর কখনো নয়)। গল্প বেরোলে এখানেই জানাব।")
+                log(f"  a viewer's voice story received ({len(text)} letters)")
+            else:
+                tg_send(it["chat"], "🙏 ধন্যবাদ! আপনার নিজের জীবনের কোনো ভৌতিক অভিজ্ঞতা থাকলে সেটা গলায় বলে পাঠান - "
+                                    "সেটা নিয়েই গল্প হবে।")
+            done += 1
+        except Exception as e:
+            log("  viewer voice message skipped:", str(e)[:100])
+            if int(time.time()) - int(it.get("date") or 0) < 86400:
+                rest.append(it)                       # (Telegram keeps the file for a while: try again next run)
+    vv["raw"] = rest
+    _js(vpath, vv)
+    return done
+
+
+def viewer_voice_stories(path_dir, used_ids):
+    vv = _jl(os.path.join(path_dir, "viewer_voice.json"), {})
+    return [dict(s, likes=10 ** 6) for s in (vv.get("stories") or []) if s.get("id") not in used_ids]
+
+
+def viewer_voice_done(path_dir, sid, links):
+    vv = _jl(os.path.join(path_dir, "viewer_voice.json"), {})
+    for s in vv.get("stories") or []:
+        if s.get("id") == sid:
+            tg_send(s.get("chat"), "👻 আপনার পাঠানো অভিজ্ঞতা নিয়ে গল্প বেরিয়েছে! " + " ".join(links))
+
+
+# ----------------------------------------------------------------- 10) Facebook photo story (countdown)
+def fb_photo_story(image):
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if env("FB_STORY") == "0" or not (page and token):
+        return None
+    with open(image, "rb") as f:
+        r = requests.post(f"{GRAPH}/{page}/photos", data={"published": "false", "access_token": token},
+                          files={"source": ("story.jpg", f, "image/jpeg")}, timeout=120).json()
+    if not r.get("id"):
+        raise RuntimeError(f"story photo: {str(r)[:200]}")
+    fin = requests.post(f"{GRAPH}/{page}/photo_stories", data={"photo_id": r["id"], "access_token": token},
+                        timeout=60).json()
+    if not fin.get("success") and not fin.get("post_id"):
+        raise RuntimeError(f"photo story: {str(fin)[:200]}")
+    return fin.get("post_id") or r["id"]
+
+
+def story_card_vertical(bg, lines, out, font_path):
+    return text_card(bg, lines, out, font_path, size=(1080, 1920), sizes=[130, 96, 72, 72][:len(lines)])
+
+
+# ----------------------------------------------------------------- 7) the story as text  +  3) web page
+def story_text(story, names=None, frac=1.0, max_chars=None):
+    """the story as readable prose: the storyteller's lines as paragraphs, people's words with their name"""
+    names = names or {}
+    out, total = [], 0
+    lines = [ln for sc in story.get("scenes") or [] for ln in (sc.get("lines") or []) if str(ln.get("text", "")).strip()]
+    stop = max(1, int(len(lines) * frac))
+    for ln in lines[:stop]:
+        t = strip_tags(str(ln["text"])).strip()
+        sp = str(ln.get("speaker", "narrator"))
+        if not sp.lower().startswith("narrat"):
+            nm = names.get(sp.lower()) or sp
+            t = f"{nm}: “{t}”"
+        out.append(t)
+        total += len(t)
+        if max_chars and total >= max_chars:
+            break
+    return "\n\n".join(out)
+
+
+def _esc(s):
+    return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date=""):
+    """docs/golpo/<slug>.html - the whole story to READ (Google finds it) with the video on top; + the list
+    page and sitemap.xml"""
+    gdir = os.path.join(docs, "golpo")
+    os.makedirs(gdir, exist_ok=True)
+    url = (base or "") + f"golpo/{slug}.html"
+    desc = re.sub(r"\s+", " ", text)[:155]
+    vid = (f'<iframe src="https://www.youtube.com/embed/{yt_id}" title="{_esc(title)}" allowfullscreen loading="lazy">'
+           f'</iframe>' if yt_id else
+           (f'<p><a href="https://www.facebook.com/{fb_id}">▶ ভিডিওতে শুনুন</a></p>' if fb_id else ""))
+    img = f"https://i.ytimg.com/vi/{yt_id}/hqdefault.jpg" if yt_id else ""
+    body = "".join(f"<p>{_esc(p)}</p>" for p in text.split("\n\n") if p.strip())
+    ld = json.dumps({"@context": "https://schema.org", "@type": "Article", "headline": title[:110],
+                     "inLanguage": lang, "datePublished": date, "image": img or None, "url": url,
+                     "author": {"@type": "Organization", "name": env("PAGE_NAME_BN") or "Daily Horror Story"}},
+                    ensure_ascii=False)
+    page = f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>{_esc(title)} | ভূতের গল্প</title>
+<meta name="description" content="{_esc(desc)}"><link rel="canonical" href="{_esc(url)}">
+<meta property="og:title" content="{_esc(title)}"><meta property="og:description" content="{_esc(desc)}">
+{f'<meta property="og:image" content="{img}">' if img else ''}<script type="application/ld+json">{ld}</script>
+<style>body{{background:#0d0b10;color:#e8e2d6;font:18px/1.9 "Noto Serif Bengali",serif;margin:0}}
+main{{max-width:760px;margin:auto;padding:18px}}h1{{color:#ffcf4a;line-height:1.4}}a{{color:#ffcf4a}}
+iframe{{width:100%;aspect-ratio:16/9;border:0;border-radius:10px}}p{{margin:0 0 1em}}</style></head><body><main>
+<p><a href="index.html">← সব গল্প</a> · <a href="../">ভূতের মানচিত্র</a></p><h1>{_esc(title)}</h1>{vid}
+<article>{body}</article><p><a href="index.html">← আরও ভূতের গল্প পড়ুন</a></p></main></body></html>"""
+    with open(os.path.join(gdir, f"{slug}.html"), "w", encoding="utf-8") as f:
+        f.write(page)
+    lst_p = os.path.join(gdir, "list.json")
+    lst = [x for x in (_jl(lst_p, []) or []) if x.get("slug") != slug]
+    lst.append({"slug": slug, "title": title, "date": date, "yt": yt_id})
+    _js(lst_p, lst)
+    rows = "".join(f'<li><a href="{_esc(x["slug"])}.html">{_esc(x["title"])}</a> <small>{_esc(x.get("date", ""))}</small></li>'
+                   for x in reversed(lst))
+    with open(os.path.join(gdir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>সব ভূতের গল্প - পড়ুন ও শুনুন</title>
+<meta name="description" content="বাংলা ভূতের গল্প, সত্যি ঘটনা আর রহস্য - প্রতিদিন নতুন গল্প, পড়ুন আর ভিডিওতে শুনুন।">
+<style>body{{background:#0d0b10;color:#e8e2d6;font:18px/1.8 sans-serif;margin:0}}main{{max-width:760px;margin:auto;padding:18px}}
+a{{color:#ffcf4a}}li{{margin:.5em 0}}</style></head><body><main><h1>👻 সব ভূতের গল্প</h1>
+<p><a href="../">ভূতের মানচিত্র</a></p><ul>{rows}</ul></main></body></html>""")
+    if base:
+        urls = [base, base + "golpo/index.html"] + [base + f"golpo/{x['slug']}.html" for x in lst]
+        with open(os.path.join(docs, "sitemap.xml"), "w", encoding="utf-8") as f:
+            f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                    + "".join(f"<url><loc>{_esc(u)}</loc></url>\n" for u in urls) + "</urlset>\n")
+    return url
+
+
+# ----------------------------------------------------------------- 4) podcast (Spotify / Apple) feed
+def gh_release_upload(path, name, tag="podcast"):
+    """an audio file into the repo's 'podcast' release (no size burden on the repo); returns its public link"""
+    tok, repo = env("GITHUB_TOKEN"), env("GITHUB_REPOSITORY")
+    if not (tok and repo):
+        return ""
+    hdr = {"Authorization": f"Bearer {tok}", "Accept": "application/vnd.github+json"}
+    r = requests.get(f"https://api.github.com/repos/{repo}/releases/tags/{tag}", headers=hdr, timeout=30)
+    if r.status_code == 404:
+        r = requests.post(f"https://api.github.com/repos/{repo}/releases", headers=hdr, timeout=30,
+                          json={"tag_name": tag, "name": "Podcast audio", "body": "Audio of the stories (podcast feed)."})
+    rel = r.json()
+    if not rel.get("id"):
+        raise RuntimeError(f"release: {str(rel)[:200]}")
+    for a in rel.get("assets") or []:
+        if a.get("name") == name:
+            return a.get("browser_download_url", "")
+    with open(path, "rb") as f:
+        up = requests.post(f"https://uploads.github.com/repos/{repo}/releases/{rel['id']}/assets",
+                           params={"name": name}, data=f, timeout=600,
+                           headers={**hdr, "Content-Type": "audio/mpeg"})
+    if not up.ok:
+        raise RuntimeError(f"upload: {up.text[:200]}")
+    return up.json().get("browser_download_url", "")
+
+
+def podcast_feed(docs, base, ep, show_title, cover_src=None, lang="bn"):
+    """adds one episode to docs/podcast.xml (an RSS feed Spotify and Apple Podcasts read by themselves)"""
+    p_ = os.path.join(docs, "podcast.json")
+    eps = [e for e in (_jl(p_, []) or []) if e.get("guid") != ep["guid"]] + [ep]
+    eps = eps[-300:]
+    _js(p_, eps)
+    cover = os.path.join(docs, "podcast_cover.jpg")
+    if cover_src and not os.path.exists(cover):
+        try:
+            im = Image.open(cover_src).convert("RGB")
+            s = min(im.width, im.height)
+            im.crop(((im.width - s) // 2, (im.height - s) // 2, (im.width + s) // 2, (im.height + s) // 2)) \
+              .resize((1400, 1400)).save(cover, quality=90)
+        except Exception:
+            pass
+    email = env("PODCAST_EMAIL")
+    items = "".join(
+        f"<item><title>{_esc(e['title'])}</title><description>{_esc(e.get('desc', ''))}</description>"
+        f"<enclosure url=\"{_esc(e['url'])}\" length=\"{int(e.get('bytes', 0))}\" type=\"audio/mpeg\"/>"
+        f"<guid isPermaLink=\"false\">{_esc(e['guid'])}</guid><pubDate>{e['date']}</pubDate>"
+        f"<itunes:duration>{int(e.get('secs', 0))}</itunes:duration><itunes:explicit>false</itunes:explicit></item>\n"
+        for e in reversed(eps))
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel><title>{_esc(show_title)}</title><link>{_esc(base)}</link><language>{lang}</language>
+<atom:link href="{_esc(base)}podcast.xml" rel="self" type="application/rss+xml"/>
+<description>প্রতিদিন নতুন বাংলা ভূতের গল্প - রেডিও নাটকের মতো, রাতের অন্ধকারে শোনার জন্য।</description>
+<itunes:author>{_esc(show_title)}</itunes:author><itunes:explicit>false</itunes:explicit>
+<itunes:category text="Fiction"><itunes:category text="Drama"/></itunes:category>
+<itunes:image href="{_esc(base)}podcast_cover.jpg"/>
+{f'<itunes:owner><itunes:name>{_esc(show_title)}</itunes:name><itunes:email>{_esc(email)}</itunes:email></itunes:owner>' if email else ''}
+{items}</channel></rss>
+"""
+    with open(os.path.join(docs, "podcast.xml"), "w", encoding="utf-8") as f:
+        f.write(xml)
+    return base + "podcast.xml"
+
+
+# ----------------------------------------------------------------- 8) the scariest moment of an old video
+def scariest_window(video, length=45.0, skip_start=90.0, skip_end=60.0):
+    """start second of the `length`-second piece around the loudest sudden moment (a scare) of a video"""
+    import numpy as _np_
+    wav = video + ".env.wav"
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-vn", "-ac", "1", "-ar", "8000", wav])
+    try:
+        import wave
+        with wave.open(wav) as w:
+            a = _np_.frombuffer(w.readframes(w.getnframes()), dtype=_np_.int16).astype(_np_.float32)
+    finally:
+        if os.path.exists(wav):
+            os.remove(wav)
+    hop = 4000                                         # 0.5 s
+    n = len(a) // hop
+    if n < 10:
+        return 0.0
+    rms = _np_.sqrt((a[:n * hop].reshape(n, hop) ** 2).mean(axis=1) + 1e-9)
+    base = _np_.convolve(rms, _np_.ones(20) / 20, mode="same")          # the 10 s around
+    jump = rms / (base + 1e-6)
+    total = n * 0.5
+    lo, hi = int(skip_start / 0.5), int(max(skip_start + length, total - skip_end) / 0.5)
+    if hi - lo < 4:
+        return max(0.0, min(total - length, skip_start))
+    k = lo + int(_np_.argmax(jump[lo:hi]))
+    return float(max(0.0, min(total - length, k * 0.5 - length * 0.75)))
+
+
+# ----------------------------------------------------------------- 2) YouTube Live
+def yt_live_create(title, description, thumb=None):
+    """a public live broadcast that starts by itself when our stream arrives: (broadcast id, rtmp url, chat id)"""
+    hdr = yt_token()
+    start = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=2)).isoformat().replace("+00:00", "Z")
+    b = requests.post(f"{YT}/liveBroadcasts", headers=hdr, params={"part": "snippet,status,contentDetails"},
+                      timeout=60, json={
+                          "snippet": {"title": title[:100], "description": description[:4900], "scheduledStartTime": start},
+                          "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+                          "contentDetails": {"enableAutoStart": True, "enableAutoStop": True, "enableDvr": True,
+                                             "latencyPreference": "normal"}})
+    if not b.ok:
+        raise RuntimeError(f"broadcast: {b.text[:400]}")
+    b = b.json()
+    s = requests.post(f"{YT}/liveStreams", headers=hdr, params={"part": "snippet,cdn"}, timeout=60, json={
+        "snippet": {"title": "bot stream"},
+        "cdn": {"ingestionType": "rtmp", "resolution": "720p", "frameRate": "30fps"}})
+    if not s.ok:
+        raise RuntimeError(f"stream: {s.text[:300]}")
+    s = s.json()
+    bd = requests.post(f"{YT}/liveBroadcasts/bind", headers=hdr, timeout=60,
+                       params={"id": b["id"], "part": "id,contentDetails", "streamId": s["id"]})
+    if not bd.ok:
+        raise RuntimeError(f"bind: {bd.text[:300]}")
+    if thumb:
+        try:
+            yt_set_thumbnail(b["id"], thumb)
+        except Exception:
+            pass
+    ing = s["cdn"]["ingestionInfo"]
+    return b["id"], f"{ing['ingestionAddress']}/{ing['streamName']}", (b.get("snippet") or {}).get("liveChatId")
+
+
+def yt_live_chat(chat_id, page_token=None):
+    """new live-chat messages: ([(author, text)], next page token)"""
+    p = {"liveChatId": chat_id, "part": "snippet,authorDetails", "maxResults": 200}
+    if page_token:
+        p["pageToken"] = page_token
+    r = requests.get(f"{YT}/liveChat/messages", headers=yt_token(), params=p, timeout=30)
+    if not r.ok:
+        return [], page_token
+    j = r.json()
+    me = yt_my_channel().get("id")
+    out = [(str((m.get("authorDetails") or {}).get("displayName", "")).lstrip("@")[:24],
+            str((m.get("snippet") or {}).get("displayMessage", ""))[:200])
+           for m in j.get("items", []) if (m.get("authorDetails") or {}).get("channelId") != me]
+    return out, j.get("nextPageToken") or page_token
+
+
+def yt_live_say(chat_id, text):
+    try:
+        return requests.post(f"{YT}/liveChat/messages", headers=yt_token(), params={"part": "snippet"}, timeout=30,
+                             json={"snippet": {"liveChatId": chat_id, "type": "textMessageEvent",
+                                               "textMessageDetails": {"messageText": text[:190]}}}).ok
+    except Exception:
+        return False
+
+
+def live_clip(src, dst, w=1280, h=720, fps=25):
+    """every piece of the live programme in exactly the same format (so they play one after another without a
+    break) with a key picture every 2 seconds, as YouTube Live wants"""
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-vf",
+          f"scale={w}:{h}:force_original_aspect_ratio=decrease,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,fps={fps},format=yuv420p",
+          "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-maxrate", "3000k", "-bufsize", "6000k",
+          "-g", str(fps * 2), "-keyint_min", str(fps * 2), "-sc_threshold", "0",
+          "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2", dst])
+    return dst
+
+
+def live_card(img, secs, dst):
+    tmp = dst + ".raw.mp4"
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", img, "-f", "lavfi", "-i",
+          "anullsrc=channel_layout=stereo:sample_rate=44100", "-t", f"{secs:.1f}", "-c:v", "libx264",
+          "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", tmp])
+    live_clip(tmp, dst)
+    os.remove(tmp)
+    return dst

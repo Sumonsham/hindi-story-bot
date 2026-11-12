@@ -3249,6 +3249,68 @@ def vote_winner(history):
 CREATOR = {}                 # your own story from Telegram (if one is waiting)
 
 
+# ===================================================================================================== v76: growth
+ASSETS = os.path.join(HERE, "assets")
+SLOT_WORDS = {"bn": {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়"},
+              "hi": {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे"}}
+
+
+def growth_start(history):
+    """every run: answers under YouTube comments, the fan channel's waiting messages, milestones (once a day)"""
+    lang = env("LANGUAGE") or "bn"
+    try:
+        if extras.yt_reply_fans(history, lang, "cartoon"):
+            save_history(history)
+    except Exception as e:
+        log("  YouTube replies skipped:", str(e)[:120])
+    try:
+        extras.tg_channel_flush(ASSETS)
+    except Exception as e:
+        log("  fan channel skipped:", str(e)[:100])
+    try:
+        got = extras.milestone_check(os.path.join(ASSETS, "milestones.json"))
+        if got:
+            font_ = find_font(lang)
+            card = extras.milestone_card(None, got["n"], got["platform"], lang, os.path.join(WORK, "milestone.jpg"), font_)
+            num = str(got['n']).translate(extras.BN_DIG) if lang == "bn" else f"{got['n']:,}"
+            text = (f"🎉 আজ আমরা {num} জনের পরিবার! আমাদের গল্প ভালোবাসার জন্য সব বাচ্চা আর বড়দের অনেক ধন্যবাদ। "
+                    "আরও মজার গল্প আসছে! ✨" if lang == "bn" else
+                    f"🎉 आज हम {num} लोगों का परिवार हैं! हमारी कहानियों को प्यार देने के लिए सभी बच्चों और बड़ों का "
+                    "बहुत धन्यवाद। और मज़ेदार कहानियाँ आ रही हैं! ✨")
+            if env("FB_PAGE_TOKEN"):
+                extras.fb_photo(card, text)
+            extras.tg_channel_post(ASSETS, text, card)
+            extras.telegram(f"🎉 কার্টুন bot - মাইলফলক: {'YouTube' if got['platform'] == 'yt' else 'Facebook'}-এ "
+                            f"{num} পার হলো ({got['count']:,})!")
+    except Exception as e:
+        log("  milestones skipped:", str(e)[:100])
+
+
+def growth_after_post(title, results, lang, thumb, slot_hour):
+    """after a story is posted: the Facebook countdown story and the fan channel"""
+    at = extras.publish_time()
+    when = SLOT_WORDS.get(lang, SLOT_WORDS["bn"]).get(slot_hour, "")
+    clean = re.sub(r"\s*[|].*$", "", title).strip()
+    if at and results.get("facebook") and env("FB_COUNTDOWN") != "0" and when:
+        try:
+            card = extras.story_card_vertical(thumb, [("আজ " if lang == "bn" else "आज ") + when, clean[:40],
+                                                      "✨ নতুন গল্প" if lang == "bn" else "✨ नई कहानी"],
+                                              os.path.join(WORK, "countdown.jpg"), FONT)
+            extras.fb_photo_story(card)
+            log("  Facebook story: countdown picture posted")
+        except Exception as e:
+            log("  Facebook countdown story skipped:", str(e)[:150])
+    try:
+        if extras.tg_get(ASSETS).get("id"):
+            fb_link = f"https://www.facebook.com/{results['facebook']}" if results.get("facebook") else ""
+            yt_link = f"https://youtu.be/{results['youtube']}" if results.get("youtube") else ""
+            extras.tg_channel_post(ASSETS, f"✨ {('আজ ' if lang == 'bn' else 'आज ') + when}: {clean}", thumb)
+            extras.tg_channel_post(ASSETS, f"📺 {clean}\n\n▶ YouTube: {yt_link}\n▶ Facebook: {fb_link}",
+                                   at=at or dt.datetime.now(dt.timezone.utc))
+    except Exception as e:
+        log("  fan channel post skipped:", str(e)[:100])
+
+
 def main():
     global FONT
     pass
@@ -3268,6 +3330,11 @@ def main():
             extras.creator_inbox(MY_STORIES, "cartoon", bot_status)   # (Telegram keeps a message 24 h) + commands
         except Exception as e:
             log("  Telegram stories not read:", str(e)[:120])
+    if not MOCK and not DRY_RUN:
+        try:                                         # v76: YouTube replies, fan channel, milestones
+            growth_start(history)
+        except Exception as e:
+            log("  growth start skipped:", str(e)[:150])
     if extras.bot_paused(MY_STORIES) and not MOCK:
         log("PAUSED from Telegram ('বন্ধ') - no video this time. Send 'চালু' to start again.")
         return
@@ -3850,6 +3917,11 @@ def main():
             log(f"Series: part {part + 1} of {total} comes on the next {category} day")
         elif part >= 2:
             extras.series_put(NEXT_PART, category, None)
+    if not MOCK and not DRY_RUN:
+        try:                                         # v76: countdown story + fan channel
+            growth_after_post(title, results, lang, thumb, slot_hour)
+        except Exception as e:
+            log("  growth steps skipped:", str(e)[:150])
     extras.telegram(extras.report_text(env(f"PAGE_NAME_{lang.upper()}") or "Little Lumi Stories", title, results, history))
 
 

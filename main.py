@@ -3565,12 +3565,12 @@ def main():
                 elif re.search(r"[\u0900-\u097F]", mine["text"]) and "hi" in LANGS:
                     lang, L, FONT = "hi", LANGS["hi"], find_font("hi")
                 log(f"YOUR OWN STORY from Telegram is today's story ({len(mine['text'])} characters)")
-            # TREND STORY (v75): the morning story is built on what families watch MOST on YouTube this week
-            # (real YouTube search, sorted by views) - a new, original story on that topic, never a copy
-            if (not mine and slot_hour == 8 and cat not in MYTH and cat != "gopal" and env("TREND_STORY") != "0"
+            # TREND STORY (v79: EVERY story): built on what families watch MOST on YouTube this week in exactly this
+            # kind of story (YouTube search of the category, sorted by views) - our own new story, never a copy
+            if (not mine and cat not in MYTH and cat not in ("divine", "festival") and env("TREND_STORY") != "0"
                     and not MOCK):
                 try:
-                    tr_ = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
+                    tr_ = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"), cat)
                 except Exception as e:
                     tr_ = []
                     log("  trend story skipped:", str(e)[:100])
@@ -3578,7 +3578,7 @@ def main():
                 tr_ = [x for x in tr_ if x.strip() and not any(d.startswith(x.strip()) for d in done_ if d)]
                 if tr_:
                     theme = (cat, tr_[0].strip() + " (told as a " + cat + " story for children)")
-                    log(f"TREND STORY - what families watch most on YouTube this week: {tr_[0]}")
+                    log(f"TREND STORY ({cat}) - what families watch most on YouTube this week: {tr_[0][:120]}")
             if slot_hour == 19 and not mine:
                 win, n_votes = vote_winner(history)  # yesterday's 1 PM vote chose between two of today's stories
                 if win and win[0] == cat:
@@ -3609,7 +3609,7 @@ def main():
     tr = []
     if not MOCK:
         try:                                         # ride what families are watching this week (+ hashtags, search words)
-            tr = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"))
+            tr = extras.trending_topics("cartoon", lang, os.path.join(HERE, "assets"), category)
         except Exception:
             tr = []
     if not MOCK:

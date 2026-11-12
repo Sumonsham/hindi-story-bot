@@ -5111,6 +5111,50 @@ TREND_QUERIES = {
     ("cartoon", "hi"): ["hindi kahaniya cartoon", "moral stories hindi", "panchatantra ki kahaniyan",
                         "jadui kahani", "hindi cartoon story", "pari ki kahani"],
 }
+# (13 Nov 2026) EVERY story's own category is searched on YouTube - what is most watched THIS WEEK in exactly that kind
+CAT_QUERIES = {
+    ("horror", "gram"): {"bn": ["গ্রামের ভূতের গল্প", "gramer bhuter golpo", "গ্রাম বাংলার ভৌতিক গল্প", "bhuter golpo gram"],
+                         "hi": ["gaon ki bhutiya kahani", "गाँव की भूतिया कहानी", "village horror story hindi"]},
+    ("horror", "shohor"): {"bn": ["শহরের ভূতের গল্প", "kolkata bhuter golpo", "ফ্ল্যাটের ভূতের গল্প", "hostel bhuter golpo"],
+                           "hi": ["shahar ki bhutiya kahani", "flat horror story hindi", "hostel horror story hindi"]},
+    ("horror", "jayga"): {"bn": ["ভূতুড়ে জায়গার গল্প", "haunted place bengali story", "পোড়ো বাড়ির ভূতের গল্প", "রাজবাড়ির ভূতের গল্প"],
+                          "hi": ["haunted place story hindi", "bhutiya haveli ki kahani", "भूतिया जगह की कहानी"]},
+    ("horror", "sotti"): {"bn": ["সত্যি ভূতের ঘটনা", "sotti bhuter ghotona", "real horror story bangla", "সত্য ঘটনা অবলম্বনে ভূতের গল্প"],
+                          "hi": ["sacchi bhutiya ghatna", "real horror story hindi", "सच्ची भूतिया घटना"]},
+    ("horror", "rohoshyo"): {"bn": ["রহস্য ভৌতিক গল্প", "tantrik goenda golpo", "অলৌকিক রহস্য গল্প", "bhuter goenda golpo"],
+                             "hi": ["rahasya horror story hindi", "tantrik jasoos kahani", "रहस्यमयी भूतिया कहानी"]},
+    ("horror", "karna"): {"bn": ["পিশাচের গল্প", "পিশাচিনীর গল্প", "pishach golpo", "তন্ত্র মন্ত্র ভৌতিক গল্প"],
+                          "hi": ["pishachini ki kahani", "पिशाच की कहानी", "tantra mantra horror story"]},
+    ("horror", "tantrik"): {"bn": ["তান্ত্রিকের গল্প", "tantrik golpo", "শ্মশানের তান্ত্রিক গল্প", "তন্ত্র সাধনার গল্প"],
+                            "hi": ["tantrik ki kahani", "तांत्रिक की कहानी", "shamshan tantrik story"]},
+    ("cartoon", "gopal"): {"bn": ["গোপাল ভাঁড়ের গল্প", "gopal bhar cartoon"], "hi": ["gopal bhar cartoon hindi"]},
+    ("cartoon", "birbal"): {"bn": ["আকবর বীরবলের গল্প", "akbar birbal bangla"], "hi": ["akbar birbal ki kahani", "अकबर बीरबल"]},
+    ("cartoon", "betal"): {"bn": ["বিক্রম বেতালের গল্প", "vikram betal bangla"], "hi": ["vikram betal ki kahani", "विक्रम बेताल"]},
+    ("cartoon", "panchatantra"): {"bn": ["পঞ্চতন্ত্রের গল্প", "panchatantra bangla cartoon"], "hi": ["panchatantra ki kahaniyan", "पंचतंत्र की कहानियाँ"]},
+    ("cartoon", "jataka"): {"bn": ["জাতকের গল্প", "jataka golpo"], "hi": ["jataka kathayen", "जातक कथाएँ"]},
+    ("cartoon", "fairy"): {"bn": ["রূপকথার গল্প", "rupkothar golpo cartoon", "ঠাকুরমার ঝুলি"], "hi": ["pari ki kahani", "परी की कहानी", "jadui kahani"]},
+    ("cartoon", "moral"): {"bn": ["নীতি কথার গল্প", "bangla moral story cartoon"], "hi": ["moral stories hindi", "शिक्षाप्रद कहानियाँ"]},
+    ("cartoon", "animal"): {"bn": ["পশু পাখির গল্প কার্টুন", "bangla animal cartoon golpo"], "hi": ["janwaron ki kahani", "जानवरों की कहानी"]},
+    ("cartoon", "nature"): {"bn": ["প্রকৃতির গল্প কার্টুন", "bangla cartoon golpo"], "hi": ["prakriti ki kahani cartoon", "hindi cartoon story"]},
+    ("cartoon", "folk"): {"bn": ["লোককথা বাংলা কার্টুন", "bangla lok kotha"], "hi": ["lok katha hindi", "लोक कथा"]},
+    ("cartoon", "lok"): {"bn": ["লোককথা বাংলা কার্টুন"], "hi": ["lok katha hindi"]},
+    ("cartoon", "detective"): {"bn": ["গোয়েন্দা গল্প কার্টুন", "bangla detective cartoon"], "hi": ["jasoos kahani cartoon", "जासूसी कहानी"]},
+    ("cartoon", "adventure"): {"bn": ["অভিযানের গল্প কার্টুন", "bangla adventure cartoon"], "hi": ["adventure kahani cartoon", "साहसिक कहानी"]},
+    ("cartoon", "para"): {"bn": ["পাড়ার গল্প কার্টুন", "bangla cartoon golpo"], "hi": ["mohalla kahani cartoon", "hindi cartoon story"]},
+    ("cartoon", "funny"): {"bn": ["মজার কার্টুন গল্প", "bangla funny cartoon"], "hi": ["funny cartoon hindi kahani", "मज़ेदार कहानी"]},
+    ("cartoon", "witty"): {"bn": ["বুদ্ধির গল্প কার্টুন", "buddhir golpo"], "hi": ["buddhi ki kahani", "चतुराई की कहानी"]},
+    ("cartoon", "bedtime"): {"bn": ["ঘুমপাড়ানি গল্প", "bedtime story bangla"], "hi": ["sone ki kahani", "bedtime story hindi"]},
+    ("cartoon", "school"): {"bn": ["স্কুলের গল্প কার্টুন", "school cartoon bangla"], "hi": ["school ki kahani cartoon"]},
+    ("cartoon", "life"): {"bn": ["জীবনের গল্প কার্টুন", "bangla jiboner golpo"], "hi": ["zindagi ki kahani cartoon", "emotional kahani hindi"]},
+    ("cartoon", "rhyme"): {"bn": ["বাংলা ছড়া কার্টুন", "bangla chora"], "hi": ["hindi rhymes cartoon", "बाल गीत"]},
+}
+
+
+def cat_queries(kind, lang, cat):
+    q = (CAT_QUERIES.get((kind, cat)) or {}).get(lang) or []
+    return q or TREND_QUERIES.get((kind, lang), [])
+
+
 # other people's published stories / shows: we take only the TOPIC of a trend, never these stories
 TREND_SKIP = re.compile(r"(?i)sunday\s*suspense|mirchi|goppo\s*mirchi|সানডে\s*সাসপেন্স|মির্চি|golpo\s*kotha|"
                         r"scary\s*mamma|bhoot\.?com|aahat|ssshhh|#?shorts?\b.*?\bmovie|full\s*movie|song|গান")
@@ -5165,13 +5209,13 @@ def parse_yt_results(html):
     return out
 
 
-def yt_trending(kind, lang, max_n=15):
+def yt_trending(kind, lang, max_n=15, queries=None):
     """The most watched videos of THIS WEEK on YouTube for our kind of video (YouTube's own search, sorted by
     views, uploaded this week) - real titles and real view counts, no API quota used. [] if YouTube says no."""
     seen, out = set(), []
     hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                          "Chrome/124.0 Safari/537.36", "Accept-Language": "en-US,en;q=0.8"}
-    for q in TREND_QUERIES.get((kind, lang), [])[:6]:
+    for q in (queries or TREND_QUERIES.get((kind, lang), []))[:6]:
         try:
             r = requests.get("https://www.youtube.com/results", headers=hdr, cookies={"CONSENT": "YES+1"}, timeout=25,
                              params={"search_query": q, "sp": "CAMSAggD", "hl": "en", "gl": "IN"})  # this week, by views
@@ -5305,7 +5349,7 @@ def trend_style_rule(kind, lang, cache_dir=None):
             f"Thumbnail text - {st.get('thumb_text_style', '')}\n")
 
 
-def trending_topics(kind, lang, cache_dir):
+def trending_topics(kind, lang, cache_dir, cat=None):
     """Once a day: what Bengali / Indian viewers are watching NOW in this kind of video on YouTube and Facebook
     (found with Google Search) - so our stories ride the trend. Cached for the day in cache_dir/trends.json.
     Returns a short list of English topic lines ([] if unknown)."""
@@ -5319,7 +5363,8 @@ def trending_topics(kind, lang, cache_dir):
             data = json.load(f)
     except Exception:
         data = {}
-    k = f"{kind}_{lang}"
+    k = f"{kind}_{lang}" + (f"_{cat}" if cat and CAT_QUERIES.get((kind, cat)) else "")
+    queries = cat_queries(kind, lang, cat) if cat else None
     old = data.get(k) or {}
     if old.get("date") == today and (old.get("topics") or int(old.get("tries") or 0) >= 2):
         return old.get("topics", [])
@@ -5340,13 +5385,13 @@ def trending_topics(kind, lang, cache_dir):
         real = old["real"]                            # (searched once today already - not again)
     else:
         try:
-            real = yt_trending(kind, lang) if env("YT_TRENDS") != "0" else []
+            real = yt_trending(kind, lang, queries=queries) if env("YT_TRENDS") != "0" else []
         except Exception as e:
             log("  YouTube trend list failed:", str(e)[:100])
     auto = []
     if not real:
         try:
-            auto = yt_autocomplete(TREND_QUERIES.get((kind, lang), [])[:4], lang)
+            auto = yt_autocomplete((queries or TREND_QUERIES.get((kind, lang), []))[:4], lang)
         except Exception:
             auto = []
     if real or auto:
@@ -5415,6 +5460,9 @@ def trending_topics(kind, lang, cache_dir):
     if style.get("hashtags"):                 # the hashtags those videos REALLY use come first
         tags_ = (style["hashtags"] + [h_ for h_ in tags_ if h_.lower() not in [x.lower() for x in style["hashtags"]]])[:12]
     TREND_STYLE[k] = style
+    if k != f"{kind}_{lang}":                 # (the posting run reads the newest hashtags / style under the kind)
+        data[f"{kind}_{lang}"] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws, "style": style,
+                                  "real": real[:15], "from_cat": cat}
     data[k] = {"date": today, "topics": topics, "hashtags": tags_, "keywords": kws, "style": style, "real": real[:15],
                "youtube_top": [f"{v['title']} ({v['views']:,})" for v in real[:10]], "from": "youtube" if real else
                ("search" if auto else "google")}

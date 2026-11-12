@@ -4282,6 +4282,12 @@ def user_thumb_prompt(kind, subject, place, moment=""):
             look = re.sub(r"(?i)[^.]*\blettering\b[^.]*\.?", "", look)     # (the words are added by the bot)
     except Exception:
         look = ""
+    try:                                              # v77: the growth monitor saw few clicks -> a stronger picture
+        if (coach_load(os.path.join(_here_assets(), "coach.json")).get("rules") or {}).get("ctr_low"):
+            look += (" Make it hit harder on a small phone screen: an extreme close-up of the most frightening face or "
+                     "eyes, very high contrast, one bold glowing colour against deep black, nothing small or busy.")
+    except Exception:
+        pass
     tmpl = tmpl + look.replace("{", "(").replace("}", ")")
     return " ".join(tmpl.format(subject=str(subject or "the ghost").strip(),
                                             place=str(place or "a haunted old place").strip(),
@@ -6765,3 +6771,321 @@ def live_card(img, secs, dst):
     live_clip(tmp, dst)
     os.remove(tmp)
     return dst
+
+
+# =====================================================================================================================
+# v77 (12 Nov 2026): the bot's own health check, the safety check before every upload, the first-30-seconds learning
+# and the daily growth monitor that changes what it can by itself and tells you only what it cannot
+# =====================================================================================================================
+def _ok_get(url, **k):
+    try:
+        r = requests.get(url, timeout=30, **k)
+        return r.ok, r
+    except Exception as e:
+        return False, e
+
+
+def health_check(kind="horror"):
+    """every key the bot needs: valid now? about to run out? -> list of (level, Bengali text). Never shows a key."""
+    out = []
+    tok, page = env("FB_PAGE_TOKEN"), env("FB_PAGE_ID")
+    if tok:
+        ok, r = _ok_get(f"{GRAPH}/debug_token", params={"input_token": tok, "access_token": tok})
+        d = (r.json().get("data") or {}) if ok else {}
+        if not ok or not d.get("is_valid", False):
+            out.append(("bad", "Facebook-এর চাবি (FB_PAGE_TOKEN) আর কাজ করছে না - Facebook-এ পোস্ট বন্ধ হয়ে যাবে। নতুন page token বানিয়ে GitHub Secrets-এ বদলে দিন।"))
+        else:
+            for k_, what in (("expires_at", "Facebook-এর চাবি"), ("data_access_expires_at", "Facebook-এর ডেটা দেখার অনুমতি")):
+                ts = int(d.get(k_) or 0)
+                if ts:
+                    days = (ts - time.time()) / 86400
+                    if days < 10:
+                        out.append(("warn", f"{what} আর {max(0, int(days))} দিনে শেষ হবে - তার আগে নতুন page token বানিয়ে GitHub Secrets-এ বদলে দিন।"))
+            if page and str(d.get("profile_id") or page) != str(page) and d.get("type") == "PAGE":
+                out.append(("warn", "Facebook-এর চাবিটা অন্য কোনো Page-এর মনে হচ্ছে - FB_PAGE_ID আর token মিলিয়ে দেখুন।"))
+    else:
+        out.append(("warn", "FB_PAGE_TOKEN নেই - Facebook-এ কিছু যাবে না।"))
+    if env("YT_REFRESH_TOKEN"):
+        try:
+            hdr = yt_token()
+            at = hdr.get("Authorization", "").replace("Bearer ", "")
+            ok, r = _ok_get("https://oauth2.googleapis.com/tokeninfo", params={"access_token": at})
+            scope = r.json().get("scope", "") if ok else ""
+            if scope:
+                if "youtube.force-ssl" not in scope and "auth/youtube " not in scope + " ":
+                    out.append(("warn", "YouTube-এর অনুমতিতে কমেন্টের উত্তর / লাইভ নেই (youtube.force-ssl) - YouTube token নতুন করে বানাতে হবে।"))
+                if "yt-analytics" not in scope:
+                    out.append(("info", "YouTube Analytics-এর অনুমতি নেই - কতক্ষণ দেখা হলো, প্রথম ৩০ সেকেন্ড শেখা যাবে না।"))
+        except Exception as e:
+            out.append(("bad", "YouTube-এর চাবি (YT_REFRESH_TOKEN) কাজ করছে না - YouTube-এ upload বন্ধ হয়ে যাবে। "
+                               f"({str(e)[:80]})"))
+    for name in ("GEMINI_API_KEY", "GEMINI_TTS_KEY"):
+        key = env(name)
+        if not key:
+            if name == "GEMINI_API_KEY" or kind == "horror":
+                out.append(("bad" if name == "GEMINI_API_KEY" else "warn", f"{name} নেই।"))
+            continue
+        ok, r = _ok_get(f"{GEMINI_BASE}/models", headers={"x-goog-api-key": key}, params={"pageSize": 1})
+        if not ok:
+            out.append(("bad", f"Gemini-র চাবি {name} কাজ করছে না ({getattr(r, 'status_code', '?')}) - "
+                               + ("গল্প লেখা বন্ধ হবে।" if name == "GEMINI_API_KEY" else "Gemini গলা বন্ধ হবে, Chirp গলা নেবে।")))
+    if env("TELEGRAM_BOT_TOKEN"):
+        ok, _r = _ok_get(f"https://api.telegram.org/bot{env('TELEGRAM_BOT_TOKEN')}/getMe")
+        if not ok:
+            out.append(("warn", "Telegram bot-এর চাবি কাজ করছে না।"))
+    return out
+
+
+# ----------------------------------------------------------------- 4) safety check before every upload
+RISKY = [   # (pattern, replacement) - words that make YouTube / Facebook hide a video, or count as misleading
+    (r"(?i)\b(?:100\s*%\s*real|real\s+ghost\s+caught|caught\s+on\s+camera|proof\s+of\s+ghost|not\s+fake)\b", ""),
+    (r"(?i)\b(?:suicide|self[\s-]?harm|kill\s+yourself)\b", ""),
+    (r"(?i)\b(?:sex|sexy|nude|naked|porn\w*|18\+)\b", ""),
+    (r"(?i)\b(?:gore|gory|beheaded|dismember\w*|bloodbath)\b", ""),
+    (r"(আত্মহত্যা|আত্মহনন|নগ্ন|উলঙ্গ|যৌন|ধর্ষণ)", ""),
+    (r"(आत्महत्या|नग्न|यौन|बलात्कार)", ""),
+    (r"(?i)\b(?:like\s+and\s+share|share\s+(?:this|kore|koro)|tag\s+\w+\s+friends?|comment\s+1\s+or\s+2)\b", ""),
+]
+
+
+def safety_check(title, description, tags, kind="horror"):
+    """Before every upload: the title / description / tags are made safe for YouTube and Facebook - no words that get
+    a video limited, no misleading 'real ghost caught' claims, no engagement bait, YouTube's limits kept (title 100,
+    description 5000, tags 500 letters, max 15 hashtags, no < >). Returns (title, description, tags, notes)."""
+    notes = []
+
+    def clean(s, what):
+        s0 = str(s or "")
+        for pat, rep_ in RISKY:
+            if re.search(pat, s0):
+                notes.append(f"{what}: '{re.search(pat, s0).group(0)}' সরানো হলো")
+                s0 = re.sub(pat, rep_, s0)
+        s0 = s0.replace("<", "‹").replace(">", "›")
+        return re.sub(r"[ \t]{2,}", " ", s0).strip(" |-–:")
+    title = clean(title, "title")
+    if len(title) > 100:
+        title = title[:100].rsplit(" ", 1)[0]
+        notes.append("title ১০০ অক্ষরে ছোট করা হলো")
+    if kind == "horror" and re.search(r"(?i)\b(?:kids?|children|bacchon|ছোটদের|বাচ্চাদের)\b", title):
+        notes.append("horror-এর title-এ 'ছোটদের' ধরনের শব্দ ছিল - সরানো হলো (YouTube ভুল করে 'kids' ভাবতে পারে)")
+        title = re.sub(r"(?i)\b(?:kids?|children|bacchon|ছোটদের|বাচ্চাদের)\b", "", title).strip()
+    description = clean(description, "description")
+    tags_in_desc = re.findall(r"#\S+", description)
+    if len(tags_in_desc) > 15:                       # (more than 60 - YouTube ignores ALL of them; keep it tidy)
+        for h_ in tags_in_desc[15:]:
+            description = description.replace(" " + h_, "", 1).replace(h_, "", 1)
+        notes.append(f"hashtag {len(tags_in_desc)} থেকে ১৫-তে নামানো হলো")
+    if len(description) > 4900:
+        description = description[:4900]
+        notes.append("description ছোট করা হলো")
+    out, total = [], 0
+    for t_ in tags or []:
+        t_ = clean(t_, "tag").replace(",", " ").strip()
+        if not t_ or t_.lower() in [x.lower() for x in out]:
+            continue
+        if len(t_) > 100 or total + len(t_) + 3 > 480:
+            continue
+        out.append(t_)
+        total += len(t_) + 3
+    return title, description, out, notes
+
+
+def thumb_safe(path, limit=1_900_000):
+    """YouTube refuses thumbnails over 2 MB: such a picture is saved again smaller"""
+    try:
+        if path and os.path.exists(path) and os.path.getsize(path) > limit:
+            im = Image.open(path).convert("RGB")
+            for size in (None, (1920, 1080), (1280, 720)):
+                if size and im.width > size[0]:
+                    im = im.resize(size)
+                for q in (90, 80, 70, 60, 50):
+                    im.save(path, "JPEG", quality=q)
+                    if os.path.getsize(path) <= limit:
+                        return True
+            return True
+    except Exception:
+        pass
+    return False
+
+
+# ----------------------------------------------------------------- 3) the first 30 seconds
+def yt_keep30(video_id, length_s):
+    """the share of viewers still watching after 30 seconds (YouTube Analytics retention curve)"""
+    if not length_s or length_s < 60:
+        return None
+    r = requests.get(YTA, headers=yt_token(), timeout=30, params={
+        "ids": "channel==MINE", "startDate": "2020-01-01", "endDate": dt.date.today().isoformat(),
+        "filters": f"video=={video_id}", "dimensions": "elapsedVideoTimeRatio", "metrics": "audienceWatchRatio"})
+    rows = r.json().get("rows") if r.ok else None
+    if not rows:
+        return None
+    want = 30.0 / float(length_s)
+    best = min(rows, key=lambda x: abs(float(x[0]) - want))
+    return round(float(best[1]) * 100, 1)
+
+
+def yt_ctr(video_ids, days=28):
+    """thumbnail click rate (%) of these videos (YouTube Analytics) -> {id: ctr}"""
+    out = {}
+    if not video_ids:
+        return out
+    end = dt.date.today()
+    r = requests.get(YTA, headers=yt_token(), timeout=30, params={
+        "ids": "channel==MINE", "startDate": (end - dt.timedelta(days=days)).isoformat(), "endDate": end.isoformat(),
+        "dimensions": "video", "filters": "video==" + ",".join(video_ids[:50]),
+        "metrics": "videoThumbnailImpressions,videoThumbnailImpressionsClickRate"})
+    for row in (r.json().get("rows") or []) if r.ok else []:
+        if row[1] and row[1] >= 100:                 # (too few impressions say nothing)
+            out[row[0]] = round(float(row[2]), 2)
+    return out
+
+
+OPENINGS = {
+    "flash": ("FLASH HOOK: the very first line is the most frightening sound or line from LATER in this story, heard "
+              "for a moment and not explained; then the narrator clearly begins the story from its real start."),
+    "question": ("QUESTION HOOK: the narrator's very first line asks the listener a chilling, personal question "
+                 "about the fear of this story (\"আপনি কি কখনো মাঝরাতে ...?\"); then the story clearly begins from its "
+                 "real start."),
+    "place": ("PLACE-AND-TIME HOOK: the first line names the exact year, place and time of night in one vivid, "
+              "real-sounding sentence with one strange detail (\"১৯৮৭ সালের শ্রাবণ, পুরুলিয়ার এক রেলস্টেশন, রাত পৌনে "
+              "দুটো - আর প্ল্যাটফর্মে একটাই আলো জ্বলছিল...\"); then the story goes on from there."),
+}
+
+
+def pick_opening(coach):
+    """the opening style for the next story: each style is tried twice first, then the one that keeps the most
+    viewers past 30 seconds is used most (and the others sometimes, so the bot keeps learning)"""
+    st = (coach or {}).get("openings") or {}
+    tried = {k: [x for x in (st.get(k) or []) if x is not None] for k in OPENINGS}
+    for k in OPENINGS:
+        if len(tried[k]) < 2:
+            return k
+    best = max(OPENINGS, key=lambda k: sum(tried[k][-8:]) / len(tried[k][-8:]))
+    return best if random.random() < 0.7 else random.choice([k for k in OPENINGS if k != best])
+
+
+def coach_load(path):
+    d = _jl(path, {})
+    return d if isinstance(d, dict) else {}
+
+
+def growth_monitor(history, path, kind="horror", lang="bn", len_of=None):
+    """ONCE A DAY: the numbers of the channel and page, what is going well and badly - and what the bot changes by
+    itself because of it. Returns (coach data, Bengali message lines, fixes the bot applied)."""
+    coach = coach_load(path)
+    today = dt.datetime.now(IST).date().isoformat()
+    if coach.get("day") == today:
+        return coach, None, None                     # (already done today)
+    coach["day"] = today
+    lines, did, todo = [], [], []
+    # ---- the keys (health check)
+    try:
+        hc = health_check(kind)
+    except Exception as e:
+        hc = [("info", f"চাবি পরীক্ষা হয়নি: {str(e)[:60]}")]
+    bad = [t for lv, t in hc if lv in ("bad", "warn")]
+    # ---- numbers: subscribers / followers, day by day
+    counts = channel_counts()
+    series = coach.setdefault("counts", {})
+    series[today] = counts
+    for k_ in sorted(series)[:-60]:
+        series.pop(k_, None)
+    days = sorted(series)
+    def delta(pf, n_days):
+        old = next((series[d].get(pf) for d in reversed(days[:-1]) if
+                    (dt.date.fromisoformat(today) - dt.date.fromisoformat(d)).days >= n_days and series[d].get(pf) is not None), None)
+        return None if old is None or counts.get(pf) is None else counts[pf] - old
+    for pf, name, word in (("yt", "YouTube", "subscriber"), ("fb", "Facebook", "follower")):
+        if counts.get(pf) is not None:
+            d1, d7 = delta(pf, 1), delta(pf, 7)
+            lines.append(f"{'▶️' if pf == 'yt' else '📘'} {name}: {counts[pf]} {word}"
+                         + (f" ({d1:+d} আজ" if d1 is not None else "") + (f", {d7:+d} এই সপ্তাহে)" if d7 is not None else (")" if d1 is not None else "")))
+    # ---- the last 7 days' videos
+    now = dt.datetime.now(dt.timezone.utc)
+    week = []
+    for h in history:
+        if h.get("kind") or not h.get("youtube"):
+            continue
+        try:
+            age = (now - dt.datetime.fromisoformat(str(h["date"]))).days
+        except Exception:
+            continue
+        if age <= 14:
+            week.append(h)
+    # first 30 seconds (needs YouTube Analytics; videos older than 2 days have data)
+    op = coach.setdefault("openings", {})
+    if env("YT_REFRESH_TOKEN") and env("YT_ANALYTICS") != "0":
+        for h in week:
+            if h.get("keep30") is not None or not h.get("opening"):
+                continue
+            try:
+                if (now - dt.datetime.fromisoformat(str(h["date"]))).days < 2:
+                    continue
+                ln = (len_of(h) if len_of else None) or (h.get("timeline") or {}).get("len")
+                k30 = yt_keep30(h["youtube"], ln)
+            except Exception:
+                k30 = None
+            if k30 is not None:
+                h["keep30"] = k30
+                op.setdefault(h["opening"], []).append(k30)
+                op[h["opening"]] = op[h["opening"]][-12:]
+        if any(op.values()):
+            avg_ = {k: sum(v) / len(v) for k, v in op.items() if v}
+            best = max(avg_, key=avg_.get)
+            lines.append("⏱️ ৩০ সেকেন্ড পরেও দেখছেন: " + " | ".join(
+                f"{ {'flash': 'ভয়ের ঝলক', 'question': 'প্রশ্ন', 'place': 'জায়গা-সময়'}.get(k, k)} {v:.0f}%"
+                for k, v in sorted(avg_.items(), key=lambda x: -x[1])))
+            if len(op.get(best, [])) >= 2:
+                did.append(f"গল্পের শুরু বেশিরভাগ সময় '{ {'flash': 'ভয়ের ঝলক', 'question': 'প্রশ্ন', 'place': 'জায়গা-সময়'}.get(best, best)}' ধাঁচে হবে - এতে সবচেয়ে বেশি লোক থেকে যাচ্ছেন")
+    # thumbnail click rate -> stronger thumbnails / titles when it is low
+    rules = coach.setdefault("rules", {})
+    try:
+        ctr = yt_ctr([h["youtube"] for h in week]) if env("YT_ANALYTICS") != "0" else {}
+    except Exception:
+        ctr = {}
+    if ctr:
+        avg_ctr = sum(ctr.values()) / len(ctr)
+        lines.append(f"🖼️ thumbnail-এ ক্লিক: গড় {avg_ctr:.1f}% (ভালো: ৪-১০%)")
+        if avg_ctr < 3.5:
+            rules["ctr_low"] = True
+            did.append("thumbnail-এ ক্লিক কম - এখন থেকে মুখ আরও কাছে, রং আরও উজ্জ্বল, লেখা আরও বড় আর title-এ আরও কৌতূহল")
+        elif avg_ctr > 6:
+            rules.pop("ctr_low", None)
+    # how much of the video people watch -> a faster start when it is low
+    pct = [float((h.get("stats") or {}).get("yt_avg_pct")) for h in week if (h.get("stats") or {}).get("yt_avg_pct") is not None]
+    if pct:
+        a_ = sum(pct) / len(pct)
+        lines.append(f"📺 গড়ে ভিডিওর {a_:.0f}% দেখা হচ্ছে")
+        if a_ < 25:
+            rules["fast_start"] = True
+            did.append("লোকে তাড়াতাড়ি চলে যাচ্ছেন - প্রথম ভয় এখন গল্পের আরও আগে আসবে, শুরুর বর্ণনা ছোট হবে")
+        elif a_ > 40:
+            rules.pop("fast_start", None)
+    drops = [int((h.get("stats") or {}).get("yt_drop_at")) for h in week if (h.get("stats") or {}).get("yt_drop_at") is not None]
+    if len(drops) >= 3:
+        lines.append(f"📉 বেশিরভাগ লোক চলে যান ভিডিওর ~{sorted(drops)[len(drops) // 2]}%-এ")
+    # best / weakest of the week
+    sc = sorted([h for h in week if h.get("stats")], key=lambda h: score(h["stats"]), reverse=True)
+    if sc:
+        lines.append(f"🏆 সেরা: {re.sub(r'[|].*$', '', str(sc[0].get('title', '')))[:50].strip()} "
+                     f"(👁 {sc[0]['stats'].get('views', 0)})")
+    # what only YOU can do
+    todo += bad
+    if counts.get("yt", 0) and counts["yt"] < 50 and kind == "horror":
+        pass
+    coach["last_report"] = {"lines": lines, "did": did, "todo": todo}
+    _js(path, coach)
+    return coach, lines, did
+
+
+def coach_rule(coach, kind="horror"):
+    """the bot's own corrections for the next story (from the growth monitor)"""
+    r = (coach or {}).get("rules") or {}
+    out = ""
+    if r.get("ctr_low"):
+        out += ("\nCLICKS ARE LOW THIS WEEK: make the title a sharper curiosity gap (a concrete strange detail + an open "
+                "question, never a lie or a spoiler) and the thumbnail_text 2-4 huge, punchy words.\n")
+    if r.get("fast_start") and kind == "horror":
+        out += ("\nVIEWERS LEAVE EARLY THIS WEEK: the first real fright comes within the first 90 seconds of the story; "
+                "keep the opening description short - but the beginning must still be clear (who, where, why).\n")
+    return out

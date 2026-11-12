@@ -3284,6 +3284,19 @@ def growth_start(history):
                             f"{num} পার হলো ({got['count']:,})!")
     except Exception as e:
         log("  milestones skipped:", str(e)[:100])
+    if env("MONITOR") != "0":
+        try:                                         # v77: once a day - keys, numbers, what the bot changes
+            coach, lines, did = extras.growth_monitor(history, os.path.join(ASSETS, "coach.json"), "cartoon", lang)
+            todo = (coach.get("last_report") or {}).get("todo") or []
+            if lines is not None and (lines or did or todo):
+                msg = ["📈 কার্টুন চ্যানেল - আজকের খবর"] + lines
+                if did:
+                    msg += ["", "🤖 bot নিজে যা বদলাল:"] + [f"• {x}" for x in did]
+                msg += (["", "⚠️ আপনাকে যা করতে হবে:"] + [f"• {x}" for x in todo]) if todo else \
+                    ["", "✅ সব চাবি ঠিক আছে - আপনার কিছু করার নেই।"]
+                extras.telegram("\n".join(msg))
+        except Exception as e:
+            log("  daily monitor skipped:", str(e)[:150])
 
 
 def growth_after_post(title, results, lang, thumb, slot_hour):
@@ -3602,6 +3615,7 @@ def main():
     if not MOCK:
         try:                                         # title + thumbnail words in this week's winning style
             extra += extras.trend_style_rule("cartoon", lang, os.path.join(HERE, "assets"))
+            extra += extras.coach_rule(extras.coach_load(os.path.join(HERE, "assets", "coach.json")), "cartoon")
         except Exception:
             pass
     if tr and category not in MYTH and category != "gopal" and part < 2:
@@ -3993,6 +4007,14 @@ def main():
     kw = next((w for w in seo_words if w.lower() not in title.lower() and len(title) + 3 + len(w) <= 100), "")
     yt_title = f"{title} | {kw}" if kw else title
     yt_tags = list(seo_words) + tags
+    try:                                             # v77: the safety check before every upload
+        yt_title, yt_description, yt_tags, n1 = extras.safety_check(yt_title, yt_description, yt_tags, "cartoon")
+        title, description, _t, n2 = extras.safety_check(title, description, [], "cartoon")
+        extras.thumb_safe(thumb)
+        if n1 or n2:
+            log("  safety check: " + "; ".join(dict.fromkeys(n1 + n2)))
+    except Exception as e:
+        log("  safety check skipped:", str(e)[:120])
 
     results = {}
     if DRY_RUN:

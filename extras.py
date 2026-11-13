@@ -7031,11 +7031,11 @@ OPENINGS = {
     "flash": ("FLASH HOOK: the very first line is the most frightening sound or line from LATER in this story, heard "
               "for a moment and not explained; then the narrator clearly begins the story from its real start."),
     "question": ("QUESTION HOOK: the narrator's very first line asks the listener a chilling, personal question "
-                 "about the fear of this story (\"আপনি কি কখনো মাঝরাতে ...?\"); then the story clearly begins from its "
-                 "real start."),
-    "place": ("PLACE-AND-TIME HOOK: the first line names the exact year, place and time of night in one vivid, "
-              "real-sounding sentence with one strange detail (\"১৯৮৭ সালের শ্রাবণ, পুরুলিয়ার এক রেলস্টেশন, রাত পৌনে "
-              "দুটো - আর প্ল্যাটফর্মে একটাই আলো জ্বলছিল...\"); then the story goes on from there."),
+                 "that only THIS story could ask (made from its own place, object or fear - never a stock question); "
+                 "then the story clearly begins from its real start."),
+    "place": ("PLACE-AND-TIME HOOK: the first line names this story's own exact year, place and hour in one vivid, "
+              "real-sounding sentence with one strange detail that belongs only to this story; then the story goes "
+              "on from there."),
 }
 
 

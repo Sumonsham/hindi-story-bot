@@ -360,7 +360,8 @@ MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman"
 # the weekly routine: the 1 PM story of each day is always this series (Mon=0 ... Sun=6)
 DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
 # the weekly programme (0 = Monday) - every day and time has its own kind of story, like a children's TV channel
-MORNING_GRID = {0: "panchatantra", 1: "cnotun", 2: "nature", 3: "fairy", 4: "jataka", 5: "animal", 6: "gita"}
+MORNING_GRID = {0: "learn", 1: "cnotun", 2: "nature", 3: "learn", 4: "jataka", 5: "animal", 6: "gita"}
+# v83 ('learn', Monday and Thursday 8 AM): little learning videos for small children, in order (see LEARN)
 EVENING_GRID = {0: "cnotun", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "cnotun", 6: "mahabharat"}
 # v80 ('cnotun'): our five NEW cartoon series take turns there (see CARTOON_SERIES)
 SERIES_CATS = ("adventure", "detective", "folk", "para")      # big stories told in 2-3 parts at 7 PM
@@ -439,11 +440,34 @@ CARTOON_SERIES = {
              "ideas": ["Robi tries to cook luchi", "Robi and Grandpa's old radio", "Robi learns to share"],
              "q": {"bn": ["রোবট কার্টুন বাংলা", "robot cartoon bangla"], "hi": ["robot cartoon hindi", "रोबोट कार्टून"]}},
 }
+# v83: what the little ones learn, one lesson each Monday and Thursday morning, in this order (then from the start)
+LEARN = ["the first 6 vowels of the alphabet of the story language (Bengali: অ আ ই ঈ উ ঊ / Hindi: अ आ इ ई उ ऊ)",
+         "the next vowels of the alphabet (Bengali: ঋ এ ঐ ও ঔ / Hindi: ऋ ए ऐ ओ औ)",
+         "consonants 1-5 (Bengali: ক খ গ ঘ ঙ / Hindi: क ख ग घ ङ)", "consonants 6-10 (Bengali: চ ছ জ ঝ ঞ / Hindi: च छ ज झ ञ)",
+         "consonants 11-15 (Bengali: ট ঠ ড ঢ ণ / Hindi: ट ठ ड ढ ण)", "consonants 16-20 (Bengali: ত থ দ ধ ন / Hindi: त थ द ध न)",
+         "consonants 21-25 (Bengali: প ফ ব ভ ম / Hindi: प फ ब भ म)", "the last consonants (Bengali: য র ল শ ষ স হ / Hindi: य र ल व श ष स ह)",
+         "numbers 1 to 5 (counting things)", "numbers 6 to 10 (counting things)", "the colours (red, blue, yellow, green, white, black)",
+         "the fruits (mango, banana, jackfruit, guava, litchi, coconut)", "the animals of the village (cow, goat, dog, cat, duck, hen)",
+         "the animals of the forest (tiger, elephant, monkey, deer, bear, lion)", "the birds (crow, sparrow, parrot, peacock, owl, kingfisher)",
+         "the vegetables (potato, brinjal, pumpkin, tomato, cauliflower, carrot)", "our body (eyes, ears, nose, mouth, hands, feet)",
+         "the shapes (circle, square, triangle, star, heart, moon)", "the days of the week", "good habits (brushing teeth, washing hands, "
+         "saying thank you, sharing, sleeping early, helping at home)"]
+EPIC["learn"] = LEARN
+LEARN_RULE = ("This is a LEARNING video for small children (2 to 6 years old) with Lumi Didi and the parrot Mithu - today they "
+              "learn: {theme}. One short, bright scene for EACH item: Lumi Didi shows it, says the letter / number / word "
+              "slowly and clearly, says one easy word that starts with it (a picture of that thing fills the screen), "
+              "and asks the children to say it with her; Mithu repeats it in a funny way. Warm, happy, slow, simple words. "
+              "At the end a tiny rhyme of all the items together. No story conflict, nothing scary. The TITLE starts with "
+              "'শিখি মজায়: ' (Hindi: 'सीखो मज़े से: ').")
+
 for _k, _s in CARTOON_SERIES.items():
     CATEGORIES[_k] = list(_s["ideas"])
     LANGS["bn"]["labels"][_k] = _s["bn"]
     LANGS["hi"]["labels"][_k] = _s["hi"]
     extras.CAT_QUERIES[("cartoon", _k)] = _s["q"]
+LANGS["bn"]["labels"]["learn"] = "শিখি মজায়"
+LANGS["hi"]["labels"]["learn"] = "सीखो मज़े से"
+CATEGORIES["learn"] = list(LEARN)
 
 
 def pick_cartoon_series(history):
@@ -812,14 +836,13 @@ SET_DIR = os.path.join(HERE, "assets", "sets")
 SET_VER = {"gopal_home": 2}      # a new number = that set is painted again (once) with its new description
 SET_RULE = ("EMPTY place, nobody in the picture: no people, no animals, no throne, no chairs in the middle. "
             "Eye-level wide view, the floor or ground clearly visible in the lower third, open space in front. " +
-            ("Detailed 3D animated-film background, bright soft colours, " if STYLE_3D else
-             "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, ") +
+            "Detailed 2D cartoon background painting like an Indian TV cartoon series, bright soft colours, " +
             "no text, no letters, no watermark")
 
 
 def puppet_ready(category=None):
     """the character packs this video can use (empty = the old way)"""
-    if puppet is None or env("PUPPET") == "0" or (STYLE_3D and env("PUPPET") != "1"):
+    if puppet is None or env("PUPPET") == "0":      # v84: Gopal always uses his own ready-made TV characters
         return set()
     av = puppet.available()
     if category is not None and (category not in PUPPET_SERIES or "gopal" not in av):
@@ -1151,7 +1174,8 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                 "chapter and verse number) and explain its meaning in simple {lang}; never invent verses. Then show "
                 "the same teaching in a short, touching modern Bengali family example (a student before an exam, a "
                 "father who lost his job...). Deep reverence for Lord Krishna; uplifting and practical for all ages.",
-    }.get(category, (CARTOON_SERIES.get(category) or {}).get("rule") or
+    }.get(category, (LEARN_RULE.replace("{theme}", str(theme[1] if isinstance(theme, (list, tuple)) else theme))
+                     if category == "learn" else None) or (CARTOON_SERIES.get(category) or {}).get("rule") or
           "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
     kind_rules = kind_rules.replace("{lang}", L["name"])
     if part == 1:
@@ -1228,6 +1252,7 @@ Story rules:
 Return ONLY JSON with exactly these keys:
 {{
  "title": "catchy {L['name']} title (max 60 characters) with 1 emoji",
+ "quiz": {{"q": "ONE short, easy {L['name']} question about this story for small children (max 10 words)", "options": ["three short {L['name']} answers, max 5 words each - only one is right"], "answer": "0, 1 or 2 = which option is right"}},
  "tagline": "{L['name']} tag line for the thumbnail and Reel, max 8 words, under the title: a fun promise or question (e.g. 'শেষে কে জিতল, জানেন?')",
  "title_b": "a SECOND, different {L['name']} title for the same story (another hook, e.g. a question), max 60 characters, 1 emoji",
  "thumbnail_text": "2-4 BIG {L['name']} words that make people curious to click - a surprising question, a funny shock or a promise (e.g. 'লোভের শাস্তি?', 'বোকা সিংহ!', 'শেষে কী হল?') - never just the title",
@@ -3383,6 +3408,14 @@ def growth_start(history):
         extras.tg_channel_flush(ASSETS)
     except Exception as e:
         log("  fan channel skipped:", str(e)[:100])
+    try:                                             # v82: people who wrote to the Page on Messenger
+        last_ = [h for h in history if not h.get("kind") and (h.get("youtube") or h.get("facebook"))][-2:]
+        links_ = [f"{str(h.get('title', '')).strip()}: " + (f"https://youtu.be/{h['youtube']}" if h.get("youtube")
+                                                           else f"https://www.facebook.com/{h['facebook']}")
+                  for h in reversed(last_)]
+        extras.messenger_replies("cartoon", links_)
+    except Exception as e:
+        log("  Messenger skipped:", str(e)[:100])
     try:
         got = extras.milestone_check(os.path.join(ASSETS, "milestones.json"))
         if got:
@@ -3415,8 +3448,100 @@ def growth_start(history):
             log("  daily monitor skipped:", str(e)[:150])
 
 
-def growth_after_post(title, results, lang, thumb, slot_hour):
-    """after a story is posted: the Facebook countdown story and the fan channel"""
+PROMO_FILE = os.path.join(ASSETS, "promos.json")
+
+
+def promo_list(lang):
+    """v84: our features that can be advertised RIGHT NOW (Bengali or Hindi, like the video)"""
+    if env("PROMOS") == "0":
+        return {}
+    bn = lang == "bn"
+    ch = extras.tg_channel_link(ASSETS)
+    names = [CARTOON_SERIES[k]["bn" if bn else "hi"] for k in CARTOON_SERIES]
+    out = {}
+    out["learn"] = ({"icon": "learn", "head": "শিখি মজায় - ছোট্টদের জন্য", "sub": "প্রতি সোম আর বৃহস্পতিবার সকাল ৮টা",
+                     "sub2": "ছড়া, রং, সংখ্যা, অক্ষর - লুমি দিদি আর মিঠুর সাথে"} if bn else
+                    {"icon": "learn", "head": "सीखो मज़े से - छोटे बच्चों के लिए", "sub": "हर सोमवार और गुरुवार सुबह 8 बजे",
+                     "sub2": "रंग, गिनती, अक्षर - लूमी दीदी और मिठू के साथ"})
+    out["series"] = ({"icon": "star", "head": "আমাদের নতুন কার্টুন সিরিজ", "sub": ", ".join(names[:3]),
+                      "sub2": ", ".join(names[3:]) + " - নতুন পর্ব প্রতি সপ্তাহে"} if bn else
+                     {"icon": "star", "head": "हमारी नई कार्टून सीरीज़", "sub": ", ".join(names[:3]),
+                      "sub2": ", ".join(names[3:]) + " - हर हफ़्ते नया एपिसोड"})
+    if env("GOPAL_DAILY") != "0":
+        out["gopal"] = ({"icon": "clock", "head": "রোজ দুপুর ১টা: গোপাল ভাঁড়", "sub": "রাজসভার মজার কাণ্ড, নতুন নতুন",
+                         "sub2": "আমাদের নিজের গোপাল, টিভি কার্টুনের মতো"} if bn else
+                        {"icon": "clock", "head": "रोज़ दोपहर 1 बजे: गोपाल भांड़", "sub": "राजदरबार की मज़ेदार कहानियाँ",
+                         "sub2": "हमारा अपना गोपाल, टीवी कार्टून जैसा"})
+    if env("YT_LIVE") != "0":
+        out["live"] = ({"icon": "live", "head": "প্রতি রবিবার সকালে লাইভ: গল্পের আসর",
+                        "sub": "সপ্তাহের সেরা কার্টুন একটানা - YouTube-এ", "sub2": "পুরো পরিবার মিলে দেখুন"} if bn else
+                       {"icon": "live", "head": "हर रविवार सुबह लाइव: कहानियों की महफ़िल",
+                        "sub": "हफ़्ते के बेस्ट कार्टून एक साथ - YouTube पर", "sub2": "पूरा परिवार साथ देखे"})
+    if env("QUIZ") != "0":
+        out["quiz"] = ({"icon": "quiz", "head": "গল্পের শেষে মজার কুইজ", "sub": "দেখো তো, ঠিক উত্তরটা বলতে পারো কিনা!",
+                        "sub2": "প্রতিটা গল্পের একদম শেষে"} if bn else
+                       {"icon": "quiz", "head": "कहानी के आख़िर में मज़ेदार क्विज़", "sub": "देखो, सही जवाब बता पाते हो या नहीं!",
+                        "sub2": "हर कहानी के बिल्कुल आख़िर में"})
+    if ch:
+        out["channel"] = ({"icon": "channel", "head": "আমাদের Telegram চ্যানেল", "sub": "নতুন কার্টুনের খবর সবার আগে",
+                           "link": re.sub(r"^https?://", "", ch), "url": ch} if bn else
+                          {"icon": "channel", "head": "हमारा Telegram चैनल", "sub": "नए कार्टून की ख़बर सबसे पहले",
+                           "link": re.sub(r"^https?://", "", ch), "url": ch})
+    return out
+
+
+def promo_card_for(lang, secs):
+    """(png, start, seconds) of this video's feature card - or None (every 2nd video, each feature every month)"""
+    feats = promo_list(lang)
+    if not feats or secs < (30 if MOCK else 120):
+        return None
+    pid = extras.promo_pick(PROMO_FILE, list(feats), every=int(env("PROMO_EVERY") or 2), map_id="")
+    if not pid:
+        return None
+    png = extras.promo_card_png((W, H), feats[pid], os.path.join(WORK, "promo_card.png"), FONT)
+    log(f"  feature card in the video: {pid}")
+    return (png, round(secs * 0.45, 1), 7.0)
+
+
+def promo_monthly_post(thumb, lang):
+    """v84: every feature gets its own Facebook poster once a month (at least 4 days apart, at 11:15 AM)"""
+    feats = promo_list(lang)
+    if not feats or not env("FB_PAGE_TOKEN") or env("PROMO_POSTS") == "0":
+        return False
+    pid = extras.promo_post_due(PROMO_FILE, list(feats), gap_days=4)
+    if not pid:
+        return False
+    f = feats[pid]
+    img = extras.promo_poster(thumb, f, os.path.join(WORK, "promo_poster.jpg"), FONT)
+    msg = "\n".join(x for x in [f"✨ {f['head']}", f.get("sub", ""), f.get("sub2", ""),
+                                (f"👉 {f['url']}" if f.get("url") else "")] if x)
+    now = dt.datetime.now(extras.IST)
+    when = now.replace(hour=11, minute=15, second=0, microsecond=0)
+    if when < now + dt.timedelta(minutes=30):
+        when += dt.timedelta(days=1)
+    extras.fb_schedule_photo(img, msg, when)
+    extras.promo_post_done(PROMO_FILE, pid)
+    log(f"  monthly feature poster scheduled on Facebook: {pid}")
+    return True
+
+
+def growth_after_post(title, results, lang, thumb, slot_hour, video=None, history=None):
+    """after a story is posted: the Facebook countdown story, the fan channel, a safe copy of the video"""
+    try:                                             # v84: each feature's own poster, once a month
+        if results.get("facebook"):
+            promo_monthly_post(thumb, lang)
+    except Exception as e:
+        log("  feature poster skipped:", str(e)[:150])
+    if video and env("VIDEO_BACKUP") != "0":
+        try:                                         # v82: the video's safe copy (GitHub release)
+            nm_ = re.sub(r"[^0-9A-Za-z-]", "-", str(SLOT or dt.datetime.now(extras.IST).strftime("%Y-%m-%d@%H")))
+            bk = extras.backup_video(video, f"cartoon-{nm_}.mp4")
+            if bk and history and history[-1].get("title") == title:
+                history[-1]["backup"] = bk
+                save_history(history)
+                log("  video backup kept")
+        except Exception as e:
+            log("  video backup skipped:", str(e)[:150])
     at = extras.publish_time()
     when = SLOT_WORDS.get(lang, SLOT_WORDS["bn"]).get(slot_hour, "")
     clean = re.sub(r"\s*[|].*$", "", title).strip()
@@ -3590,7 +3715,7 @@ def main():
     if not MOCK and not DRY_RUN:
         try:
             changed = extras.flush_pending(history)    # comments of earlier videos that are live now
-            changed = extras.reply_fans(history, env("LANGUAGE") or "bn") or changed   # answer the fans
+            changed = extras.reply_fans(history, env("LANGUAGE") or "bn", kind="cartoon") or changed   # answer the fans
             if changed:
                 save_history(history)
         except Exception as e:
@@ -4102,6 +4227,45 @@ def main():
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
     log(f"Video ready: {duration(video):.0f} seconds")
+    cards_ = []                                      # pictures laid over the video (one re-encode for all)
+    if category in CARTOON_SERIES and env("PREV_CARD") != "0":
+        try:                                         # v82: 'আগের পর্বে: ...' over the first seconds (no voice)
+            prev_ep = next((h for h in reversed(history) if h.get("category") == category and h.get("title")), None)
+            if prev_ep:
+                nm_ = CARTOON_SERIES[category]["bn" if lang == "bn" else "hi"]
+                png_ = extras.prev_card_png(f"{nm_} - আগের পর্বে" if lang == "bn" else f"{nm_} - पिछली बार",
+                                            re.sub(r"^.*?:\s*", "", str(prev_ep["title"]))[:60], (W, H),
+                                            os.path.join(WORK, "prev_card.png"), FONT)
+                cards_.append((png_, 0.0, 5.0))
+                log(f"  'last episode' card: {prev_ep['title'][:60]}")
+        except Exception as e:
+            log("  last-episode card skipped:", str(e)[:150])
+    try:                                             # v84: a small card for one of our features (every 2nd video)
+        pc_ = promo_card_for(lang, duration(video))
+        if pc_:
+            cards_.append(pc_)
+    except Exception as e:
+        log("  feature card skipped:", str(e)[:150])
+    if cards_:
+        try:
+            vw_ = os.path.join(WORK, "final_cards.mp4")
+            extras.overlay_cards(video, cards_, vw_)
+            os.replace(vw_, video)
+        except Exception as e:
+            log("  cards over the video skipped:", str(e)[:150])
+    qz = story.get("quiz") if isinstance(story.get("quiz"), dict) else None
+    if qz and env("QUIZ") != "0" and category not in MYTH:
+        try:                                         # v82: a little quiz at the very end (no voice)
+            opts = [str(x).strip() for x in (qz.get("options") or []) if str(x).strip()][:3]
+            ans = int(str(qz.get("answer", 0)).strip()[:1] or 0)
+            if len(opts) == 3 and 0 <= ans <= 2 and str(qz.get("q", "")).strip():
+                vq_ = os.path.join(WORK, "final_quiz.mp4")
+                extras.append_quiz(video, {"q": str(qz["q"]).strip(), "options": opts, "answer": ans}, lang, FONT, vq_,
+                                   bg=(imgs[-1] if imgs else None))
+                os.replace(vq_, video)
+                log(f"  quiz at the end: {qz['q']}")
+        except Exception as e:
+            log("  quiz skipped:", str(e)[:150])
 
     own = [t if t.startswith("#") else "#" + t.replace(" ", "") for t in story.get("hashtags", [])[:15]]
     seeds = ([category, "bangla cartoon golpo", "গোপাল ভাঁড়" if category == "gopal" else "রূপকথার গল্প"] if lang == "bn"
@@ -4203,7 +4367,7 @@ def main():
             extras.series_put(NEXT_PART, category, None)
     if not MOCK and not DRY_RUN:
         try:                                         # v76: countdown story + fan channel
-            growth_after_post(title, results, lang, thumb, slot_hour)
+            growth_after_post(title, results, lang, thumb, slot_hour, video, history)
         except Exception as e:
             log("  growth steps skipped:", str(e)[:150])
     extras.telegram(extras.report_text(env(f"PAGE_NAME_{lang.upper()}") or "Little Lumi Stories", title, results, history))
@@ -4441,6 +4605,16 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
                 log("  English subtitles added on YouTube")
         except Exception as e:
             log("  subtitles skipped:", str(e)[:160])
+        if env("HINDI_SUBS") != "0":
+            try:                                      # v82: subtitles in the other language (Bengali <-> Hindi)
+                other, code, nm = ("Hindi", "hi", "हिन्दी") if lang == "bn" else ("Bengali", "bn", "বাংলা")
+                tr2 = extras.translate_lines([s[3] for s in segs], other)
+                srt2 = extras.write_srt(segs, tr2, os.path.join(WORK, f"subs_{code}.srt"))
+                if srt2:
+                    extras.yt_upload_captions(results["youtube"], srt2, language=code, name=nm)
+                    log(f"  {other} subtitles added on YouTube")
+            except Exception as e:
+                log("  second-language subtitles skipped:", str(e)[:160])
     if results.get("facebook") and env("ANNOUNCE") != "0":
         try:                                          # "coming soon" post 2 hours before the evening video
             nxt = extras.next_slot([8, 13, 19], [19])

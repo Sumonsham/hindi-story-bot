@@ -4986,7 +4986,46 @@ def sub_times(text, dur, chunks):
 
 
 # ----------------------------------------------------------------- talking with the fans
-def reply_fans(history, lang, max_n=5):
+def human_reply_ask(kind, lang, todo):
+    """v84: the prompt for replies that read like the channel owner typed them himself - not like a bot"""
+    page = ("a Bengali horror-story page/channel (the stories are told late at night, a little mysterious)" if kind == "horror"
+            else "a Bengali/Hindi children's story cartoon page/channel (family friendly, cheerful)")
+    home = "Bengali (natural Kolkata cholit bhasha)" if lang == "bn" else "Hindi (simple, natural)"
+    return (f"You are the real person who runs {page}. You are replying to your viewers' comments YOURSELF, from "
+            "your own page, the way a real Bengali creator types on the phone. Rules for every reply:\n"
+            f"- Reply in the SAME language and script the viewer used (Bengali letters -> Bengali; Bengali/Hindi "
+            f"written in English letters -> answer the same way in English letters; English -> simple English). "
+            f"If unclear, use {home}.\n"
+            "- React to exactly what THIS viewer said (their guess, their fear, their memory, their question, the "
+            "character they liked). Never a generic 'thank you for watching'. No two replies may start the same way.\n"
+            "- Sound human: casual, warm, sometimes a little playful; vary the length (3 to 22 words); use their "
+            "first name only sometimes; 0 or 1 emoji (often none); no formal words, no 'dear viewer', no 'we "
+            "appreciate'.\n"
+            "- Answer a question honestly and simply; never spoil a twist; if they ask for a story idea, say you "
+            "noted it. Never ask for likes, shares, subscriptions or follows; no links, no hashtags.\n"
+            "- Never say you are a bot or AI, and never promise something exact (dates, prizes).\n"
+            "- For spam, links, abuse or anything rude return an empty string \"\" (we skip it).\n"
+            "Return ONLY a JSON list of strings, one per comment, in the same order.\n"
+            + "\n".join(f"{k + 1}. [video: {t}] {n or 'viewer'}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
+
+
+def _ask_replies(ask, key):
+    for model in helper_models(key)[:4]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": ask}]}],
+                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.95}},
+                              timeout=90)
+            if r.ok:
+                out = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                if isinstance(out, list) and out:
+                    return out
+        except Exception:
+            continue
+    return []
+
+
+def reply_fans(history, lang, max_n=12, kind=None):
     """Each run: answer the first few NEW comments under our recent videos - warm, short, personal replies (like
     a real creator), so people feel heard and come back. Never more than max_n replies per run."""
     token, page_id, key = env("FB_PAGE_TOKEN"), env("FB_PAGE_ID"), env("GEMINI_API_KEY")
@@ -4994,23 +5033,29 @@ def reply_fans(history, lang, max_n=5):
         return False
     now = dt.datetime.now(dt.timezone.utc)
     todo = []
-    for h in reversed(history[-6:]):
-        if not h.get("facebook") or not h.get("date"):
+    kind = kind or ("horror" if "horror" in os.path.abspath(__file__).lower() else "cartoon")
+    for h in reversed(history[-14:]):
+        if not h.get("date") or len(todo) >= max_n:
             continue
         try:
             age = (now - dt.datetime.fromisoformat(h["date"])).total_seconds() / 3600
         except Exception:
             continue
-        if not 1 <= age <= 48:
+        if not 0.3 <= age <= 24 * 7:                      # v84: a whole week, not just 2 days
             continue
-        try:
-            r = requests.get(f"{GRAPH}/{h['facebook']}/comments", timeout=30, params={
-                "fields": "id,message,from{id,name},comment_count", "limit": 50, "order": "chronological",
-                "access_token": token}).json()
-        except Exception:
-            continue
+        items = []
+        for fid in [h.get("facebook"), h.get("fb_reel"), h.get("fb_teaser")]:
+            if not fid or not isinstance(fid, str):
+                continue
+            try:
+                r = requests.get(f"{GRAPH}/{fid}/comments", timeout=30, params={
+                    "fields": "id,message,from{id,name},comment_count", "limit": 50, "order": "chronological",
+                    "access_token": token}).json()
+                items += r.get("data", []) or []
+            except Exception:
+                continue
         done = set(h.get("replied") or [])
-        for c in r.get("data", []):
+        for c in items:
             frm = c.get("from") or {}
             msg = str(c.get("message", "")).strip()
             if (c.get("id") in done or frm.get("id") == page_id or c.get("comment_count") or len(msg) < 2
@@ -5020,31 +5065,15 @@ def reply_fans(history, lang, max_n=5):
     if not todo:
         return False
     lang = todo[0][0].get("lang") or lang            # the language of the video they commented on
-    lang_name = "Bengali (pure Kolkata cholit bhasha)" if lang == "bn" else "Hindi"
-    ask = ("You run a popular story page. Write a short, warm, natural reply (max 18 words, 0-1 emoji) to each "
-           f"viewer comment in {lang_name}, like a real friendly creator: thank them by first name, answer their "
-           "question if they asked one (never spoil a twist), invite them to the next story. No links, no hashtags. "
-           "Return ONLY a JSON list of strings in the same order.\n" +
-           "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
-    try:
-        replies = None
-        for model in helper_models(key)[:3]:
-            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
-                              json={"contents": [{"parts": [{"text": ask}]}],
-                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
-                              timeout=90)
-            if r.ok:
-                replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
-                break
-        if replies is None:
-            raise RuntimeError("no model answered")
-    except Exception as e:
-        log("  fan replies skipped:", str(e)[:120])
+    replies = _ask_replies(human_reply_ask(kind, lang, todo), key)
+    if not replies:
+        log("  fan replies skipped: no model answered")
         return False
     n = 0
-    for (h, cid, name, msg, t), text in zip(todo, replies if isinstance(replies, list) else []):
-        text = str(text).strip()
+    for (h, cid, name, msg, t), text in zip(todo, replies):
+        text = str(text).strip().strip('"')
         if not text:
+            h.setdefault("replied", []).append(cid)          # spam / rude - skipped on purpose, never again
             continue
         try:
             rr = requests.post(f"{GRAPH}/{cid}/comments", data={"message": text, "access_token": token},
@@ -5054,7 +5083,9 @@ def reply_fans(history, lang, max_n=5):
         except Exception:
             pass
         h.setdefault("replied", []).append(cid)
-    log(f"  replied to {n} viewer comments")
+        h["replied"] = h["replied"][-300:]
+        time.sleep(0 if env("MOCK") else random.uniform(2, 6))   # like a person, not all in the same second
+    log(f"  replied to {n} Facebook comments (as the page)")
     return True
 
 
@@ -6223,7 +6254,7 @@ def yt_my_channel():
     return _MY_YT
 
 
-def yt_reply_fans(history, lang, kind="horror", max_n=5):
+def yt_reply_fans(history, lang, kind="horror", max_n=12):
     """Each run: a short, warm reply under the first few NEW YouTube comments of our last 2 days' videos (YouTube
     shows a video to more people when its comments get answers). Never more than max_n a run, never twice."""
     key = env("GEMINI_API_KEY")
@@ -6232,22 +6263,26 @@ def yt_reply_fans(history, lang, kind="horror", max_n=5):
     me = yt_my_channel().get("id")
     now = dt.datetime.now(dt.timezone.utc)
     todo = []
-    for h in reversed(history[-8:]):
-        if not h.get("youtube") or not h.get("date") or len(todo) >= max_n:
+    for h in reversed(history[-14:]):
+        if not h.get("date") or len(todo) >= max_n:
             continue
         try:
             age = (now - dt.datetime.fromisoformat(h["date"])).total_seconds() / 3600
         except Exception:
             continue
-        if not 1 <= age <= 60:
+        if not 0.3 <= age <= 24 * 7:                      # v84: a whole week
             continue
-        try:
-            r = requests.get(f"{YT}/commentThreads", headers=yt_token(), timeout=30, params={
-                "part": "snippet", "videoId": h["youtube"], "maxResults": 50, "order": "time",
-                "textFormat": "plainText"})
-            items = r.json().get("items", []) if r.ok else []
-        except Exception:
-            continue
+        items = []
+        for vid in [h.get("youtube"), h.get("yt_short"), h.get("yt_teaser")]:
+            if not vid or not isinstance(vid, str):
+                continue
+            try:
+                r = requests.get(f"{YT}/commentThreads", headers=yt_token(), timeout=30, params={
+                    "part": "snippet", "videoId": vid, "maxResults": 50, "order": "time",
+                    "textFormat": "plainText"})
+                items += (r.json().get("items", []) or []) if r.ok else []
+            except Exception:
+                continue
         done = set(h.get("yt_replied") or [])
         for it in items:
             sn = it["snippet"]["topLevelComment"]["snippet"]
@@ -6260,31 +6295,12 @@ def yt_reply_fans(history, lang, kind="horror", max_n=5):
     if not todo:
         return False
     lang = todo[0][0].get("lang") or lang
-    lang_name = "Bengali (pure Kolkata cholit bhasha)" if lang == "bn" else "Hindi"
-    who = ("the grave, warm storyteller of a horror-story channel" if kind == "horror" else
-           "the friendly storyteller of a children's story channel")
-    ask = (f"You are {who}. Write a short, warm, natural reply (max 18 words, 0-1 emoji) to each viewer comment in "
-           f"{lang_name}: thank them by name, answer a question if there is one (never spoil a twist), mention the "
-           "next story if it fits. No links, no hashtags, never ask for likes, shares or subscriptions. Return ONLY "
-           "a JSON list of strings in the same order.\n"
-           + "\n".join(f"{k + 1}. [{t}] {n}: {m}" for k, (h, cid, n, m, t) in enumerate(todo)))
-    replies = []
-    for model in helper_models(key)[:4]:
-        try:
-            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
-                              json={"contents": [{"parts": [{"text": ask}]}],
-                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
-                              timeout=90)
-            if r.ok:
-                replies = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
-                if isinstance(replies, list) and replies:
-                    break
-        except Exception:
-            continue
+    replies = _ask_replies(human_reply_ask(kind, lang, todo), key)
     n = 0
-    for (h, cid, name, msg, t), text in zip(todo, replies if isinstance(replies, list) else []):
-        text = str(text).strip()
+    for (h, cid, name, msg, t), text in zip(todo, replies):
+        text = str(text).strip().strip('"')
         if not text:
+            h["yt_replied"] = (list(h.get("yt_replied") or []) + [cid])[-200:]
             continue
         try:
             rr = requests.post(f"{YT}/comments", headers=yt_token(), params={"part": "snippet"}, timeout=30,
@@ -6293,7 +6309,8 @@ def yt_reply_fans(history, lang, kind="horror", max_n=5):
         except Exception:
             pass
         h["yt_replied"] = (list(h.get("yt_replied") or []) + [cid])[-200:]
-    log(f"  replied to {n} YouTube comments")
+        time.sleep(0 if env("MOCK") else random.uniform(2, 6))
+    log(f"  replied to {n} YouTube comments (as the channel)")
     return n > 0
 
 
@@ -6429,6 +6446,11 @@ def tg_scan(updates, path_dir, owner_chat, kind="horror"):
                 ch, changed = {}, True
     if changed:
         _js(os.path.join(path_dir, "tg_channel.json"), ch)
+    if kind == "horror" and env("TG_STORY") != "0":
+        try:                                          # v83: 'গল্প চাই' written to the bot
+            tg_requests_scan(updates, path_dir, owner_chat)
+        except Exception as e:
+            log("  Telegram story requests skipped:", str(e)[:100])
     if kind != "horror" or env("VIEWER_VOICE") == "0":
         return
     vpath = os.path.join(path_dir, "viewer_voice.json")
@@ -6652,10 +6674,17 @@ def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date=""):
            (f'<p><a href="https://www.facebook.com/{fb_id}">▶ ভিডিওতে শুনুন</a></p>' if fb_id else ""))
     img = f"https://i.ytimg.com/vi/{yt_id}/hqdefault.jpg" if yt_id else ""
     body = "".join(f"<p>{_esc(p)}</p>" for p in text.split("\n\n") if p.strip())
-    ld = json.dumps({"@context": "https://schema.org", "@type": "Article", "headline": title[:110],
-                     "inLanguage": lang, "datePublished": date, "image": img or None, "url": url,
-                     "author": {"@type": "Organization", "name": env("PAGE_NAME_BN") or "Daily Horror Story"}},
-                    ensure_ascii=False)
+    ld_ = [{"@context": "https://schema.org", "@type": "Article", "headline": title[:110],
+            "inLanguage": lang, "datePublished": date, "image": img or None, "url": url,
+            "author": {"@type": "Organization", "name": env("PAGE_NAME_BN") or "Daily Horror Story"}}]
+    if yt_id:                                        # v82: Google shows the video's picture in search results
+        ld_.append({"@context": "https://schema.org", "@type": "VideoObject", "name": title[:100],
+                    "description": desc or title, "thumbnailUrl": [img], "uploadDate": date or None,
+                    "embedUrl": f"https://www.youtube.com/embed/{yt_id}",
+                    "contentUrl": f"https://www.youtube.com/watch?v={yt_id}", "inLanguage": lang,
+                    **({"duration": f"PT{int(VIDEO_SECS.get(yt_id, 0)) // 60}M{int(VIDEO_SECS.get(yt_id, 0)) % 60}S"}
+                       if VIDEO_SECS.get(yt_id) else {})})
+    ld = json.dumps(ld_ if len(ld_) > 1 else ld_[0], ensure_ascii=False)
     page = f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{_esc(title)} | ভূতের গল্প</title>
 <meta name="description" content="{_esc(desc)}"><link rel="canonical" href="{_esc(url)}">
@@ -6690,7 +6719,7 @@ a{{color:#ffcf4a}}li{{margin:.5em 0}}</style></head><body><main><h1>👻 সব 
 
 
 # ----------------------------------------------------------------- 4) podcast (Spotify / Apple) feed
-def gh_release_upload(path, name, tag="podcast"):
+def gh_release_upload(path, name, tag="podcast", ctype="audio/mpeg", title="Podcast audio"):
     """an audio file into the repo's 'podcast' release (no size burden on the repo); returns its public link"""
     tok, repo = env("GITHUB_TOKEN"), env("GITHUB_REPOSITORY")
     if not (tok and repo):
@@ -6699,7 +6728,7 @@ def gh_release_upload(path, name, tag="podcast"):
     r = requests.get(f"https://api.github.com/repos/{repo}/releases/tags/{tag}", headers=hdr, timeout=30)
     if r.status_code == 404:
         r = requests.post(f"https://api.github.com/repos/{repo}/releases", headers=hdr, timeout=30,
-                          json={"tag_name": tag, "name": "Podcast audio", "body": "Audio of the stories (podcast feed)."})
+                          json={"tag_name": tag, "name": title, "body": f"{title} (made by the bot)."})
     rel = r.json()
     if not rel.get("id"):
         raise RuntimeError(f"release: {str(rel)[:200]}")
@@ -6709,7 +6738,7 @@ def gh_release_upload(path, name, tag="podcast"):
     with open(path, "rb") as f:
         up = requests.post(f"https://uploads.github.com/repos/{repo}/releases/{rel['id']}/assets",
                            params={"name": name}, data=f, timeout=600,
-                           headers={**hdr, "Content-Type": "audio/mpeg"})
+                           headers={**hdr, "Content-Type": ctype})
     if not up.ok:
         raise RuntimeError(f"upload: {up.text[:200]}")
     return up.json().get("browser_download_url", "")
@@ -7176,3 +7205,613 @@ def coach_rule(coach, kind="horror"):
         out += ("\nVIEWERS LEAVE EARLY THIS WEEK: the first real fright comes within the first 90 seconds of the story; "
                 "keep the opening description short - but the beginning must still be clear (who, where, why).\n")
     return out
+
+
+
+# =====================================================================================================================
+# v82 (13 Nov 2026): Hindi subtitles, Web Stories, video backups, the week's best comment, sequels of hit stories,
+# Messenger replies, the cartoon quiz, the "last episode" card
+# =====================================================================================================================
+VIDEO_SECS = {}          # youtube id -> length (for the story page's VideoObject)
+
+
+def translate_lines(lines, target="Hindi", key=None, chunk=60):
+    """{original line: translation} - simple, natural spoken language, in chunks (light models)"""
+    key = key or env("GEMINI_API_KEY")
+    out = {}
+    lines = [str(x).strip() for x in dict.fromkeys(lines) if str(x).strip()]
+    for i in range(0, len(lines), chunk):
+        part = lines[i:i + chunk]
+        ask = (f"Translate each line into simple, natural, spoken {target} (as subtitles of a story video). Keep names. "
+               "Answer ONLY a JSON list of strings, same order and same number.\n" + json.dumps(part, ensure_ascii=False))
+        for model in helper_models(key)[:4]:
+            try:
+                r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                                  json={"contents": [{"parts": [{"text": ask}]}],
+                                        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2}},
+                                  timeout=120)
+                if not r.ok:
+                    continue
+                got = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                if isinstance(got, list) and len(got) == len(part):
+                    out.update({a: str(b).strip() for a, b in zip(part, got) if str(b).strip()})
+                    break
+            except Exception:
+                continue
+    return out
+
+
+def backup_video(video, name):
+    """a safe copy of every finished video in the repo's 'videos' release (free; nothing is lost if a platform
+    removes a video, and the live / old-video Shorts take it from here)"""
+    if env("VIDEO_BACKUP") == "0" or not os.path.exists(video):
+        return ""
+    if os.path.getsize(video) > 1_900_000_000:
+        return ""
+    return gh_release_upload(video, name, tag="videos", ctype="video/mp4", title="Video backups")
+
+
+def web_story(docs, slug, title, frames, texts, base, link, lang="bn", poster=None):
+    """docs/golpo/<slug>-ws.html: a Google 'Web Story' (tap-through pages, a picture and one line each; Google shows
+    these in Discover on phones) - the last page leads to the full story"""
+    gdir = os.path.join(docs, "golpo", "ws")
+    os.makedirs(gdir, exist_ok=True)
+    pages = []
+    for k, (img, tx) in enumerate(zip(frames, texts)):
+        pages.append(f"""<amp-story-page id="p{k}" auto-advance-after="6s"><amp-story-grid-layer template="fill">
+<amp-img src="{_esc(img)}" width="720" height="1280" layout="responsive" alt="{_esc(tx[:80])}"></amp-img></amp-story-grid-layer>
+<amp-story-grid-layer template="thirds"><div grid-area="lower-third" class="t"><p>{_esc(tx)}</p></div></amp-story-grid-layer></amp-story-page>""")
+    pages.append(f"""<amp-story-page id="end"><amp-story-grid-layer template="fill"><amp-img src="{_esc(frames[-1])}" width="720" height="1280"
+layout="responsive" alt="end"></amp-img></amp-story-grid-layer><amp-story-grid-layer template="vertical"><div class="t e">
+<h1>{_esc(title)}</h1><p>{'তারপর কী হলো? পুরো গল্প শুনুন 👇' if lang == 'bn' else 'आगे क्या हुआ? पूरी कहानी सुनिए 👇'}</p></div>
+</amp-story-grid-layer><amp-story-page-outlink layout="nodisplay"><a href="{_esc(link)}">{'পুরো গল্প' if lang == 'bn' else 'पूरी कहानी'}</a>
+</amp-story-page-outlink></amp-story-page>""")
+    html = f"""<!doctype html><html amp lang="{lang}"><head><meta charset="utf-8"><title>{_esc(title)}</title>
+<link rel="canonical" href="{_esc(base)}golpo/ws/{slug}.html"><meta name="viewport" content="width=device-width">
+<style amp-boilerplate>body{{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}}@keyframes -amp-start{{from{{visibility:hidden}}to{{visibility:visible}}}}</style><noscript><style amp-boilerplate>body{{-webkit-animation:none;animation:none}}</style></noscript>
+<script async src="https://cdn.ampproject.org/v0.js"></script>
+<script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
+<style amp-custom>.t{{background:linear-gradient(transparent,rgba(0,0,0,.85));color:#fff;padding:18px 16px 36px;font:22px/1.5 sans-serif}}
+.e{{background:rgba(0,0,0,.6);text-align:center;margin-top:40%}} h1{{color:#ffcf4a;font-size:26px}}</style></head><body>
+<amp-story standalone title="{_esc(title)}" publisher="{_esc(env('PAGE_NAME_BN') or 'ভূতের গল্প')}"
+publisher-logo-src="{_esc(base)}podcast_cover.jpg" poster-portrait-src="{_esc(poster or frames[0])}">
+{''.join(pages)}</amp-story></body></html>"""
+    with open(os.path.join(gdir, f"{slug}.html"), "w", encoding="utf-8") as f:
+        f.write(html)
+    sm = os.path.join(docs, "sitemap.xml")
+    try:
+        x = open(sm, encoding="utf-8").read()
+        u = f"{base}golpo/ws/{slug}.html"
+        if u not in x:
+            x = x.replace("</urlset>", f"<url><loc>{_esc(u)}</loc></url>\n</urlset>")
+            open(sm, "w", encoding="utf-8").write(x)
+    except Exception:
+        pass
+    return f"{base}golpo/ws/{slug}.html"
+
+
+def best_comment(history, kind="horror", days=7):
+    """the week's most beautiful / chilling viewer comment (polite, nothing personal) -> (first name, text) or None"""
+    key = env("GEMINI_API_KEY")
+    cands = []
+    now = dt.datetime.now(dt.timezone.utc)
+    used = {h.get("best_comment_id") for h in history if h.get("best_comment_id")}
+    for h in history[-20:]:
+        try:
+            if (now - dt.datetime.fromisoformat(str(h.get("date")))).days > days or h.get("kind"):
+                continue
+        except Exception:
+            continue
+        if h.get("youtube") and env("YT_REFRESH_TOKEN"):
+            try:
+                r = requests.get(f"{YT}/commentThreads", headers=yt_token(), timeout=30, params={
+                    "part": "snippet", "videoId": h["youtube"], "maxResults": 50, "order": "relevance",
+                    "textFormat": "plainText"})
+                for it in (r.json().get("items", []) if r.ok else []):
+                    sn = it["snippet"]["topLevelComment"]["snippet"]
+                    if (sn.get("authorChannelId") or {}).get("value") == yt_my_channel().get("id"):
+                        continue
+                    cands.append(("yt_" + it["id"], str(sn.get("authorDisplayName", "")).lstrip("@").split(" ")[0][:20],
+                                  str(sn.get("textDisplay", ""))[:300], int(sn.get("likeCount") or 0)))
+            except Exception:
+                pass
+        if h.get("facebook") and env("FB_PAGE_TOKEN"):
+            try:
+                r = requests.get(f"{GRAPH}/{h['facebook']}/comments", timeout=30, params={
+                    "fields": "id,message,from{id,name},like_count", "limit": 50, "access_token": env("FB_PAGE_TOKEN")}).json()
+                for c in r.get("data", []):
+                    if (c.get("from") or {}).get("id") == env("FB_PAGE_ID"):
+                        continue
+                    cands.append(("fb_" + c["id"], first_name((c.get("from") or {}).get("name")),
+                                  str(c.get("message", ""))[:300], int(c.get("like_count") or 0)))
+            except Exception:
+                pass
+    cands = [c for c in cands if c[0] not in used and 15 <= len(c[2]) and not re.search(r"https?://|\d{6,}|@\w", c[2])]
+    if not cands or not key:
+        return None
+    cands = sorted(cands, key=lambda c: -c[3])[:30]
+    ask = ("These are viewer comments under our " + ("horror" if kind == "horror" else "children's") + " story videos. "
+           "Pick the ONE most heartfelt, chilling or beautiful comment that is polite, has no personal details, no "
+           "insult, no link and no request; you may shorten it (max 25 words, same language, same meaning). Answer "
+           "ONLY JSON {\"n\": number of the comment, \"text\": \"the comment as it will be read aloud\"} or {\"n\": 0} "
+           "if none is good.\n" + "\n".join(f"{k + 1}. {c[1]}: {c[2]}" for k, c in enumerate(cands)))
+    for model in helper_models(key)[:3]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": ask}]}],
+                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 0.3}},
+                              timeout=90)
+            if not r.ok:
+                continue
+            got = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            n = int((got or {}).get("n") or 0)
+            if 1 <= n <= len(cands) and str(got.get("text") or "").strip():
+                c = cands[n - 1]
+                return {"id": c[0], "name": c[1] or "একজন দর্শক", "text": str(got["text"]).strip()[:220]}
+            return None
+        except Exception:
+            continue
+    return None
+
+
+def messenger_replies(kind="horror", links=(), voice_bot="", max_n=10):
+    """people who wrote to the Page on Messenger get a friendly answer once a day: today's stories + how to send
+    their own experience (needs the Page token's Messenger permission; silently nothing without it)"""
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if not (page and token) or env("MESSENGER") == "0":
+        return 0
+    path = os.path.join(_here_assets(), "messenger.json")
+    st = _jl(path, {})
+    st = st if isinstance(st, dict) else {}
+    today = dt.datetime.now(IST).date().isoformat()
+    done = st.get("done") or {}
+    r = requests.get(f"{GRAPH}/{page}/conversations", timeout=30, params={
+        "fields": "participants,messages.limit(1){message,from,created_time}", "limit": 25, "access_token": token}).json()
+    if r.get("error"):
+        st["error"] = str(r["error"].get("message", ""))[:160]
+        _js(path, st)
+        return 0
+    n = 0
+    for conv in r.get("data", []):
+        m = ((conv.get("messages") or {}).get("data") or [{}])[0]
+        frm = m.get("from") or {}
+        if not frm.get("id") or frm.get("id") == page or done.get(frm["id"]) == today or n >= max_n:
+            continue
+        try:
+            age = (dt.datetime.now(dt.timezone.utc) - dt.datetime.strptime(m["created_time"], "%Y-%m-%dT%H:%M:%S%z")).total_seconds()
+        except Exception:
+            age = 0
+        if age > 23 * 3600:                           # (Facebook allows an answer only within 24 hours)
+            continue
+        nm = first_name(frm.get("name"))
+        text = ((f"নমস্কার {nm}! 🕯️ মেসেজের জন্য ধন্যবাদ। আমাদের নতুন গল্প:\n" if kind == "horror" else
+                 f"নমস্কার {nm}! ✨ মেসেজের জন্য ধন্যবাদ। আমাদের নতুন গল্প:\n")
+                + "\n".join(f"▶ {l}" for l in links if l)
+                + (f"\n\n🎙️ নিজের ভৌতিক অভিজ্ঞতা গলায় বলে পাঠাতে চাইলে: {voice_bot}" if voice_bot and kind == "horror" else ""))
+        rr = requests.post(f"{GRAPH}/{page}/messages", timeout=30, data={
+            "recipient": json.dumps({"id": frm["id"]}), "messaging_type": "RESPONSE",
+            "message": json.dumps({"text": text[:1900]}), "access_token": token}).json()
+        if rr.get("message_id"):
+            n += 1
+            done[frm["id"]] = today
+    st["done"] = {k: v for k, v in done.items() if v >= (dt.date.today() - dt.timedelta(days=3)).isoformat()}
+    st.pop("error", None)
+    _js(path, st)
+    if n:
+        log(f"  Messenger: answered {n} people")
+    return n
+
+
+def overlay_card(video, png, secs, out, start=0.0):
+    """a picture (with transparency) over `secs` seconds of a video (from `start`) - the timeline stays the same"""
+    return overlay_cards(video, [(png, start, secs)], out)
+
+
+def overlay_cards(video, cards, out):
+    """several pictures, each over its own few seconds [(png, start, secs)] - one re-encode for all of them"""
+    cards = [(p, float(s), float(d)) for p, s, d in cards if p and os.path.exists(p) and d > 0]
+    if not cards:
+        shutil.copy(video, out)
+        return out
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", video]
+    fl, last = [], "[0:v]"
+    for k, (p, s, d) in enumerate(cards):
+        cmd += ["-loop", "1", "-framerate", "25", "-t", f"{s + d + 0.2:.2f}", "-i", p]
+        fin = f"fade=t=in:st={s:.2f}:d=0.5:alpha=1," if s > 0.3 else ""
+        fl.append(f"[{k + 1}:v]format=rgba,{fin}fade=t=out:st={max(s + 0.5, s + d - 0.6):.2f}:d=0.6:alpha=1[o{k}]")
+        fl.append(f"{last}[o{k}]overlay=0:0:eof_action=pass:enable='between(t,{s:.2f},{s + d:.2f})'[v{k}]")
+        last = f"[v{k}]"
+    cmd += ["-filter_complex", ";".join(fl), "-map", last, "-map", "0:a?", "-c:v", "libx264", "-preset", "veryfast",
+            "-crf", "21", "-c:a", "copy", "-movflags", "+faststart", out]
+    _run(cmd)
+    return out
+
+
+# ----------------------------------------------------------------- v84: our own features, advertised in the videos
+# Every second main video gets a small, good-looking card for ONE of our features (about 7 s, at the middle,
+# no voice, nothing covered for long). Every feature comes at least once a month; the ghost map every ~10 days.
+# Once a month each feature also gets its own Facebook poster (spaced out, never two on the same day).
+PROMO_COLORS = {"map": (220, 60, 60), "bot": (40, 160, 225), "voice": (235, 120, 40), "channel": (40, 160, 225),
+                "podcast": (30, 185, 84), "live": (230, 40, 40), "web": (150, 110, 230), "moon": (90, 120, 220),
+                "star": (240, 180, 30), "clock": (240, 150, 40), "learn": (60, 190, 120), "quiz": (230, 90, 170)}
+
+
+def _promo_icon(d, cx, cy, r, icon, col):
+    """a simple drawn icon (no emoji - the fonts have none)"""
+    W_ = max(3, r // 7)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=col + (255,))
+    wh = (255, 255, 255, 255)
+    s = r * 0.55
+    if icon == "map":                                   # a map pin
+        d.ellipse([cx - s * 0.6, cy - s * 0.95, cx + s * 0.6, cy + s * 0.25], fill=wh)
+        d.polygon([(cx - s * 0.5, cy - s * 0.1), (cx + s * 0.5, cy - s * 0.1), (cx, cy + s * 0.95)], fill=wh)
+        d.ellipse([cx - s * 0.25, cy - s * 0.6, cx + s * 0.25, cy - s * 0.1], fill=col + (255,))
+    elif icon in ("bot", "channel"):                    # a paper plane
+        d.polygon([(cx - s, cy - s * 0.1), (cx + s, cy - s * 0.8), (cx + s * 0.35, cy + s * 0.85)], fill=wh)
+        d.polygon([(cx - s * 0.05, cy + s * 0.15), (cx + s, cy - s * 0.8), (cx + s * 0.05, cy + s * 0.75)],
+                  fill=(225, 235, 245, 255))
+    elif icon == "voice":                               # a microphone
+        d.rounded_rectangle([cx - s * 0.32, cy - s * 0.95, cx + s * 0.32, cy + s * 0.25], radius=int(s * 0.32), fill=wh)
+        d.arc([cx - s * 0.6, cy - s * 0.55, cx + s * 0.6, cy + s * 0.55], 0, 180, fill=wh, width=W_)
+        d.line([cx, cy + s * 0.55, cx, cy + s * 0.9], fill=wh, width=W_)
+        d.line([cx - s * 0.35, cy + s * 0.9, cx + s * 0.35, cy + s * 0.9], fill=wh, width=W_)
+    elif icon == "podcast":                             # headphones
+        d.arc([cx - s * 0.85, cy - s * 0.85, cx + s * 0.85, cy + s * 0.85], 180, 360, fill=wh, width=W_ + 2)
+        for sx in (-1, 1):
+            d.rounded_rectangle([cx + sx * s * 0.85 - s * 0.22, cy - s * 0.05, cx + sx * s * 0.85 + s * 0.22,
+                                 cy + s * 0.75], radius=int(s * 0.15), fill=wh)
+    elif icon == "live":                                # a play button with a dot
+        d.polygon([(cx - s * 0.45, cy - s * 0.7), (cx - s * 0.45, cy + s * 0.7), (cx + s * 0.75, cy)], fill=wh)
+    elif icon == "web":                                 # an open book
+        d.polygon([(cx - s, cy - s * 0.6), (cx - s * 0.05, cy - s * 0.4), (cx - s * 0.05, cy + s * 0.75),
+                   (cx - s, cy + s * 0.55)], fill=wh)
+        d.polygon([(cx + s, cy - s * 0.6), (cx + s * 0.05, cy - s * 0.4), (cx + s * 0.05, cy + s * 0.75),
+                   (cx + s, cy + s * 0.55)], fill=wh)
+    elif icon == "moon":
+        d.ellipse([cx - s * 0.8, cy - s * 0.8, cx + s * 0.8, cy + s * 0.8], fill=wh)
+        d.ellipse([cx - s * 0.4, cy - s * 1.0, cx + s * 1.1, cy + s * 0.5], fill=col + (255,))
+    elif icon == "star":
+        pts = [(cx + (s if k % 2 == 0 else s * 0.42) * math.sin(k * math.pi / 5),
+                cy - (s if k % 2 == 0 else s * 0.42) * math.cos(k * math.pi / 5)) for k in range(10)]
+        d.polygon(pts, fill=wh)
+    elif icon == "clock":
+        d.ellipse([cx - s * 0.85, cy - s * 0.85, cx + s * 0.85, cy + s * 0.85], outline=wh, width=W_)
+        d.line([cx, cy, cx, cy - s * 0.55], fill=wh, width=W_)
+        d.line([cx, cy, cx + s * 0.4, cy + s * 0.2], fill=wh, width=W_)
+    elif icon == "learn":                               # a pencil
+        d.polygon([(cx - s * 0.75, cy + s * 0.45), (cx + s * 0.45, cy - s * 0.75), (cx + s * 0.75, cy - s * 0.45),
+                   (cx - s * 0.45, cy + s * 0.75)], fill=wh)
+        d.polygon([(cx - s * 0.75, cy + s * 0.45), (cx - s * 0.45, cy + s * 0.75), (cx - s * 0.9, cy + s * 0.9)], fill=wh)
+    else:                                               # quiz: a big question mark
+        d.arc([cx - s * 0.5, cy - s * 0.9, cx + s * 0.5, cy + s * 0.1], 200, 90, fill=wh, width=W_ + 2)
+        d.line([cx, cy + s * 0.1, cx, cy + s * 0.4], fill=wh, width=W_ + 2)
+        d.ellipse([cx - W_, cy + s * 0.62, cx + W_, cy + s * 0.62 + 2 * W_], fill=wh)
+
+
+def _mixed_runs(text, font_path):
+    """split a line into pieces for the main (Bengali / Hindi) font and pieces for an English-letter font, so
+    'Telegram-এ লিখুন: গল্প চাই' shows every letter and every sign (the Indian fonts have no English letters)"""
+    try:
+        if font_path not in _CMAPS:
+            from fontTools.ttLib import TTFont
+            _CMAPS[font_path] = set(TTFont(font_path).getBestCmap())
+        cm = _CMAPS[font_path]
+    except Exception:
+        cm = set()
+    lat = latin_font()
+    runs = []
+    for ch in no_tofu(str(text)):
+        if ch == " " and runs:
+            which = runs[-1][1]
+        elif ord(ch) in cm:
+            which = font_path
+        elif lat:
+            which = lat
+        else:
+            continue
+        if runs and runs[-1][1] == which:
+            runs[-1][0] += ch
+        else:
+            runs.append([ch, which])
+    return [(a, b) for a, b in runs if a]
+
+
+def _mixed_width(d, runs, size):
+    return sum(d.textlength(a, font=_font(b, size)) for a, b in runs)
+
+
+def _mixed_draw(d, x, base, runs, size, fill, stroke):
+    for a, b in runs:
+        f = _font(b, size)
+        d.text((x, base), a, font=f, fill=fill, anchor="ls", stroke_width=stroke, stroke_fill=(0, 0, 0))
+        x += d.textlength(a, font=f)
+
+
+def _mixed_fit(d, text, font_path, size, max_w):
+    runs = _mixed_runs(text, font_path)
+    while runs and _mixed_width(d, runs, size) > max_w and size > 14:
+        size -= 2
+    return runs, size
+
+
+def promo_card_png(size, promo, out, font_path):
+    """a rounded glass card at the top of the picture: icon + headline + one line + the address (transparent elsewhere)"""
+    W, H = size
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    col = PROMO_COLORS.get(promo.get("icon"), (240, 180, 30))
+    cw, ch = int(W * 0.66), int(H * 0.2)                 # top right: the top left keeps the heartbeat / logo
+    x0, y0 = W - cw - int(W * 0.03), int(H * 0.045)
+    sh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle([x0 + 6, y0 + 8, x0 + cw + 6, y0 + ch + 8], radius=ch // 4, fill=(0, 0, 0, 120))
+    im = Image.alpha_composite(im, sh.filter(ImageFilter.GaussianBlur(10)))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([x0, y0, x0 + cw, y0 + ch], radius=ch // 4, fill=(14, 12, 22, 215), outline=col + (255,), width=4)
+    d.rounded_rectangle([x0 + 5, y0 + int(ch * 0.22), x0 + 13, y0 + int(ch * 0.78)], radius=4, fill=col + (255,))
+    r = int(ch * 0.3)
+    _promo_icon(d, x0 + 30 + r, y0 + ch // 2, r, promo.get("icon", "star"), col)
+    tx, tw = x0 + 60 + 2 * r, cw - (90 + 2 * r)
+    lines = [(promo.get("head", ""), 0.25, (255, 214, 90)), (promo.get("sub", ""), 0.17, (245, 245, 245)),
+             (promo.get("link", ""), 0.14, (150, 215, 255))]
+    lines = [x for x in lines if str(x[0]).strip()]
+    fitted = [(*_mixed_fit(d, txt, font_path, int(ch * k), tw), c) for txt, k, c in lines]
+    hs = [int(sz * 1.25) for runs, sz, c in fitted]
+    y = y0 + (ch - sum(hs)) // 2
+    for (runs, sz, c), h in zip(fitted, hs):
+        _mixed_draw(d, tx, y + int(h * 0.8), runs, sz, c, 2)
+        y += h
+    im.save(out)
+    return out
+
+
+def promo_poster(bg, promo, out, font_path, size=(1080, 1080)):
+    """the monthly Facebook poster for one feature: a dark blurred picture, a big icon, the words"""
+    W, H = size
+    try:
+        im = Image.open(bg).convert("RGB")
+        s = max(W / im.width, H / im.height)
+        im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1))
+        l, t = (im.width - W) // 2, (im.height - H) // 2
+        im = im.crop((l, t, l + W, t + H)).filter(ImageFilter.GaussianBlur(6))
+    except Exception:
+        im = Image.new("RGB", (W, H), (16, 12, 26))
+    im = Image.blend(im, Image.new("RGB", (W, H), (6, 4, 12)), 0.62).convert("RGBA")
+    d = ImageDraw.Draw(im)
+    col = PROMO_COLORS.get(promo.get("icon"), (240, 180, 30))
+    d.rounded_rectangle([40, 40, W - 40, H - 40], radius=40, outline=col + (255,), width=6)
+    _promo_icon(d, W // 2, int(H * 0.27), int(H * 0.12), promo.get("icon", "star"), col)
+    y = int(H * 0.47)
+    for txt, k, c in [(promo.get("head", ""), 0.068, (255, 214, 90)), (promo.get("sub", ""), 0.045, (245, 245, 245)),
+                      (promo.get("sub2", ""), 0.04, (220, 220, 220)), (promo.get("link", ""), 0.036, (150, 215, 255))]:
+        if not str(txt).strip():
+            continue
+        runs, sz = _mixed_fit(d, txt, font_path, int(H * k), W * 0.84)
+        w = _mixed_width(d, runs, sz)
+        _mixed_draw(d, (W - w) / 2, y + sz, runs, sz, c, 3)
+        y += int(sz * 1.25) + int(H * 0.04)
+    im.convert("RGB").save(out, quality=92)
+    return out
+
+
+def promo_pick(path, ids, every=2, map_id="map", map_gap=10, today=None):
+    """which feature (if any) this video advertises. Every `every`-th video; first the ones not yet shown this
+    month, the map whenever it is `map_gap` days since it was last shown; then the one shown longest ago."""
+    ids = [i for i in ids if i]
+    if not ids:
+        return None
+    st = _jl(path, {}) or {}
+    today = today or dt.datetime.now(IST).date()
+    st["n"] = int(st.get("n", 0)) + 1
+    pick = None
+    if st["n"] % max(1, every) == 0:
+        shown = st.get("shown") or {}
+        month = today.isoformat()[:7]
+
+        def ago(i):
+            try:
+                return (today - dt.date.fromisoformat(shown[i])).days
+            except Exception:
+                return 10 ** 6
+        if map_id in ids and ago(map_id) >= map_gap:
+            pick = map_id
+        else:
+            fresh = [i for i in ids if str(shown.get(i, ""))[:7] != month]
+            pick = fresh[0] if fresh else max(ids, key=ago)
+        shown[pick] = today.isoformat()
+        st["shown"] = shown
+    _js(path, st)
+    return pick
+
+
+def promo_post_due(path, ids, gap_days=3, today=None):
+    """the feature whose monthly Facebook poster is due today (not posted this month, >= gap_days since the last)"""
+    st = _jl(path, {}) or {}
+    today = today or dt.datetime.now(IST).date()
+    posted = st.get("posted") or {}
+    try:
+        last = max(dt.date.fromisoformat(v) for v in posted.values())
+        if (today - last).days < gap_days:
+            return None
+    except ValueError:
+        pass
+    month = today.isoformat()[:7]
+    for i in ids:
+        if i and str(posted.get(i, ""))[:7] != month:
+            return i
+    return None
+
+
+def promo_post_done(path, pid, today=None):
+    st = _jl(path, {}) or {}
+    today = today or dt.datetime.now(IST).date()
+    st.setdefault("posted", {})[pid] = today.isoformat()
+    _js(path, st)
+
+
+def prev_card_png(text_top, text_main, size, out, font_path):
+    """'আগের পর্বে: ...' as a band at the top of the picture (transparent elsewhere)"""
+    W, H = size
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    band = int(H * 0.2)
+    d.rectangle([0, 0, W, band], fill=(0, 0, 0, 170))
+    f1, f2 = _font(font_path, int(band * 0.28)), _font(font_path, int(band * 0.34))
+    a, b = fit_glyphs(text_top, font_path), fit_glyphs(text_main, font_path)
+    while d.textlength(b, font=f2) > W * 0.92 and f2.size > 18:
+        f2 = _font(font_path, f2.size - 2)
+    d.text(((W - d.textlength(a, font=f1)) / 2, band * 0.1), a, font=f1, fill=(255, 207, 74), stroke_width=2, stroke_fill=(0, 0, 0))
+    d.text(((W - d.textlength(b, font=f2)) / 2, band * 0.48), b, font=f2, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+    im.save(out)
+    return out
+
+
+def append_quiz(video, quiz, lang, font_path, out, bg=None):
+    """the cartoon's little quiz at the very end (question 6 s, then the right answer lights up 3 s) - no voice"""
+    import subprocess as _sp
+    pr = _sp.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height,r_frame_rate",
+                  "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip().split(",")
+    W, H = int(pr[0]), int(pr[1])
+    fps = pr[2] if len(pr) > 2 else "25"
+    q, opts, ans = str(quiz["q"]), [str(x) for x in quiz["options"]][:3], int(quiz["answer"])
+    work = os.path.dirname(out)
+    imgs = []
+    for k, show in enumerate((False, True)):
+        im = Image.new("RGB", (W, H), (255, 244, 214))
+        if bg and os.path.exists(bg):
+            try:
+                b_ = Image.open(bg).convert("RGB").resize((W, H)).filter(ImageFilter.GaussianBlur(8))
+                im = Image.blend(b_, Image.new("RGB", (W, H), (255, 250, 235)), 0.55)
+            except Exception:
+                pass
+        d = ImageDraw.Draw(im)
+        fq, fo = _font(font_path, int(H * 0.07)), _font(font_path, int(H * 0.06))
+        head = fit_glyphs(("🧠 ছোট্ট প্রশ্ন" if lang == "bn" else "🧠 छोटा सा सवाल"), font_path)
+        d.text(((W - d.textlength(head, font=fo)) / 2, H * 0.08), head, font=fo, fill=(220, 90, 20))
+        qq = fit_glyphs(q, font_path)
+        while d.textlength(qq, font=fq) > W * 0.9 and fq.size > 20:
+            fq = _font(font_path, fq.size - 2)
+        d.text(((W - d.textlength(qq, font=fq)) / 2, H * 0.22), qq, font=fq, fill=(40, 30, 60))
+        for i, o in enumerate(opts):
+            y = H * (0.42 + 0.16 * i)
+            good = show and i == ans
+            d.rounded_rectangle([W * 0.15, y, W * 0.85, y + H * 0.12], radius=int(H * 0.03),
+                                fill=(120, 210, 120) if good else (255, 255, 255), outline=(220, 140, 40), width=5)
+            oo = fit_glyphs(f"{'কখগ'[i] if lang == 'bn' else 'कखग'[i]}) {o}" + ("  ✔" if good else ""), font_path)
+            fo2 = _font(font_path, int(H * 0.055))
+            while d.textlength(oo, font=fo2) > W * 0.66 and fo2.size > 18:
+                fo2 = _font(font_path, fo2.size - 2)
+            d.text((W * 0.19, y + H * 0.03), oo, font=fo2, fill=(30, 30, 30))
+        p = os.path.join(work, f"quiz_{k}.png")
+        im.save(p)
+        imgs.append(p)
+    clip = os.path.join(work, "quiz_clip.mp4")
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-t", "6", "-i", imgs[0], "-loop", "1", "-t", "3", "-i", imgs[1],
+          "-f", "lavfi", "-t", "9", "-i", "sine=frequency=660:sample_rate=44100,volume=0.0",
+          "-filter_complex", f"[0:v][1:v]concat=n=2:v=1:a=0,fps={fps},format=yuv420p[v];"
+          "[2:a]aformat=sample_rates=44100:channel_layouts=stereo[a]", "-map", "[v]", "-map", "[a]",
+          "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", clip])
+    _run(["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-i", clip, "-filter_complex",
+          f"[0:v]fps={fps},format=yuv420p,setsar=1[v0];[1:v]scale={W}:{H},setsar=1[v1];"
+          "[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a0];[1:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];"
+          "[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]", "-map", "[v]", "-map", "[a]",
+          "-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out])
+    return out
+
+
+# =====================================================================================================================
+# v83 (13 Nov 2026): tiny written ghost stories (for the text Shorts and for 'গল্প চাই' on Telegram)
+# =====================================================================================================================
+def micro_story(lang="bn", avoid=(), key=None):
+    """a NEW 2-4 sentence ghost story with a twist (original, Kolkata Bengali), its title and an English picture idea"""
+    key = key or env("GEMINI_API_KEY")
+    if not key:
+        return None
+    ask = ((f"Write ONE brand-new, original, very short ghost story in {'pure Kolkata Bengali (cholit bhasha)' if lang == 'bn' else 'Hindi'}: "
+            "3 or 4 short sentences, a real everyday Bengal setting (a real kind of place, a real hour), the chill grows "
+            "with each sentence and the LAST sentence is a quiet twist that makes the listener's skin crawl. Nothing gory, "
+            "nothing about children being hurt, no copy of any known story. Never one of these: "
+            + "; ".join(str(a)[:40] for a in list(avoid)[-30:]) +
+            ". Answer ONLY JSON: {\"title\": \"2-5 word title\", \"lines\": [\"sentence 1\", \"sentence 2\", ...], "
+            "\"picture\": \"ENGLISH: one dark, atmospheric, empty scene for the background (a place, light, mood; no "
+            "people, no text)\"}"))
+    for model in helper_models(key)[:4]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": ask}]}],
+                                    "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0}},
+                              timeout=90)
+            if not r.ok:
+                continue
+            got = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            lines = [str(x).strip() for x in (got or {}).get("lines") or [] if str(x).strip()]
+            if got and got.get("title") and 2 <= len(lines) <= 5:
+                return {"title": str(got["title"]).strip()[:60], "lines": lines[:4],
+                        "picture": str(got.get("picture") or "a dark empty village road at night, one lantern")[:300]}
+        except Exception:
+            continue
+    return None
+
+
+def tg_requests_scan(updates, path_dir, owner_chat):
+    """'গল্প চাই' (or /start) written to the bot by a viewer -> remembered, answered by the next run"""
+    p = os.path.join(path_dir, "tg_requests.json")
+    d = _jl(p, {"q": [], "seen": []})
+    seen = set(d.get("seen") or [])
+    for u in updates:
+        msg = u.get("message") or {}
+        chat = msg.get("chat") or {}
+        txt = str(msg.get("text") or "").strip()
+        if (not txt or chat.get("type") != "private" or str(chat.get("id")) == str(owner_chat)
+                or u.get("update_id") in seen):
+            continue
+        seen.add(u.get("update_id"))
+        kind = "start" if txt.startswith("/start") else (
+            "story" if re.search(r"(?i)গল্প|golpo|galpo|story|kahani|कहानी|ভূত|bhoot|bhut", txt) else "")
+        if kind:
+            d.setdefault("q", []).append({"chat": chat.get("id"), "name": str((msg.get("from") or {}).get("first_name") or "")[:20],
+                                          "kind": kind, "date": msg.get("date")})
+    d["seen"] = sorted(seen)[-800:]
+    d["q"] = (d.get("q") or [])[-60:]
+    _js(p, d)
+
+
+def tg_requests_answer(path_dir, latest_link="", max_n=12):
+    """answers the waiting 'গল্প চাই' messages: a NEW tiny written ghost story each (max 3 a day per person)"""
+    p = os.path.join(path_dir, "tg_requests.json")
+    d = _jl(p, {"q": [], "seen": []})
+    if not d.get("q"):
+        return 0
+    today = dt.datetime.now(IST).date().isoformat()
+    count = {k: v for k, v in (d.get("count") or {}).items() if k.endswith(today)}
+    done, n, keep = d.get("titles") or [], 0, []
+    for rq in d["q"]:
+        if n >= max_n:
+            keep.append(rq)
+            continue
+        if int(time.time()) - int(rq.get("date") or 0) > 86400:
+            continue                                      # (too old to answer)
+        ck = f"{rq['chat']}|{today}"
+        nm = rq.get("name") or "বন্ধু"
+        if rq["kind"] == "start":
+            ok_ = tg_send(rq["chat"], f"🕯️ নমস্কার {nm}! আমি ভূতের গল্পের বট।\n\n👻 'গল্প চাই' লিখলেই একটা নতুন ছোট্ট ভূতের "
+                                      "গল্প পাঠাব।\n🎙️ নিজের আসল ভৌতিক অভিজ্ঞতা থাকলে voice message-এ বলে পাঠান - সেটা "
+                                      "নিয়েই গল্প হবে।" + (f"\n\n▶ আজকের পুরো গল্প: {latest_link}" if latest_link else ""))
+            n += bool(ok_)
+            continue
+        if count.get(ck, 0) >= 3:
+            tg_send(rq["chat"], f"🌙 {nm}, আজকের ৩টে গল্প হয়ে গেছে - কাল আবার লিখবেন। ততক্ষণ পুরো গল্পটা শুনুন: {latest_link}")
+            continue
+        ms = micro_story("bn", done)
+        if not ms:
+            keep.append(rq)
+            break                                         # (Gemini busy: the next run tries again)
+        done = (done + [ms["title"]])[-200:]
+        txt = f"👻 {ms['title']}\n\n" + "\n".join(ms["lines"]) + (f"\n\n▶ আজকের পুরো গল্প শুনুন: {latest_link}" if latest_link else "") \
+              + "\n\nআরও চাইলে আবার লিখুন: গল্প চাই"
+        if tg_send(rq["chat"], txt):
+            n += 1
+            count[ck] = count.get(ck, 0) + 1
+    d.update(q=keep, count=count, titles=done)
+    _js(p, d)
+    if n:
+        log(f"  Telegram: answered {n} 'গল্প চাই' message(s)")
+    return n

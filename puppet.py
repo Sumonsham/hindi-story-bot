@@ -277,7 +277,8 @@ class Actor:
             p = c.pose(a)
             if p:
                 return p
-        return c.pose("talk") if talking else c.pose("relaxed")
+        # (a character without a talking pose - the courtiers - just stands; never "no pose" = a failed scene)
+        return (c.pose("talk") if talking else None) or c.pose("relaxed") or next(iter(c.P))
 
     def base_pose(self):
         return self.pose_for(None)

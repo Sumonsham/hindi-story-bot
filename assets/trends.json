@@ -1,6 +1,155 @@
 {
  "cartoon_bn": {
-  "date": "2026-11-02",
-  "topics": []
+  "date": "2026-11-13",
+  "topics": [
+   "A lonely shepherd boy in a Bethlehem desert cave who hears a mysterious midnight choir and follows a glowing star to a newborn king.",
+   "A young village potter in ancient Magadha who carves a miraculous clay lamp that lights itself every time a traveler shares a true story of kindness.",
+   "A curious forest-dwelling monkey in the foothills of the Himalayas who discovers a golden lotus that blooms only when selfless deeds are done.",
+   "A gentle temple dancer in ancient Bengal who finds a forgotten manuscript that brings moral fables to life at sunset under a banyan tree.",
+   "A young apprentice weaver in a mountain village who creates a magical blanket that keeps children warm only if they speak the absolute truth.",
+   "A wise village storyteller by the banks of the Ganges who teaches greedy merchants a lesson using enchanted seeds that sprout into honesty."
+  ],
+  "hashtags": [
+   "#MoralStories",
+   "#BanglaCartoon",
+   "#HindiMoralStories",
+   "#KidsAnimation",
+   "#BedtimeStories",
+   "#ThakurmarJhuli",
+   "#PanchatantraTales",
+   "#JatakaTales",
+   "#BiblicalStories",
+   "#AnimatedFairytales"
+  ],
+  "keywords": [
+   "bengali moral stories",
+   "hindi cartoon stories",
+   "kids animated bible stories",
+   "thakurmar jhuli new episodes",
+   "panchatantra ki kahani",
+   "jatak katha cartoon",
+   "bedtime stories for kids in bengali",
+   "moral stories in hindi"
+  ],
+  "style": {
+   "tags": [],
+   "hashtags": [],
+   "title_style": "Titles are moderately long and descriptive, utilizing the vertical bar '|' to divide main topics and secondary keywords for SEO. They incorporate emotional and thematic hooks like 'শিশুদের জন্য' (for children) and relevant emojis to instantly capture parental interest.",
+   "thumb_style": "Thumbnails feature warm, glowing pastel or rich cinematic lighting with a cozy barn setting centered around the manger scene. Characters display sweet, welcoming facial expressions, rendered in clean 2D or soft 3D animation with bold outlines and minimal, easy-to-read text overlays.",
+   "thumb_text_style": "3 to 4 words of large, bold English text with white fill and dark drop shadows."
+  },
+  "real": [
+   {
+    "id": "TUbsKpvJO40",
+    "title": "শিশু যিশুর সঙ্গে প্রথম সাক্ষাৎ ✝️ শিশুদের জন্য যিশুর জন্মকাহিনী শুনতে শুনতে ঘুমিয়ে পড়ুন",
+    "views": 2403,
+    "age": "4d ago"
+   },
+   {
+    "id": "eYvIXUfw2B0",
+    "title": "প্রথম বড়দিন ⭐ বাচ্চাদের জন্য শিশু যিশুর গল্প | যিশুর জন্মকাহিনীর কার্টুন",
+    "views": 150,
+    "age": "2d ago"
+   },
+   {
+    "id": "DjHW1EfCg2s",
+    "title": "যিশুর জন্ম | শিশুদের জন্য প্রথম বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প",
+    "views": 67,
+    "age": "23h ago"
+   },
+   {
+    "id": "KjV0t8hnxjI",
+    "title": "জাতকের গল্প 10",
+    "views": 5,
+    "age": "1d ago"
+   },
+   {
+    "id": "mLNmE9dmVaU",
+    "title": "What Are the Jataka Tales Actually? | 2,500-Year-Old History and the Mysteries of Buddhism | GM E...",
+    "views": 4,
+    "age": "9h ago"
+   }
+  ],
+  "from_cat": "jataka"
+ },
+ "cartoon_bn_jataka": {
+  "date": "2026-11-13",
+  "topics": [
+   "A lonely shepherd boy in a Bethlehem desert cave who hears a mysterious midnight choir and follows a glowing star to a newborn king.",
+   "A young village potter in ancient Magadha who carves a miraculous clay lamp that lights itself every time a traveler shares a true story of kindness.",
+   "A curious forest-dwelling monkey in the foothills of the Himalayas who discovers a golden lotus that blooms only when selfless deeds are done.",
+   "A gentle temple dancer in ancient Bengal who finds a forgotten manuscript that brings moral fables to life at sunset under a banyan tree.",
+   "A young apprentice weaver in a mountain village who creates a magical blanket that keeps children warm only if they speak the absolute truth.",
+   "A wise village storyteller by the banks of the Ganges who teaches greedy merchants a lesson using enchanted seeds that sprout into honesty."
+  ],
+  "hashtags": [
+   "#MoralStories",
+   "#BanglaCartoon",
+   "#HindiMoralStories",
+   "#KidsAnimation",
+   "#BedtimeStories",
+   "#ThakurmarJhuli",
+   "#PanchatantraTales",
+   "#JatakaTales",
+   "#BiblicalStories",
+   "#AnimatedFairytales"
+  ],
+  "keywords": [
+   "bengali moral stories",
+   "hindi cartoon stories",
+   "kids animated bible stories",
+   "thakurmar jhuli new episodes",
+   "panchatantra ki kahani",
+   "jatak katha cartoon",
+   "bedtime stories for kids in bengali",
+   "moral stories in hindi"
+  ],
+  "style": {
+   "tags": [],
+   "hashtags": [],
+   "title_style": "Titles are moderately long and descriptive, utilizing the vertical bar '|' to divide main topics and secondary keywords for SEO. They incorporate emotional and thematic hooks like 'শিশুদের জন্য' (for children) and relevant emojis to instantly capture parental interest.",
+   "thumb_style": "Thumbnails feature warm, glowing pastel or rich cinematic lighting with a cozy barn setting centered around the manger scene. Characters display sweet, welcoming facial expressions, rendered in clean 2D or soft 3D animation with bold outlines and minimal, easy-to-read text overlays.",
+   "thumb_text_style": "3 to 4 words of large, bold English text with white fill and dark drop shadows."
+  },
+  "real": [
+   {
+    "id": "TUbsKpvJO40",
+    "title": "শিশু যিশুর সঙ্গে প্রথম সাক্ষাৎ ✝️ শিশুদের জন্য যিশুর জন্মকাহিনী শুনতে শুনতে ঘুমিয়ে পড়ুন",
+    "views": 2403,
+    "age": "4d ago"
+   },
+   {
+    "id": "eYvIXUfw2B0",
+    "title": "প্রথম বড়দিন ⭐ বাচ্চাদের জন্য শিশু যিশুর গল্প | যিশুর জন্মকাহিনীর কার্টুন",
+    "views": 150,
+    "age": "2d ago"
+   },
+   {
+    "id": "DjHW1EfCg2s",
+    "title": "যিশুর জন্ম | শিশুদের জন্য প্রথম বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প",
+    "views": 67,
+    "age": "23h ago"
+   },
+   {
+    "id": "KjV0t8hnxjI",
+    "title": "জাতকের গল্প 10",
+    "views": 5,
+    "age": "1d ago"
+   },
+   {
+    "id": "mLNmE9dmVaU",
+    "title": "What Are the Jataka Tales Actually? | 2,500-Year-Old History and the Mysteries of Buddhism | GM E...",
+    "views": 4,
+    "age": "9h ago"
+   }
+  ],
+  "youtube_top": [
+   "শিশু যিশুর সঙ্গে প্রথম সাক্ষাৎ ✝️ শিশুদের জন্য যিশুর জন্মকাহিনী শুনতে শুনতে ঘুমিয়ে পড়ুন (2,403)",
+   "প্রথম বড়দিন ⭐ বাচ্চাদের জন্য শিশু যিশুর গল্প | যিশুর জন্মকাহিনীর কার্টুন (150)",
+   "যিশুর জন্ম | শিশুদের জন্য প্রথম বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প (67)",
+   "জাতকের গল্প 10 (5)",
+   "What Are the Jataka Tales Actually? | 2,500-Year-Old History and the Mysteries of Buddhism | GM E... (4)"
+  ],
+  "from": "youtube"
  }
 }

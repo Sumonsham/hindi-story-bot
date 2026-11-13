@@ -113,6 +113,9 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FREEMODEL_API_KEY: ${{ secrets.FREEMODEL_API_KEY }}
           TTS_PAID: ${{ secrets.TTS_PAID }}
+          GEMINI_TTS_KEY: ${{ secrets.GEMINI_TTS_KEY }}    # v85: Gemini voices for the cartoons
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}    # v85: Chirp 3 HD when Gemini's day is used up
+          TTS_DAY_BUDGET: ${{ secrets.TTS_DAY_BUDGET }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}

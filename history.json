@@ -2366,6 +2366,20 @@
   "riddle": {
    "q": "বলি তো দেখি ভাই—ডানা আছে কিন্তু পাখি নই, আলো ছড়াই রাতে কিন্তু তারা নই! আমি কে?",
    "a": "জোনাকি"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 3,
+   "length_s": 468,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-13T03:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 3
   }
  },
  {
@@ -2469,5 +2483,33 @@
    "q": "দিনের বেলা ঘুমিয়ে থাকি, রাত হলে চোখ খুলি। হাজার হাজার ভাই আমি, নীল আকাশে দুলি। বল তো আমি কে?",
    "a": "তারা"
   }
+ },
+ {
+  "date": "2026-11-13T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-13@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "A village market square where a clever court jester tricks a greedy merchant into buying empty magic pots by claiming they multiply gold. (told as a gopal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও জাদুহাঁড়ির রহস্য! 🍯✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "তিনটি হাঁড়ি"
+  },
+  "title_b": "গোপাল ভাঁড় ও সোনা ফলানো হাঁড়ি! 💰",
+  "question_post": null,
+  "facebook": "1154633730326340",
+  "youtube": "zAnrwM2Rk4A",
+  "fb_reel": "1795489228171051",
+  "fb_story": "2045096266196972",
+  "fb_reel2": "3336325453225383",
+  "yt_short": "28vPRUJHK2A"
  }
 ]

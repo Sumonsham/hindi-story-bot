@@ -2,75 +2,135 @@
  "cartoon_bn": {
   "date": "2026-11-13",
   "topics": [
-   "A lonely shepherd boy in a Bethlehem desert cave who hears a mysterious midnight choir and follows a glowing star to a newborn king.",
-   "A young village potter in ancient Magadha who carves a miraculous clay lamp that lights itself every time a traveler shares a true story of kindness.",
-   "A curious forest-dwelling monkey in the foothills of the Himalayas who discovers a golden lotus that blooms only when selfless deeds are done.",
-   "A gentle temple dancer in ancient Bengal who finds a forgotten manuscript that brings moral fables to life at sunset under a banyan tree.",
-   "A young apprentice weaver in a mountain village who creates a magical blanket that keeps children warm only if they speak the absolute truth.",
-   "A wise village storyteller by the banks of the Ganges who teaches greedy merchants a lesson using enchanted seeds that sprout into honesty."
+   "A village market square where a clever court jester tricks a greedy merchant into buying empty magic pots by claiming they multiply gold.",
+   "A royal durbar hall where a quick-witted prankster exposes a fake holy man using only a handful of roasted peanuts and a clever riddle.",
+   "A quiet riverside bank where a simple village boy outsmarts a notorious highway robber by pretending the river water belongs to the king.",
+   "A crowded royal courtyard where the King challenges his witty advisor to prove a crow can speak Sanskrit within three days.",
+   "A dusty village crossroads where a mischievous trickster convinces the village headman that a stray goat is actually a disguised royal minister.",
+   "A grand palace dining hall where a clever jester serves a meal made entirely of painted wooden clay to teach the arrogant royals a lesson about humility."
   ],
   "hashtags": [
+   "#GopalBhar",
+   "#BengaliCartoons",
    "#MoralStories",
    "#BanglaCartoon",
-   "#HindiMoralStories",
    "#KidsAnimation",
-   "#BedtimeStories",
+   "#FairyTales",
+   "#FunnyStories",
    "#ThakurmarJhuli",
-   "#PanchatantraTales",
-   "#JatakaTales",
-   "#BiblicalStories",
-   "#AnimatedFairytales"
+   "#AnimatedStories",
+   "#Panchatantra"
   ],
   "keywords": [
-   "bengali moral stories",
-   "hindi cartoon stories",
-   "kids animated bible stories",
-   "thakurmar jhuli new episodes",
-   "panchatantra ki kahani",
-   "jatak katha cartoon",
-   "bedtime stories for kids in bengali",
-   "moral stories in hindi"
+   "gopal bhar new episode",
+   "bengali cartoon stories",
+   "moral stories in bengali",
+   "funny gopal bhar cartoon",
+   "bangla cartoon comedy",
+   "best of gopal bhar",
+   "animated folk tales india",
+   "kids moral stories bengali"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles are moderately long and descriptive, utilizing the vertical bar '|' to divide main topics and secondary keywords for SEO. They incorporate emotional and thematic hooks like 'শিশুদের জন্য' (for children) and relevant emojis to instantly capture parental interest.",
-   "thumb_style": "Thumbnails feature warm, glowing pastel or rich cinematic lighting with a cozy barn setting centered around the manger scene. Characters display sweet, welcoming facial expressions, rendered in clean 2D or soft 3D animation with bold outlines and minimal, easy-to-read text overlays.",
-   "thumb_text_style": "3 to 4 words of large, bold English text with white fill and dark drop shadows."
+   "title_style": "The titles are concise and punchy, combining recognizable character names like Gopal Bhar with dramatic verbs or mystery hooks. They frequently utilize vertical bars (|) to segment branding, series names, and episode descriptors. Click-pulling words focus on curiosity, deception, and humorous situations.",
+   "thumb_style": "The thumbnails feature vibrant, saturated primary colors and clear daylight or warm indoor lighting typical of 2D animation. Characters display exaggerated, expressive facial expressions ranging from cheerful grins to shocked disbelief. The composition centers on the main protagonist, Gopal, interacting with secondary characters in simple, uncluttered village or courtroom backgrounds.",
+   "thumb_text_style": "Zero to minimal words of text appear on the thumbnails, relying entirely on character expressions and recognizable branding logos to drive clicks."
   },
   "real": [
    {
-    "id": "TUbsKpvJO40",
-    "title": "শিশু যিশুর সঙ্গে প্রথম সাক্ষাৎ ✝️ শিশুদের জন্য যিশুর জন্মকাহিনী শুনতে শুনতে ঘুমিয়ে পড়ুন",
-    "views": 2403,
-    "age": "4d ago"
+    "id": "dBEfp6JW7yU",
+    "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 600902,
+    "age": "3d ago"
    },
    {
-    "id": "eYvIXUfw2B0",
-    "title": "প্রথম বড়দিন ⭐ বাচ্চাদের জন্য শিশু যিশুর গল্প | যিশুর জন্মকাহিনীর কার্টুন",
-    "views": 150,
+    "id": "OuW84nG2xzw",
+    "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 586722,
     "age": "2d ago"
    },
    {
-    "id": "DjHW1EfCg2s",
-    "title": "যিশুর জন্ম | শিশুদের জন্য প্রথম বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প",
-    "views": 67,
-    "age": "23h ago"
+    "id": "wQIfxilQhmE",
+    "title": "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar",
+    "views": 541915,
+    "age": "6d ago"
    },
    {
-    "id": "KjV0t8hnxjI",
-    "title": "জাতকের গল্প 10",
-    "views": 5,
-    "age": "1d ago"
+    "id": "b6Xisjmxnj8",
+    "title": "অদৃশ্য চোর | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 460816,
+    "age": "6d ago"
    },
    {
-    "id": "mLNmE9dmVaU",
-    "title": "What Are the Jataka Tales Actually? | 2,500-Year-Old History and the Mysteries of Buddhism | GM E...",
-    "views": 4,
-    "age": "9h ago"
+    "id": "54_S-BaycRI",
+    "title": "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 338456,
+    "age": "4d ago"
+   },
+   {
+    "id": "kX5DjdGd7Ws",
+    "title": "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483",
+    "views": 287846,
+    "age": "5d ago"
+   },
+   {
+    "id": "8xoEaSYVzLw",
+    "title": "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 264867,
+    "age": "3d ago"
+   },
+   {
+    "id": "yBykv2cWsxM",
+    "title": "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 264759,
+    "age": "5d ago"
+   },
+   {
+    "id": "dgOdyGJj4XY",
+    "title": "Gopal Bhar remains silent after seeing the Minister's trick! | Gopal Bhar | New Episode 2026",
+    "views": 255567,
+    "age": "5d ago"
+   },
+   {
+    "id": "fRmwWecQRPU",
+    "title": "রাজা গোপালের কাছ থেকে শত শত মুরগি কিনলেন!|| Gopal Bhar || New Episode ||",
+    "views": 251991,
+    "age": "6d ago"
+   },
+   {
+    "id": "mHxq6v9hJrw",
+    "title": "তৃতীয় ব্যক্তি  | Gopal Bhar Movie | Gopal Bhar",
+    "views": 237121,
+    "age": "4d ago"
+   },
+   {
+    "id": "gP64-7gG7rk",
+    "title": "রাজার মৃত্যুর খবর শুনে শোকে স্তব্ধ গোটা রাজপ্রাসাদ! | Gopal Bhar | New Episode 2026",
+    "views": 236942,
+    "age": "6d ago"
+   },
+   {
+    "id": "6lDGwRPtDC4",
+    "title": "সব-ই তার ইচ্ছে | Gopal Bhar | Gopal Dhamaal",
+    "views": 236858,
+    "age": "3d ago"
+   },
+   {
+    "id": "B0rGh2xuxkc",
+    "title": "বাবা গোপাল  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 236811,
+    "age": "5d ago"
+   },
+   {
+    "id": "seFttatkFHg",
+    "title": "গোপালের শিরোচ্ছেদ | Gopal Bhar | Full Episode | Episode 489",
+    "views": 236052,
+    "age": "3d ago"
    }
   ],
-  "from_cat": "jataka"
+  "from_cat": "gopal"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",
@@ -149,6 +209,151 @@
    "যিশুর জন্ম | শিশুদের জন্য প্রথম বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প (67)",
    "জাতকের গল্প 10 (5)",
    "What Are the Jataka Tales Actually? | 2,500-Year-Old History and the Mysteries of Buddhism | GM E... (4)"
+  ],
+  "from": "youtube"
+ },
+ "cartoon_bn_gopal": {
+  "date": "2026-11-13",
+  "topics": [
+   "A village market square where a clever court jester tricks a greedy merchant into buying empty magic pots by claiming they multiply gold.",
+   "A royal durbar hall where a quick-witted prankster exposes a fake holy man using only a handful of roasted peanuts and a clever riddle.",
+   "A quiet riverside bank where a simple village boy outsmarts a notorious highway robber by pretending the river water belongs to the king.",
+   "A crowded royal courtyard where the King challenges his witty advisor to prove a crow can speak Sanskrit within three days.",
+   "A dusty village crossroads where a mischievous trickster convinces the village headman that a stray goat is actually a disguised royal minister.",
+   "A grand palace dining hall where a clever jester serves a meal made entirely of painted wooden clay to teach the arrogant royals a lesson about humility."
+  ],
+  "hashtags": [
+   "#GopalBhar",
+   "#BengaliCartoons",
+   "#MoralStories",
+   "#BanglaCartoon",
+   "#KidsAnimation",
+   "#FairyTales",
+   "#FunnyStories",
+   "#ThakurmarJhuli",
+   "#AnimatedStories",
+   "#Panchatantra"
+  ],
+  "keywords": [
+   "gopal bhar new episode",
+   "bengali cartoon stories",
+   "moral stories in bengali",
+   "funny gopal bhar cartoon",
+   "bangla cartoon comedy",
+   "best of gopal bhar",
+   "animated folk tales india",
+   "kids moral stories bengali"
+  ],
+  "style": {
+   "tags": [],
+   "hashtags": [],
+   "title_style": "The titles are concise and punchy, combining recognizable character names like Gopal Bhar with dramatic verbs or mystery hooks. They frequently utilize vertical bars (|) to segment branding, series names, and episode descriptors. Click-pulling words focus on curiosity, deception, and humorous situations.",
+   "thumb_style": "The thumbnails feature vibrant, saturated primary colors and clear daylight or warm indoor lighting typical of 2D animation. Characters display exaggerated, expressive facial expressions ranging from cheerful grins to shocked disbelief. The composition centers on the main protagonist, Gopal, interacting with secondary characters in simple, uncluttered village or courtroom backgrounds.",
+   "thumb_text_style": "Zero to minimal words of text appear on the thumbnails, relying entirely on character expressions and recognizable branding logos to drive clicks."
+  },
+  "real": [
+   {
+    "id": "dBEfp6JW7yU",
+    "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 600902,
+    "age": "3d ago"
+   },
+   {
+    "id": "OuW84nG2xzw",
+    "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 586722,
+    "age": "2d ago"
+   },
+   {
+    "id": "wQIfxilQhmE",
+    "title": "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar",
+    "views": 541915,
+    "age": "6d ago"
+   },
+   {
+    "id": "b6Xisjmxnj8",
+    "title": "অদৃশ্য চোর | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 460816,
+    "age": "6d ago"
+   },
+   {
+    "id": "54_S-BaycRI",
+    "title": "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 338456,
+    "age": "4d ago"
+   },
+   {
+    "id": "kX5DjdGd7Ws",
+    "title": "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483",
+    "views": 287846,
+    "age": "5d ago"
+   },
+   {
+    "id": "8xoEaSYVzLw",
+    "title": "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 264867,
+    "age": "3d ago"
+   },
+   {
+    "id": "yBykv2cWsxM",
+    "title": "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 264759,
+    "age": "5d ago"
+   },
+   {
+    "id": "dgOdyGJj4XY",
+    "title": "Gopal Bhar remains silent after seeing the Minister's trick! | Gopal Bhar | New Episode 2026",
+    "views": 255567,
+    "age": "5d ago"
+   },
+   {
+    "id": "fRmwWecQRPU",
+    "title": "রাজা গোপালের কাছ থেকে শত শত মুরগি কিনলেন!|| Gopal Bhar || New Episode ||",
+    "views": 251991,
+    "age": "6d ago"
+   },
+   {
+    "id": "mHxq6v9hJrw",
+    "title": "তৃতীয় ব্যক্তি  | Gopal Bhar Movie | Gopal Bhar",
+    "views": 237121,
+    "age": "4d ago"
+   },
+   {
+    "id": "gP64-7gG7rk",
+    "title": "রাজার মৃত্যুর খবর শুনে শোকে স্তব্ধ গোটা রাজপ্রাসাদ! | Gopal Bhar | New Episode 2026",
+    "views": 236942,
+    "age": "6d ago"
+   },
+   {
+    "id": "6lDGwRPtDC4",
+    "title": "সব-ই তার ইচ্ছে | Gopal Bhar | Gopal Dhamaal",
+    "views": 236858,
+    "age": "3d ago"
+   },
+   {
+    "id": "B0rGh2xuxkc",
+    "title": "বাবা গোপাল  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 236811,
+    "age": "5d ago"
+   },
+   {
+    "id": "seFttatkFHg",
+    "title": "গোপালের শিরোচ্ছেদ | Gopal Bhar | Full Episode | Episode 489",
+    "views": 236052,
+    "age": "3d ago"
+   }
+  ],
+  "youtube_top": [
+   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (600,902)",
+   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (586,722)",
+   "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar (541,915)",
+   "অদৃশ্য চোর | Gopal Bhar (Bengali) | Double Gopal (460,816)",
+   "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar (338,456)",
+   "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483 (287,846)",
+   "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal (264,867)",
+   "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar (264,759)",
+   "Gopal Bhar remains silent after seeing the Minister's trick! | Gopal Bhar | New Episode 2026 (255,567)",
+   "রাজা গোপালের কাছ থেকে শত শত মুরগি কিনলেন!|| Gopal Bhar || New Episode || (251,991)"
   ],
   "from": "youtube"
  }

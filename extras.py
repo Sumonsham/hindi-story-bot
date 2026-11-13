@@ -3528,8 +3528,33 @@ def chirp_used(path):
     return int(c.get("chars", 0)) if c.get("month") == _month() else 0
 
 
+_OTHER_CHIRP = {}
+
+
+def chirp_other_used():
+    """v85: the cartoon bot uses Chirp too now - both bots share ONE free monthly share (1 million letters), so each
+    one also counts what the OTHER repo used this month (read from its public assets/tts_usage.json)"""
+    if "n" in _OTHER_CHIRP:
+        return _OTHER_CHIRP["n"]
+    n = 0
+    repo = env("GITHUB_REPOSITORY")
+    other = env("CHIRP_SHARED_WITH")
+    if not other and "/" in repo:
+        owner, name = repo.split("/", 1)
+        other = f"{owner}/{'hindi-story-bot' if 'horror' in name.lower() else 'horror-story-bot'}"
+    if other and not env("MOCK"):
+        try:
+            r = requests.get(f"https://raw.githubusercontent.com/{other}/HEAD/assets/tts_usage.json", timeout=20)
+            c = (r.json().get("chirp") or {}) if r.ok else {}
+            n = int(c.get("chars", 0)) if c.get("month") == _month() else 0
+        except Exception:
+            n = 0
+    _OTHER_CHIRP["n"] = n
+    return n
+
+
 def chirp_left(path):
-    return max(0, int(env("CHIRP_MONTH_CAP") or 900000) - chirp_used(path))
+    return max(0, int(env("CHIRP_MONTH_CAP") or 900000) - chirp_used(path) - chirp_other_used())
 
 
 def chirp_ok(path):

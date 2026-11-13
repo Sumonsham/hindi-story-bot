@@ -1731,6 +1731,8 @@ EMOTION_WORDS = {
 }
 GEMINI_CACHE = {}
 GEMINI_READY = False
+TTS_USAGE = os.path.join(HERE, "assets", "tts_usage.json")        # v85: Gemini requests today + Chirp letters this month
+os.environ.setdefault("CHIRP_RATE", "1.0")                         # cartoons: a lively, normal speed (horror: 0.9)
 
 
 def gemini_persona(voices, speaker):
@@ -1802,10 +1804,13 @@ def prepare_voices(parts_lines, voices, lang):
     global GEMINI_READY
 
     def gemini_all():
-        if not extras.tts_keys():
+        """v85: GEMINI voices for the cartoons (your choice, 13 Nov 2026) - character by character inside today's free
+        share (GEMINI_TTS_KEY of THIS repo, TTS_DAY_BUDGET a day); a character that does not fit gets the Google
+        Chirp 3 HD voice of the SAME name (GOOGLE_TTS_KEY); only if that also fails, the free voice for the whole video."""
+        if not (extras.tts_keys() or extras.chirp_ok(TTS_USAGE)) or env("CARTOON_GEMINI") == "0":
             return False
-        log(f"Expressive voices for all {len(todo)} lines")
-        items = []
+        extras.TTS_STATE["off"] = not extras.tts_keys()
+        items, who_of = [], []
         for (i, j, ln) in todo:
             voice, who = gemini_persona(voices, ln.get("speaker", "narrator"))
             feel = f"{EMOTION_WORDS.get(str(ln.get('emotion', 'normal')).lower(), 'naturally')}" + (
@@ -1814,13 +1819,64 @@ def prepare_voices(parts_lines, voices, lang):
                           "who": who + ". This is a children's cartoon story: expressive, never flat or robotic",
                           "feel": feel, "spk": voice, "out": os.path.join(WORK, f"g_{i:02d}_{j:02d}.wav"),
                           "lang": lang})
-        if extras.tts_gemini_batch(items, LANGS[lang]["name"], SR, extras.voice_minutes(45)):
-            for (i, j, ln), it in zip(todo, items):
-                GEMINI_CACHE[(i, j)] = it["out"]
-            log("  all lines voiced by Gemini")
-            return True
-        GEMINI_CACHE.clear()
-        return False
+            who_of.append(voice)                      # one voice = one character
+        made = lambda it: os.path.exists(it["out"]) and os.path.getsize(it["out"]) > 2000
+        order = sorted(set(who_of), key=lambda v: (v != NARRATOR_GEMINI[0], -who_of.count(v)))
+        mine = lambda v: [it for it, w in zip(items, who_of) if w == v]
+        left = extras.tts_budget_left(TTS_USAGE) if extras.tts_keys() else 0
+        log(f"Gemini voices for all {len(todo)} lines ({len(order)} characters) - today's free requests left: {left}")
+        done = set()
+        extras.TTS_USED[0] = 0
+        for v in order:
+            if extras.TTS_STATE["off"] or extras.TTS_USED[0] >= left:
+                break
+            its = mine(v)
+            need = len(extras.tts_groups(its))
+            if extras.TTS_USED[0] + need > left:
+                continue                              # (a character is only begun when it can also be finished)
+            try:
+                extras.tts_gemini_batch(its, LANGS[lang]["name"], SR, extras.voice_minutes(45), max_requests=left)
+            except Exception as e:
+                log("  Gemini voices stopped:", str(e)[:150])
+            for it in [it for it in its if not made(it)]:     # a line still open: alone, while the share lasts
+                if extras.TTS_USED[0] >= left or extras.TTS_STATE["off"]:
+                    break
+                extras.TTS_USED[0] += 1
+                extras.tts_gemini(it["text"], it["voice"], f"{it['who']}. {it['feel']}. " + extras.PRONOUNCE.get(lang, ""),
+                                  LANGS[lang]["name"], it["out"], SR)
+            if all(made(it) for it in its):
+                done.add(v)
+        try:
+            extras.tts_budget_use(TTS_USAGE)
+        except Exception as e:
+            log("  voice usage not saved:", str(e)[:100])
+        log(f"  Gemini voiced {len(done)} of {len(order)} characters completely")
+        extras.TTS_STATE["off"] = True
+        waiting = [v for v in order if v not in done]
+        if waiting and extras.chirp_ok(TTS_USAGE):    # Chirp 3 HD voice of the SAME name, a whole character at a time
+            used0 = extras.chirp_used(TTS_USAGE)
+            for v in waiting:
+                its = mine(v)
+                if all(made(it) or extras.chirp_tts(it["plain"], it["voice"], it["out"], SR, TTS_USAGE, lang) for it in its):
+                    done.add(v)
+                else:
+                    break
+            spent = extras.chirp_used(TTS_USAGE) - used0
+            if spent:
+                log(f"  Chirp 3 HD voice for {len(waiting)} character(s): {spent} letters")
+                extras.note(f"কার্টুন: Gemini-র দিনের গলা শেষ, Chirp গলা নিল {spent} অক্ষর "
+                            f"(এই মাসে দুই bot মিলিয়ে সীমা {env('CHIRP_MONTH_CAP') or 900000})")
+        if any(v not in done for v in order):
+            log("  not every character could get Gemini / Chirp today - the free voice for the whole video")
+            for it in items:
+                if os.path.exists(it["out"]):
+                    os.remove(it["out"])
+            GEMINI_CACHE.clear()
+            return False
+        for (i, j, ln), it in zip(todo, items):
+            GEMINI_CACHE[(i, j)] = it["out"]
+        log("  all lines voiced (Gemini" + (" + Chirp)" if extras.chirp_used(TTS_USAGE) else ")"))
+        return True
 
     def free_all():
         if not (extras.parler_ok() and extras.ensure_parler()):
@@ -1831,11 +1887,10 @@ def prepare_voices(parts_lines, voices, lang):
                                                                  ln.get("emotion", "normal"), p, SR),
                           "free voice model", min(int(env("FREE_VOICE_MINUTES") or 260), max(30, job_minutes_left() - 70)))
 
-    # cartoons: the free voice model first (the Gemini voice limit is kept for the horror stories);
-    # Gemini only as a backup if the free model fails. USE_GEMINI_VOICE=1 puts Gemini first again.
-    # CARTOONS: ONLY the free voice model - never Gemini (its free voice limit is kept for the horror stories)
-    extras.TTS_STATE["off"] = True               # no Gemini voice call anywhere in this video
-    order = (free_all,)
+    # v85 (13 Nov 2026, your choice): CARTOONS = Gemini voices first, then Chirp 3 HD of the same name,
+    # and only if both are gone the free voice model (never a Microsoft voice)
+    extras.TTS_STATE["off"] = True
+    order = (gemini_all, free_all)
     for engine in order:
         if engine():
             GEMINI_READY = True
@@ -1849,9 +1904,9 @@ def prepare_voices(parts_lines, voices, lang):
 
 def no_voice_stop():
     """No good voice today (Gemini limit over, free model failed): no robotic Microsoft voice - skip this video."""
-    log("STOPPED: the free voice model failed today. Nothing was posted - the next run will try again. "
-        "(Cartoons use only the free voice; Microsoft voices are switched off.)")
-    extras.telegram("⚠️ Little Lumi: today's voices could not be made (the free voice model failed) "
+    log("STOPPED: no Gemini / Chirp voice left and the free voice model failed today. Nothing was posted - the next "
+        "run will try again. (Microsoft voices are switched off.)")
+    extras.telegram("⚠️ Little Lumi: today's voices could not be made (Gemini + Chirp used up, free voice model failed) "
                     "- this video was skipped. The next run will try again.")
     sys.exit(0)
 

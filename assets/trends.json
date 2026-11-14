@@ -2,147 +2,135 @@
  "cartoon_bn": {
   "date": "2026-11-14",
   "topics": [
-   "A remote village home in winter where two rival sister-in-laws compete in a midnight Pitha-making contest using a cursed earthen oven that whispers family secre",
-   "A desolate railway track near a rural station where an innocent potato family gets stranded on the way to their grandparents' house during a spooky midnight fog",
-   "A dense bamboo grove at the edge of a village where a mischievous young shepherd boy discovers a talking bamboo gourd that grants wishes with a terrifying hidde",
-   "An old zamindar mansion on the night of Kali Puja where a neglected servant girl finds a glowing black veil that possesses anyone who dares to wear it.",
-   "A deep riverbank in rural Bengal where a clever village kid outsmarts a notorious river witch by offering her magical sweets during a sudden thunderstorm.",
-   "A thatched-roof hut during a heavy monsoon storm where a devoted mother and her hardworking son are tested by a mysterious traveling beggar holding a glowing la"
+   "Village marketplace where Gopal tricks a greedy merchant into buying ordinary river stones by claiming they whisper royal secrets",
+   "Royal palace durbar where Gopal uses a trained talking parrot to expose a corrupt vizier trying to frame an innocent farmer",
+   "A shadowy bamboo forest at midnight where Gopal investigates a glowing phantom light that turns out to be thieves hiding stolen temple gold",
+   "A riverside fishing dock where Gopal challenges the local tax collector to a hilarious cooking contest using invisible spices",
+   "The royal courtyard where the King loses his favorite royal seal and Gopal tests the suspects with magic shrinking rice",
+   "A dusty village square where Gopal sets up a fake court to judge two fighting brothers who claim ownership of the same shadow"
   ],
   "hashtags": [
+   "#GopalBhar",
    "#BanglaCartoon",
    "#BengaliMoralStories",
-   "#BhuterCartoon",
+   "#GopalBharNewEpisode",
+   "#FunnyCartoons",
+   "#KidsAnimation",
    "#BanglaGolpo",
-   "#BengaliAnimation",
-   "#VuterGolpo",
-   "#ThakurmarJhuli",
-   "#BanglaAnimationStory",
-   "#GopalBhar",
-   "#HorrorCartoon"
+   "#CartoonVideo",
+   "#MoralStories",
+   "#GopalComedy"
   ],
   "keywords": [
-   "bangla cartoon golpo",
+   "gopal bhar new episode",
+   "bangla cartoon",
    "bengali moral stories",
-   "bhuter cartoon bangla",
-   "vuter golpo bengali animation",
-   "notun bangla golpo",
-   "bengali animated village story",
-   "bangla golpo 3d animation",
-   "bhoutik golpo cartoon"
+   "gopal bhar comedy",
+   "animated folk tales",
+   "bengali cartoon video",
+   "gopal bhar latest",
+   "kids funny stories"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles are moderately long and feature emotional or suspenseful hooks like 'Bhuter Cartoon' or 'Bengali Animated Village Story' to attract viewers. They frequently use vertical separators ('|') and descriptive phrases in Bengali to summarize the plot and appeal to family audiences.",
-   "thumb_style": "Thumbnails feature vibrant, saturated 2D cartoon artwork with dramatic lighting, often contrasting dark night scenes with glowing elements or bright daylight settings. Characters display exaggerated emotional expressions like fear or surprise, and compositions clearly isolate the main narrative conflict or spooky elements.",
-   "thumb_text_style": "Short Bengali text consisting of 2 to 6 words written in bold, high-contrast colors like white, black-outlined red, or yellow."
+   "title_style": "The titles are moderately short and straightforward, using character names like Gopal Bhar alongside descriptive hooks or series labels. They rely heavily on the vertical separator '|' to organize brand names and episode categories cleanly. Words that spark curiosity, such as mystery or food references, are used to pull clicks without relying on excessive punctuation or emojis.",
+   "thumb_style": "The thumbnails feature brightly lit, 2D cartoon scenes with saturated primary colors like blue, red, and yellow against earthy backgrounds. Characters display clear, expressive facial expressions ranging from cheerful to curious, often gathered in groups to showcase a narrative moment. Composition focuses on key character interactions within simple indoor or outdoor settings, maintaining a clean look without heavy textual overlays.",
+   "thumb_text_style": "zero words of text on the thumbnail as the visual storytelling speaks for itself"
   },
   "real": [
    {
-    "id": "Rdw4OzyvCas",
-    "title": "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story",
-    "views": 1856472,
-    "age": "6d ago"
-   },
-   {
-    "id": "w5RSFS0PSFM",
-    "title": "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 1271032,
-    "age": "6d ago"
-   },
-   {
-    "id": "0dteMbTNjkI",
-    "title": "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo",
-    "views": 1109110,
-    "age": "3d ago"
-   },
-   {
-    "id": "MHOyVtyD2cA",
-    "title": "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 722369,
-    "age": "5d ago"
-   },
-   {
-    "id": "Rp0O-NEk574",
-    "title": "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 693551,
-    "age": "2d ago"
-   },
-   {
-    "id": "o4fvtQnEh0k",
-    "title": "কালো ঘোমটা | Kalo Ghomta | Grambanglar Bhuter Cartoon | Vuter Golpo | Bengali Horror Story",
-    "views": 673844,
-    "age": "7d ago"
-   },
-   {
     "id": "dBEfp6JW7yU",
     "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 617605,
+    "views": 618125,
     "age": "4d ago"
-   },
-   {
-    "id": "iZhgpFbKT4k",
-    "title": "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon",
-    "views": 613334,
-    "age": "3d ago"
    },
    {
     "id": "OuW84nG2xzw",
     "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 606530,
+    "views": 607125,
     "age": "3d ago"
    },
    {
-    "id": "0HIioAo7Fmw",
-    "title": "😱 নানা বাড়ি যাওয়ার পথে ট্রেনে দুর্ঘটনা ! প্রাণে বাঁচল আলু পরিবার | Bangla 3D Animation Story",
-    "views": 563114,
-    "age": "7d ago"
+    "id": "54_S-BaycRI",
+    "title": "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 347846,
+    "age": "5d ago"
    },
    {
-    "id": "GHjvQ5hH7QQ",
-    "title": "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 560681,
-    "age": "20h ago"
-   },
-   {
-    "id": "NLUUjWdUQJ8",
-    "title": "বড়মা ও জমিদার বাড়ির কালীপুজো | Boro Maa | JOMIDAR BARIR KALI | Notun Bangla Golpo | Bangla Cartoon",
-    "views": 550452,
+    "id": "mgDZIx_NYiE",
+    "title": "গভীর রাতে জঙ্গলে কাতলা মাছ এল কোথা থেকে? | Gopal Bhar | New Episode 2026",
+    "views": 319615,
     "age": "6d ago"
    },
    {
-    "id": "wQIfxilQhmE",
-    "title": "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar",
-    "views": 545729,
-    "age": "7d ago"
+    "id": "kX5DjdGd7Ws",
+    "title": "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483",
+    "views": 299259,
+    "age": "6d ago"
    },
    {
-    "id": "n-iB_sdmURA",
-    "title": "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird",
-    "views": 518510,
-    "age": "1d ago"
+    "id": "sKUZ9irJjTE",
+    "title": "গোপাল পুরো গ্রামকে দেশি মাছ ও ভাত খাওয়াল || Gopal Bhar || Latest Episode ||",
+    "views": 287222,
+    "age": "6d ago"
    },
    {
-    "id": "RZtqnK3yBmk",
-    "title": "কালী পূজার রাতে মা সত্যিই আসে | Bhuter Cartoon | KALI PUJA | Notun Bangla Golpo | Kali Thakur Story",
-    "views": 485234,
-    "age": "7d ago"
+    "id": "yBykv2cWsxM",
+    "title": "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 270711,
+    "age": "6d ago"
+   },
+   {
+    "id": "8xoEaSYVzLw",
+    "title": "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 268172,
+    "age": "4d ago"
+   },
+   {
+    "id": "mHxq6v9hJrw",
+    "title": "তৃতীয় ব্যক্তি  | Gopal Bhar Movie | Gopal Bhar",
+    "views": 242531,
+    "age": "5d ago"
+   },
+   {
+    "id": "6lDGwRPtDC4",
+    "title": "সব-ই তার ইচ্ছে | Gopal Bhar | Gopal Dhamaal",
+    "views": 241138,
+    "age": "4d ago"
+   },
+   {
+    "id": "seFttatkFHg",
+    "title": "গোপালের শিরোচ্ছেদ | Gopal Bhar | Full Episode | Episode 489",
+    "views": 240922,
+    "age": "4d ago"
+   },
+   {
+    "id": "B0rGh2xuxkc",
+    "title": "বাবা গোপাল  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 239371,
+    "age": "6d ago"
+   },
+   {
+    "id": "8rKQOEnfuGA",
+    "title": "সুস্বাদু মাছের ঝোল | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 222863,
+    "age": "3d ago"
+   },
+   {
+    "id": "LPIwbghZiuA",
+    "title": "সীতার আবদার | Gopal Bhar Movie | Gopal Bhar",
+    "views": 209081,
+    "age": "6d ago"
+   },
+   {
+    "id": "syE0-ptijR0",
+    "title": "গোপালের রণকৌশাল | Fun Time With Gopal | Gopal Bhar",
+    "views": 188195,
+    "age": "6d ago"
    }
   ],
-  "youtube_top": [
-   "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story (1,856,472)",
-   "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo (1,271,032)",
-   "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo (1,109,110)",
-   "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna (722,369)",
-   "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo (693,551)",
-   "কালো ঘোমটা | Kalo Ghomta | Grambanglar Bhuter Cartoon | Vuter Golpo | Bengali Horror Story (673,844)",
-   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (617,605)",
-   "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon (613,334)",
-   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (606,530)",
-   "😱 নানা বাড়ি যাওয়ার পথে ট্রেনে দুর্ঘটনা ! প্রাণে বাঁচল আলু পরিবার | Bangla 3D Animation Story (563,114)"
-  ],
-  "from": "youtube"
+  "from_cat": "gopal"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",
@@ -225,147 +213,147 @@
   "from": "youtube"
  },
  "cartoon_bn_gopal": {
-  "date": "2026-11-13",
+  "date": "2026-11-14",
   "topics": [
-   "A village market square where a clever court jester tricks a greedy merchant into buying empty magic pots by claiming they multiply gold.",
-   "A royal durbar hall where a quick-witted prankster exposes a fake holy man using only a handful of roasted peanuts and a clever riddle.",
-   "A quiet riverside bank where a simple village boy outsmarts a notorious highway robber by pretending the river water belongs to the king.",
-   "A crowded royal courtyard where the King challenges his witty advisor to prove a crow can speak Sanskrit within three days.",
-   "A dusty village crossroads where a mischievous trickster convinces the village headman that a stray goat is actually a disguised royal minister.",
-   "A grand palace dining hall where a clever jester serves a meal made entirely of painted wooden clay to teach the arrogant royals a lesson about humility."
+   "Village marketplace where Gopal tricks a greedy merchant into buying ordinary river stones by claiming they whisper royal secrets",
+   "Royal palace durbar where Gopal uses a trained talking parrot to expose a corrupt vizier trying to frame an innocent farmer",
+   "A shadowy bamboo forest at midnight where Gopal investigates a glowing phantom light that turns out to be thieves hiding stolen temple gold",
+   "A riverside fishing dock where Gopal challenges the local tax collector to a hilarious cooking contest using invisible spices",
+   "The royal courtyard where the King loses his favorite royal seal and Gopal tests the suspects with magic shrinking rice",
+   "A dusty village square where Gopal sets up a fake court to judge two fighting brothers who claim ownership of the same shadow"
   ],
   "hashtags": [
    "#GopalBhar",
-   "#BengaliCartoons",
-   "#MoralStories",
    "#BanglaCartoon",
+   "#BengaliMoralStories",
+   "#GopalBharNewEpisode",
+   "#FunnyCartoons",
    "#KidsAnimation",
-   "#FairyTales",
-   "#FunnyStories",
-   "#ThakurmarJhuli",
-   "#AnimatedStories",
-   "#Panchatantra"
+   "#BanglaGolpo",
+   "#CartoonVideo",
+   "#MoralStories",
+   "#GopalComedy"
   ],
   "keywords": [
    "gopal bhar new episode",
-   "bengali cartoon stories",
-   "moral stories in bengali",
-   "funny gopal bhar cartoon",
-   "bangla cartoon comedy",
-   "best of gopal bhar",
-   "animated folk tales india",
-   "kids moral stories bengali"
+   "bangla cartoon",
+   "bengali moral stories",
+   "gopal bhar comedy",
+   "animated folk tales",
+   "bengali cartoon video",
+   "gopal bhar latest",
+   "kids funny stories"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "The titles are concise and punchy, combining recognizable character names like Gopal Bhar with dramatic verbs or mystery hooks. They frequently utilize vertical bars (|) to segment branding, series names, and episode descriptors. Click-pulling words focus on curiosity, deception, and humorous situations.",
-   "thumb_style": "The thumbnails feature vibrant, saturated primary colors and clear daylight or warm indoor lighting typical of 2D animation. Characters display exaggerated, expressive facial expressions ranging from cheerful grins to shocked disbelief. The composition centers on the main protagonist, Gopal, interacting with secondary characters in simple, uncluttered village or courtroom backgrounds.",
-   "thumb_text_style": "Zero to minimal words of text appear on the thumbnails, relying entirely on character expressions and recognizable branding logos to drive clicks."
+   "title_style": "The titles are moderately short and straightforward, using character names like Gopal Bhar alongside descriptive hooks or series labels. They rely heavily on the vertical separator '|' to organize brand names and episode categories cleanly. Words that spark curiosity, such as mystery or food references, are used to pull clicks without relying on excessive punctuation or emojis.",
+   "thumb_style": "The thumbnails feature brightly lit, 2D cartoon scenes with saturated primary colors like blue, red, and yellow against earthy backgrounds. Characters display clear, expressive facial expressions ranging from cheerful to curious, often gathered in groups to showcase a narrative moment. Composition focuses on key character interactions within simple indoor or outdoor settings, maintaining a clean look without heavy textual overlays.",
+   "thumb_text_style": "zero words of text on the thumbnail as the visual storytelling speaks for itself"
   },
   "real": [
    {
     "id": "dBEfp6JW7yU",
     "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 600902,
-    "age": "3d ago"
+    "views": 618125,
+    "age": "4d ago"
    },
    {
     "id": "OuW84nG2xzw",
     "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 586722,
-    "age": "2d ago"
-   },
-   {
-    "id": "wQIfxilQhmE",
-    "title": "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar",
-    "views": 541915,
-    "age": "6d ago"
-   },
-   {
-    "id": "b6Xisjmxnj8",
-    "title": "অদৃশ্য চোর | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 460816,
-    "age": "6d ago"
+    "views": 607125,
+    "age": "3d ago"
    },
    {
     "id": "54_S-BaycRI",
     "title": "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 338456,
-    "age": "4d ago"
+    "views": 347846,
+    "age": "5d ago"
+   },
+   {
+    "id": "mgDZIx_NYiE",
+    "title": "গভীর রাতে জঙ্গলে কাতলা মাছ এল কোথা থেকে? | Gopal Bhar | New Episode 2026",
+    "views": 319615,
+    "age": "6d ago"
    },
    {
     "id": "kX5DjdGd7Ws",
     "title": "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483",
-    "views": 287846,
-    "age": "5d ago"
+    "views": 299259,
+    "age": "6d ago"
    },
    {
-    "id": "8xoEaSYVzLw",
-    "title": "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 264867,
-    "age": "3d ago"
+    "id": "sKUZ9irJjTE",
+    "title": "গোপাল পুরো গ্রামকে দেশি মাছ ও ভাত খাওয়াল || Gopal Bhar || Latest Episode ||",
+    "views": 287222,
+    "age": "6d ago"
    },
    {
     "id": "yBykv2cWsxM",
     "title": "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 264759,
-    "age": "5d ago"
-   },
-   {
-    "id": "dgOdyGJj4XY",
-    "title": "Gopal Bhar remains silent after seeing the Minister's trick! | Gopal Bhar | New Episode 2026",
-    "views": 255567,
-    "age": "5d ago"
-   },
-   {
-    "id": "fRmwWecQRPU",
-    "title": "রাজা গোপালের কাছ থেকে শত শত মুরগি কিনলেন!|| Gopal Bhar || New Episode ||",
-    "views": 251991,
+    "views": 270711,
     "age": "6d ago"
+   },
+   {
+    "id": "8xoEaSYVzLw",
+    "title": "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 268172,
+    "age": "4d ago"
    },
    {
     "id": "mHxq6v9hJrw",
     "title": "তৃতীয় ব্যক্তি  | Gopal Bhar Movie | Gopal Bhar",
-    "views": 237121,
-    "age": "4d ago"
-   },
-   {
-    "id": "gP64-7gG7rk",
-    "title": "রাজার মৃত্যুর খবর শুনে শোকে স্তব্ধ গোটা রাজপ্রাসাদ! | Gopal Bhar | New Episode 2026",
-    "views": 236942,
-    "age": "6d ago"
+    "views": 242531,
+    "age": "5d ago"
    },
    {
     "id": "6lDGwRPtDC4",
     "title": "সব-ই তার ইচ্ছে | Gopal Bhar | Gopal Dhamaal",
-    "views": 236858,
-    "age": "3d ago"
-   },
-   {
-    "id": "B0rGh2xuxkc",
-    "title": "বাবা গোপাল  | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 236811,
-    "age": "5d ago"
+    "views": 241138,
+    "age": "4d ago"
    },
    {
     "id": "seFttatkFHg",
     "title": "গোপালের শিরোচ্ছেদ | Gopal Bhar | Full Episode | Episode 489",
-    "views": 236052,
+    "views": 240922,
+    "age": "4d ago"
+   },
+   {
+    "id": "B0rGh2xuxkc",
+    "title": "বাবা গোপাল  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 239371,
+    "age": "6d ago"
+   },
+   {
+    "id": "8rKQOEnfuGA",
+    "title": "সুস্বাদু মাছের ঝোল | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 222863,
     "age": "3d ago"
+   },
+   {
+    "id": "LPIwbghZiuA",
+    "title": "সীতার আবদার | Gopal Bhar Movie | Gopal Bhar",
+    "views": 209081,
+    "age": "6d ago"
+   },
+   {
+    "id": "syE0-ptijR0",
+    "title": "গোপালের রণকৌশাল | Fun Time With Gopal | Gopal Bhar",
+    "views": 188195,
+    "age": "6d ago"
    }
   ],
   "youtube_top": [
-   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (600,902)",
-   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (586,722)",
-   "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar (541,915)",
-   "অদৃশ্য চোর | Gopal Bhar (Bengali) | Double Gopal (460,816)",
-   "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar (338,456)",
-   "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483 (287,846)",
-   "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal (264,867)",
-   "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar (264,759)",
-   "Gopal Bhar remains silent after seeing the Minister's trick! | Gopal Bhar | New Episode 2026 (255,567)",
-   "রাজা গোপালের কাছ থেকে শত শত মুরগি কিনলেন!|| Gopal Bhar || New Episode || (251,991)"
+   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (618,125)",
+   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (607,125)",
+   "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar (347,846)",
+   "গভীর রাতে জঙ্গলে কাতলা মাছ এল কোথা থেকে? | Gopal Bhar | New Episode 2026 (319,615)",
+   "নবাবের বলদ | Gopal Bhar | Full Episode | Episode 483 (299,259)",
+   "গোপাল পুরো গ্রামকে দেশি মাছ ও ভাত খাওয়াল || Gopal Bhar || Latest Episode || (287,222)",
+   "গোপালের কবিতা  | Gopal Bhar | Best Of Gopal Bhar (270,711)",
+   "লোকক্ষ্মী এলো ঘোরে  | Gopal Bhar (Bengali) | Double Gopal (268,172)",
+   "তৃতীয় ব্যক্তি  | Gopal Bhar Movie | Gopal Bhar (242,531)",
+   "সব-ই তার ইচ্ছে | Gopal Bhar | Gopal Dhamaal (241,138)"
   ],
   "from": "youtube"
  },

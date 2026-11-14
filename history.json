@@ -2121,12 +2121,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 433,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-10T22:04+00:00"
+   "checked": "2026-11-14T03:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2176,7 +2176,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-11T03:04+00:00"
+   "checked": "2026-11-14T03:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2515,6 +2515,22 @@
   "riddle": {
    "q": "দিনের বেলা ঘুমিয়ে থাকি, রাত হলে চোখ খুলি। হাজার হাজার ভাই আমি, নীল আকাশে দুলি। বল তো আমি কে?",
    "a": "তারা"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 341,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-14T03:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-14T03:04+00:00",
+   "thumb": true
   }
  },
  {
@@ -2605,5 +2621,30 @@
    "q": "ডালে ডালে লাল জামা পরে ঝুলে থাকি, মিষ্টি ঘ্রাণে সবার মন জয় করে রাখি! আমি কে?",
    "a": "গোলাপ ফুল"
   }
+ },
+ {
+  "date": "2026-11-14T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-14@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "Village marketplace where Gopal tricks a greedy merchant into buying ordinary river stones by claiming they whisper royal secrets (told as a gopal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও রাজ-কণ্ঠ পাথর | গোপালের দারুণ বুদ্ধি 💎",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": null,
+  "title_b": "নদীর সাধারণ পাথর কীভাবে সোনা হলো? গোপাল ভাঁড়ের বিচার 😮",
+  "question_post": null,
+  "facebook": "1178978431135587",
+  "youtube": "UptbRThykaU",
+  "fb_reel": "1847776179766037",
+  "fb_story": "3181926205341159",
+  "fb_reel2": "1104934045701565",
+  "yt_short": "w7Wb_4cdxWU"
  }
 ]

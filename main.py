@@ -3528,9 +3528,9 @@ def promo_list(lang):
                         {"icon": "clock", "head": "रोज़ दोपहर 1 बजे: गोपाल भांड़", "sub": "राजदरबार की मज़ेदार कहानियाँ",
                          "sub2": "हमारा अपना गोपाल, टीवी कार्टून जैसा"})
     if env("YT_LIVE") != "0":
-        out["live"] = ({"icon": "live", "head": "প্রতি রবিবার সকালে লাইভ: গল্পের আসর",
+        out["live"] = ({"icon": "live", "head": "প্রতি শনিবার রাত ১০টায় লাইভ: গল্পের আসর",
                         "sub": "সপ্তাহের সেরা কার্টুন একটানা - YouTube-এ", "sub2": "পুরো পরিবার মিলে দেখুন"} if bn else
-                       {"icon": "live", "head": "हर रविवार सुबह लाइव: कहानियों की महफ़िल",
+                       {"icon": "live", "head": "हर शनिवार रात 10 बजे लाइव: कहानियों की महफ़िल",
                         "sub": "हफ़्ते के बेस्ट कार्टून एक साथ - YouTube पर", "sub2": "पूरा परिवार साथ देखे"})
     if env("QUIZ") != "0":
         out["quiz"] = ({"icon": "quiz", "head": "গল্পের শেষে মজার কুইজ", "sub": "দেখো তো, ঠিক উত্তরটা বলতে পারো কিনা!",
@@ -3699,14 +3699,23 @@ def weekly_live(history):
                                   ["कहानी का मेला", "लाइव", "लगातार बच्चों की कहानियाँ"]),
                              os.path.join(WORK, "live_thumb.jpg"), FONT)
     try:
+        try:                                         # v98: the live starts at 10 PM sharp (cron-job.org starts us early)
+            hh_, mm_ = (env("LIVE_AT") or "22:00").split(":")
+            at_ = dt.datetime.now(extras.IST).replace(hour=int(hh_), minute=int(mm_), second=0, microsecond=0)
+            wait_ = (at_ - dt.datetime.now(extras.IST)).total_seconds()
+            if 0 < wait_ <= 45 * 60:
+                log(f"Live: everything ready - waiting {wait_ / 60:.0f} min until {hh_}:{mm_}")
+                time.sleep(wait_)
+        except Exception:
+            pass
         bid, rtmp, chat = extras.yt_live_create(title, desc, thumb)
     except Exception as e:
         msg = str(e)
         log("Live could not start:", msg[:300])
         if "liveStreamingNotEnabled" in msg or "not enabled" in msg.lower():
-            extras.telegram("⚠️ কার্টুন চ্যানেলে রবিবারের লাইভ হলো না: আপনার YouTube চ্যানেলে লাইভ এখনো চালু নয়। একবার YouTube Studio-তে "
+            extras.telegram("⚠️ কার্টুন চ্যানেলে শনিবারের লাইভ হলো না: আপনার YouTube চ্যানেলে লাইভ এখনো চালু নয়। একবার YouTube Studio-তে "
                             "'Create → Go live' টিপে ফোন নম্বর দিয়ে যাচাই করুন - ২৪ ঘণ্টা পরে লাইভ চালু হয়ে যাবে, তারপর "
-                            "bot নিজেই প্রতি রবিবার লাইভ করবে।")
+                            "bot নিজেই প্রতি শনিবার রাত ১০টায় লাইভ করবে।")
         return
     link = f"https://www.youtube.com/watch?v={bid}"
     log("LIVE:", link)

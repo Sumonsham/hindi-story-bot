@@ -2465,7 +2465,23 @@
   "youtube": "6xOzVDe8dGg",
   "fb_reel": "4587365018162238",
   "fb_story": "1124646633307774",
-  "fb_reel2": "28992977013654864"
+  "fb_reel2": "28992977013654864",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 0,
+   "length_s": 479,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-13T22:03+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-13T22:03+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-13T02:31+00:00",
@@ -2555,5 +2571,39 @@
   "fb_reel": "1149616500982904",
   "fb_story": "1158343607133794",
   "fb_reel2": "1188004246982896"
+ },
+ {
+  "date": "2026-11-14T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-14@8",
+  "pending_comments": [],
+  "category": "festival",
+  "idea": "Chacha Nehru's love for children and a school's Children's Day surprise",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "শিশু দিবসে অলৌকিক লাল গোলাপের রহস্য | Chacha Nehru Special Story 🌹✨",
+  "festival": "Children's Day",
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "চাঁচা নেহেরুর কোট"
+  },
+  "title_b": "স্কুলের সেরা উপহার আর সাহেবের ম্যাজিক! 🎁✨",
+  "question_post": "2026-11-14",
+  "facebook": "1160486633068095",
+  "youtube": "PjZo1yUKkDI",
+  "fb_reel": "1521918796437809",
+  "fb_story": "1366930345367945",
+  "fb_reel2": "3182716121934043",
+  "coloring": "122139024638735948",
+  "yt_short": "hGUSjq9R9LM",
+  "riddle_post": "122139038744735948",
+  "riddle": {
+   "q": "ডালে ডালে লাল জামা পরে ঝুলে থাকি, মিষ্টি ঘ্রাণে সবার মন জয় করে রাখি! আমি কে?",
+   "a": "গোলাপ ফুল"
+  }
  }
 ]

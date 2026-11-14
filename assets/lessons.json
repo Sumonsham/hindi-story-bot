@@ -1,18 +1,25 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-11T09:07+00:00",
+  "made": "2026-11-13T22:04+00:00",
   "lessons": [
-   "Compilation videos generate the highest organic reach (4 to 8 views vs 0-1 for standard shorts), showing audiences prefer bingeable story bundles.",
-   "Mystery, detective, and adventure themes ('অজানা দ্বীপের রহস্যময় ঘুড়ি', 'উল্টো পায়ের ছাপের রহস্য') drive the highest individual video views (3 views) and retention (1.5% - 2.9%).",
-   "Gopal Bhar stories maintain steady but low baseline engagement (1-2 views); frequent duplication of the same plots ('ষাঁড়ের দুধ', 'সোনার আংটি') within days leads to zero views due to fatigue.",
-   "Audience retention across standard uploads is near zero (0% to 3.2%), indicating stories lack immediate hooks in the first 5-10 seconds to stop scrolling.",
-   "Overall numbers are too small to statistically evaluate chapter lengths or endings, but multi-part mystery adventures clearly outperform standalone folk/festival moral tales."
+   "Keep total views and engagement metrics as baseline indicators while prioritizing audience retention signals when available.",
+   "Maintain high-performing content structures such as classic folktales and detective series that draw initial viewer interest.",
+   "Structure narrative chapters tightly to prevent audience drop-off and maintain momentum throughout the video.",
+   "Incorporate audience feedback directly into subsequent story concepts to drive repeat engagement.",
+   "Balance runtime based on viewer drop-off points, ensuring compilation and episodic formats keep pacing swift."
   ],
   "titles": [
-   "Specific mystery hooks with concrete physical clues ('অজানা দ্বীপের রহস্যময় ঘুড়ি', 'উল্টো পায়ের ছাপের রহস্য') outperform generic moral and festival titles.",
-   "B-test swaps show that vague atmospheric titles ('বৃষ্টিভেজা রাতের রহস্যময় সুর', 'বাগানে খসে পড়া ছোট তারা') underperform and require concrete character/conflict focus.",
-   "Action-oriented challenges and riddles ('ইলিশ মাছ আর রাজার পরীক্ষা', 'বেতাল ও জীবন্ত সিংহ') yield higher clicks and likes than passive devotional titles."
+   "Use descriptive questions or intriguing mysteries in titles to successfully outperform generic options during A/B tests.",
+   "Leverage popular recurring characters like Gopal Bhar or detective themes in title hooks to capture immediate clicks.",
+   "Keep title swaps active by introducing emotional stakes or clear curiosities that prompt higher initial curiosity."
   ],
-  "requests": []
+  "requests": [
+   "A ghost story or supernatural mystery theme",
+   "Stories featuring rivers, ponds, or specific natural landmarks",
+   "Interactive guessing games about story clues like colored threads",
+   "Character name inclusions where viewer names are integrated into the plot",
+   "Moral dilemmas asking viewers to judge characters' actions and sacrifices",
+   "Wishes and magical item scenarios where characters make choices"
+  ]
  }
 }

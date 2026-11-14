@@ -1,76 +1,148 @@
 {
  "cartoon_bn": {
-  "date": "2026-11-13",
+  "date": "2026-11-14",
   "topics": [
-   "A brave king patrolling a cursed cremation ground at midnight must answer a riddle about a stolen royal necklace before a hanging corpse escapes",
-   "A village blacksmith sheltering from a torrential storm in a ruined temple hears a ghostly lullaby and discovers a cradle rocking by itself",
-   "A curious young cowherd grazing cattle near a forbidden forest stumbles upon a weeping tree that bleeds gold coins when touched",
-   "A greedy merchant taking a shortcut through a dense mountain pass is tricked by a shape-shifting fox demanding his most prized possession",
-   "A devoted disciple meditating in a lonely Himalayan cave is tested by a deity who assumes the terrifying form of a multi-armed demon",
-   "Two rival princes hunting in an ancient royal garden enter a labyrinth where statues whisper prophetic warnings about their impending doom"
+   "A remote village home in winter where two rival sister-in-laws compete in a midnight Pitha-making contest using a cursed earthen oven that whispers family secre",
+   "A desolate railway track near a rural station where an innocent potato family gets stranded on the way to their grandparents' house during a spooky midnight fog",
+   "A dense bamboo grove at the edge of a village where a mischievous young shepherd boy discovers a talking bamboo gourd that grants wishes with a terrifying hidde",
+   "An old zamindar mansion on the night of Kali Puja where a neglected servant girl finds a glowing black veil that possesses anyone who dares to wear it.",
+   "A deep riverbank in rural Bengal where a clever village kid outsmarts a notorious river witch by offering her magical sweets during a sudden thunderstorm.",
+   "A thatched-roof hut during a heavy monsoon storm where a devoted mother and her hardworking son are tested by a mysterious traveling beggar holding a glowing la"
   ],
   "hashtags": [
-   "#VikramBetal",
    "#BanglaCartoon",
-   "#BengaliGhostStories",
+   "#BengaliMoralStories",
+   "#BhuterCartoon",
+   "#BanglaGolpo",
+   "#BengaliAnimation",
+   "#VuterGolpo",
    "#ThakurmarJhuli",
-   "#PanchatantraStories",
-   "#KidsMoralStories",
-   "#BanglaSadhu",
-   "#AnimatedStories",
-   "#HorrorStories",
-   "#Folktales"
+   "#BanglaAnimationStory",
+   "#GopalBhar",
+   "#HorrorCartoon"
   ],
   "keywords": [
-   "Vikram Betal bangla",
-   "bangla cartoon ghost story",
+   "bangla cartoon golpo",
    "bengali moral stories",
-   "thakurmar jhuli cartoon",
-   "vikram aur betal hindi",
-   "panchatantra stories in bengali",
-   "bengali horror cartoon",
-   "animated folk tales India"
+   "bhuter cartoon bangla",
+   "vuter golpo bengali animation",
+   "notun bangla golpo",
+   "bengali animated village story",
+   "bangla golpo 3d animation",
+   "bhoutik golpo cartoon"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles are moderately long, mixing Bengali storytelling phrases with English series names and hashtags like '#assamesestory' to capture search traffic. They use punctuation like quotes, hyphens, and the '🤯' emoji or question formats to spark curiosity and highlight high-stakes mysteries.",
-   "thumb_style": "Thumbnails feature dramatic, high-contrast night scenes under a full moon, with dark blue and black forest backgrounds glowing with eerie light. They display intense close-ups of majestic kings holding torches alongside pale, sharp-toothed ghosts or blue-skinned demons gripping them from behind.",
-   "thumb_text_style": "There are 2 to 4 large, bold words in bright yellow or red, often rendered in a stylized, glossy title font with black outlines."
+   "title_style": "Titles are moderately long and feature emotional or suspenseful hooks like 'Bhuter Cartoon' or 'Bengali Animated Village Story' to attract viewers. They frequently use vertical separators ('|') and descriptive phrases in Bengali to summarize the plot and appeal to family audiences.",
+   "thumb_style": "Thumbnails feature vibrant, saturated 2D cartoon artwork with dramatic lighting, often contrasting dark night scenes with glowing elements or bright daylight settings. Characters display exaggerated emotional expressions like fear or surprise, and compositions clearly isolate the main narrative conflict or spooky elements.",
+   "thumb_text_style": "Short Bengali text consisting of 2 to 6 words written in bold, high-contrast colors like white, black-outlined red, or yellow."
   },
   "real": [
    {
-    "id": "MMM9TayMafk",
-    "title": "বীৰ ৰজা বিক্ৰম আৰু বেতাল-\"কাহিনী আৰম্ভ\"(Vikram and Betal) #assamesestory #axomiyasadhu #horrorstory",
-    "views": 736,
-    "age": "3d ago"
-   },
-   {
-    "id": "0rpy1LzxOqY",
-    "title": "যে ধাঁধার উত্তর রাজা বিক্রমও দিতে পারেননি 🤯 | বিক্রম ও বেতাল পর্ব ৮, প্রথম ভাগ",
-    "views": 197,
-    "age": "3d ago"
-   },
-   {
-    "id": "UJkNdSTAtHA",
-    "title": "Vikram Betal Series - The Introduction Episode | Vikram Betal Series - The Beginning |",
-    "views": 145,
-    "age": "4d ago"
-   },
-   {
-    "id": "VZnjhVcD3cA",
-    "title": "The Fierce Form of Goddess Kali | Maa Kali | Bengali Ghost Stories | Bangla Cartoon | Bengali Fai...",
-    "views": 58,
+    "id": "Rdw4OzyvCas",
+    "title": "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story",
+    "views": 1856472,
     "age": "6d ago"
    },
    {
-    "id": "Vj0YdpRpZt4",
-    "title": "বিক্রম ও বেতাল | রহস্যময় ভৌতিক গল্প | বাংলা লোককথা | পর্ব ১",
-    "views": 13,
+    "id": "w5RSFS0PSFM",
+    "title": "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 1271032,
+    "age": "6d ago"
+   },
+   {
+    "id": "0dteMbTNjkI",
+    "title": "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo",
+    "views": 1109110,
+    "age": "3d ago"
+   },
+   {
+    "id": "MHOyVtyD2cA",
+    "title": "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
+    "views": 722369,
+    "age": "5d ago"
+   },
+   {
+    "id": "Rp0O-NEk574",
+    "title": "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 693551,
+    "age": "2d ago"
+   },
+   {
+    "id": "o4fvtQnEh0k",
+    "title": "কালো ঘোমটা | Kalo Ghomta | Grambanglar Bhuter Cartoon | Vuter Golpo | Bengali Horror Story",
+    "views": 673844,
+    "age": "7d ago"
+   },
+   {
+    "id": "dBEfp6JW7yU",
+    "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 617605,
+    "age": "4d ago"
+   },
+   {
+    "id": "iZhgpFbKT4k",
+    "title": "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon",
+    "views": 613334,
+    "age": "3d ago"
+   },
+   {
+    "id": "OuW84nG2xzw",
+    "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 606530,
+    "age": "3d ago"
+   },
+   {
+    "id": "0HIioAo7Fmw",
+    "title": "😱 নানা বাড়ি যাওয়ার পথে ট্রেনে দুর্ঘটনা ! প্রাণে বাঁচল আলু পরিবার | Bangla 3D Animation Story",
+    "views": 563114,
+    "age": "7d ago"
+   },
+   {
+    "id": "GHjvQ5hH7QQ",
+    "title": "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 560681,
+    "age": "20h ago"
+   },
+   {
+    "id": "NLUUjWdUQJ8",
+    "title": "বড়মা ও জমিদার বাড়ির কালীপুজো | Boro Maa | JOMIDAR BARIR KALI | Notun Bangla Golpo | Bangla Cartoon",
+    "views": 550452,
+    "age": "6d ago"
+   },
+   {
+    "id": "wQIfxilQhmE",
+    "title": "হাতধোয়ার নিমন্ত্রণ | Gopal Bhar Movie | Gopal Bhar",
+    "views": 545729,
+    "age": "7d ago"
+   },
+   {
+    "id": "n-iB_sdmURA",
+    "title": "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird",
+    "views": 518510,
     "age": "1d ago"
+   },
+   {
+    "id": "RZtqnK3yBmk",
+    "title": "কালী পূজার রাতে মা সত্যিই আসে | Bhuter Cartoon | KALI PUJA | Notun Bangla Golpo | Kali Thakur Story",
+    "views": 485234,
+    "age": "7d ago"
    }
   ],
-  "from_cat": "betal"
+  "youtube_top": [
+   "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story (1,856,472)",
+   "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo (1,271,032)",
+   "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo (1,109,110)",
+   "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna (722,369)",
+   "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo (693,551)",
+   "কালো ঘোমটা | Kalo Ghomta | Grambanglar Bhuter Cartoon | Vuter Golpo | Bengali Horror Story (673,844)",
+   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (617,605)",
+   "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon (613,334)",
+   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (606,530)",
+   "😱 নানা বাড়ি যাওয়ার পথে ট্রেনে দুর্ঘটনা ! প্রাণে বাঁচল আলু পরিবার | Bangla 3D Animation Story (563,114)"
+  ],
+  "from": "youtube"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",

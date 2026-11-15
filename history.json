@@ -1603,12 +1603,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 458,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-12T09:03+00:00"
+   "checked": "2026-11-15T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2689,7 +2689,23 @@
   "fb_reel": "1847776179766037",
   "fb_story": "3181926205341159",
   "fb_reel2": "1104934045701565",
-  "yt_short": "w7Wb_4cdxWU"
+  "yt_short": "w7Wb_4cdxWU",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 1,
+   "length_s": 550,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-15T09:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-15T09:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-14T13:31+00:00",
@@ -2776,5 +2792,32 @@
   "fb_reel2": "1558421613001252",
   "coloring": "122139172616735948",
   "yt_short": "mzUHPSk1iqA"
+ },
+ {
+  "date": "2026-11-15T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-15@19",
+  "pending_comments": [],
+  "category": "mahabharat",
+  "idea": "Devavrata's terrible vow - he becomes Bhishma",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "মহাভারত পর্ব 1: ভীষ্মের ভীষণ প্রতিজ্ঞা | মহাভারত পর্ব ১",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "পিতার সুখের জন্য"
+  },
+  "title_b": "রাজপুত্র দেবব্রত কীভাবে ভীষ্ম হলেন? | মহাভারত",
+  "question_post": null,
+  "facebook": "2912145379169760",
+  "youtube": "Kp82z0Tpezg",
+  "fb_reel": "1599567338610891",
+  "fb_story": "2437328817072844",
+  "fb_reel2": "1090258824063122"
  }
 ]

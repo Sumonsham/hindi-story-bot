@@ -1,136 +1,148 @@
 {
  "cartoon_bn": {
-  "date": "2026-11-14",
+  "date": "2026-11-15",
   "topics": [
-   "An isolated village home during a winter power outage where a mysterious clay pitcher left in the courtyard triggers a terrifying nocturnal haunting.",
-   "A remote ancestral mansion during Kali Puja preparations where an ancient portrait starts weeping blood as midnight approaches.",
-   "A dense bamboo forest on a new moon night where two fairies trying to save a lost child stumble upon a witch's hidden ritual cabin.",
-   "A forgotten rural primary school where children playing after sunset accidentally summon a legendary female spirit bound to a banyan tree.",
-   "A lonely highway rest stop during a heavy fog where truck drivers picking up a strange hitchhiker realize she has no shadow.",
-   "An old brick house bordering a dried-up marshland where washing clothes outdoors after dark attracts a malevolent phantom looking for a mortal body."
+   "A remote Bengal village during a winter fog where two orphaned sisters find a talking rice-paddy scarecrow that grants wishes at midnight.",
+   "A haunted zamindar estate in rural Bengal where a mysterious ghost warns a greedy landlord about stealing a poor widow's homestead.",
+   "A magical banyan tree deep in a village forest where a good-hearted fairy tests a young cowherd boy's honesty\n using golden mangoes.",
+   "A riverside village during monsoon where an old fisherman discovers a sunken boat loaded with talking brass coins that predict the future.",
+   "A spooky mustard field on a no-moon night where a mischievous shakchunni ghost tries to steal hot winter sweets from a traveling baker.",
+   "A village marketplace where clever court jester Gopal Bhar outwits a corrupt tax collector using a basket of talking vegetables."
   ],
   "hashtags": [
-   "#BanglaBhuterCartoon",
-   "#BhuterGolpo",
-   "#HindiHorrorStories",
    "#BanglaCartoon",
-   "#VuterGolpo",
-   "#ScaryStories",
-   "#BhoutikGolpo",
-   "#GhostStory",
+   "#BhuterCartoon",
    "#BanglaGolpo",
-   "#HorrorCartoon"
+   "#BengaliMoralStories",
+   "#ThakurmarJhuli",
+   "#GopalBhar",
+   "#BanglaVuterGolpo",
+   "#AnimatedStory",
+   "#MoralStory",
+   "#BanglaAnimation"
   ],
   "keywords": [
+   "bangla cartoon golpo",
    "bhuter cartoon",
-   "bangla vuter golpo",
-   "hindi horror stories",
-   "bengali horror cartoon",
-   "bhoutik golpo",
-   "scary cartoon story",
-   "new bangla golpo",
-   "bhoot wala cartoon"
+   "bengali animated story",
+   "vuter golpo bangla",
+   "gopal bhar new episode",
+   "bangla moral stories",
+   "thakurmar jhuli",
+   "bengali horror cartoon"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles rely on catchy horror keywords like 'Bhuter Cartoon', 'Bhoutik Golpo', and eerie specific phrases paired with series tags separated by '|'. They are moderate in length, combining suspenseful hooks (like 'রাত ঠিক তিনটে') with broad genre labels to maximize searchability.",
-   "thumb_style": "Thumbnails feature dark, spooky night settings illuminated by a single light source like a lantern, moon, or glowing eyes to create high contrast. Characters display extreme fear with wide eyes and open mouths, while menacing figures or ghosts lurk in the background.",
-   "thumb_text_style": "Zero to three words of large, bold text in white or red with a horror-styled font are placed directly on the thumbnail to tease the video's premise."
+   "title_style": "Titles are moderately long and structured with descriptive Bengali phrases followed by English keyword tags separated by vertical pipes (|). They leverage emotional and curiosity-driven hooks like moral stories, horror elements, and unique concepts without relying on emojis or numbers.",
+   "thumb_style": "Thumbnails feature vibrant, high-contrast 2D animated scenes set in rural village environments with detailed lighting. Characters display exaggerated emotional expressions of surprise or fear, often interacting with surreal elements like giant vegetables or green-skinned witches.",
+   "thumb_text_style": "Short Bengali text consisting of 2 to 4 words, rendered in clean, medium-large fonts with white or red fill and black outlines for high readability."
   },
   "real": [
    {
-    "id": "w85Q2rBVRsc",
-    "title": "Diwali wali Chudail | Hindi Horror Stories | Scary Pumpkin",
-    "views": 4389702,
+    "id": "Rdw4OzyvCas",
+    "title": "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story",
+    "views": 2042729,
     "age": "7d ago"
    },
    {
-    "id": "Rdw4OzyvCas",
-    "title": "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story",
-    "views": 1925681,
+    "id": "w5RSFS0PSFM",
+    "title": "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 1321174,
     "age": "7d ago"
+   },
+   {
+    "id": "0dteMbTNjkI",
+    "title": "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo",
+    "views": 1225455,
+    "age": "4d ago"
+   },
+   {
+    "id": "GHjvQ5hH7QQ",
+    "title": "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 905678,
+    "age": "1d ago"
    },
    {
     "id": "MHOyVtyD2cA",
     "title": "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 732245,
-    "age": "5d ago"
+    "views": 757685,
+    "age": "6d ago"
    },
    {
-    "id": "JqIUlyMffr0",
-    "title": "दादी की वो भूतों वाली कहानी जो सच हो गई! | 90s Childhood Horror Story",
-    "views": 712230,
+    "id": "Rp0O-NEk574",
+    "title": "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 754289,
     "age": "3d ago"
    },
    {
     "id": "iZhgpFbKT4k",
     "title": "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon",
-    "views": 633406,
+    "views": 673199,
     "age": "4d ago"
    },
    {
-    "id": "9GnxZOQehHE",
-    "title": "ভূতের বাড়ি পার্ট টু ☠️🏚️| Ghost House( part 2)🧟‍♀️🧌Horror Video | bhoot chaturdshi special video |",
-    "views": 623719,
-    "age": "6d ago"
-   },
-   {
-    "id": "NLUUjWdUQJ8",
-    "title": "বড়মা ও জমিদার বাড়ির কালীপুজো | Boro Maa | JOMIDAR BARIR KALI | Notun Bangla Golpo | Bangla Cartoon",
-    "views": 558119,
-    "age": "7d ago"
-   },
-   {
-    "id": "DBKh-GaaYuE",
-    "title": "ভূতের বিয়ে পার্ট ২ | Comedy Saimon | Bangla Funny Video #funny #funnyvideo #ababa #trending",
-    "views": 555999,
-    "age": "6d ago"
+    "id": "dBEfp6JW7yU",
+    "title": "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 631664,
+    "age": "5d ago"
    },
    {
     "id": "n-iB_sdmURA",
     "title": "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird",
-    "views": 553332,
+    "views": 621250,
     "age": "2d ago"
    },
    {
-    "id": "3SD2U5i5gdE",
-    "title": "কাফনতালাশ - Kafontalash | Bhuter Cartoon | Bengali Horror Cartoon | Bhoutik Golpo | Vuter Katun",
-    "views": 386207,
-    "age": "1d ago"
-   },
-   {
-    "id": "GyO0bgPz7p8",
-    "title": "Haunted Forest | Horror Stories | Scary Owl | 18+ Adult Horror Story | Horror Story in Hindi",
-    "views": 303038,
-    "age": "5d ago"
-   },
-   {
-    "id": "QGbj5dU0TcE",
-    "title": "শীতের রাতে কলস নিয়ে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 281994,
-    "age": "2d ago"
-   },
-   {
-    "id": "GUOLJNyz9-0",
-    "title": "মরা বিলের অভিশপ্ত আত্মা! Bhuter Cartoon | True Horror Story | Ghost | Bangla Bhuter Golpo",
-    "views": 263838,
+    "id": "OuW84nG2xzw",
+    "title": "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 618451,
     "age": "4d ago"
    },
    {
-    "id": "2S6PWnQTOww",
-    "title": "রাতের বেলা উঠানে ঝাড়ু রাখলেই আসে ওলাবিবি! Olabibi Bhoutik Golpo | Bhuter Cartoon | Story Bird Golpo",
-    "views": 260730,
-    "age": "Streamed 5d ago"
+    "id": "NLUUjWdUQJ8",
+    "title": "বড়মা ও জমিদার বাড়ির কালীপুজো | Boro Maa | JOMIDAR BARIR KALI | Notun Bangla Golpo | Bangla Cartoon",
+    "views": 575878,
+    "age": "7d ago"
    },
    {
-    "id": "B0TpOmmZOrg",
-    "title": "গ্রামে যখন বিদ্যূত থাকেনা | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 231743,
+    "id": "dpALvtCExTY",
+    "title": "Poor Alu Became a Millionaire by Repairing an Abandoned Dredger Boat! 😱💰 | Bengali 3D Cartoon",
+    "views": 535902,
+    "age": "2d ago"
+   },
+   {
+    "id": "2Ml8IKAe2as",
+    "title": "Gopal Bhar 0954 Son-in-law's Farewell on Jamai Sasthi Bengali",
+    "views": 446893,
+    "age": "5d ago"
+   },
+   {
+    "id": "UxPxXSaWVXQ",
+    "title": "🌙 চাঁদের বুড়ি! চাঁদের দেশে আলু পরিবারের জাদুকরী অভিযান ✨ | Bangla 3D Animated Story",
+    "views": 389535,
+    "age": "2d ago"
+   },
+   {
+    "id": "54_S-BaycRI",
+    "title": "ব্রিটিশ মিশন | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 357139,
     "age": "6d ago"
    }
   ],
-  "from_cat": "bhutu"
+  "youtube_top": [
+   "দুই পরী ও ডাইনি মায়ের ভালোবাসা | Bhuter Cartoon | DAINI MAA O PORI | Notun bangla Golpo Moral Story (2,042,729)",
+   "এক উঠোনের দুই চুলা | বাংলা কার্টুন গল্প | Bengali Animated Village Story | Bangla Cartoon Golpo (1,321,174)",
+   "শীতের সকালে দুই বোনের পিঠা বানানোর প্রতিযোগিতা | Bengali Animated Story | Bangla Cartoon Golpo (1,225,455)",
+   "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo (905,678)",
+   "রাত ঠিক তিনটে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna (757,685)",
+   "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo (754,289)",
+   "রক্ত কাফনের তালাশ | Bhuter Cartoon | Vuter Golpo | Bengali Horror Story | Bangla Vuter Cartoon (673,199)",
+   "গোপালকে ধরে নিয়ে যাওয়া হলো | Gopal Bhar | Best Of Gopal Bhar (631,664)",
+   "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird (621,250)",
+   "মেধা অনুশীলন | Gopal Bhar (Bengali) | Double Gopal (618,451)"
+  ],
+  "from": "youtube"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",

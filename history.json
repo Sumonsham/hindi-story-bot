@@ -623,7 +623,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   }
  },
  {
@@ -938,7 +938,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   }
  },
  {
@@ -1227,12 +1227,12 @@
   "stats": {
    "likes": 1,
    "comments": 0,
-   "views": 10,
+   "views": 12,
    "length_s": 5645,
-   "yt_views": 9,
+   "yt_views": 12,
    "yt_avg_s": 3,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   }
  },
  {
@@ -1267,7 +1267,7 @@
    "yt_views": 1,
    "yt_avg_s": 8,
    "yt_avg_pct": 1.8,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   }
  },
  {
@@ -1554,12 +1554,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 423,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1893,7 +1893,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-11T22:04+00:00"
+   "checked": "2026-11-14T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2275,10 +2275,10 @@
    "comments": 1,
    "views": 2,
    "length_s": 431,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-11T22:04+00:00"
+   "yt_views": 2,
+   "yt_avg_s": 3,
+   "yt_avg_pct": 0.8,
+   "checked": "2026-11-14T22:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2602,7 +2602,21 @@
   "youtube": "VS5BRsw4oDA",
   "fb_reel": "1149616500982904",
   "fb_story": "1158343607133794",
-  "fb_reel2": "1188004246982896"
+  "fb_reel2": "1188004246982896",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 2,
+   "length_s": 599,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-14T22:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 2
+  }
  },
  {
   "date": "2026-11-14T02:31+00:00",
@@ -2689,5 +2703,35 @@
   "fb_reel": "1509634887682826",
   "fb_story": "957472097195374",
   "fb_reel2": "964582019762888"
+ },
+ {
+  "date": "2026-11-15T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-15@8",
+  "pending_comments": [],
+  "category": "gita",
+  "idea": "Chapter 1 - Arjuna's sorrow on the battlefield",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গীতার জ্ঞান পর্ব 1: কুরুক্ষেত্রের যুদ্ধে অর্জুনের কান্না ও শ্রীকৃষ্ণের অভয় | Gita Gyan Episode",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": null,
+  "title_b": "যুদ্ধের মাঠে অর্জুনের বিষাদ! শ্রীকৃষ্ণের প্রথম শিক্ষা | Bhagavad Gita Chapter 1 Bengali",
+  "question_post": "2026-11-15",
+  "facebook": "1143071218695623",
+  "youtube": "lkjHumtVdew",
+  "fb_reel": "1031762209938812",
+  "fb_story": "3058360804530501",
+  "fb_reel2": "1834762031006156",
+  "yt_short": "vY9s0Ivo1Go",
+  "riddle_post": "122139164750735948",
+  "riddle": {
+   "q": "পা নেই কিন্তু চলে, ডানা নেই কিন্তু ওড়ে, মুখ নেই কিন্তু মুখ ভেঙচায়! বলতো জিনিসটা কী?",
+   "a": "মেঘ"
+  }
  }
 ]

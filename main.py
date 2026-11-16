@@ -360,7 +360,8 @@ MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman"
 # the weekly routine: the 1 PM story of each day is always this series (Mon=0 ... Sun=6)
 DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
 # the weekly programme (0 = Monday) - every day and time has its own kind of story, like a children's TV channel
-MORNING_GRID = {0: "learn", 1: "cnotun", 2: "nature", 3: "learn", 4: "jataka", 5: "animal", 6: "gita"}
+MORNING_GRID = {0: "learn", 1: "cnotun", 2: "keno", 3: "learn", 4: "jataka", 5: "animal", 6: "gita"}
+# v100: Wednesday 8 AM = 'সায়নের কেন?' (Sayan asks one 'why?', Sumon kaku answers with a little adventure)
 # v83 ('learn', Monday and Thursday 8 AM): little learning videos for small children, in order (see LEARN)
 EVENING_GRID = {0: "cnotun", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "cnotun", 6: "mahabharat"}
 # v80 ('cnotun'): our five NEW cartoon series take turns there (see CARTOON_SERIES)
@@ -470,6 +471,29 @@ LANGS["hi"]["labels"]["learn"] = "सीखो मज़े से"
 CATEGORIES["learn"] = list(LEARN)
 
 
+KENO = ["why the sky is blue", "why the moon changes its shape", "why it rains", "why we see a rainbow",
+        "why leaves are green", "why we must brush our teeth", "why the sea is salty", "why we get a fever",
+        "why birds can fly", "why there is thunder before rain", "why the sun sets", "why we sleep at night",
+        "why ice floats on water", "why plants need sunlight", "why we have day and night", "why the stars twinkle",
+        "why we should not waste water", "why cats see in the dark", "why honey is sweet - how bees make it",
+        "why the wind blows", "why fireflies glow", "why we must wash our hands", "why boats float",
+        "why we hear an echo", "why the clouds are white and sometimes black", "why a seed grows into a tree"]
+KENO_RULE = ("\nOUR SERIES 'সায়নের কেন?' (Hindi 'सायन का क्यों?') - TODAY'S QUESTION: {q}.\nSAYAN (8) suddenly asks this "
+             "'why' (a real child's question, in his own funny words, in the first scene). SUMON KAKU does not give a "
+             "lecture: he turns the answer into a small, funny everyday adventure that SHOWS it (an experiment at home, "
+             "a walk, a game) - Sayan tries, gets it a little wrong, laughs, then understands. The science must be "
+             "CORRECT but told so a 5-8 year old understands, with one simple example to remember. Sayan says the "
+             "answer in his own words at the end. The TITLE starts with 'সায়নের কেন?: ' (Hindi: 'सायन का क्यों?: ').\n")
+
+
+EPIC["keno"] = KENO                   # (in order, one question a week)
+CATEGORIES["keno"] = list(KENO)
+LANGS["bn"]["labels"]["keno"] = "সায়নের কেন?"
+LANGS["hi"]["labels"]["keno"] = "सायन का क्यों?"
+extras.CAT_QUERIES[("cartoon", "keno")] = {"bn": ["বাচ্চাদের প্রশ্ন কেন", "ছোটদের বিজ্ঞান কার্টুন", "kids why questions bangla"],
+                                          "hi": ["bachon ke kyun sawal", "kids science cartoon hindi"]}
+
+
 def pick_cartoon_series(history):
     """the next of our new cartoon series: the one not shown for the longest time"""
     last = {k: "" for k in CARTOON_SERIES}
@@ -551,6 +575,7 @@ JOB_START = time.time()                          # GitHub stops a job after 6 ho
 def job_minutes_left():
     return (float(env("JOB_LIMIT_MINUTES") or 350) * 60 - (time.time() - JOB_START)) / 60
 SLOT = None
+STATE = {}                    # v100: small notes shared by the steps of one run
 
 
 def recently_posted(history, hours):
@@ -719,7 +744,7 @@ def gemini_models(key):
     return out or tries[-1:]
 
 
-# ---- SAHEB: the channel's own hero, in (almost) every story. Never inside the scriptures (Ramayan, Mahabharat,
+# ---- SUMON (was 'Saheb' until 16 Nov 2026): the channel's own hero, in (almost) every story. Never inside the scriptures (Ramayan, Mahabharat,
 # divine leelas) - those stay faithful; in the Gita he is the person in the modern-life example.
 SAHEB_FACE = ("friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle "
               "confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, "
@@ -728,10 +753,10 @@ SAHEB_FACE = ("friendly calm clever Bengali young man about 32, soft oval face w
 SAHEB_CLASSIC = SAHEB_FACE + ", maroon kurta with small gold buttons, cream dhoti, cream shawl with a thin gold " \
                              "border over the left shoulder, small brown cloth shoulder bag, brown nagra shoes"
 SAHEB_MODERN = SAHEB_FACE + ", teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
-SAHEB_MODERN_CATS = ("para", "detective", "school", "life", "festival", "adventure", "nature", "bedtime", "gita")
+SAHEB_MODERN_CATS = ("keno", "para", "detective", "school", "life", "festival", "adventure", "nature", "bedtime", "gita")
 SAHEB_ROLE = {
     "gopal": "Gopal's young friend from the village (NEVER in the royal court): Gopal meets him on the village lane, at "
-             "the market or the riverside; they talk the problem over, Saheb asks the questions the viewers would "
+             "the market or the riverside; they talk the problem over, Sumon asks the questions the viewers would "
              "ask, sometimes shows the way or gives a small hint, and is amazed by Gopal's wit (Gopal stays the hero)",
     "birbal": "a young scholar from Bengal visiting Emperor Akbar's court who becomes Birbal's admiring helper "
               "(Birbal stays the hero)",
@@ -741,9 +766,10 @@ SAHEB_ROLE = {
     "fairy": "a kind young man from the village who helps the little hero or heroine",
     "lok": "a curious young traveller from Kolkata who hears or sees this district's tale",
     "funny": "the sensible young man in the middle of the comedy who tries to calm everyone down",
-    "para": "the friendly young neighbour Saheb-da whom the whole para trusts",
-    "detective": "Jhontu and Mini's friendly elder cousin Saheb-da who helps them get around - but the KIDS solve "
-                 "the case, never Saheb",
+    "keno": "Sayan's uncle Sumon kaku, who answers Sayan's 'why?' by showing it with a small funny adventure",
+    "para": "the friendly young neighbour Sumon-da whom the whole para trusts",
+    "detective": "Jhontu and Mini's friendly elder cousin Sumon-da who helps them get around - but the KIDS solve "
+                 "the case, never Sumon",
     "school": "a kind young teacher or a visiting elder brother at the school",
     "life": "a kind young man of the family or the neighbourhood",
     "festival": "a cheerful young man of the family who joins the festival",
@@ -753,6 +779,11 @@ SAHEB_ROLE = {
     "gita": "the young man in the modern-life example who learns the Gita's lesson",
 }
 SAHEB_SKIP = ("ramayan", "mahabharat", "divine")
+SAYAN_LOOK = ("a slim, sweet Bengali boy of 8 in a cartoon style, short thick dark-brown hair neatly swept to one side "
+              "with a soft fringe, big round dark-brown eyes, thick dark eyebrows, a small gentle smile, light wheat-brown "
+              "skin, a light-pink polo T-shirt with a short zip at the collar and darker pink collar and sleeve edges, "
+              "black cargo trousers with side pockets, grey-and-white sneakers, a thin red thread on his right wrist")
+SAYAN_SKIP = SAHEB_SKIP + ("gopal",)        # (Gopal's episodes use our ready-made TV characters - Sayan has none yet)
 
 
 def saheb_rule(category):
@@ -763,10 +794,18 @@ def saheb_rule(category):
                                     "(a traveller, farmer, woodcutter or villager - he never harms animals); if it "
                                     "is only animals, he is the young man who finds them at the end and says the "
                                     "lesson")
-    return ("\nOUR OWN HERO: include SAHEB in this story - name \"Saheb\" (in Bengali 'সাহেব', Hindi 'साहेब'), "
-            "gender male, age adult, kind human, EXACTLY this look every time: \"" + look + "\". His role: " + role +
-            ". Give him 2-5 natural lines; he is warm, curious and funny, never rude. Put him in the characters "
-            "list with this exact look.\n")
+    out = ("\nOUR OWN HERO: include SUMON in this story - name \"Sumon\" (in Bengali 'সুমন', Hindi 'सुमन'), "
+           "gender male, age adult, kind human, EXACTLY this look every time: \"" + look + "\". His role: " + role +
+           ". Give him 2-5 natural lines; he is warm, curious and funny, never rude. Put him in the characters "
+           "list with this exact look.\n")
+    if category not in SAYAN_SKIP and env("SAYAN") != "0":       # v99: Sumon's nephew Sayan (8) is always with him
+        out += ("OUR OWN CHILD HERO: SAYAN goes everywhere with Sumon - name \"Sayan\" (Bengali 'সায়ন', Hindi "
+                "'सायन'), gender male, age child (8 years old), kind human, Sumon's nephew (he calls him 'Sumon kaku' "
+                "/ Hindi 'सुमन चाचा'), EXACTLY this look every time: \"" + SAYAN_LOOK + "\". He is curious (asks "
+                "'কেন?' a lot), brave, a little naughty and very funny; he notices small things the grown-ups miss and "
+                "often gives the idea that helps - children watching should feel he is one of them. Give him 3-6 natural "
+                "lines. Put him in the characters list with this exact look.\n")
+    return out
 
 
 # ----------------------------------------------------------------- TV-style cartoon with our own characters
@@ -789,7 +828,7 @@ PUPPET_CAST = {   # id -> (name to use in the story, gender, age, look)
              "bindi, red Banarasi saree with a gold border, gold jewellery"),
     "gopal_bou": ("Gopal's wife", "female", "adult", "plump cheerful Bengali village wife, hair in a bun, sindoor, red "
                   "bindi, white saree with a red border, red and white bangles, a bunch of keys tucked at the waist"),
-    "saheb": ("Saheb", "male", "adult", SAHEB_CLASSIC),
+    "saheb": ("Sumon", "male", "adult", SAHEB_CLASSIC),
     "paharadar": ("Palace guard", "male", "adult", "tall broad palace guard, big curled black moustache, small red "
                   "turban, brown leather vest over a white kurta, red waist sash, white dhoti, a long spear"),
     "senapati": ("Senapati", "male", "adult", "proud boastful army chief, thick black beard, huge upturned moustache, "
@@ -870,13 +909,13 @@ def puppet_rules(category):
             "- The places change like a TV episode: the royal court ('court'), Gopal's poor mud hut with his wife "
             "('gopal_home'), village lanes ('village_path'), the market, the sweet shop, the riverside... Gopal "
             "walks between places: a short scene of him walking home on the village lane, talking (to himself, or "
-            "with Saheb who joins him).\n"
+            "with Sumon who joins him).\n"
             "- THE COURT is full and alive: the Raja sits on his throne; courtiers sit at the sides and a guard "
             "stands (they are drawn automatically). The Raja ASKS FOR OPINIONS: Mantri, Senapati, Pandit and "
             "Rajvaidya each give their own (proud, wrong or funny) opinion in their own style, they argue a little, "
             "the Mantri schemes against Gopal - then Gopal's clever answer wins and the Raja laughs and rewards him.\n"
-            "- SAHEB is NEVER in the royal court: he is Gopal's friend in the village. Gopal meets him standing on "
-            "the village lane (or the market / riverside); they talk the problem over, Saheb asks the questions the "
+            "- SUMON is NEVER in the royal court: he is Gopal's friend in the village. Gopal meets him standing on "
+            "the village lane (or the market / riverside); they talk the problem over, Sumon asks the questions the "
             "viewers would ask, sometimes he shows the way or gives a small hint - Gopal always finds the answer.\n"
             "- Gopal's wife at home: real, funny husband-and-wife talk (she scolds, worries, laughs).\n"
             "- In EVERY line: \"to\" = the name of the character the speaker talks to (the speaker turns to them, "
@@ -1175,7 +1214,9 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                 "the same teaching in a short, touching modern Bengali family example (a student before an exam, a "
                 "father who lost his job...). Deep reverence for Lord Krishna; uplifting and practical for all ages.",
     }.get(category, (LEARN_RULE.replace("{theme}", str(theme[1] if isinstance(theme, (list, tuple)) else theme))
-                     if category == "learn" else None) or (CARTOON_SERIES.get(category) or {}).get("rule") or
+                     if category == "learn" else
+                     KENO_RULE.replace("{q}", str(theme[1] if isinstance(theme, (list, tuple)) else theme))
+                     if category == "keno" else None) or (CARTOON_SERIES.get(category) or {}).get("rule") or
           "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
     kind_rules = kind_rules.replace("{lang}", L["name"])
     if part == 1:
@@ -3491,6 +3532,13 @@ def growth_start(history):
     if env("MONITOR") != "0":
         try:                                         # v77: once a day - keys, numbers, what the bot changes
             coach, lines, did = extras.growth_monitor(history, os.path.join(ASSETS, "coach.json"), "cartoon", lang)
+            if lines is not None:
+                try:                                 # v100: which Reel opening keeps children watching
+                    hl_ = extras.hook_learn(history, HOOK_FILE, "cartoon")
+                    if hl_:
+                        lines.append(hl_)
+                except Exception as e:
+                    log("  Reel opening test skipped:", str(e)[:100])
             todo = (coach.get("last_report") or {}).get("todo") or []
             if lines is not None and (lines or did or todo):
                 msg = ["📈 কার্টুন চ্যানেল - আজকের খবর"] + lines
@@ -3522,6 +3570,10 @@ def promo_list(lang):
                       "sub2": ", ".join(names[3:]) + " - নতুন পর্ব প্রতি সপ্তাহে"} if bn else
                      {"icon": "star", "head": "हमारी नई कार्टून सीरीज़", "sub": ", ".join(names[:3]),
                       "sub2": ", ".join(names[3:]) + " - हर हफ़्ते नया एपिसोड"})
+    out["keno"] = ({"icon": "quiz", "head": "প্রতি বুধবার সকাল ৮টা: সায়নের কেন?", "sub": "আকাশ নীল কেন? চাঁদ ছোট-বড় হয় কেন?",
+                    "sub2": "সায়নের প্রশ্ন, সুমন কাকুর মজার উত্তর"} if bn else
+                   {"icon": "quiz", "head": "हर बुधवार सुबह 8 बजे: सायन का क्यों?", "sub": "आसमान नीला क्यों? चाँद छोटा-बड़ा क्यों?",
+                    "sub2": "सायन के सवाल, सुमन चाचा के मज़ेदार जवाब"})
     if env("GOPAL_DAILY") != "0":
         out["gopal"] = ({"icon": "clock", "head": "রোজ দুপুর ১টা: গোপাল ভাঁড়", "sub": "রাজসভার মজার কাণ্ড, নতুন নতুন",
                          "sub2": "আমাদের নিজের গোপাল, টিভি কার্টুনের মতো"} if bn else
@@ -3951,6 +4003,10 @@ def main():
                   "narrator, sounds and fun small moments - never new main events or a different ending. Keep it "
                   "child-friendly. If something is unclear or missing, fill it in the creator's own spirit.\n")
     story = make_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)
+    try:                                             # v100: every line follows the one before (no jumps)
+        extras.line_flow_fix(story, L["name"], kind="cartoon", inserts=category not in PUPPET_SERIES)
+    except Exception as e:
+        log("  line-by-line check skipped:", str(e)[:100])
     if (CREATOR.get("story") or {}).get("true"):         # 'সত্য ঘটনা অবলম্বনে' everywhere
         extras.mark_true_story(story, lang)
     if part == 1:
@@ -4409,7 +4465,8 @@ def main():
                     "pending_comments": list(extras.PENDING),
                     "category": category, "idea": theme[1], "episode": episode, "part": part, "continues": continues,
                     "series_id": series_id, "title": title, "festival": festival, "vote": vote_saved,
-                    "viewer_names": vnames, "quiz": quiz_saved,
+                    "viewer_names": vnames, "quiz": quiz_saved, "hook_style": STATE.get("hook_style"),
+                    "moral": str(story.get("moral", "")).strip()[:160] or None,
                     "title_b": str(story.get("title_b") or "").strip()[:95] or None,
                     "question_post": extras.fb_question_post(history, "cartoon", lang) if not (MOCK or DRY_RUN) else None,
                     **results})
@@ -4556,6 +4613,217 @@ def portrait_source(st, en, lang):
         cwd=WORK)
     return out, off
 
+KIDS_FILE = os.path.join(HERE, "assets", "kids_extras.json")
+
+
+def _gem_kids(prompt):
+    key = env("GEMINI_API_KEY")
+    if MOCK or not key:
+        return None
+    for model in extras.helper_models(key)[:4]:
+        try:
+            r = requests.post(f"{extras.GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}],
+                                    "generationConfig": {"temperature": 0.5, "responseMimeType": "application/json"}},
+                              timeout=90)
+            if r.ok:
+                return extras.load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+        except Exception:
+            continue
+    return None
+
+
+def worksheet_png(ws, title, lang, out):
+    """an A4 printable worksheet: trace the letters / numbers, count and write, match the pairs"""
+    BN = lang == "bn"
+    Wp, Hp = 1240, 1754
+    im = Image.new("RGB", (Wp, Hp), "white")
+    d = ImageDraw.Draw(im)
+    fp = FONT
+    F = lambda s: extras._font(fp, s)
+    T = lambda s: extras.fit_glyphs(str(s), fp)
+
+    def put(x, y_, txt, size, fill, max_w=None, center=False, **_):
+        """Bengali / Hindi text with the signs (: - ( ) _) the Indian fonts lack, from an English-letter font"""
+        runs, sz = extras._mixed_fit(d, txt, fp, size, max_w or Wp - 2 * x)
+        w_ = extras._mixed_width(d, runs, sz)
+        extras._mixed_draw(d, (Wp - w_) / 2 if center else x, y_ + sz * 0.95, runs, sz, fill, 0)
+        return sz
+    d.rectangle([24, 24, Wp - 24, Hp - 24], outline=(40, 40, 40), width=5)
+    y = 50
+    put(60, y, title, 60, (20, 20, 20), Wp - 120, center=True)
+    y += 100
+    put(60, y, "নাম: ____________________" if BN else "नाम: ____________________", 36, (60, 60, 60))
+    y += 80
+    # 1) trace
+    put(60, y, "১) দাগ ধরে লেখো" if BN else "1) लकीर पर लिखो", 44, (200, 40, 90))
+    y += 70
+    tr = [str(x) for x in (ws.get("trace") or [])][:6]
+    if tr:
+        cw = (Wp - 120) // len(tr)
+        for k, ch in enumerate(tr):
+            x0 = 60 + k * cw
+            fz = F(min(150, int(cw * 0.75)) if len(ch) <= 2 else min(70, int(cw * 0.5)))
+            s_ = T(ch)
+            d.text((x0 + (cw - d.textlength(s_, font=fz)) / 2, y), s_, font=fz, fill=(205, 205, 205),
+                   stroke_width=2, stroke_fill=(150, 150, 150))
+            d.rounded_rectangle([x0 + 10, y + 190, x0 + cw - 10, y + 330], radius=14, outline=(150, 150, 150), width=3)
+        y += 360
+    # 2) count
+    put(60, y, "২) গুনে বাক্সে সংখ্যা লেখো" if BN else "2) गिनो और डिब्बे में लिखो", 44, (30, 120, 200))
+    y += 70
+    for it in (ws.get("count") or [])[:3]:
+        n_ = max(1, min(9, int(str(it.get("n", 3))[:1] or 3)))
+        for k in range(n_):
+            cx, cy, r = 110 + k * 95, y + 45, 36
+            pts = [(cx + (r if j % 2 == 0 else r * 0.45) * math.sin(j * math.pi / 5),
+                    cy - (r if j % 2 == 0 else r * 0.45) * math.cos(j * math.pi / 5)) for j in range(10)]
+            d.polygon(pts, outline=(40, 40, 40), width=3)
+        d.text((110 + 9 * 95 - 40, y + 15), T(it.get("word", "")), font=F(34), fill=(40, 40, 40))
+        d.rounded_rectangle([Wp - 190, y, Wp - 70, y + 90], radius=12, outline=(40, 40, 40), width=4)
+        y += 120
+    y += 20
+    # 3) match
+    pairs = [p for p in (ws.get("match") or []) if isinstance(p, (list, tuple)) and len(p) == 2][:4]
+    if pairs:
+        put(60, y, "৩) দাগ টেনে মেলাও" if BN else "3) रेखा खींचकर मिलाओ", 44, (40, 150, 70))
+        y += 75
+        right = [p[1] for p in pairs]
+        random.Random(len(title)).shuffle(right)
+        for k, (a_, _b) in enumerate(pairs):
+            yy = y + k * 95
+            d.text((90, yy), T(a_), font=F(42), fill=(20, 20, 20))
+            d.ellipse([480, yy + 18, 500, yy + 38], fill=(20, 20, 20))
+            d.ellipse([740, yy + 18, 760, yy + 38], fill=(20, 20, 20))
+            d.text((800, yy), T(right[k]), font=F(42), fill=(20, 20, 20))
+    pg = env("PAGE_NAME_BN" if BN else "PAGE_NAME_HI") or ""
+    if pg:
+        s_ = T(pg)
+        d.text(((Wp - d.textlength(s_, font=F(30))) / 2, Hp - 80), s_, font=F(30), fill=(120, 120, 120))
+    im.save(out, quality=95)
+    return out
+
+
+def worksheet_post(story, category, title, lang):
+    """v100: 'শিখি মজায়' days - a printable worksheet for the same lesson (Facebook photo + Telegram channel)"""
+    if category != "learn" or env("WORKSHEET") == "0":
+        return False
+    BN = lang == "bn"
+    ws = _gem_kids(f"Make a printable worksheet for small children (3-6 years) for this lesson video: '{title}'. In "
+                   f"{'Bengali' if BN else 'Hindi'} script only. Answer ONLY JSON: {{\"trace\": [up to 6 letters, "
+                   "numbers or very short words from the lesson to trace], \"count\": [3 items: {\"word\": \"a thing "
+                   "from the lesson\", \"n\": 1-9}], \"match\": [4 pairs [\"item\", \"what it matches\"] from the lesson "
+                   "(e.g. a letter and a word that starts with it, a colour and a thing of that colour)]}")
+    if not isinstance(ws, dict) or not ws.get("trace"):
+        return False
+    img = worksheet_png(ws, ("কাজের পাতা: " if BN else "अभ्यास पत्र: ") + re.sub(r"^.*?:\s*", "", title)[:40], lang,
+                        os.path.join(WORK, "worksheet.jpg"))
+    msg = ("✏️ আজকের 'শিখি মজায়'-এর কাজের পাতা - ছাপিয়ে নিয়ে ছোট্টদের দিয়ে করান।" if BN else
+           "✏️ आज के 'सीखो मज़े से' का अभ्यास पत्र - प्रिंट करके बच्चों से करवाइए।") + f"\n\n🎬 {title}"
+    extras.fb_photo(img, msg)
+    try:
+        extras.tg_channel_post(ASSETS, msg, img)
+    except Exception:
+        pass
+    log("  worksheet posted")
+    return True
+
+
+def moral_card_post(history, lang):
+    """v100: once a week (Sunday) - the week's lesson as a bright card: 'এই সপ্তাহে সায়ন শিখল: ...'"""
+    now = dt.datetime.now(extras.IST)
+    if now.weekday() != 6 or env("MORAL_CARD") == "0":
+        return False
+    st = _jload(KIDS_FILE, {}) if "_jload" in globals() else extras._jl(KIDS_FILE, {})
+    st = st if isinstance(st, dict) else {}
+    wk = f"{now.isocalendar()[0]}-W{now.isocalendar()[1]:02d}"
+    if st.get("moral_week") == wk:
+        return False
+    BN = lang == "bn"
+    morals = [str(h.get("moral")) for h in history[-25:] if h.get("moral") and h.get("lang") == lang]
+    if not morals:
+        return False
+    got = _gem_kids(f"These are the lessons of this week's children's cartoons: {json.dumps(morals[-14:], ensure_ascii=False)}. "
+                    f"Write ONE short, warm line in {'Bengali (Kolkata)' if BN else 'Hindi'} (max 12 words) - the most "
+                    "useful lesson for children, said simply. Answer ONLY JSON: {\"line\": \"..\"}")
+    line = str((got or {}).get("line") or morals[-1]).strip()
+    W_, H_ = 1080, 1080
+    im = Image.new("RGB", (W_, H_), (255, 244, 214))
+    d = ImageDraw.Draw(im)
+    for k in range(H_):                                # soft sunny gradient
+        c = int(255 - k * 0.06)
+        d.line([(0, k), (W_, k)], fill=(255, max(200, c), max(150, int(214 - k * 0.06))))
+    d.rounded_rectangle([50, 50, W_ - 50, H_ - 50], radius=50, outline=(255, 140, 60), width=10)
+    T = lambda s: extras.fit_glyphs(str(s), FONT)
+    head = T("এই সপ্তাহে সায়ন শিখল" if BN else "इस हफ़्ते सायन ने सीखा")
+    f1 = extras._font(FONT, 70)
+    d.text(((W_ - d.textlength(head, font=f1)) / 2, 150), head, font=f1, fill=(220, 70, 40))
+    words, rows, cur = T(line).split(), [], ""
+    f2 = extras._font(FONT, 78)
+    for w_ in words:
+        if cur and d.textlength(cur + " " + w_, font=f2) > W_ - 200:
+            rows.append(cur)
+            cur = w_
+        else:
+            cur = (cur + " " + w_).strip()
+    rows.append(cur)
+    y = 420 - len(rows) * 45
+    for r_ in rows:
+        d.text(((W_ - d.textlength(r_, font=f2)) / 2, y), r_, font=f2, fill=(40, 40, 60))
+        y += 110
+    pg = T(env("PAGE_NAME_BN" if BN else "PAGE_NAME_HI") or "")
+    if pg:
+        f3 = extras._font(FONT, 40)
+        d.text(((W_ - d.textlength(pg, font=f3)) / 2, H_ - 160), pg, font=f3, fill=(120, 90, 60))
+    out = os.path.join(WORK, "moral_card.jpg")
+    im.save(out, quality=93)
+    msg = (("🌟 এই সপ্তাহে সায়ন শিখল: " if BN else "🌟 इस हफ़्ते सायन ने सीखा: ") + line)
+    extras.fb_photo(out, msg)
+    try:
+        extras.tg_channel_post(ASSETS, msg, out)
+    except Exception:
+        pass
+    st["moral_week"] = wk
+    extras._js(KIDS_FILE, st)
+    log("  weekly lesson card posted")
+    return True
+
+
+HOOK_FILE = os.path.join(HERE, "assets", "hook_test.json")
+
+
+def hook_window(segs, part_times, story, style, max_len=None):
+    """v100: a Reel that OPENS on its best moment: 'voice' = Sayan's question / a funny line, 'sound' = a big laugh or
+    an exciting shout. Starts at the start of that line, ends at the end of a line within the Reel length."""
+    max_len = float(max_len or env("REEL_SECONDS") or 30)
+    if not segs or len(part_times) < 3:
+        return None
+    lines = {str(ln.get("text", "")).strip(): ln for sc in story.get("scenes", []) for ln in sc.get("lines", [])}
+    lo, hi = part_times[1], part_times[1] + (part_times[-1] - part_times[1]) * 0.8
+    best, bs = None, 0
+    for s, d, nar, tx in segs:
+        if not (lo <= s <= hi) or s + max_len > (segs[-1][0] + segs[-1][1]):
+            continue
+        ln = lines.get(str(tx).strip()) or {}
+        emo = str(ln.get("emotion", "")).lower()
+        spk = str(ln.get("speaker", "")).lower()
+        if style == "sound":
+            sc_ = (3 if emo in ("laughing", "excited", "scared", "shout") else 0) + (1 if "!" in str(tx) else 0)
+        else:
+            sc_ = (3 if "sayan" in spk or "সায়ন" in spk else 0) + (2 if "?" in str(tx) else 0) + (0 if nar else 1)
+        if sc_ > bs:
+            best, bs = s, sc_
+    if best is None or bs < 2:
+        return None
+    start, end = max(0.0, best - 0.2), best
+    for s, d, *_ in segs:
+        if s >= best and s + d - start <= max_len:
+            end = s + d
+    if end - start < 12:
+        return None
+    log(f"  Reel opens on {'a big laugh / excitement' if style == 'sound' else 'Sayan / a funny line'} at {best:.0f} s")
+    return start, end + 0.5
+
 
 def grow(video, story, title, lang, L, category, tags, results, history, page):
     """Extra reach after the main post: Reel + Short teaser, first comment, playlist. Never stops the run.
@@ -4565,6 +4833,14 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
     teaser = os.path.join(WORK, "teaser.mp4")
     try:
         st, en = extras.pick_window(segs, part_times, story.get("teaser_scene") or 2)
+        if env("HOOK_TEST") != "0":                  # v100: the Reel starts on its best moment (two kinds, learned)
+            try:
+                STATE["hook_style"] = extras.hook_pick(HOOK_FILE, history)
+                hw_ = hook_window(segs, part_times, story, STATE["hook_style"])
+                if hw_:
+                    st, en = hw_
+            except Exception as e:
+                log("  Reel opening test skipped:", str(e)[:100])
         src = None
         try:
             src = portrait_source(st, en, lang)          # the cartoon itself filmed in 9:16 (looks native on phones)
@@ -4624,18 +4900,33 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
     if results.get("facebook") and env("COLORING") != "0" and not done_today and not CF_QUOTA_OUT:
         try:                                          # printable colouring page of today's main character
             main_c = next((c for c in story.get("characters", []) if c.get("look")), {})
+            names_ = {str(c.get("name", "")).lower() for c in story.get("characters", [])}
+            who_ = (f"{ascii_text(main_c.get('look', ''))} {ascii_text(main_c.get('name', ''))}, happy pose")
+            if "sayan" in names_:                     # v100: our two heroes on the page
+                who_ = (f"two characters: a boy of 8 ({SAYAN_LOOK}) and his kind young uncle ({SAHEB_FACE}), both "
+                        "smiling, the boy pointing at something exciting")
             raw = os.path.join(WORK, "color_raw.jpg")
             prompt = ("black and white coloring book page for small children, clean thick black outlines only, no "
                       "shading, no grey, no colour, pure white background, simple cute shapes, full body: "
-                      f"{ascii_text(main_c.get('look', ''))} {ascii_text(main_c.get('name', ''))}, happy pose, "
-                      "a few simple background elements")
+                      f"{who_}, a few simple background elements")
             with open(raw, "wb") as f:                # keep it portrait (no 16:9 frame)
                 f.write(cf_request(CF_MODEL, prompt, w=768, h=1024, seed=random.randint(1, 99999)))
             page_img = extras.coloring_sheet(raw, os.path.join(WORK, "coloring.jpg"), FONT, L["color_title"])
             out["coloring"] = extras.fb_photo(page_img, f"{L['color_msg']}\n\n🎬 {title}")
             log("Posted colouring page:", out["coloring"])
+            try:
+                extras.tg_channel_post(ASSETS, f"🖍️ {L['color_msg']}\n\n🎬 {title}", page_img)
+            except Exception:
+                pass
         except Exception as e:
             log("  colouring page skipped:", str(e)[:200])
+    if results.get("facebook") and not DRY_RUN:
+        for fn_, nm_ in ((lambda: worksheet_post(story, category, title, lang), "worksheet"),
+                         (lambda: moral_card_post(history, lang), "moral card")):
+            try:                                     # v100
+                fn_()
+            except Exception as e:
+                log(f"  {nm_} skipped:", str(e)[:150])
     if results.get("youtube"):
         try:
             extras.yt_add_to_playlist(results["youtube"], f"{L['labels'][category]} | {L['playlist_tail']}", lang)

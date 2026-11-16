@@ -6625,6 +6625,71 @@ def adda_summary(path_dir, key):
 HOOK_STYLES = ("voice", "sound")
 
 
+def line_flow_fix(story, lang_name, key=None, kind="cartoon", inserts=True):
+    """v100: the whole story read LINE BY LINE as one film; breaks in the flow mended with the smallest change (one
+    line changed, or one short line added that copies its neighbour's picture / who-talks-to-whom). Returns fixes."""
+    key = key or env("GEMINI_API_KEY")
+    if not key or env("MOCK") == "1" or env("LINE_FLOW") == "0":
+        return 0
+    rows, idx = [], {}
+    for i, sc in enumerate(story.get("scenes") or []):
+        rows.append(f"--- scene {i}")
+        for j, ln in enumerate(sc.get("lines") or []):
+            tx = str(ln.get("text", "")).strip()
+            if tx:
+                rows.append(f"{i}.{j} {ln.get('speaker', 'narrator')}: {strip_tags(tx)[:300]}")
+                idx[f"{i}.{j}"] = (i, j)
+    who = "children's cartoon (ages 3-10)" if kind == "cartoon" else "horror audio story"
+    prompt = (f"This is ONE {lang_name} {who}, line by line ('scene.line speaker: text'). Read it like a strict film "
+              "editor. Find ONLY real breaks: a reply that does not fit the line before it; a line or event from "
+              "nowhere; someone knowing what he was never told; a person or thing used before it was introduced; a "
+              "fact contradicting an earlier line; the same thing said twice. Mend each with the SMALLEST change: "
+              "replace that one line" + (", or add ONE short line after a given line" if inserts else "") +
+              f". New text in {lang_name}, the same speaker's way of talking, max 25 words, no English. At most 10 "
+              "fixes; [] if it flows. Answer ONLY JSON: [{\"id\": \"scene.line\", \"replace\": \"new text\"}"
+              + (" or {\"after\": \"scene.line\", \"speaker\": \"name\", \"insert\": \"new line\"}" if inserts else "")
+              + "]\n" + "\n".join(rows))
+    fixes = None
+    for model in text_models(key)[:2] + helper_models(key)[:3]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}],
+                                    "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"}},
+                              timeout=200)
+        except Exception:
+            continue
+        if r.ok:
+            fixes = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            break
+    if not isinstance(fixes, list):
+        return 0
+    names = {str(ln.get("speaker", "")).strip().lower() for sc in story["scenes"] for ln in sc.get("lines") or []}
+    n, adds = 0, []
+    for fx in fixes[:10]:
+        if not isinstance(fx, dict):
+            continue
+        new = str(fx.get("replace") or fx.get("insert") or "").strip()
+        if not (2 <= len(new.split()) <= 30) or re.search(r"[A-Za-z]{4,}", new):
+            continue
+        if fx.get("id") in idx and fx.get("replace"):
+            i, j = idx[fx["id"]]
+            story["scenes"][i]["lines"][j]["text"] = new
+            story["scenes"][i]["lines"][j]["en"] = ""
+            n += 1
+        elif inserts and fx.get("after") in idx and fx.get("insert"):
+            i, j = idx[fx["after"]]
+            spk = str(fx.get("speaker") or "narrator").strip()
+            base_ = dict(story["scenes"][i]["lines"][j])          # same picture / same people as its neighbour
+            base_.update(speaker=spk if spk.lower() in names else base_.get("speaker", "narrator"), text=new, en="")
+            base_.pop("sfx", None)
+            adds.append(((i, j), base_))
+    for (i, j), ln in sorted(adds, key=lambda z: z[0], reverse=True):
+        story["scenes"][i]["lines"].insert(j + 1, ln)
+        n += 1
+    log(f"  line-by-line check: {n} place(s) mended")
+    return n
+
+
 def hook_pick(path, history):
     """'voice' = the trailer opens on a ghost's / person's frightening line; 'sound' = on a scream / bang / laugh.
     Until each has 3 measured Shorts they take turns; then the better one 4 times in 5."""
@@ -6638,7 +6703,7 @@ def hook_pick(path, history):
     return best if random.random() < 0.8 else [s for s in HOOK_STYLES if s != best][0]
 
 
-def hook_learn(history, path):
+def hook_learn(history, path, kind="horror"):
     """once a day: how much of each measured Short people watched (YouTube Analytics) -> per opening style"""
     if not env("YT_REFRESH_TOKEN") or env("MOCK") == "1":
         return None
@@ -6674,7 +6739,8 @@ def hook_learn(history, path):
     if not all(res.get(s) for s in HOOK_STYLES):
         return None
     m = {s: sum(res[s]) / len(res[s]) for s in HOOK_STYLES}
-    name = {"voice": "ভূত / মানুষের ভয়ের লাইন দিয়ে শুরু", "sound": "চিৎকার / শব্দ দিয়ে শুরু"}
+    name = ({"voice": "ভূত / মানুষের ভয়ের লাইন দিয়ে শুরু", "sound": "চিৎকার / শব্দ দিয়ে শুরু"} if kind == "horror" else
+            {"voice": "সায়নের প্রশ্ন / মজার কথা দিয়ে শুরু", "sound": "হাসি / উত্তেজনার মুহূর্ত দিয়ে শুরু"})
     best = max(m, key=m.get)
     return (f"🎬 Reel-এর শুরু পরীক্ষা: '{name['voice']}' গড়ে {m['voice']:.0f}% দেখা, '{name['sound']}' {m['sound']:.0f}% - "
             f"এখন বেশিরভাগ Reel: {name[best]}")
@@ -7429,10 +7495,11 @@ def growth_monitor(history, path, kind="horror", lang="bn", len_of=None):
     if len(drops) >= 3:
         med_ = sorted(drops)[len(drops) // 2]
         lines.append(f"📉 বেশিরভাগ লোক চলে যান ভিডিওর ~{med_}%-এ")
-        if 8 <= med_ <= 92 and kind == "horror":         # v95: that part of the story gets a strong turn
+        if 8 <= med_ <= 92:                              # v95 (+v100 cartoon): that part gets a strong turn
             if rules.get("drop_pct") != med_:
-                did.append(f"গল্পের ~{med_}% জায়গায় লোক বেশি চলে যাচ্ছেন - এখন থেকে ঠিক ওই জায়গায় একটা বড় মোড় "
-                           "(রহস্য খোলা, নতুন ভয়, কারও মৃত্যু) রাখা হবে")
+                did.append(f"গল্পের ~{med_}% জায়গায় লোক বেশি চলে যাচ্ছেন - এখন থেকে ঠিক ওই জায়গায় " +
+                           ("একটা বড় মোড় (রহস্য খোলা, নতুন ভয়, কারও মৃত্যু) রাখা হবে" if kind == "horror" else
+                            "সবচেয়ে মজার বা উত্তেজনার মুহূর্তটা রাখা হবে"))
             rules["drop_pct"] = med_
     # best / weakest of the week
     sc = sorted([h for h in week if h.get("stats")], key=lambda h: score(h["stats"]), reverse=True)
@@ -7455,6 +7522,10 @@ def coach_rule(coach, kind="horror"):
     if r.get("ctr_low"):
         out += ("\nCLICKS ARE LOW THIS WEEK: make the title a sharper curiosity gap (a concrete strange detail + an open "
                 "question, never a lie or a spoiler) and the thumbnail_text 2-4 huge, punchy words.\n")
+    if r.get("drop_pct") and kind == "cartoon":
+        out += (f"\nCHILDREN STOP WATCHING AROUND {int(r['drop_pct'])}% OF OUR CARTOONS: exactly around that point of "
+                "THIS story put the funniest or most exciting moment - a surprise, a big laugh, Sayan's clever idea, a "
+                "chase; never a slow explanation or a long talk there.\n")
     if r.get("drop_pct") and kind == "horror":
         out += (f"\nVIEWERS LEAVE AROUND {int(r['drop_pct'])}% OF OUR STORIES: exactly around that point of THIS story "
                 "put a strong turn - a revelation, a death, a new and worse scare or a sudden reversal; never a calm "

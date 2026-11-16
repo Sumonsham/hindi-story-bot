@@ -155,7 +155,7 @@ RIG_NAMES = [   # words in a story character's name / look -> character pack
     ("bonik", r"bonik|banik|merchant|trader|shopkeeper|dokandar|seller|vendor"),
     ("chashi", r"chashi|farmer|peasant|villager|cowherd|man from the village"),
     ("gramer_bou", r"village (wife|woman|lady)|gramer bou|woman|housewife"),
-    ("saheb", r"\bsaheb"),
+    ("saheb", r"\bsaheb|\bsumon|সুমন|सुमन"),
     ("sabhasad_1", r"courtier|sabhasad"),
 ]
 

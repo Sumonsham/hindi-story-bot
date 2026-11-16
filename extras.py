@@ -2966,6 +2966,7 @@ SPK_VOICED = {}                 # seconds of speech per letter of every voice (p
 
 
 CUT_HOW = [""]                  # how the last recording was cut: "count" (as many clear pauses as line ends) / "length"
+SUSPECT_NEIGH = {}              # v102: line file -> ("short"/"long", the lines next to it in the same recording)
 SUSPECT = []                    # (how far off, line file) - lines whose length does not fit their words (maybe cut wrong)
 TTS_SPARE = [0]                 # requests of today's share that are free for asking a recording again
 SAMPLE = {"dir": None, "max": 16}   # a few raw recordings + their text are kept, to tune the cutting on REAL sound
@@ -3494,6 +3495,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
                     r_ = voiced[k] / (lchars[k] * ref)
                     if (r_ > 1.45 and voiced[k] - lchars[k] * ref >= 1.0) or r_ < 0.62:
                         SUSPECT.append((abs(math.log(r_)) + (0.15 if how == "length" else 0), ln))
+                        # v102: a line too SHORT lost words to the line next to it in this recording - making it
+                        # again alone would put those words in TWICE, so its neighbours are made again with it
+                        SUSPECT_NEIGH[ln] = ("short" if r_ < 1 else "long",
+                                             [lines[q] for q in (k - 1, k + 1) if 0 <= q < len(lines)])
                         odd += 1
             SPK_VOICED[vk] = ref if vk not in SPK_VOICED else SPK_VOICED[vk] * 0.6 + ref * 0.4
         if chars >= 60 and not broken:
@@ -5266,7 +5271,7 @@ def parse_yt_results(html):
     return out
 
 
-def yt_trending(kind, lang, max_n=15, queries=None):
+def yt_trending(kind, lang, max_n=15, queries=None, sp="CAMSAggD"):
     """The most watched videos of THIS WEEK on YouTube for our kind of video (YouTube's own search, sorted by
     views, uploaded this week) - real titles and real view counts, no API quota used. [] if YouTube says no."""
     seen, out = set(), []
@@ -5275,7 +5280,7 @@ def yt_trending(kind, lang, max_n=15, queries=None):
     for q in (queries or TREND_QUERIES.get((kind, lang), []))[:6]:
         try:
             r = requests.get("https://www.youtube.com/results", headers=hdr, cookies={"CONSENT": "YES+1"}, timeout=25,
-                             params={"search_query": q, "sp": "CAMSAggD", "hl": "en", "gl": "IN"})  # this week, by views
+                             params={"search_query": q, "sp": sp, "hl": "en", "gl": "IN"})  # this week (CAMSAggC: today), by views
             rows = parse_yt_results(r.text) if r.ok else []
         except Exception as e:
             log(f"  YouTube trend search '{q}' failed: {str(e)[:80]}")
@@ -7071,7 +7076,7 @@ def podcast_feed(docs, base, ep, show_title, cover_src=None, lang="bn"):
         f"<enclosure url=\"{_esc(e['url'])}\" length=\"{int(e.get('bytes', 0))}\" type=\"audio/mpeg\"/>"
         f"<guid isPermaLink=\"false\">{_esc(e['guid'])}</guid><pubDate>{e['date']}</pubDate>"
         f"<itunes:duration>{int(e.get('secs', 0))}</itunes:duration><itunes:explicit>false</itunes:explicit>"
-        f"<itunes:episodeType>full</itunes:episodeType><itunes:image href=\"{_esc(img)}\"/>"
+        f"<itunes:episodeType>full</itunes:episodeType><itunes:image href=\"{_esc(e.get('image') or img)}\"/>"
         + (f"<podcast:transcript url=\"{_esc(e['vtt'])}\" type=\"text/vtt\" language=\"{lang}\"/>" if e.get("vtt") else "")
         + (f"<podcast:chapters url=\"{_esc(e['chapters'])}\" type=\"application/json+chapters\"/>" if e.get("chapters") else "")
         + "</item>\n"
@@ -7921,6 +7926,52 @@ def promo_poster(bg, promo, out, font_path, size=(1080, 1080)):
     return out
 
 
+def listen_badge_png(size, out, font_path, badges_dir, lang="bn"):
+    """v101: a lower-third 'also available on Spotify / Apple Podcasts' banner (like the ads in songs and videos).
+    The OFFICIAL badges are used if you put them in assets/badges/ (spotify.png, apple.png - from Spotify for Creators
+    and Apple's marketing tools, made for exactly this use); otherwise neat text pills with our own drawn icons."""
+    W, H = size
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    bh = int(H * 0.17)
+    y0 = int(H * 0.62)
+    head = "এই গল্পটা শুনতেও পারেন" if lang == "bn" else "यह कहानी सुन भी सकते हैं"
+    lab_runs, lsz = _mixed_fit(d, head, font_path, int(bh * 0.24), W * 0.8)
+    lw = _mixed_width(d, lab_runs, lsz)
+    official = [os.path.join(badges_dir, f) for f in ("spotify.png", "apple.png") if os.path.exists(os.path.join(badges_dir, f))]
+    pills = []
+    if len(official) == 2:
+        for p in official:
+            b = Image.open(p).convert("RGBA")
+            s = (bh * 0.55) / b.height
+            pills.append(b.resize((int(b.width * s), int(b.height * s)), Image.LANCZOS))
+    else:
+        for name, col, icon in (("Spotify", (30, 185, 84), "podcast"), ("Apple Podcasts", (150, 60, 230), "podcast")):
+            ph = int(bh * 0.55)
+            lf = latin_font() or font_path
+            f = _font(lf, int(ph * 0.42))
+            tw = d.textlength(name, font=f)
+            pw = int(ph * 1.1 + tw + ph * 0.5)
+            pill = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+            pd = ImageDraw.Draw(pill)
+            pd.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=ph // 2, fill=(15, 15, 18, 235), outline=col + (255,), width=3)
+            _promo_icon(pd, ph // 2 + 4, ph // 2, int(ph * 0.36), icon, col)
+            pd.text((ph * 1.05, (ph - f.size) / 2 - 2), name, font=f, fill=(255, 255, 255))
+            pills.append(pill)
+    gap = int(W * 0.02)
+    total_w = sum(p.width for p in pills) + gap * (len(pills) - 1)
+    bw = int(max(total_w, lw) + W * 0.06)
+    x0 = (W - bw) // 2
+    d.rounded_rectangle([x0, y0, x0 + bw, y0 + bh], radius=bh // 4, fill=(0, 0, 0, 170))
+    _mixed_draw(d, (W - lw) / 2, y0 + int(bh * 0.34), lab_runs, lsz, (255, 214, 90), 2)
+    x = (W - total_w) // 2
+    for p in pills:
+        im.alpha_composite(p, (x, y0 + int(bh * 0.40)))
+        x += p.width + gap
+    im.save(out)
+    return out
+
+
 def promo_pick(path, ids, every=2, map_id="map", map_gap=10, today=None):
     """which feature (if any) this video advertises. Every `every`-th video; first the ones not yet shown this
     month, the map whenever it is `map_gap` days since it was last shown; then the one shown longest ago."""
@@ -8083,7 +8134,7 @@ def place_story(avoid=(), districts="", key=None):
     return None
 
 
-def micro_story(lang="bn", avoid=(), key=None):
+def micro_story(lang="bn", avoid=(), key=None, topic=""):
     """a NEW 2-4 sentence ghost story with a twist (original, Kolkata Bengali), its title and an English picture idea"""
     key = key or env("GEMINI_API_KEY")
     if not key:
@@ -8091,7 +8142,10 @@ def micro_story(lang="bn", avoid=(), key=None):
     ask = ((f"Write ONE brand-new, original, very short ghost story in {'pure Kolkata Bengali (cholit bhasha)' if lang == 'bn' else 'Hindi'}: "
             "3 or 4 short sentences, a real everyday Bengal setting (a real kind of place, a real hour), the chill grows "
             "with each sentence and the LAST sentence is a quiet twist that makes the listener's skin crawl. Nothing gory, "
-            "nothing about children being hurt, no copy of any known story. Never one of these: "
+            "nothing about children being hurt, no copy of any known story. "
+            + (f"TODAY people everywhere are talking about: '{topic}' - let the tiny story touch the same fear or "
+               "folk belief (our own original story; never retell a film or news, never use real people's names). "
+               if topic else "") + "Never one of these: "
             + "; ".join(str(a)[:40] for a in list(avoid)[-30:]) +
             ". Answer ONLY JSON: {\"title\": \"2-5 word title\", \"lines\": [\"sentence 1\", \"sentence 2\", ...], "
             "\"picture\": \"ENGLISH: one dark, atmospheric, empty scene for the background (a place, light, mood; no "

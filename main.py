@@ -1077,6 +1077,91 @@ def pick_hook(scenes):
     return i, take
 
 
+def _said_key(s):
+    return re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", extras.strip_tags(str(s)))
+
+
+def _sents(text):
+    return [x.strip() for x in re.split(r"(?<=[।!?])\s+(?=\S)", str(text).strip()) if x.strip()] or [str(text)]
+
+
+def same_said(a, b):
+    """v102: two sentences a listener hears as the SAME thing"""
+    from difflib import SequenceMatcher
+    ka, kb = _said_key(a), _said_key(b)
+    if len(ka) < 14 or len(kb) < 14:
+        return False
+    short, long_ = sorted((ka, kb), key=len)
+    return (len(short) >= 18 and short in long_) or SequenceMatcher(None, ka, kb).ratio() >= 0.8
+
+
+def new_hook_line(scenes, story, lang, hk):
+    """v102: the opening is NEVER a copy of a story line (it was heard twice). The funny moment is chosen as before,
+    but the line heard at the start is a NEW one in the same voice; without one the story simply starts."""
+    key = env("GEMINI_API_KEY")
+    if MOCK or not key or not hk:
+        return None
+    hi, take = hk
+    said = [x for sc in scenes for ln in sc.get("lines") or [] for x in _sents(ln.get("text", ""))]
+    prompt = (f"A {LANGS[lang]['name']} children's cartoon story. Its funniest / most exciting moment is this line by "
+              f"{take[0].get('speaker', 'narrator')}: \"{extras.strip_tags(str(take[0].get('text', '')))}\"\n"
+              f"Story: {str(story.get('summary') or story.get('description') or '')[:800]}\n"
+              "Write ONE NEW line for the first seconds of the video, said by the SAME character, that makes children "
+              "stay (funny, surprising, a question). Max 12 words. It must NOT repeat or copy any line of the story "
+              "and must not tell the ending. Answer ONLY JSON: {\"text\": \"the line\"}")
+    for model in extras.helper_models(key)[:3] + gemini_models(key)[:2]:
+        try:
+            r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                              json={"contents": [{"parts": [{"text": prompt}]}],
+                                    "generationConfig": {"temperature": 0.8, "responseMimeType": "application/json"}},
+                              timeout=90)
+            if not r.ok:
+                continue
+            ans = extras.load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+            tx = str((ans or {}).get("text", "")).strip() if isinstance(ans, dict) else ""
+            if 6 <= len(_said_key(tx)) and len(tx) <= 110 and not any(same_said(a, b) for a in _sents(tx) for b in said):
+                base = dict(take[0])
+                for k in ("voice_text", "sfx", "en"):
+                    base.pop(k, None)
+                base["text"] = tx
+                return hi, [base]
+        except Exception:
+            continue
+    return None
+
+
+def no_line_twice(parts):
+    """v102: over the WHOLE video, a sentence already heard is taken out (a line left empty goes, with its picture)"""
+    heard, removed = [], 0
+    for p in parts:
+        lines, shots = p.get("lines") or [], p.get("shots")
+        keep_l, keep_s = [], []
+        for k, ln in enumerate(lines):
+            tx = str(ln.get("text", ""))
+            sents = _sents(tx)
+            keep = []
+            for s_ in sents:
+                if len(_said_key(s_)) >= 14 and any(same_said(s_, h) for h in heard):
+                    removed += 1
+                    continue
+                keep.append(s_)
+                heard.append(s_)
+            if len(keep) != len(sents):
+                ln["text"] = " ".join(keep).strip()
+                ln.pop("voice_text", None)
+            if str(ln.get("text", "")).strip() or not tx.strip():
+                keep_l.append(ln)
+                if shots is not None:
+                    keep_s.append(shots[k] if k < len(shots) else None)
+        if len(keep_l) != len(lines) and keep_l:
+            p["lines"] = keep_l
+            if shots is not None:
+                p["shots"] = keep_s
+    if removed:
+        log(f"  {removed} sentence(s) heard earlier in the video taken out (no line is said twice)")
+    return removed
+
+
 def puppet_lines(sp, pz):
     """the spoken lines of a part, in the renderer's words"""
     rig = pz.get("rig")
@@ -4238,7 +4323,9 @@ def main():
     if moral:
         end_lines.append({"speaker": "narrator", "emotion": "calm",
                           "text": (f"{L['moral_intro']} {moral}" if category != "funny" else moral)})
-    elif story.get("ending_line"):
+    elif story.get("ending_line") and not any(same_said(a_, b_) for a_ in _sents(story["ending_line"])
+                                              for sc in scenes[-2:] for ln in sc.get("lines") or []
+                                              for b_ in _sents(ln.get("text", ""))):
         end_lines.append({"speaker": "narrator", "text": story["ending_line"]})
     end_img = host if host != thumb_base else (shots_per_scene[-1][-1] if shots_per_scene[-1] else imgs[-1])
     lesson_img = None
@@ -4326,7 +4413,7 @@ def main():
 
     # COLD OPEN: people decide in 3 seconds - start INSIDE the story (its first, funniest/most gripping scene),
     # then Lumi Didi greets and says the title, then the rest of the story
-    hk = None if env("HOOK_OPEN") == "0" else pick_hook(scenes)
+    hk = None if env("HOOK_OPEN") == "0" else new_hook_line(scenes, story, lang, pick_hook(scenes))
     if hk and parts[0].get("host_part"):         # 1) a funny moment (5 s), 2) Lumi Didi + title, 3) the story
         hi, hlines = hk
         himg = shots_per_scene[hi][0] if shots_per_scene[hi] else imgs[hi]
@@ -4343,6 +4430,10 @@ def main():
         if p.get("host_part"):
             p["puppet"] = host_puppet(first_host)
             first_host = False
+    try:
+        no_line_twice(parts)
+    except Exception as e:
+        log("  repeat check of the whole video skipped:", str(e)[:100])
     HOOK_TEXT[0] = str(story.get("thumbnail_text") or "").strip()
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)

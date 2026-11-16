@@ -2781,6 +2781,22 @@
   "riddle": {
    "q": "পা নেই কিন্তু চলে, ডানা নেই কিন্তু ওড়ে, মুখ নেই কিন্তু মুখ ভেঙচায়! বলতো জিনিসটা কী?",
    "a": "মেঘ"
+  },
+  "stats": {
+   "likes": 2,
+   "comments": 1,
+   "views": 1,
+   "length_s": 504,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-16T03:03+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-16T03:03+00:00",
+   "thumb": true
   }
  },
  {
@@ -2879,5 +2895,48 @@
    "q": "সোনার মতো গায়ে তার রঙ, ফলের রাজা বলে তার ঢং। বল তো ফলটির নাম কী?",
    "a": "আম"
   }
+ },
+ {
+  "date": "2026-11-16T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-16@13",
+  "pending_comments": [],
+  "category": "gopal",
+  "idea": "A clever court jester in medieval Bengal uses a trick with a fake royal decree to save a village from an unfair tax collector during a drought. (told as a gopal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় | খরার দিনে খাজনা মাফ | বুদ্ধির খেল 📜✨",
+  "festival": null,
+  "vote": {
+   "ideas": [
+    [
+     "detective",
+     "the parrot that spoke the thief's name"
+    ],
+    [
+     "detective",
+     "who took Thakuma's gold locket?"
+    ]
+   ],
+   "labels": [
+    "কথা বলা টিয়া ও চোর",
+    "ঠাকুমার হারানো সোনার লকেট"
+   ]
+  },
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "আকাশের মেঘ"
+  },
+  "title_b": "গোপাল ভাঁড় ও লোভী জমিদারের খাজনা আদায়! 🌾👑",
+  "question_post": null,
+  "facebook": "1454515269985906",
+  "youtube": "yz8jUoNw1tM",
+  "fb_reel": "1360635186017479",
+  "fb_story": "1512745197335144",
+  "fb_reel2": "1776376970136208",
+  "yt_short": "gljOZ3MerRw"
  }
 ]

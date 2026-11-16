@@ -2373,12 +2373,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 3,
+   "views": 9,
    "length_s": 468,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-13T03:04+00:00"
+   "yt_views": 5,
+   "yt_avg_s": 4,
+   "yt_avg_pct": 1.0,
+   "checked": "2026-11-16T09:03+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2826,7 +2826,23 @@
   "fb_story": "4541586369393111",
   "fb_reel2": "1558421613001252",
   "coloring": "122139172616735948",
-  "yt_short": "mzUHPSk1iqA"
+  "yt_short": "mzUHPSk1iqA",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 1,
+   "length_s": 411,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-16T09:03+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-16T09:03+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-15T13:31+00:00",
@@ -2937,6 +2953,37 @@
   "fb_reel": "1360635186017479",
   "fb_story": "1512745197335144",
   "fb_reel2": "1776376970136208",
-  "yt_short": "gljOZ3MerRw"
+  "yt_short": "gljOZ3MerRw",
+  "vote_used": true
+ },
+ {
+  "date": "2026-11-16T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-16@19",
+  "pending_comments": [],
+  "category": "jadu",
+  "idea": "A poor village farmer discovers a magical banyan tree that grows glowing musical flutes instead of fruit, but a greedy landlord tries to steal the roots. (told as a jadu story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "জাদু পেন্সিল: সুরেলী বটগাছ ও লোভী জমিদার 🌳🎶",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "আলো ছড়ানো বাঁশি"
+  },
+  "hook_style": "voice",
+  "moral": "প্রকৃতির উপহার সবার আনন্দের জন্য, লোভ দিয়ে তাকে নিজের করে আটকানো যায় না।",
+  "title_b": "জাদু পেন্সিল: বাঁশি ফলা বটগাছের আসল রহস্য! ✨🌳",
+  "question_post": null,
+  "facebook": "1153570027367543",
+  "youtube": "ktlleYartRU",
+  "fb_reel": "1678389750619005",
+  "fb_story": "2583160835503680",
+  "fb_reel2": "1752165909220115",
+  "yt_short": "qVwHlaTE-cg"
  }
 ]

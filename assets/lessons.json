@@ -1,25 +1,24 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-13T22:04+00:00",
+  "made": "2026-11-15T22:07+00:00",
   "lessons": [
-   "Keep total views and engagement metrics as baseline indicators while prioritizing audience retention signals when available.",
-   "Maintain high-performing content structures such as classic folktales and detective series that draw initial viewer interest.",
-   "Structure narrative chapters tightly to prevent audience drop-off and maintain momentum throughout the video.",
-   "Incorporate audience feedback directly into subsequent story concepts to drive repeat engagement.",
-   "Balance runtime based on viewer drop-off points, ensuring compilation and episodic formats keep pacing swift."
+   "Open stories with immediate dialogue or action rather than slow introductions, as retention drops quickly.",
+   "Keep compilation videos under 90 minutes to ensure higher completion rates based on current watch percentages.",
+   "Focus on popular categories like detective mysteries and moral tales which showed slightly better viewer response.",
+   "Include familiar character dynamics like Gopal Bhar and witty animals to naturally drive engagement.",
+   "End videos with direct interactive questions to encourage the comment actions viewers are already responding to."
   ],
   "titles": [
-   "Use descriptive questions or intriguing mysteries in titles to successfully outperform generic options during A/B tests.",
-   "Leverage popular recurring characters like Gopal Bhar or detective themes in title hooks to capture immediate clicks.",
-   "Keep title swaps active by introducing emotional stakes or clear curiosities that prompt higher initial curiosity."
+   "Use curiosity-driven questions and emotional hooks in titles to outperform standard descriptive ones.",
+   "Incorporate clear emoji markers that match the specific theme of the story to boost initial click-through rates.",
+   "Test alternative titles (Title B) for major slots to identify high-performing phrasing early."
   ],
   "requests": [
-   "A ghost story or supernatural mystery theme",
-   "Stories featuring rivers, ponds, or specific natural landmarks",
-   "Interactive guessing games about story clues like colored threads",
-   "Character name inclusions where viewer names are integrated into the plot",
-   "Moral dilemmas asking viewers to judge characters' actions and sacrifices",
-   "Wishes and magical item scenarios where characters make choices"
+   "A ghost story or haunted house theme",
+   "Winter-themed village settings with traditional food elements",
+   "Classic characters like Gopal Bhar and Birbal",
+   "Moral dilemmas involving sacrifice and choices",
+   "Interactive quiz questions directly inside the video"
   ]
  }
 }

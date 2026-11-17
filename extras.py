@@ -7384,7 +7384,24 @@ def _esc(s):
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;"))
 
 
-def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date=""):
+def seo_block(seo):
+    """v111: the story's search words as READABLE text at the end of its page (English title + summary, and the
+    Bengali / English words people type) - Google only finds a page for words that are on it"""
+    if not isinstance(seo, dict) or not (seo.get("bn") or seo.get("en")):
+        return ""
+    chips = "".join(f'<span class="kw">{_esc(w)}</span>' for w in (seo.get("bn") or []) + (seo.get("en") or []))
+    en = ""
+    if seo.get("title_en") or seo.get("summary_en"):
+        en = (f'<h2 lang="en">{_esc(seo.get("title_en") or "")} - Bengali horror story</h2>'
+              f'<p lang="en">{_esc(seo.get("summary_en") or "")}</p>')
+    return (f'<section class="seo">{en}<p class="kws">এই গল্প নিয়ে খোঁজা হয় / Search: {chips}</p></section>')
+
+
+SEO_CSS = (".seo{border-top:1px solid #333;margin-top:2em;padding-top:1em;font-size:15px}.seo h2{color:#ffcf4a;"
+           "font-size:18px}.kw{display:inline-block;background:#221d28;border-radius:12px;padding:2px 10px;margin:3px}")
+
+
+def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date="", seo=None):
     """docs/golpo/<slug>.html - the whole story to READ (Google finds it) with the video on top; + the list
     page and sitemap.xml"""
     gdir = os.path.join(docs, "golpo")
@@ -7396,7 +7413,11 @@ def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date=""):
            (f'<p><a href="https://www.facebook.com/{fb_id}">▶ ভিডিওতে শুনুন</a></p>' if fb_id else ""))
     img = f"https://i.ytimg.com/vi/{yt_id}/hqdefault.jpg" if yt_id else ""
     body = "".join(f"<p>{_esc(p)}</p>" for p in text.split("\n\n") if p.strip())
+    seo = seo if isinstance(seo, dict) else {}
+    kws = ", ".join((seo.get("bn") or []) + (seo.get("en") or []))
     ld_ = [{"@context": "https://schema.org", "@type": "Article", "headline": title[:110],
+            **({"alternativeHeadline": seo["title_en"]} if seo.get("title_en") else {}),
+            **({"keywords": kws} if kws else {}),
             "inLanguage": lang, "datePublished": date, "image": img or None, "url": url,
             "author": {"@type": "Organization", "name": env("PAGE_NAME_BN") or "Daily Horror Story"}}]
     if yt_id:                                        # v82: Google shows the video's picture in search results
@@ -7408,20 +7429,20 @@ def story_page(docs, slug, title, text, yt_id, fb_id, base, lang="bn", date=""):
                        if VIDEO_SECS.get(yt_id) else {})})
     ld = json.dumps(ld_ if len(ld_) > 1 else ld_[0], ensure_ascii=False)
     page = f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>{_esc(title)} | ভূতের গল্প</title>
-<meta name="description" content="{_esc(desc)}"><link rel="canonical" href="{_esc(url)}">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>{_esc(title)} | ভূতের গল্প{(" | " + _esc(seo["title_en"])) if seo.get("title_en") else ""}</title>
+<meta name="description" content="{_esc(desc)}"><link rel="canonical" href="{_esc(url)}">{f'<meta name="keywords" content="{_esc(kws)}">' if kws else ''}
 <meta property="og:title" content="{_esc(title)}"><meta property="og:description" content="{_esc(desc)}">
 {f'<meta property="og:image" content="{img}">' if img else ''}<script type="application/ld+json">{ld}</script>
 <style>body{{background:#0d0b10;color:#e8e2d6;font:18px/1.9 "Noto Serif Bengali",serif;margin:0}}
 main{{max-width:760px;margin:auto;padding:18px}}h1{{color:#ffcf4a;line-height:1.4}}a{{color:#ffcf4a}}
-iframe{{width:100%;aspect-ratio:16/9;border:0;border-radius:10px}}p{{margin:0 0 1em}}</style></head><body><main>
+iframe{{width:100%;aspect-ratio:16/9;border:0;border-radius:10px}}p{{margin:0 0 1em}}{SEO_CSS}</style></head><body><main>
 <p><a href="index.html">← সব গল্প</a> · <a href="../">ভূতের মানচিত্র</a></p><h1>{_esc(title)}</h1>{vid}
-<article>{body}</article><p><a href="index.html">← আরও ভূতের গল্প পড়ুন</a></p></main></body></html>"""
+<article>{body}</article>{seo_block(seo)}<p><a href="index.html">← আরও ভূতের গল্প পড়ুন</a></p></main></body></html>"""
     with open(os.path.join(gdir, f"{slug}.html"), "w", encoding="utf-8") as f:
         f.write(page)
     lst_p = os.path.join(gdir, "list.json")
     lst = [x for x in (_jl(lst_p, []) or []) if x.get("slug") != slug]
-    lst.append({"slug": slug, "title": title, "date": date, "yt": yt_id})
+    lst.append({"slug": slug, "title": title, "date": date, "yt": yt_id, "seo": bool(seo.get("bn") or seo.get("en"))})
     _js(lst_p, lst)
     rows = "".join(f'<li><a href="{_esc(x["slug"])}.html">{_esc(x["title"])}</a> <small>{_esc(x.get("date", ""))}</small></li>'
                    for x in reversed(lst))

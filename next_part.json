@@ -100,5 +100,63 @@
   "last_lines": "হঠাৎই নদীর বুক চিরে উঠে দাঁড়াল এক বিশাল দানব 'রক্তনেত্র'! তার চোখ দুটি জ্বলন্ত আগুনের গোলা আর হাতে বিরাট কাঁটাওয়ালা গদা! / হাহা হা! কার এত বড় সাহস যে আমার অনুমতি ছাড়া রাক্ষসপুরীর সীমানায় পা দেয়? তোদের এখানেই পিষে মারব! / সাহেব ভাই! দানবের ভয়ে আমার হাত কেঁপে পালকটা খসে যাচ্ছে! বাঁচাও! / বিশাল গদা তেড়ে আসছে নিচে! সোনার পালকও হাত থেকে নদীর গভীরে খসে পড়ার মুখে! কিন্তু চতুর সাহেব কি পারবে এই ভয়ঙ্কর দানবকে নিজের বুদ্ধি দিয়ে পরাস্ত করতে? জানতে হলে অপেক্ষা করুন আগামী পর্বের জন্য!",
   "setting": "Ancient magical forest bordering Rupnagar, twilight shifting to midnight, giant banyan tree with glowing leaves, deep misty river, starry sky",
   "updated": "2026-11-09T13:31:47.390664+00:00"
+ },
+ "detective": {
+  "created": "2026-11-17T13:31:48.839189+00:00",
+  "category": "detective",
+  "idea": "A village housewife discovers her husband is secretly visiting a mysterious second family in a neighboring village, triggering village gossip and tension. (told as a detective story for children)",
+  "title": "পাশের গ্রামে বাবার গোপন সংসার? 🔍 চমকে দেওয়া রহস্য!",
+  "done": 1,
+  "total": 2,
+  "series_id": "2026-11-17T09:48+00:00",
+  "summary": " In the peaceful village of Shantipur, housewife Malati Debi is heartbroken over rumors that her quiet carpenter husband, Bimal, is secretly visiting another family in nearby Palashpur. Every Tuesday and Friday, Bimal slips away on his bicycle loaded with mystery parcels, baby milk powder, and handcrafted toys. Distraught by village gossip, Malati hires the sharp young detective duo, Jhontu and Mini. Accompanied by their dependable elder cousin Sumon and inquisitive little Sayan, the kids gather physical clues like yellow thorn-apple pollen and a torn grocery bill. They trail Bimal through the winding bamboo trails all the way to a secluded, mysterious cottage in Palashpur. Just as they peek through a window and hear a baby's cry and an unfamiliar woman's voice, a mysterious shadow grabs Jhontu's shoulder from behind.",
+  "part2_plan": "Part 2 will reveal who caught the children outside the cottage and expose the emotional truth behind Bimal's secret trips. The children will uncover that the woman is the destitute sister of Bimal's late friend, and Bimal was secretly supporting her orphaned baby with wooden toys and supplies. Jhontu and Mini will clear all misunderstandings in the village, reunite Bimal and Malati with open hearts, and bring the village together to help the struggling family.",
+  "characters": [
+   {
+    "name": "Jhontu",
+    "gender": "male",
+    "age": "child",
+    "kind": "human",
+    "look": "sharp 12-year-old boy, messy dark hair, round black glasses, blue-and-white striped t-shirt, beige shorts, carrying a brass magnifying glass"
+   },
+   {
+    "name": "Mini",
+    "gender": "female",
+    "age": "child",
+    "kind": "human",
+    "look": "brave 11-year-old girl, two neat braided plaits with red ribbons, bright yellow frock, white socks and black shoes, holding a small spiral notebook and pencil"
+   },
+   {
+    "name": "Sumon",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), wheat-brown skin, teal half-sleeve shirt, dark-blue jeans, brown belt, black wristwatch, white sneakers"
+   },
+   {
+    "name": "Sayan",
+    "gender": "male",
+    "age": "child",
+    "kind": "human",
+    "look": "a slim, sweet Bengali boy of 8 in a cartoon style, short thick dark-brown hair neatly swept to one side with a soft fringe, big round dark-brown eyes, thick dark eyebrows, a small gentle smile, light wheat-brown skin, a light-pink polo T-shirt with a short zip at the collar and darker pink collar and sleeve edges, black cargo trousers with side pockets, grey-and-white sneakers, a thin red thread on his right wrist"
+   },
+   {
+    "name": "Malati",
+    "gender": "female",
+    "age": "adult",
+    "kind": "human",
+    "look": "a worried village housewife of 34, dark hair tied in a loose bun, red-and-white cotton saree, silver bangles on wrists, tearful anxious brown eyes"
+   },
+   {
+    "name": "Bimal",
+    "gender": "male",
+    "age": "adult",
+    "kind": "human",
+    "look": "a 38-year-old hardworking village carpenter, thin build, dusky complexion, wearing a simple cream-colored kurta, white dhoti folded at knees, tired eyes with a secretive expression"
+   }
+  ],
+  "last_lines": "ঠিক সেই রোমাঞ্চকর মুহূর্তে, যখন রহস্যের জট খুলতে শুরু করেছে, তখনই ঘটে গেল এক হাড়হিম করা কাণ্ড! শুকনো পাতার ওপর মড়মড় করে উঠল ভারী পায়ের আওয়াজ! / কে... কে ওখান...! / সুমন কাকু! পেছনটা দেখো! / কে এই অচেনা মানুষ? বিমল কাকু কি তাদের ধরে ফেলল, নাকি এই কুটিরে পাহারা দিচ্ছে অন্য কোনো ভয়ংকর শত্রু? রহস্যের আসল উত্তর লুকিয়ে আছে ঠিক পরের পর্বে!",
+  "setting": "A picturesque, sunlit rural Bengal village called Shantipur, filled with green coconut trees, mud cottages with straw roofs, dusty red-earth village paths leading to a neighboring village across a bamboo grove and a wooden footbridge.",
+  "updated": "2026-11-17T13:31:48.839317+00:00"
  }
 }

@@ -547,7 +547,7 @@
    "yt_views": 9,
    "yt_avg_s": 8,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -584,7 +584,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -849,7 +849,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -879,12 +879,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 556,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -1124,7 +1124,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -1157,10 +1157,10 @@
    "comments": 1,
    "views": 4,
    "length_s": 403,
-   "yt_views": 4,
-   "yt_avg_s": 7,
-   "yt_avg_pct": 2.0,
-   "checked": "2026-11-14T09:03+00:00"
+   "yt_views": 5,
+   "yt_avg_s": 6,
+   "yt_avg_pct": 1.6,
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -1217,7 +1217,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   }
  },
  {
@@ -1429,10 +1429,10 @@
    "comments": 1,
    "views": 4,
    "length_s": 430,
-   "yt_views": 3,
+   "yt_views": 4,
    "yt_avg_s": 6,
    "yt_avg_pct": 1.5,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1479,7 +1479,7 @@
    "yt_views": 2,
    "yt_avg_s": 14,
    "yt_avg_pct": 3.2,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1519,7 +1519,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1756,12 +1756,12 @@
   "stats": {
    "likes": 3,
    "comments": 1,
-   "views": 4,
+   "views": 6,
    "length_s": 533,
-   "yt_views": 3,
+   "yt_views": 4,
    "yt_avg_s": 0,
-   "yt_avg_pct": 0.1,
-   "checked": "2026-11-14T09:03+00:00"
+   "yt_avg_pct": 0.2,
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1808,7 +1808,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1853,7 +1853,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2238,7 +2238,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2566,12 +2566,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 480,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-14T09:03+00:00"
+   "yt_views": 1,
+   "yt_avg_s": 4,
+   "yt_avg_pct": 0.8,
+   "checked": "2026-11-17T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2996,7 +2996,23 @@
   "fb_story": "1512745197335144",
   "fb_reel2": "1776376970136208",
   "yt_short": "gljOZ3MerRw",
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 546,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-17T09:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-17T09:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-16T13:31+00:00",
@@ -3103,6 +3119,37 @@
   "fb_reel": "936983662830625",
   "fb_story": "2350170312490788",
   "fb_reel2": "29337252415930714",
-  "yt_short": "Qo0X6c3_oRU"
+  "yt_short": "Qo0X6c3_oRU",
+  "vote_used": true
+ },
+ {
+  "date": "2026-11-17T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-17@19",
+  "pending_comments": [],
+  "category": "detective",
+  "idea": "A village housewife discovers her husband is secretly visiting a mysterious second family in a neighboring village, triggering village gossip and tension. (told as a detective story for children)",
+  "episode": null,
+  "part": 1,
+  "continues": true,
+  "series_id": "2026-11-17T09:48+00:00",
+  "title": "পাশের গ্রামে বাবার গোপন সংসার? 🔍 চমকে দেওয়া রহস্য! | পর্ব 1",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "হলুদ ধুতরো"
+  },
+  "hook_style": "sound",
+  "moral": "যেকোনো গুজবে কান দেওয়ার আগে সত্যের শিকড়ে পৌঁছানোই বুদ্ধিমানের কাজ।",
+  "title_b": "বিমল কাকুর অচেনা ঠিকানা! 🚲 ঝন্টু-মিনির প্রথম ক্লু!",
+  "question_post": null,
+  "facebook": "1008942478919027",
+  "youtube": "ozi4heQ2YU0",
+  "fb_reel": "1397886628823834",
+  "fb_story": "1468960505376456",
+  "fb_reel2": "1447790810900530",
+  "yt_short": "kuVO7OLGVWU"
  }
 ]

@@ -1383,14 +1383,14 @@
    "a": "গাছ"
   },
   "stats": {
-   "likes": 2,
+   "likes": 1,
    "comments": 1,
    "views": 3,
    "length_s": 484,
-   "yt_views": 2,
+   "yt_views": 3,
    "yt_avg_s": 2,
    "yt_avg_pct": 0.4,
-   "checked": "2026-11-13T09:04+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1715,10 +1715,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 363,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-13T09:04+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2027,7 +2027,7 @@
    "yt_views": 2,
    "yt_avg_s": 9,
    "yt_avg_pct": 1.6,
-   "checked": "2026-11-13T09:04+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2086,7 +2086,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-13T09:04+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2433,7 +2433,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-13T09:04+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2472,12 +2472,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 0,
+   "views": 2,
    "length_s": 479,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-13T22:03+00:00"
+   "checked": "2026-11-16T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2869,7 +2869,23 @@
   "youtube": "Kp82z0Tpezg",
   "fb_reel": "1599567338610891",
   "fb_story": "2437328817072844",
-  "fb_reel2": "1090258824063122"
+  "fb_reel2": "1090258824063122",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 536,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-16T22:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-16T22:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-15T13:36+00:00",
@@ -2877,7 +2893,17 @@
   "kind": "compilation",
   "title": "99 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "2532122157272410",
-  "youtube": "QcmkKUk4hMA"
+  "youtube": "QcmkKUk4hMA",
+  "stats": {
+   "likes": 3,
+   "comments": 0,
+   "views": 0,
+   "length_s": 5964,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-16T22:04+00:00"
+  }
  },
  {
   "date": "2026-11-16T02:31+00:00",
@@ -2985,5 +3011,37 @@
   "fb_story": "2583160835503680",
   "fb_reel2": "1752165909220115",
   "yt_short": "qVwHlaTE-cg"
+ },
+ {
+  "date": "2026-11-17T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-17@8",
+  "pending_comments": [],
+  "category": "tukai",
+  "idea": "A creepy old banyan tree in a village where children find glowing red footprints leading inside, making them wonder if a friendly tree spirit is trapped. (told as a tukai story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "টুকাই গোয়েন্দা: মেটেপাড়ার মায়াবী বটগাছ ও লাল পায়ের ছাপ! 🔍🌳",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": null,
+  "hook_style": "sound",
+  "moral": "ভয় না পেয়ে বুদ্ধির আলো দিয়ে বিচার করলে কোনো অন্ধবিশ্বাসই টিকে থাকে না।",
+  "title_b": "টুকাই গোয়েন্দা: রাতের আঁধারে জ্বলন্ত পায়ের ছাপের রহস্য! 👣✨",
+  "question_post": "2026-11-17",
+  "facebook": "1457058873207288",
+  "youtube": "M1bOm9YYkog",
+  "fb_reel": "1119310364052131",
+  "fb_story": "1453601089547630",
+  "fb_reel2": "1442221657676266",
+  "coloring": "122139424988735948",
+  "riddle_post": "122139440366735948",
+  "riddle": {
+   "q": "ডালে ডালে ঘোরে সে কিন্তু পাখি নয়, লাল ফল খেতে তার বড়ই মিষ্টি লাগে! বল তো আমি কে?",
+   "a": "কাঠবিড়ালি"
+  }
  }
 ]

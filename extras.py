@@ -186,7 +186,7 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
     hook_text, cta_text = no_tofu(hook_text), no_tofu(cta_text)
     ov = Image.new("RGBA", (VW, VH), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
-    lines, f, size = _fit_text(d, hook_text, font_path, VW - 70, 78, lines_max=2)
+    lines, f, size = _fit_text(d, hook_text, font_path, VW - 60, int(env("REEL_TOP_SIZE") or 92), lines_max=2)
     y = 36
     for l in lines:
         tw = d.textlength(l, font=f)
@@ -201,12 +201,13 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
             d.text(((VW - tw) / 2, y), l, font=tf_, fill=(255, 255, 255, 255), stroke_width=max(3, ts // 12),
                    stroke_fill=(0, 0, 0, 255))
             y += int(ts * 1.3)
-    cl, cf, cs = _fit_text(d, cta_text, font_path, VW - 110, 46, lines_max=1)
-    tw = d.textlength(cl[0], font=cf)
-    by = VH - 185
-    d.rounded_rectangle([(VW - tw) / 2 - 30, by - 14, (VW + tw) / 2 + 30, by + cs * 1.35 + 10], radius=26,
-                        fill=band_col + (240,), outline=(255, 255, 255, 255), width=3)
-    d.text(((VW - tw) / 2, by), cl[0], font=cf, fill=(255, 255, 255, 255))
+    if str(cta_text or "").strip():                # (v108: no band at all when there is nothing to send people to)
+        cl, cf, cs = _fit_text(d, cta_text, font_path, VW - 110, 46, lines_max=1)
+        tw = d.textlength(cl[0], font=cf)
+        by = VH - 185
+        d.rounded_rectangle([(VW - tw) / 2 - 30, by - 14, (VW + tw) / 2 + 30, by + cs * 1.35 + 10], radius=26,
+                            fill=band_col + (240,), outline=(255, 255, 255, 255), width=3)
+        d.text(((VW - tw) / 2, by), cl[0], font=cf, fill=(255, 255, 255, 255))
     png = os.path.join(workdir, "teaser_overlay.png")
     ov.save(png)
     dur = max(5.0, end - start)
@@ -3510,6 +3511,375 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
     return len(done_lines) == n_lines
 
 
+# ===================== v104: NOTHING IS HEARD TWICE - the finished voice files are LISTENED to ===================
+# Gemini sometimes says a sentence twice inside one recording, or a cut leaves the start of the next line at the end
+# of a line. The length checks catch only the big cases. Here every finished line is compared WITH ITSELF (and its
+# end with the start of the next lines of the same voice): the same words said twice give a long stretch of
+# matching sound (tempo may differ). Tuned on our own Gemini recordings (17 Nov 2026): 97% of repeated pieces of
+# 1-2.5 s found; the only other matches were names really written twice in the text - those are left alone.
+def _logmel(a, sr, hop_s=0.01, win_s=0.025, n_mels=40):
+    import numpy as np
+    a = a.astype("float32")
+    a = a / (np.abs(a).max() + 1e-9)
+    hop, win = int(sr * hop_s), int(sr * win_s)
+    nfft = 1 << (win - 1).bit_length()
+    n = max(1, 1 + (len(a) - win) // hop)
+    idx = np.arange(win)[None, :] + hop * np.arange(n)[:, None]
+    fr = a[np.clip(idx, 0, len(a) - 1)] * np.hanning(win)[None, :]
+    sp = np.abs(np.fft.rfft(fr, nfft)) ** 2
+    f = np.linspace(0, sr / 2, sp.shape[1])
+    mel = lambda x: 2595 * np.log10(1 + x / 700)
+    pts = np.linspace(mel(60), mel(min(7600, sr / 2)), n_mels + 2)
+    hz = 700 * (10 ** (pts / 2595) - 1)
+    fb = np.zeros((n_mels, len(f)))
+    for m in range(n_mels):
+        l_, c_, r_ = hz[m], hz[m + 1], hz[m + 2]
+        fb[m] = np.clip(np.minimum((f - l_) / (c_ - l_ + 1e-9), (r_ - f) / (r_ - c_ + 1e-9)), 0, None)
+    lm = np.log(sp @ fb.T + 1e-8)
+    return lm, lm.max(axis=1)
+
+
+def _twice_feats(a, sr):
+    import numpy as np
+    lm, en = _logmel(a, sr)
+    voiced = en > np.percentile(en, 95) - 8.0
+    x = lm - lm.mean(axis=0)
+    k = np.ones(3) / 3
+    x = np.apply_along_axis(lambda c: np.convolve(c, k, mode="same"), 0, x)
+    x = x - x.mean(axis=1, keepdims=True)
+    x /= (np.linalg.norm(x, axis=1, keepdims=True) + 1e-9)
+    return x.astype("float32"), voiced
+
+
+def heard_twice(a, sr, need=16.0, min_len=1.0, min_lag=0.5, bias=0.68, split=None, min_density=0.1):
+    """the stretches of a voice file that are said twice: [(start1, end1, start2, end2, score)] in seconds.
+    split: only matches whose first copy starts before 'split' s and whose second copy starts after it."""
+    import numpy as np
+    x, v = _twice_feats(a, sr)
+    n = len(x)
+    ml = int(min_lag / 0.01)
+    if n <= ml + 10:
+        return []
+    S = x @ x.T
+    both = v[:, None] & v[None, :]
+    none = ~v[:, None] & ~v[None, :]
+    S = np.where(both, S - bias, np.where(none, -0.02, -0.35)).astype("float32")
+    del both, none
+    H1 = np.zeros(n + 2, "float32"); H2 = np.zeros(n + 2, "float32")       # rows i-1 and i-2 (shifted by 2)
+    T1 = np.zeros(n + 2, "int32"); T2 = np.zeros(n + 2, "int32")
+    cands = []
+    for i in range(n):
+        H0 = np.zeros(n + 2, "float32"); T0 = np.zeros(n + 2, "int32")
+        lo = i + ml
+        if lo < n:
+            j = np.arange(lo, n)
+            c1, c2, c3 = H1[j + 1], H1[j], H2[j + 1]
+            best = np.maximum(np.maximum(c1, c2), c3)
+            src = np.where(best == c1, T1[j + 1], np.where(best == c2, T1[j], T2[j + 1]))
+            h = np.maximum(best + S[i, j], 0)
+            H0[j + 2] = h
+            T0[j + 2] = np.where(best > 0, src, i)
+            k = int(np.argmax(h))
+            if h[k] >= need:
+                cands.append((float(h[k]), i, int(j[k]), int(T0[j[k] + 2])))
+        H2, T2, H1, T1 = H1, T1, H0, T0
+    out = []
+    for sc, i, j, s1 in sorted(cands, reverse=True):
+        s2 = max(0, j - (i - s1))
+        r = (s1 * 0.01, i * 0.01, s2 * 0.01, j * 0.01, sc)
+        if r[1] - r[0] < min_len or r[3] - r[2] < min_len:
+            continue
+        if sc / max(1.0, (r[1] - r[0]) * 100) < min_density:
+            continue                                  # a long but weak likeness (the same voice, not the same words)
+        if r[2] < r[1] - 0.15 or max(r[1] - r[0], r[3] - r[2]) > 12:
+            continue                                  # the two copies overlap: a steady sound, not words said twice
+        if split is not None and not (r[0] < split <= r[2]):
+            continue
+        if any(not (r[1] < o[0] or r[0] > o[1]) for o in out):
+            continue
+        out.append(r)
+        if len(out) >= 4:
+            break
+    return out
+
+
+def _key_txt(s):
+    return re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", str(s))
+
+
+def _longest_shared(a, b=None):
+    """the longest piece of text (letters only) written twice: inside a, or in both a and b"""
+    if b is None:
+        best = 0
+        for L in range(6, len(a) // 2 + 1):
+            seen, hit = set(), False
+            for i in range(len(a) - L + 1):
+                s = a[i:i + L]
+                if s in seen:
+                    hit = True
+                    break
+                seen.add(s)
+            if not hit:
+                break
+            best = L
+        return best
+    from difflib import SequenceMatcher
+    m = SequenceMatcher(None, a, b, autojunk=False).find_longest_match(0, len(a), 0, len(b))
+    return m.size
+
+
+def _quiet_point(a, sr, t, reach=0.25):
+    """the quietest moment near t (s) - a cut there does not split a word"""
+    import numpy as np
+    c = int(t * sr)
+    lo, hi = max(0, c - int(reach * sr)), min(len(a), c + int(reach * sr))
+    if hi - lo < int(0.03 * sr):
+        return c
+    hop = int(0.01 * sr)
+    e = [np.abs(a[q:q + hop].astype("float32")).mean() for q in range(lo, hi - hop, hop)]
+    return lo + int(np.argmin(e)) * hop if e else c
+
+
+def _pause_near(a, sr, t, direction, reach=0.7):
+    """the nearest pause (80 ms of near-silence) from t going back (-1) or forward (+1) within reach s - a repeated
+    sentence is cut from pause to pause, so no half word of it is left"""
+    import numpy as np
+    hop = int(0.01 * sr)
+    env_ = np.array([np.abs(a[q:q + hop].astype("float32")).mean() for q in range(0, len(a) - hop, hop)])
+    if not env_.size:
+        return t
+    quiet = env_ < max(np.percentile(env_, 95) * 0.06, 1e-6)
+    c = int(t / 0.01)
+    rng = range(c, max(-1, c - int(reach / 0.01)), -1) if direction < 0 else range(c, min(len(env_), c + int(reach / 0.01)))
+    run = 0
+    for q in rng:
+        run = run + 1 if 0 <= q < len(quiet) and quiet[q] else 0
+        if run >= 8:
+            return (q + (4 if direction < 0 else -4)) * 0.01
+    if direction > 0 and c + int(reach / 0.01) >= len(env_):
+        return len(a) / sr                            # the file ends first: up to its end
+    if direction < 0 and c - int(reach / 0.01) <= 0:
+        return 0.0
+    return t
+
+
+def fix_heard_twice(lines, sr_out=None, loose=False, inside=True):
+    """lines: [{"out": voice file, "plain": its text, "voice": voice name}] in STORY ORDER. Words said twice are cut out
+    of the files (no new request is needed). Returns how many cuts were made."""
+    import numpy as np
+    from scipy.io import wavfile
+    from scipy.signal import resample_poly
+    t0, cuts = time.time(), 0
+    an = 16000
+
+    def load(path):
+        rate, a = wavfile.read(path)
+        a = a.astype("float32")
+        if a.ndim > 1:
+            a = a.mean(axis=1)
+        g = np.gcd(int(rate), an)
+        return rate, a, resample_poly(a, an // g, int(rate) // g).astype("float32")
+
+    def rate_of(b, key):                             # letters per second of speech in this voice file
+        _x, v = _twice_feats(b, an)
+        return len(key) / max(0.5, v.sum() * 0.01)
+
+    def save(path, rate, a):
+        wavfile.write(path, rate, np.clip(a, -32768, 32767).astype(np.int16))
+
+    def cut(a, rate, s, e):
+        cs = 0 if s <= 0.01 else _quiet_point(a, rate, s)
+        ce = len(a) if e >= len(a) / rate - 0.01 else _quiet_point(a, rate, e)
+        if ce - cs < int(0.3 * rate):
+            return None
+        fade = min(int(0.02 * rate), cs, len(a) - ce)
+        out = np.concatenate([a[:cs], a[ce:]])
+        if fade > 1:
+            out[cs - fade:cs] *= np.linspace(1, 0.3, fade)
+            out[cs:cs + fade] *= np.linspace(0.3, 1, fade)
+        return out
+
+    ok = [x for x in lines if x.get("out") and os.path.exists(x["out"]) and os.path.getsize(x["out"]) > 2000]
+    # 1) inside each line
+    for x in (ok if inside else []):
+        if time.time() - t0 > float(env("TWICE_MAX_MIN") or 8) * 60:
+            log("  twice-check: time limit - the rest is left as it is")
+            return cuts
+        try:
+            rate, a, b = load(x["out"])
+            if len(b) < an * 2.0 or len(b) > an * 60:
+                continue
+            key = _key_txt(x.get("plain", ""))
+            legit = _longest_shared(key)
+            for s1, e1, s2, e2, sc in (heard_twice(b, an, need=8, min_len=0.6, min_density=0.04) if loose
+                                       else heard_twice(b, an, min_len=1.2, min_density=0.15))[:1]:
+                if not loose and legit >= 6 and (e1 - s1) * rate_of(b, key) <= legit * 2.2 + 6:
+                    continue                          # the text itself says these words twice (a name, a call)
+                if s2 - e1 < 0.8:                     # 'A A': the first try goes (copy 1 up to copy 2 = no gap)
+                    piece = (s1, s2)
+                else:                                 # 'A B A': the 2nd A, from the pause before to the pause after
+                    # (the matched stretch may miss a soft first / last word: the 2nd copy goes as far as the
+                    # 1st copy's sentence goes from its matched part to its own pauses)
+                    pre = s1 - _pause_near(a, rate, s1, -1, 0.6)
+                    post = _pause_near(a, rate, e1, 1, 1.0) - e1
+                    piece = (min(_pause_near(a, rate, s2, -1, 0.6), s2 - pre),
+                             min(len(a) / rate, max(_pause_near(a, rate, e2, 1, 1.0), e2 + post)))
+                new = cut(a, rate, *piece)
+                if new is not None:
+                    save(x["out"], rate, new)
+                    cuts += 1
+                    log(f"  twice-check: {piece[1] - piece[0]:.1f} s said twice cut out of a line "
+                        f"({str(x.get('plain', ''))[:40]}...)")
+        except Exception as ex:
+            log("  twice-check skipped a line:", str(ex)[:80])
+    # 2) the end of a line against the start of the next lines of the same voice
+    for k, x in enumerate(ok):
+        nxt = [y for y in ok[k + 1:k + 7] if y.get("voice") == x.get("voice")][:2]
+        for y in nxt:
+            try:
+                rate, a, b = load(x["out"])
+                _r2, _a2, b2 = load(y["out"])
+                tail, head = b[-int(an * 8):], b2[:int(an * 8)]
+                if len(tail) < an or len(head) < an:
+                    continue
+                gap = np.zeros(int(an * 0.4), "float32")
+                both_ = np.concatenate([tail, gap, head])
+                split = (len(tail) + len(gap)) / an
+                hits = (heard_twice(both_, an, split=split, need=8, min_len=0.6, min_density=0.04) if loose
+                        else heard_twice(both_, an, split=split, min_len=1.2, min_density=0.15))
+                if not hits:
+                    continue
+                s1, e1, s2, e2, sc = hits[0]
+                kx, ky = _key_txt(x.get("plain", "")), _key_txt(y.get("plain", ""))
+                legit = _longest_shared(kx, ky)
+                if not loose and legit >= 6 and (e1 - s1) * rate_of(b, kx) <= legit * 2.2 + 6:
+                    continue
+                off = len(b) / an - len(tail) / an
+                ends_ = e1 >= len(tail) / an - 1.2
+                st_ = _pause_near(a, rate, off + s1, -1, 0.6)
+                new = cut(a, rate, st_, len(a) / rate if ends_ else _pause_near(a, rate, off + e1, 1, 1.0))
+                if new is not None:
+                    save(x["out"], rate, new)
+                    cuts += 1
+                    log(f"  twice-check: {e1 - s1:.1f} s of the next line was also at the end of a line - cut out "
+                        f"({str(x.get('plain', ''))[:40]}...)")
+                break
+            except Exception as ex:
+                log("  twice-check skipped a pair:", str(ex)[:80])
+    log(f"  twice-check: {len(ok)} voice files listened to, {cuts} piece(s) said twice cut out "
+        f"({(time.time() - t0) / 60:.1f} min)")
+    return cuts
+
+
+def listen_for_repeats(lines, lang_name, max_minutes=12):
+    """v104: Gemini (a TEXT model - not the voice limit) LISTENS to each voice's finished lines together with the
+    script and names every line in which words are heard that are not written there at that place (something said
+    twice, or the start of a later line said too early). Returns {index in lines: the words heard twice}. Only an
+    answer whose words really are in the script is believed."""
+    import base64
+    import numpy as np
+    from scipy.io import wavfile
+    from scipy.signal import resample_poly
+    from difflib import SequenceMatcher
+    key = env("GEMINI_API_KEY")
+    if env("MOCK") or not key or env("LISTEN_CHECK") == "0":
+        return {}
+    an = 16000
+    groups = {}
+    for k, x in enumerate(lines):
+        if x.get("out") and os.path.exists(x["out"]):
+            groups.setdefault(x.get("voice"), []).append(k)
+    found = {}
+    for voice, ids in groups.items():
+        chunk, secs, chunks = [], 0.0, []
+        for k in ids:
+            try:
+                rate, a = wavfile.read(lines[k]["out"])
+            except Exception:
+                continue
+            a = a.astype("float32")
+            if a.ndim > 1:
+                a = a.mean(axis=1)
+            g = np.gcd(int(rate), an)
+            b = resample_poly(a, an // g, int(rate) // g).astype("float32")
+            if secs + len(b) / an > max_minutes * 60 and chunk:
+                chunks.append(chunk)
+                chunk, secs = [], 0.0
+            chunk.append((k, b))
+            secs += len(b) / an + 1.0
+        if chunk:
+            chunks.append(chunk)
+        for chunk in chunks:
+            wav = os.path.join(os.path.dirname(lines[chunk[0][0]]["out"]), "listen.wav")
+            mp3 = wav[:-4] + ".mp3"
+            gap = np.zeros(an, "float32")
+            wavfile.write(wav, an, np.clip(np.concatenate([np.concatenate([b, gap]) for _k, b in chunk]),
+                                           -32768, 32767).astype(np.int16))
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ac", "1", "-b:a", "48k", mp3])
+            script = "\n".join(f"{n + 1}. {lines[k].get('plain', '')}" for n, (k, _b) in enumerate(chunk))
+            prompt = (f"This recording is ONE voice reading the numbered {lang_name} lines below, one after the other "
+                      "(about one second of silence between lines). Listen very carefully and compare with the script. "
+                      "Find ONLY real faults where words are HEARD that are NOT in the script at that point: a sentence "
+                      "or part of a sentence said twice, a word said twice that is written once, or words of a LATER "
+                      "line already heard at the end of an earlier line. Ignore small mispronunciations, pauses, "
+                      "breaths, sighs and laughs. Answer ONLY JSON: [{\"line\": number of the line where the extra words "
+                      "are heard, \"repeated\": \"the extra words exactly as written in the script\"}] - [] if every "
+                      "line is heard exactly once.\nSCRIPT:\n" + script)
+            body = {"contents": [{"parts": [{"text": prompt},
+                                            {"inline_data": {"mime_type": "audio/mp3",
+                                                             "data": base64.b64encode(open(mp3, "rb").read()).decode()}}]}],
+                    "generationConfig": {"temperature": 0, "responseMimeType": "application/json"}}
+            ans = None
+            for model in (text_models(key)[:2] + helper_models(key)[:2]):
+                try:
+                    r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                                      json=body, timeout=300)
+                    if r.ok:
+                        ans = load_json_loose(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+                        break
+                    log(f"  listening check: {model} {r.status_code}")
+                except Exception as e:
+                    log("  listening check:", str(e)[:80])
+            for f_ in (wav, mp3):
+                if os.path.exists(f_):
+                    os.remove(f_)
+            if not isinstance(ans, list):
+                continue
+            keyt = lambda s: re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", str(s))
+            allk = [keyt(lines[k].get("plain", "")) for k, _b in chunk]
+            for f_ in ans:
+                try:
+                    n = int(f_.get("line")) - 1
+                    q = keyt(f_.get("repeated", ""))
+                except Exception:
+                    continue
+                if not (0 <= n < len(chunk)) or len(q) < 4:
+                    continue
+                # believed only when these words are really in the script (in this line or a line near it)
+                near = allk[max(0, n - 1):n + 3]
+                ok_ = any(q in s_ or (len(q) >= 8 and SequenceMatcher(None, q, s_, autojunk=False)
+                                      .find_longest_match(0, len(q), 0, len(s_)).size >= len(q) * 0.8) for s_ in near)
+                if ok_:
+                    found[chunk[n][0]] = str(f_.get("repeated", ""))[:80]
+        log(f"  listening check ({voice}): {sum(1 for k in found if lines[k].get('voice') == voice)} line(s) with words "
+            "heard twice")
+    return found
+
+
+def cut_repeat_loose(x, prev=None):
+    """a line the listening check named: the repeated words are found by sound with LOWER thresholds (we know they
+    are there) and cut out - inside the line, or the end of the line before it (prev). True when something was cut."""
+    before = os.path.getsize(x["out"]) if os.path.exists(x["out"]) else 0
+    fix_heard_twice([x], loose=True)
+    if os.path.exists(x["out"]) and os.path.getsize(x["out"]) != before:
+        return True
+    if prev:
+        b2 = os.path.getsize(prev["out"]) if os.path.exists(prev["out"]) else 0
+        fix_heard_twice([prev, x], loose=True, inside=False)
+        return os.path.exists(prev["out"]) and os.path.getsize(prev["out"]) != b2
+    return False
+
+
 CUT_STATS = [0, 0]              # recordings cut by the count of their pauses / by the length of the words
 
 
@@ -4833,7 +5203,7 @@ def fb_caption(description, limit=390):
     note = [p for p in rest if p.startswith("🔁")][:1] + note      # "share + follow" always stays
     rest = [p for p in rest if p not in note]
     out = [head[:150]]
-    tags = tags[:5]                     # Facebook: fewer than 6 hashtags = better quality signal
+    tags = tags[:int(env("FB_TAGS") or 3)]   # v106: Facebook's own advice (17 Nov 2026): 2-3 hashtags = ~60% more views
     tag_room = min(75, len(" ".join(tags)) + 2) if tags else 0          # keep space for the 5 hashtags
     room = lambda: limit - tag_room - len("\n\n".join(out + note)) - 4
     for p in rest:

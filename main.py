@@ -4922,6 +4922,13 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
     out = {}
     part_times, segs = TIMELINE[0], TIMELINE[1]
     teaser = os.path.join(WORK, "teaser.mp4")
+    # v106 (Facebook's numbers, 17 Nov 2026: 2 s average watch on a 45 s Reel): the Reel opens with the story's
+    # QUESTION in big letters ('লাল পায়ের ছাপ কার?') and the title small under it - a title alone does not hold anyone
+    tl_ = str(story.get("tagline") or story.get("thumbnail_text") or "").strip()
+    clean_t = re.sub(r"\s*\|.*$", "", title).strip()
+    top_, sub_ = ((tl_, clean_t) if tl_.endswith(("?", "?")) and env("REEL_QUESTION_TOP") != "0" else (clean_t, tl_))
+    cta_ = L["cta"] if env("REEL_LINK_IN_CAPTION") == "1" else \
+        ("পুরো গল্পের লিংক কমেন্টে" if lang == "bn" else "पूरी कहानी का लिंक कमेंट में")
     try:
         st, en = extras.pick_window(segs, part_times, story.get("teaser_scene") or 2)
         if env("HOOK_TEST") != "0":                  # v100: the Reel starts on its best moment (two kinds, learned)
@@ -4939,11 +4946,10 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  9:16 teaser picture not made, using the wide one:", str(e)[:150])
         if src:
             path, off = src
-            extras.make_teaser(path, st - off, en - off, teaser, FONT, re.sub(r"\s*\|.*$", "", title).strip(),
-                               L["cta"], WORK, colors=((255, 225, 0), (255, 60, 120)), vertical=True,
-                               tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""))
+            extras.make_teaser(path, st - off, en - off, teaser, FONT, top_,
+                               cta_, WORK, colors=((255, 225, 0), (255, 60, 120)), vertical=True, tagline=sub_)
         else:
-            extras.make_teaser(video, st, en, teaser, FONT, re.sub(r"\s*\|.*$", "", title).strip(), L["cta"], WORK, tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""),
+            extras.make_teaser(video, st, en, teaser, FONT, top_, cta_, WORK, tagline=sub_,
                                colors=((255, 225, 0), (255, 60, 120)))
         log(f"Teaser ready ({en - st:.0f} s, from {st:.0f} s)")
     except Exception as e:
@@ -4954,10 +4960,19 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
     question = str(story.get("comment_question", "")).strip()
     fb_full = f"https://www.facebook.com/watch/?v={results['facebook']}" if results.get("facebook") else page
     short_desc = f"{title}\n\n{L['full_link']} {fb_full}\n\n{' '.join(tags[:5])}"   # the FULL story's own link
+    # v106: a Reel whose caption sends people AWAY is watched less - the Reel caption has no link now (the story's
+    # question + 3 hashtags); the full story's link goes into the Reel's first comment
+    reel_desc = short_desc if env("REEL_LINK_IN_CAPTION") == "1" else \
+        "\n\n".join(x for x in (title, tl_ if tl_ and tl_ not in title else "", " ".join(tags[:3])) if x)
+
+    def link_comment(rid):                           # (a scheduled Reel cannot take a comment yet: the next run
+        if rid and env("REEL_LINK_IN_CAPTION") != "1":   # posts it once the Reel is live)
+            extras.PENDING.append({"id": str(rid), "text": f"{L['full_link']} {fb_full}"})
     if teaser and env("FB_REELS") != "0":
         try:
-            out["fb_reel"] = extras.fb_post_reel(teaser, short_desc)
+            out["fb_reel"] = extras.fb_post_reel(teaser, reel_desc)
             log("Posted Facebook Reel:", out["fb_reel"])
+            link_comment(out["fb_reel"])
         except Exception as e:
             log("  Facebook Reel skipped:", str(e)[:200])
         try:                                     # the teaser on the page Story too (24 h, top of the feed)
@@ -4969,13 +4984,22 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
         if env("SECOND_REEL") != "0":                # a second Reel from another moment, 2 hours later
             try:
                 pt_, sg_ = TIMELINE[0], TIMELINE[1]
-                s2, e2 = extras.pick_window(sg_, pt_, max(2, (len(pt_) * 3) // 5), max_len=50.0)
+                s2, e2 = extras.pick_window(sg_, pt_, max(2, (len(pt_) * 3) // 5),
+                                            max_len=float(env("REEL2_SECONDS") or 30))
+                try:                                  # v106: it too opens on a strong moment (the other kind)
+                    other_ = "sound" if STATE.get("hook_style") == "voice" else "voice"
+                    late_ = [x for x in sg_ if x[0] >= (en if teaser else 0)]
+                    hw2 = hook_window(late_, pt_, story, other_)
+                    if hw2:
+                        s2, e2 = hw2
+                except Exception:
+                    pass
                 reel2 = os.path.join(WORK, "reel2.mp4")
-                extras.make_teaser(video, s2, e2, reel2, FONT, re.sub(r"\s*\|.*$", "", title).strip(), L["cta"], WORK,
-                                   tagline=str(story.get("tagline") or story.get("thumbnail_text") or ""))
+                extras.make_teaser(video, s2, e2, reel2, FONT, top_, cta_, WORK, tagline=sub_)
                 base = extras.PUBLISH.get("at") or dt.datetime.now(extras.IST)
-                out["fb_reel2"] = extras.fb_post_reel(reel2, short_desc, at=max(base, dt.datetime.now(extras.IST))
+                out["fb_reel2"] = extras.fb_post_reel(reel2, reel_desc, at=max(base, dt.datetime.now(extras.IST))
                                                       + dt.timedelta(hours=2))
+                link_comment(out["fb_reel2"])
                 log("Second Facebook Reel scheduled (2 hours later):", out["fb_reel2"])
             except Exception as e:
                 log("  second Reel skipped:", str(e)[:200])

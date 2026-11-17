@@ -41,6 +41,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 # ----------------------------------------------------------------- settings
 W, H, FPS, SR = 1280, 720, 25, 44100
+os.environ.setdefault("FEED_EXTRA", "3")      # v109: the cartoon page may carry 3 extra posts a day (horror 1)
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.path.join(HERE, "work")
 HISTORY = os.path.join(HERE, "history.json")
@@ -1999,6 +2000,39 @@ def prepare_voices(parts_lines, voices, lang):
                     os.remove(it["out"])
             GEMINI_CACHE.clear()
             return False
+        if env("VOICE_CHECK") != "0":                 # v109: what is heard must be what the subtitle shows
+            try:
+                lines_ = [{"out": it["out"], "plain": it["plain"], "voice": it["voice"]} for it in items]
+                gem_n = [0]
+
+                def remake_(k):
+                    it = items[k]
+                    tmp_ = it["out"] + ".again.wav"
+                    ok_ = False
+                    try:
+                        if (extras.tts_keys() and extras.gemini_quota_left() and gem_n[0] < 4
+                                and extras.tts_budget_left(TTS_USAGE) > 0):
+                            gem_n[0] += 1
+                            extras.TTS_STATE["off"] = False
+                            extras.TTS_USED[0] += 1
+                            ok_ = extras.tts_gemini(it["text"], it["voice"], f"{it['who']}. {it['feel']}. "
+                                                    + extras.PRONOUNCE.get(lang, ""), LANGS[lang]["name"], tmp_, SR,
+                                                    max_tries=1)
+                            extras.TTS_STATE["off"] = True
+                        if not ok_ and extras.chirp_ok(TTS_USAGE):
+                            ok_ = extras.chirp_tts(it["plain"], it["voice"], tmp_, SR, TTS_USAGE, lang)
+                        if ok_ and os.path.exists(tmp_) and os.path.getsize(tmp_) > 2000:
+                            os.replace(tmp_, it["out"])
+                            return True
+                        return False
+                    finally:
+                        if os.path.exists(tmp_):
+                            os.remove(tmp_)
+                extras.voice_verify(lines_, LANGS[lang]["name"], remake_)
+                if extras.TTS_USED[0]:
+                    extras.tts_budget_use(TTS_USAGE)
+            except Exception as e:
+                log("  voice check skipped:", str(e)[:120])
         for (i, j, ln), it in zip(todo, items):
             GEMINI_CACHE[(i, j)] = it["out"]
         log("  all lines voiced (Gemini" + (" + Chirp)" if extras.chirp_used(TTS_USAGE) else ")"))
@@ -3402,6 +3436,7 @@ def post_to_facebook(video, thumb, title, description):
                                                        "description": description, **fb_when()},
                                             files={"thumb": ("thumb.jpg", th, "image/jpeg")}, timeout=300))
             if jf.get("success") or jf.get("id"):
+                extras.feed_note("video", extras.PUBLISH.get("at"))
                 return js.get("video_id") or jf.get("id") or sid
             raise RuntimeError(str(jf)[:300])
         except PermissionError:
@@ -3927,6 +3962,12 @@ def main():
         except Exception as e:
             log("  Telegram stories not read:", str(e)[:120])
     if not MOCK and not DRY_RUN:
+        for fn_, nm_ in ((cartoon_watchdog, "missed-video check"), (cartoon_followers, "follower count")):
+            try:                                     # v109
+                fn_(history)
+            except Exception as e:
+                log(f"  {nm_} skipped:", str(e)[:120])
+    if not MOCK and not DRY_RUN:
         try:                                         # v76: YouTube replies, fan channel, milestones
             growth_start(history)
         except Exception as e:
@@ -4437,6 +4478,13 @@ def main():
     HOOK_TEXT[0] = str(story.get("thumbnail_text") or "").strip()
     video = os.path.join(WORK, "final.mp4")
     build_video(parts, lang, video)
+    if env("JINGLE") != "0":
+        try:                                         # v109 (C5): the show's own little tune under Lumi Didi's hello
+            hk_ = next((k for k, p_ in enumerate(parts) if p_.get("host_part")), None)
+            if hk_ is not None and TIMELINE[0] and hk_ < len(TIMELINE[0]):
+                add_jingle(video, float(TIMELINE[0][hk_]))
+        except Exception as e:
+            log("  show tune skipped:", str(e)[:120])
     log(f"Video ready: {duration(video):.0f} seconds")
     cards_ = []                                      # pictures laid over the video (one re-encode for all)
     if category in CARTOON_SERIES and env("PREV_CARD") != "0":
@@ -4795,6 +4843,315 @@ def worksheet_png(ws, title, lang, out):
     return out
 
 
+# ===================== v109: C3 - a daily 'শিখি' Short (one letter a day), C2 - a weekly rhyme video ===================
+# (the letter-word pairs are plain everyday words; the rhymes are anonymous Bengali folk rhymes, centuries old -
+# public domain)
+BN_LETTERS = [("অ", "অজগর", "a big friendly cartoon python"), ("আ", "আম", "a ripe yellow mango"),
+              ("ই", "ইঁদুর", "a cute little grey mouse"), ("ঈ", "ঈগল", "a brave eagle flying"),
+              ("উ", "উট", "a smiling camel in the desert"), ("ঊ", "ঊষা", "a soft orange sunrise over a village"),
+              ("ঋ", "ঋষি", "a kind old sage with a white beard under a tree"), ("এ", "একতারা", "a one-string folk instrument, ektara"),
+              ("ঐ", "ঐরাবত", "a royal white elephant with a golden cloth"), ("ও", "ওল", "an elephant foot yam vegetable"),
+              ("ঔ", "ঔষধ", "a small bottle of medicine and a spoon"), ("ক", "কলা", "a bunch of yellow bananas"),
+              ("খ", "খরগোশ", "a fluffy white rabbit"), ("গ", "গরু", "a friendly brown cow in a green field"),
+              ("ঘ", "ঘড়ি", "a round wall clock"), ("চ", "চাঁদ", "a smiling crescent moon in the night sky"),
+              ("ছ", "ছাতা", "a colourful umbrella in the rain"), ("জ", "জাহাজ", "a big ship on the blue sea"),
+              ("ঝ", "ঝুড়ি", "a woven bamboo basket full of fruit"), ("ট", "টিয়া", "a green parrot with a red beak"),
+              ("ঠ", "ঠেলাগাড়ি", "a wooden hand cart"), ("ড", "ডিম", "two white eggs in a nest"),
+              ("ঢ", "ঢাক", "a big festival drum, dhak, with white feathers"), ("ত", "তরমুজ", "a sliced red watermelon"),
+              ("থ", "থালা", "a shiny brass plate"), ("দ", "দোলনা", "a swing hanging from a tree"),
+              ("ধ", "ধান", "golden rice paddy plants in a field"), ("ন", "নৌকা", "a small wooden boat on a river"),
+              ("প", "পাখি", "a little colourful bird on a branch"), ("ফ", "ফুল", "a bright red flower"),
+              ("ব", "বই", "an open picture book"), ("ভ", "ভালুক", "a cuddly brown bear"),
+              ("ম", "মাছ", "a happy orange fish in water"), ("য", "যাদুকর", "a friendly magician with a hat"),
+              ("র", "রথ", "a colourful festival chariot"), ("ল", "লাটিম", "a spinning wooden top toy"),
+              ("শ", "শাপলা", "a pink water lily on a pond"), ("ষ", "ষাঁড়", "a strong bull in a field"),
+              ("স", "সূর্য", "a big smiling sun"), ("হ", "হাতি", "a friendly grey elephant")]
+RHYMES = [
+    {"title": "আয় আয় চাঁদ মামা", "pic": "a smiling full moon over a Bengal village at night, a mother holding a baby on a veranda",
+     "lines": ["আয় আয় চাঁদ মামা টি দিয়ে যা,", "চাঁদের কপালে চাঁদ টি দিয়ে যা।", "ধান ভানলে কুঁড়ো দেব,",
+               "মাছ কাটলে মুড়ো দেব,", "কালো গাইয়ের দুধ দেব,", "দুধ খাবার বাটি দেব,", "চাঁদের কপালে চাঁদ টি দিয়ে যা।"]},
+    {"title": "বৃষ্টি পড়ে টাপুর টুপুর", "pic": "gentle rain over a village river, children watching from a hut, green fields",
+     "lines": ["বৃষ্টি পড়ে টাপুর টুপুর, নদেয় এল বান,", "শিব ঠাকুরের বিয়ে হল, তিন কন্যা দান।",
+               "এক কন্যা রাঁধেন বাড়েন, এক কন্যা খান,", "এক কন্যা না পেয়ে বাপের বাড়ি যান।"]},
+    {"title": "হাট্টিমাটিম টিম", "pic": "funny cute imaginary creatures with two horns laying eggs in a field, colourful",
+     "lines": ["হাট্টিমাটিম টিম,", "তারা মাঠে পাড়ে ডিম,", "তাদের খাড়া দুটো শিং,", "তারা হাট্টিমাটিম টিম।"]},
+    {"title": "আতা গাছে তোতা পাখি", "pic": "a green parrot on a custard apple tree and bees around a pomegranate tree",
+     "lines": ["আতা গাছে তোতা পাখি,", "ডালিম গাছে মৌ,", "এত ডাকি তবু কথা", "কও না কেন বউ?"]},
+    {"title": "খোকা ঘুমোলো পাড়া জুড়োলো", "pic": "a baby sleeping peacefully in a village home at night, birds on paddy fields",
+     "lines": ["খোকা ঘুমোলো, পাড়া জুড়োলো, বর্গি এল দেশে,", "বুলবুলিতে ধান খেয়েছে, খাজনা দেব কিসে?",
+               "ধান ফুরোলো, পান ফুরোলো, খাজনার উপায় কী?", "আর ক'টা দিন সবুর করো, রসুন বুনেছি।"]},
+    {"title": "ঘুম পাড়ানি মাসি পিসি", "pic": "two kind aunties visiting a sleepy child at night, stars, soft lamp light",
+     "lines": ["ঘুম পাড়ানি মাসি পিসি মোদের বাড়ি এসো,", "খাট নেই, পালং নেই, চোখ পেতে বোসো।",
+               "বাটা ভরে পান দেব, গাল ভরে খেয়ো,", "খোকার চোখে ঘুম নেই, ঘুম দিয়ে যেয়ো।"]},
+    {"title": "নোটন নোটন পায়রাগুলি", "pic": "pigeons by a river, children bathing on the other bank, big fish jumping",
+     "lines": ["নোটন নোটন পায়রাগুলি ঝোটন বেঁধেছে,", "ওপারেতে ছেলেমেয়ে নাইতে নেমেছে।",
+               "দুই ধারে দুই রুই কাতলা ভেসে উঠেছে,", "কে দেখেছে, কে দেখেছে? দাদা দেখেছে।"]},
+]
+
+
+def _kid_voice(text, out, style):
+    """one recording for the children's extras: Gemini (1 request, while today's share lasts) or Chirp"""
+    voice = NARRATOR_GEMINI[0]
+    ok = False
+    if extras.tts_keys() and extras.gemini_quota_left() and extras.tts_budget_left(TTS_USAGE) > 0:
+        extras.TTS_STATE["off"] = False
+        extras.TTS_USED[0] += 1
+        try:
+            ok = extras.tts_gemini(text, voice, style, LANGS["bn"]["name"], out, SR, max_tries=1)
+        finally:
+            extras.tts_budget_use(TTS_USAGE)
+    if not ok and extras.chirp_ok(TTS_USAGE):
+        ok = extras.chirp_tts(extras.strip_tags(text), voice, out, SR, TTS_USAGE, "bn")
+    return ok and os.path.exists(out)
+
+
+def _kid_picture(prompt, out, seed):
+    try:
+        if CF_QUOTA_OUT:
+            raise RuntimeError("no pictures left today")
+        with open(out, "wb") as f:
+            f.write(cf_request(CF_MODEL, "bright cute children's cartoon illustration, simple shapes, soft colours, "
+                                         f"no text: {prompt}", w=768, h=1024, seed=seed))
+        return out
+    except Exception as e:
+        log("  picture for the children's extra:", str(e)[:100])
+        Image.new("RGB", (768, 1024), (255, 236, 179)).save(out)
+        return out
+
+
+def _kid_frame(pic, out, big="", lines=(), hi=-1, title=""):
+    """a 1080x1920 frame: the picture on top, then big words / the rhyme with the current line in colour"""
+    VW, VH = 1080, 1920
+    img = Image.new("RGB", (VW, VH), (255, 248, 225))
+    p = Image.open(pic).convert("RGB")
+    s = VW / p.width
+    p = p.resize((VW, int(p.height * s)))
+    top_h = int(VH * (0.5 if len(lines) <= 4 else 0.4))
+    img.paste(p.crop((0, 0, VW, min(p.height, top_h))), (0, 0))
+    d = ImageDraw.Draw(img)
+    y = top_h + 30
+    if title:
+        rows, f, sz = extras._fit_text(d, title, FONT, VW - 80, 70, lines_max=1)
+        for r in rows:
+            d.text(((VW - d.textlength(r, font=f)) / 2, y), r, font=f, fill=(200, 40, 90))
+            y += int(sz * 1.4)
+    if big:
+        rows, f, sz = extras._fit_text(d, big, FONT, VW - 80, 300, lines_max=1)
+        for r in rows:
+            d.text(((VW - d.textlength(r, font=f)) / 2, y), r, font=f, fill=(230, 60, 20), stroke_width=6,
+                   stroke_fill=(255, 255, 255))
+            y += int(sz * 1.15)
+    for k, ln in enumerate(lines):
+        rows, f, sz = extras._fit_text(d, ln, FONT, VW - 70, (110 if len(lines) == 1 else 64 if len(lines) <= 4 else 52),
+                                       lines_max=2 if len(lines) <= 4 else 1)
+        for r in rows:
+            d.text(((VW - d.textlength(r, font=f)) / 2, y), r, font=f,
+                   fill=(220, 30, 90) if k == hi or len(lines) == 1 else (70, 70, 70))
+            y += int(sz * 1.3)
+        y += 10
+    img.save(out, quality=92)
+    return out
+
+
+def _kid_video(frames, wav, out):
+    """frames: [(jpg, seconds)] + the voice -> a 9:16 video"""
+    lst = out + ".txt"
+    with open(lst, "w") as f:
+        for jpg, sec in frames:
+            f.write(f"file '{os.path.abspath(jpg)}'\nduration {max(0.4, sec):.2f}\n")
+        f.write(f"file '{os.path.abspath(frames[-1][0])}'\n")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-i", wav,
+                    "-vf", "scale=1080:1920,format=yuv420p", "-r", "25", "-c:v", "libx264", "-preset", "veryfast",
+                    "-crf", "23", "-c:a", "aac", "-b:a", "160k", "-ac", "2", "-shortest", "-movflags", "+faststart", out],
+                   check=True)
+    return out
+
+
+def _kid_post(video, thumb, title, desc, tags, lang, kind):
+    out = {}
+    if youtube_ready() and env("KIDS_EXTRA_YT") != "0":
+        try:
+            out["youtube"] = post_to_youtube(video, thumb, f"{title[:85]} #Shorts", desc, tags, lang)
+            log(f"  {kind} on YouTube: {out['youtube']}")
+        except Exception as e:
+            log(f"  {kind} YouTube skipped:", str(e)[:150])
+    if env("FB_REELS") != "0":
+        try:
+            out["facebook"] = extras.fb_post_reel(video, f"{title}\n\n{' '.join(tags[:3])}")
+            log(f"  {kind} on Facebook: {out['facebook']}")
+        except Exception as e:
+            log(f"  {kind} Facebook skipped:", str(e)[:150])
+    return out
+
+
+def learn_short(history, lang):
+    """C3: every morning (8 AM run) one Bengali letter: the letter big, a picture, Lumi Didi says it twice
+    ('অ - অ-তে অজগর!'). Small children learn by repeating; parents search for exactly this."""
+    slot_h = int(str(SLOT).split("@")[1]) if SLOT and "@" in str(SLOT) else None
+    if lang != "bn" or env("LEARN_SHORT") != "1" or slot_h != 8:   # (17 Nov: the page is for EVERYONE - only if switched on)
+        return False
+    st = extras._jl(KIDS_FILE, {})
+    st = st if isinstance(st, dict) else {}
+    today = dt.datetime.now(extras.IST).date().isoformat()
+    if st.get("learn_day") == today:
+        return False
+    k = int(st.get("learn_i") or 0) % len(BN_LETTERS)
+    letter, word, pic_p = BN_LETTERS[k]
+    pic = _kid_picture(pic_p, os.path.join(WORK, "learn_pic.jpg"), 100 + k)
+    wav = os.path.join(WORK, "learn.wav")
+    if not _kid_voice(f"{letter}! {letter}-তে {word}! ... বলো তো সবাই, {letter}-তে {word}!", wav,
+                      "Lumi Didi, a warm cheerful young teacher, saying it slowly and clearly to small children, "
+                      "with a happy smile in the voice"):
+        return False
+    a = _kid_frame(pic, os.path.join(WORK, "learn_a.jpg"), big=letter, lines=[word],
+                   title="শিখি মজায়")
+    v = _kid_video([(a, 8.0)], wav, os.path.join(WORK, "learn_short.mp4"))
+    title = f"{letter}-তে {word} | বাংলা বর্ণমালা শিখি | শিখি মজায়"
+    res = _kid_post(v, a, title, f"{title}\nছোট্টদের জন্য রোজ একটা নতুন অক্ষর। সায়নের সঙ্গে শিখি!",
+                    ["#বাংলাবর্ণমালা", "#শিখিমজায়", "#ছোটদেরগল্প"], lang, "learning Short")
+    if res:
+        st.update(learn_day=today, learn_i=k + 1)
+        extras._js(KIDS_FILE, st)
+    return bool(res)
+
+
+def rhyme_video(history, lang):
+    """C2: every Sunday morning one old Bengali rhyme - a picture, the words big with the line being said in colour,
+    Lumi Didi chanting it twice in a sing-song way. Children play rhymes again and again."""
+    slot_h = int(str(SLOT).split("@")[1]) if SLOT and "@" in str(SLOT) else None
+    now = dt.datetime.now(extras.IST)
+    if (lang != "bn" or env("RHYME") != "1" or slot_h != 8     # (17 Nov: the page is for EVERYONE - only if switched on)
+            or now.weekday() != int(env("RHYME_DAY") or 6)):
+        return False
+    st = extras._jl(KIDS_FILE, {})
+    st = st if isinstance(st, dict) else {}
+    if st.get("rhyme_day") == now.date().isoformat():
+        return False
+    k = int(st.get("rhyme_i") or 0) % len(RHYMES)
+    rh = RHYMES[k]
+    pic = _kid_picture(rh["pic"], os.path.join(WORK, "rhyme_pic.jpg"), 300 + k)
+    text = " ".join(rh["lines"])
+    wav = os.path.join(WORK, "rhyme.wav")
+    if not _kid_voice(f"{text} ... আবার একবার, সবাই মিলে! ... {text}", wav,
+                      "Lumi Didi chanting an old Bengali nursery rhyme for small children: a cheerful sing-song "
+                      "chant with a clear, steady, bouncy rhythm, every line in the same beat"):
+        return False
+    from scipy.io import wavfile
+    rate, a_ = wavfile.read(wav)
+    total = len(a_) / rate
+    weights = [len(x) for x in rh["lines"]] * 2
+    gap = 1.2                                          # ('আবার একবার' between the two rounds)
+    unit = (total - gap) / max(1, sum(weights))
+    frames = []
+    for rnd in range(2):
+        for i, ln in enumerate(rh["lines"]):
+            fr = _kid_frame(pic, os.path.join(WORK, f"rhyme_{rnd}_{i}.jpg"), lines=rh["lines"], hi=i, title=rh["title"])
+            frames.append((fr, len(ln) * unit))
+        if rnd == 0:
+            frames.append((_kid_frame(pic, os.path.join(WORK, "rhyme_again.jpg"), lines=["আবার একবার, সবাই মিলে!"],
+                                      title=rh["title"]), gap))
+    v = _kid_video(frames, wav, os.path.join(WORK, "rhyme.mp4"))
+    title = f"{rh['title']} | বাংলা ছড়া | ছোটদের ছড়া"
+    res = _kid_post(v, frames[0][0], title, f"{title}\nপুরনো বাংলা ছড়া - ছোট্টদের সঙ্গে গলা মিলিয়ে বলুন।",
+                    ["#বাংলাছড়া", "#ছোটদেরছড়া", "#ছড়া"], lang, "rhyme video")
+    if res:
+        st.update(rhyme_day=now.date().isoformat(), rhyme_i=k + 1)
+        extras._js(KIDS_FILE, st)
+    return bool(res)
+
+
+WATCH_FILE = os.path.join(HERE, "assets", "watchdog.json")
+FOLLOW_FILE = os.path.join(HERE, "assets", "followers.json")
+
+
+def cartoon_watchdog(history):
+    """X1: a cartoon of the last two days that should be out but is not -> one Telegram note"""
+    if env("WATCHDOG") == "0":
+        return []
+    now = dt.datetime.now(extras.IST)
+    posted = {h.get("slot") for h in history if h.get("slot") and (h.get("facebook") or h.get("youtube"))}
+    data = extras._jl(WATCH_FILE, {})
+    data = data if isinstance(data, dict) else {}
+    told = set(data.get("told") or [])
+    miss = []
+    for back in (1, 0):
+        day = (now - dt.timedelta(days=back)).date()
+        for (_hh, _mm, h) in TRIGGERS:
+            key = f"{day.isoformat()}@{h}"
+            due = dt.datetime(day.year, day.month, day.day, h, 30, tzinfo=extras.IST)
+            if now > due + dt.timedelta(minutes=30) and key not in posted and key not in told:
+                miss.append(key)
+    if miss:
+        extras.telegram("⚠️ কার্টুন: এই ভিডিও(গুলো) যায়নি: " + ", ".join(
+            f"{k.split('@')[0]} {k.split('@')[1]}:00" for k in miss)
+            + "\nদেখে নিন: GitHub → hindi-story-bot → Actions-এ ওই সময়ের run লাল কিনা, আর cron-job.org-এ job চলেছিল কিনা।")
+        told |= set(miss)
+        data["told"] = sorted(told)[-40:]
+        extras._js(WATCH_FILE, data)
+    return miss
+
+
+def cartoon_followers(history):
+    """H5 for the cartoon page: followers once a day; a drop -> Telegram note with the day's posts"""
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if not (page and token) or env("FOLLOWER_WATCH") == "0":
+        return None
+    today = dt.datetime.now(extras.IST).date()
+    d = extras._jl(FOLLOW_FILE, {})
+    d = d if isinstance(d, dict) else {}
+    if today.isoformat() in d:
+        return None
+    js = requests.get(f"{extras.GRAPH}/{page}", params={"fields": "followers_count,fan_count", "access_token": token},
+                      timeout=30).json()
+    n = int(js.get("followers_count") or js.get("fan_count") or 0)
+    if not n:
+        return None
+    prev = sorted(k for k in d if k < today.isoformat())
+    d[today.isoformat()] = n
+    extras._js(FOLLOW_FILE, {k: v for k, v in d.items() if k >= (today - dt.timedelta(days=60)).isoformat()})
+    if prev:
+        last = int(d[prev[-1]])
+        log(f"  cartoon followers: {n} ({n - last:+d})")
+        if n - last <= -max(3, int(last * 0.01)):
+            fl = extras._jl(extras.FEED_FILE, {})
+            y = (today - dt.timedelta(days=1)).isoformat()
+            kinds = (fl.get(y) or []) if isinstance(fl, dict) else []
+            extras.telegram(f"⚠️ কার্টুন পেজে follower কমেছে: {last} → {n} ({n - last})। গতকাল পেজে গিয়েছিল "
+                            f"{len(kinds)}টা পোস্ট ({', '.join(sorted(set(kinds))) or 'হিসেব নেই'})।")
+    return n
+
+
+def jingle_wav(path):
+    """C5: the show's 3-second tune - always the SAME (children recognise it): a bright bell-like melody"""
+    import numpy as np
+    sr = 44100
+    notes = [(523.25, 0.22), (659.25, 0.22), (783.99, 0.22), (1046.5, 0.36), (880.0, 0.22), (1046.5, 0.6)]
+    out = []
+    for f, d in notes:
+        n = int(sr * d)
+        tt = np.arange(n) / sr
+        env_ = np.exp(-tt * 5.5)
+        tone = (np.sin(2 * np.pi * f * tt) + 0.35 * np.sin(2 * np.pi * 2 * f * tt) + 0.15 * np.sin(2 * np.pi * 3 * f * tt))
+        out.append(tone * env_)
+    a = np.concatenate(out)
+    a = np.concatenate([a, np.zeros(int(sr * 0.4))]) * 0.5
+    from scipy.io import wavfile
+    wavfile.write(path, sr, (np.clip(a, -1, 1) * 32767).astype(np.int16))
+    return path
+
+
+def add_jingle(video, at):
+    """the tune mixed softly into the video's sound at 'at' seconds (Lumi Didi's hello) - the picture is untouched"""
+    jw = jingle_wav(os.path.join(WORK, "jingle.wav"))
+    tmp = video + ".j.mp4"
+    ms = int(max(0.0, at) * 1000)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-i", jw, "-filter_complex",
+                    f"[1:a]adelay={ms}|{ms},volume=0.45[j];[0:a][j]amix=inputs=2:duration=first:normalize=0[a]",
+                    "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", tmp], check=True)
+    os.replace(tmp, video)
+    log(f"  the show's tune added at {at:.1f} s")
+
+
 def worksheet_post(story, category, title, lang):
     """v100: 'শিখি মজায়' days - a printable worksheet for the same lesson (Facebook photo + Telegram channel)"""
     if category != "learn" or env("WORKSHEET") == "0":
@@ -4970,7 +5327,11 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             extras.PENDING.append({"id": str(rid), "text": f"{L['full_link']} {fb_full}"})
     if teaser and env("FB_REELS") != "0":
         try:
-            out["fb_reel"] = extras.fb_post_reel(teaser, reel_desc)
+            extras.FEED["priority"] = True           # (the story's own Reel always goes)
+            try:
+                out["fb_reel"] = extras.fb_post_reel(teaser, reel_desc)
+            finally:
+                extras.FEED["priority"] = False
             log("Posted Facebook Reel:", out["fb_reel"])
             link_comment(out["fb_reel"])
         except Exception as e:
@@ -5037,7 +5398,9 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             log("  colouring page skipped:", str(e)[:200])
     if results.get("facebook") and not DRY_RUN:
         for fn_, nm_ in ((lambda: worksheet_post(story, category, title, lang), "worksheet"),
-                         (lambda: moral_card_post(history, lang), "moral card")):
+                         (lambda: moral_card_post(history, lang), "moral card"),
+                         (lambda: learn_short(history, lang), "learning Short"),
+                         (lambda: rhyme_video(history, lang), "rhyme video")):
             try:                                     # v100
                 fn_()
             except Exception as e:

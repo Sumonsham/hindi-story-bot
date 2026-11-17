@@ -237,8 +237,45 @@ def make_teaser(video, start, end, out, font_path, hook_text, cta_text, workdir,
 
 
 # ----------------------------------------------------------------- Facebook
+FEED = {"priority": False}
+FEED_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "feed_log.json")
+
+
+def _feed_day(at=None):
+    return (at or dt.datetime.now(IST)).astimezone(IST).date().isoformat()
+
+
+def feed_count(day=None, extra_only=True):
+    d = _jl(FEED_FILE, {})
+    items = (d.get(day or _feed_day()) or []) if isinstance(d, dict) else []
+    return len([x for x in items if not (extra_only and str(x).startswith("main:"))])
+
+
+def feed_ok(at=None):
+    """v109 (followers were leaving: 12-14 posts a day on the page): the main videos, their Reel and the morning
+    teasers always go (FEED['priority']); everything EXTRA (photos, text stories, old-video Reels, promos, questions)
+    at most FEED_EXTRA a day (horror 1, cartoon 2)."""
+    if FEED["priority"]:
+        return True
+    return feed_count(_feed_day(at)) < int(env("FEED_EXTRA") or 1)
+
+
+def feed_note(kind, at=None):
+    try:
+        d = _jl(FEED_FILE, {})
+        d = d if isinstance(d, dict) else {}
+        day = _feed_day(at)
+        d.setdefault(day, []).append(("main:" if FEED["priority"] or kind == "video" else "") + kind)
+        keep = (dt.datetime.now(IST).date() - dt.timedelta(days=10)).isoformat()
+        _js(FEED_FILE, {k: v for k, v in d.items() if k >= keep})
+    except Exception:
+        pass
+
+
 def fb_post_reel(video, description, at=None):
     """Publishes a Facebook Reel on the page. Returns the video id."""
+    if not feed_ok(at):
+        raise RuntimeError(f"today's extra posts are done ({feed_count(_feed_day(at))}, FEED_EXTRA) - this extra Reel waits")
     page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
     r = requests.post(f"{GRAPH}/{page}/video_reels", data={"upload_phase": "start", "access_token": token},
                       timeout=60).json()
@@ -260,6 +297,7 @@ def fb_post_reel(video, description, at=None):
     fin = requests.post(f"{GRAPH}/{page}/video_reels", data=data, timeout=120).json()
     if not fin.get("success"):
         raise RuntimeError(f"reel finish: {str(fin)[:300]}")
+    feed_note("reel", at)
     return vid
 
 
@@ -1234,12 +1272,15 @@ def words_card(base_img, font_path, title, words, out, size=(1280, 720)):
 
 def fb_photo(image, message):
     """Publishes a photo post on the page right now."""
+    if not feed_ok():
+        raise RuntimeError(f"today's extra posts are done ({feed_count()}, FEED_EXTRA) - this extra post waits")
     with open(image, "rb") as f:
         r = requests.post(f"{GRAPH}/{env('FB_PAGE_ID')}/photos", data={
             "message": message, "access_token": env("FB_PAGE_TOKEN")},
             files={"source": ("page.jpg", f, "image/jpeg")}, timeout=120).json()
     if not r.get("id"):
         raise RuntimeError(str(r)[:300])
+    feed_note("photo")
     return r["id"]
 
 
@@ -3771,11 +3812,12 @@ def fix_heard_twice(lines, sr_out=None, loose=False, inside=True):
     return cuts
 
 
-def listen_for_repeats(lines, lang_name, max_minutes=12):
-    """v104: Gemini (a TEXT model - not the voice limit) LISTENS to each voice's finished lines together with the
-    script and names every line in which words are heard that are not written there at that place (something said
-    twice, or the start of a later line said too early). Returns {index in lines: the words heard twice}. Only an
-    answer whose words really are in the script is believed."""
+def listen_check(lines, lang_name, max_minutes=12):
+    """v104/v109: Gemini (a TEXT model - not the voice limit) LISTENS to each voice's finished lines together with the
+    script and names every line where what is HEARD differs from what is WRITTEN: words said twice ("twice") or
+    words / a sentence of the line that are NOT heard at all ("missing" - the subtitle shows them, the voice does
+    not say them). Returns {index in lines: {"kind": "twice" / "missing", "words": ...}}. Only answers whose words
+    really are in the script are believed."""
     import base64
     import numpy as np
     from scipy.io import wavfile
@@ -3790,6 +3832,11 @@ def listen_for_repeats(lines, lang_name, max_minutes=12):
         if x.get("out") and os.path.exists(x["out"]):
             groups.setdefault(x.get("voice"), []).append(k)
     found = {}
+    keyt = lambda s: re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", str(s))
+
+    def in_text(q, s_):
+        return q in s_ or (len(q) >= 8 and SequenceMatcher(None, q, s_, autojunk=False)
+                           .find_longest_match(0, len(q), 0, len(s_)).size >= len(q) * 0.8)
     for voice, ids in groups.items():
         chunk, secs, chunks = [], 0.0, []
         for k in ids:
@@ -3818,13 +3865,14 @@ def listen_for_repeats(lines, lang_name, max_minutes=12):
             subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ac", "1", "-b:a", "48k", mp3])
             script = "\n".join(f"{n + 1}. {lines[k].get('plain', '')}" for n, (k, _b) in enumerate(chunk))
             prompt = (f"This recording is ONE voice reading the numbered {lang_name} lines below, one after the other "
-                      "(about one second of silence between lines). Listen very carefully and compare with the script. "
-                      "Find ONLY real faults where words are HEARD that are NOT in the script at that point: a sentence "
-                      "or part of a sentence said twice, a word said twice that is written once, or words of a LATER "
-                      "line already heard at the end of an earlier line. Ignore small mispronunciations, pauses, "
-                      "breaths, sighs and laughs. Answer ONLY JSON: [{\"line\": number of the line where the extra words "
-                      "are heard, \"repeated\": \"the extra words exactly as written in the script\"}] - [] if every "
-                      "line is heard exactly once.\nSCRIPT:\n" + script)
+                      "(about one second of silence between lines). Listen very carefully, word by word, and compare "
+                      "with the script. Report ONLY real faults: (a) \"twice\": words HEARD that are not written at that "
+                      "point - a sentence or part of it said twice, or words of a LATER line already heard at the end of "
+                      "an earlier line; (b) \"missing\": words or a sentence WRITTEN in a line that are NOT heard at "
+                      "all (skipped, cut off at the start or the end). Ignore small mispronunciations, pauses, breaths, "
+                      "sighs and laughs. Answer ONLY JSON: [{\"line\": line number, \"kind\": \"twice\" or \"missing\", "
+                      "\"words\": \"the words exactly as written in the script\"}] - [] if every line is heard exactly "
+                      "as written, once.\nSCRIPT:\n" + script)
             body = {"contents": [{"parts": [{"text": prompt},
                                             {"inline_data": {"mime_type": "audio/mp3",
                                                              "data": base64.b64encode(open(mp3, "rb").read()).decode()}}]}],
@@ -3845,25 +3893,57 @@ def listen_for_repeats(lines, lang_name, max_minutes=12):
                     os.remove(f_)
             if not isinstance(ans, list):
                 continue
-            keyt = lambda s: re.sub(r"[^\wঀ-৿ऀ-ॿ]", "", str(s))
             allk = [keyt(lines[k].get("plain", "")) for k, _b in chunk]
             for f_ in ans:
                 try:
                     n = int(f_.get("line")) - 1
-                    q = keyt(f_.get("repeated", ""))
+                    q = keyt(f_.get("words") or f_.get("repeated") or "")
+                    kind = "missing" if str(f_.get("kind", "")).lower().startswith("miss") else "twice"
                 except Exception:
                     continue
                 if not (0 <= n < len(chunk)) or len(q) < 4:
                     continue
-                # believed only when these words are really in the script (in this line or a line near it)
-                near = allk[max(0, n - 1):n + 3]
-                ok_ = any(q in s_ or (len(q) >= 8 and SequenceMatcher(None, q, s_, autojunk=False)
-                                      .find_longest_match(0, len(q), 0, len(s_)).size >= len(q) * 0.8) for s_ in near)
-                if ok_:
-                    found[chunk[n][0]] = str(f_.get("repeated", ""))[:80]
-        log(f"  listening check ({voice}): {sum(1 for k in found if lines[k].get('voice') == voice)} line(s) with words "
-            "heard twice")
+                near = [allk[n]] if kind == "missing" else allk[max(0, n - 1):n + 3]
+                if any(in_text(q, s_) for s_ in near):
+                    k0 = chunk[n][0]
+                    if k0 not in found or kind == "missing":   # (missing words: the line is made again anyway)
+                        found[k0] = {"kind": kind, "words": str(f_.get("words") or f_.get("repeated") or "")[:80]}
+        log(f"  listening check ({voice}): " + ", ".join(
+            f"{sum(1 for k, v in found.items() if lines[k].get('voice') == voice and v['kind'] == kd)} {kd}"
+            for kd in ("twice", "missing")))
     return found
+
+
+def listen_for_repeats(lines, lang_name, max_minutes=12):
+    """(older name) only the lines with words heard twice: {index: words}"""
+    return {k: v["words"] for k, v in listen_check(lines, lang_name, max_minutes).items() if v["kind"] == "twice"}
+
+
+def voice_verify(lines, lang_name, remake, max_fix=None):
+    """v109: the finished voice files are checked against the script and mended, for BOTH bots:
+    1) words said twice are cut out by sound; 2) Gemini listens: a line with words said twice is cut (or made
+    again), a line whose words are NOT all heard is made again alone - remake(index) -> True when done.
+    Returns (cut, made again)."""
+    cuts = fix_heard_twice(lines)
+    heard = listen_check(lines, lang_name)
+    again = 0
+    for k in sorted(heard, key=lambda q: (heard[q]["kind"] != "missing", q))[:int(max_fix or env("VOICE_FIX_MAX") or 14)]:
+        x, v = lines[k], heard[k]
+        log(f"  heard {'twice' if v['kind'] == 'twice' else 'NOT said'}: '{v['words'][:50]}' in '{x.get('plain', '')[:40]}...'")
+        if v["kind"] == "twice":
+            prev = next((y for y in reversed(lines[max(0, k - 6):k]) if y.get("voice") == x.get("voice")), None)
+            if cut_repeat_loose(x, prev):
+                cuts += 1
+                continue
+        try:
+            if remake(k):
+                again += 1
+                fix_heard_twice([x])
+        except Exception as e:
+            log("  a line could not be made again:", str(e)[:100])
+    if heard:
+        log(f"  voice check: {len(heard)} line(s) differed from the script - {cuts} cut, {again} made again")
+    return cuts, again
 
 
 def cut_repeat_loose(x, prev=None):
@@ -6188,7 +6268,7 @@ def fb_question_post(history, kind, lang, page_name="", photo=None, link=""):
     Once a week (Wednesday) for horror: 'Spot the ghost' - a picture of the newest story with its ghost hidden
     in it (Meta's advice, 8 Nov 2026: keeps the followers taking part)."""
     page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
-    if not (page and token) or env("FB_QUESTION") == "0":
+    if not (page and token) or env("FB_QUESTION") == "0" or not feed_ok():
         return None
     today = dt.datetime.now(IST).date().isoformat()
     if any(h.get("question_post") == today for h in history[-8:]):
@@ -6230,6 +6310,7 @@ def fb_question_post(history, kind, lang, page_name="", photo=None, link=""):
     msg = qs[dt.datetime.now(IST).timetuple().tm_yday % len(qs)]
     r = requests.post(f"{GRAPH}/{page}/feed", data={"message": msg, "access_token": token}, timeout=30).json()
     if r.get("id"):
+        feed_note("question")
         log("  daily question posted on Facebook")
         return today
     log("  daily question skipped:", str(r)[:160])

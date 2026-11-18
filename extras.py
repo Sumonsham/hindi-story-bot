@@ -245,18 +245,22 @@ def _feed_day(at=None):
     return (at or dt.datetime.now(IST)).astimezone(IST).date().isoformat()
 
 
-def feed_count(day=None, extra_only=True):
+def feed_count(day=None, extra_only=True, kind=None):
     d = _jl(FEED_FILE, {})
     items = (d.get(day or _feed_day()) or []) if isinstance(d, dict) else []
-    return len([x for x in items if not (extra_only and str(x).startswith("main:"))])
+    if kind:                                          # v117: one kind only (the story's second Reel = "reel2")
+        return len([x for x in items if str(x) == kind])
+    return len([x for x in items if not (extra_only and (str(x).startswith("main:") or str(x) == "reel2"))])
 
 
-def feed_ok(at=None):
+def feed_ok(at=None, kind=None):
     """v109 (followers were leaving: 12-14 posts a day on the page): the main videos, their Reel and the morning
     teasers always go (FEED['priority']); everything EXTRA (photos, text stories, old-video Reels, promos, questions)
     at most FEED_EXTRA a day (horror 1, cartoon 2)."""
     if FEED["priority"]:
         return True
+    if kind == "reel2":                               # v117: Facebook says Reels get ~13x the views - the story's
+        return feed_count(_feed_day(at), kind="reel2") < int(env("REEL_EXTRA") or 2)   # 2nd Reel has its own allowance
     return feed_count(_feed_day(at)) < int(env("FEED_EXTRA") or 1)
 
 
@@ -272,9 +276,9 @@ def feed_note(kind, at=None):
         pass
 
 
-def fb_post_reel(video, description, at=None):
+def fb_post_reel(video, description, at=None, kind="reel"):
     """Publishes a Facebook Reel on the page. Returns the video id."""
-    if not feed_ok(at):
+    if not feed_ok(at, kind):
         raise RuntimeError(f"today's extra posts are done ({feed_count(_feed_day(at))}, FEED_EXTRA) - this extra Reel waits")
     page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
     r = requests.post(f"{GRAPH}/{page}/video_reels", data={"upload_phase": "start", "access_token": token},
@@ -297,7 +301,7 @@ def fb_post_reel(video, description, at=None):
     fin = requests.post(f"{GRAPH}/{page}/video_reels", data=data, timeout=120).json()
     if not fin.get("success"):
         raise RuntimeError(f"reel finish: {str(fin)[:300]}")
-    feed_note("reel", at)
+    feed_note(kind, at)
     return vid
 
 
@@ -324,6 +328,42 @@ def fb_post_story(video):
     if not fin.get("success"):
         raise RuntimeError(f"story finish: {str(fin)[:300]}")
     return fin.get("post_id") or vid
+
+
+def fb_top_reel_story(work, days=7):
+    """v117 (Facebook's own tip: 'Share your top played reel to your story'): finds the page's most-played Reel of
+    the last `days` days and shares it again to the page Story (24 h at the top of followers' feeds).
+    Returns (reel id, plays) or None."""
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if env("FB_STORY") == "0" or env("TOP_REEL_STORY") == "0" or not (page and token):
+        return None
+    since = int((dt.datetime.now(IST) - dt.timedelta(days=days)).timestamp())
+    r = requests.get(f"{GRAPH}/{page}/video_reels", params={"fields": "id,created_time", "since": since,
+                                                             "limit": 50, "access_token": token}, timeout=60).json()
+    best = None
+    for v in r.get("data") or []:
+        try:
+            ins = requests.get(f"{GRAPH}/{v['id']}/video_insights", params={"metric": "blue_reels_play_count",
+                               "access_token": token}, timeout=30).json()
+            n = int(((ins.get("data") or [{}])[0].get("values") or [{}])[0].get("value") or 0)
+        except Exception:
+            n = 0
+        if n and (best is None or n > best[1]):
+            best = (v["id"], n)
+    if not best:
+        return None
+    src = requests.get(f"{GRAPH}/{best[0]}", params={"fields": "source", "access_token": token},
+                       timeout=30).json().get("source")
+    if not src:
+        raise RuntimeError("top reel: no download link")
+    raw, out = os.path.join(work, "top_reel_raw.mp4"), os.path.join(work, "top_reel_story.mp4")
+    with requests.get(src, stream=True, timeout=300) as d, open(raw, "wb") as f:
+        for ch in d.iter_content(1 << 20):
+            f.write(ch)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-t", "59", "-c:v", "libx264", "-preset",
+                    "veryfast", "-c:a", "aac", "-movflags", "+faststart", out], check=True)   # Story: up to 60 s
+    fb_post_story(out)
+    return best
 
 
 def fb_comment(object_id, text):
@@ -4344,6 +4384,9 @@ def flush_pending(history):
             continue
         left = []
         for c in todo:
+            if c.get("after") and time.time() < float(c["after"]):   # v117: not live yet (a next-day Reel) - wait
+                left.append(c)
+                continue
             try:
                 fb_comment(c["id"], c["text"])
                 log("  earlier video's comment posted")

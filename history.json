@@ -623,7 +623,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   }
  },
  {
@@ -941,7 +941,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   }
  },
  {
@@ -1230,12 +1230,12 @@
   "stats": {
    "likes": 1,
    "comments": 0,
-   "views": 12,
+   "views": 14,
    "length_s": 5645,
-   "yt_views": 12,
+   "yt_views": 13,
    "yt_avg_s": 3,
    "yt_avg_pct": 0.1,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   }
  },
  {
@@ -1270,7 +1270,7 @@
    "yt_views": 1,
    "yt_avg_s": 8,
    "yt_avg_pct": 1.8,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   }
  },
  {
@@ -1559,10 +1559,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 423,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1896,7 +1896,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-14T22:04+00:00"
+   "checked": "2026-11-17T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2276,12 +2276,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 2,
+   "views": 5,
    "length_s": 431,
-   "yt_views": 2,
-   "yt_avg_s": 3,
-   "yt_avg_pct": 0.8,
-   "checked": "2026-11-14T22:04+00:00"
+   "yt_views": 4,
+   "yt_avg_s": 1,
+   "yt_avg_pct": 0.3,
+   "checked": "2026-11-17T22:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2609,12 +2609,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 2,
+   "views": 4,
    "length_s": 599,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-14T22:04+00:00"
+   "yt_views": 2,
+   "yt_avg_s": 58,
+   "yt_avg_pct": 9.8,
+   "checked": "2026-11-17T22:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3042,7 +3042,21 @@
   "fb_reel": "1678389750619005",
   "fb_story": "2583160835503680",
   "fb_reel2": "1752165909220115",
-  "yt_short": "qVwHlaTE-cg"
+  "yt_short": "qVwHlaTE-cg",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 2,
+   "length_s": 744,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-17T22:05+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 2
+  }
  },
  {
   "date": "2026-11-17T02:31+00:00",
@@ -3151,5 +3165,48 @@
   "fb_story": "1468960505376456",
   "fb_reel2": "1447790810900530",
   "yt_short": "kuVO7OLGVWU"
+ },
+ {
+  "date": "2026-11-18T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-18@8",
+  "pending_comments": [
+   {
+    "id": "1644105640798993",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1659751419155517"
+   },
+   {
+    "id": "906363509230236",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1659751419155517"
+   }
+  ],
+  "category": "keno",
+  "idea": "why the sky is blue",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "পর্ব 1: সায়নের কেন?: আকাশ কেন নীল? | Science Mystery | Bangla Cartoon 🌤️🔍",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "নীল আলো"
+  },
+  "hook_style": "voice",
+  "moral": "বইয়ের পাতার চেয়ে নিজের চোখে পরখ করে শেখা বিজ্ঞানের আনন্দ অনেক বেশি!",
+  "title_b": "আকাশের রঙ নীল হল কেন? | সায়নের মজার পরীক্ষা! 🌈✨",
+  "question_post": "2026-11-18",
+  "facebook": "1659751419155517",
+  "youtube": "EdJ4nw1zZv4",
+  "fb_reel": "1644105640798993",
+  "fb_story": "1423309069533320",
+  "fb_reel2": "906363509230236",
+  "riddle_post": "122139566522735948",
+  "riddle": {
+   "q": "দিনের বেলা নীল চাদর, রাতে তাতে তারার মেলা, মেঘ ভাসে যেথায় সারা বেলা—বল তো আমি কে?",
+   "a": "আকাশ"
+  }
  }
 ]

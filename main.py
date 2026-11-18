@@ -3451,6 +3451,19 @@ def youtube_ready():
     return all(env(k) for k in ("YT_CLIENT_ID", "YT_CLIENT_SECRET", "YT_REFRESH_TOKEN"))
 
 
+YT_KIDS = [None]               # the category of the video being made (for the 'made for kids' mark)
+
+
+def made_for_kids():
+    """v112: YouTube's 'made for kids' mark is a LEGAL question (COPPA): the page is for everybody, so only the kinds
+    of story that are really made for small children get it - learning, 'why?' questions, bedtime and fairy tales
+    (change the list with the variable KIDS_CATEGORIES; YT_MADE_FOR_KIDS = 1 / 0 marks everything / nothing)"""
+    if env("YT_MADE_FOR_KIDS") in ("1", "0"):
+        return env("YT_MADE_FOR_KIDS") == "1"
+    kids = [x.strip() for x in (env("KIDS_CATEGORIES") or "learn,keno,bedtime,fairy").split(",") if x.strip()]
+    return str(YT_KIDS[0] or "") in kids
+
+
 def post_to_youtube(video, thumb, title, description, tags, lang, localizations=None):
     r = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": env("YT_CLIENT_ID"), "client_secret": env("YT_CLIENT_SECRET"),
@@ -3462,7 +3475,8 @@ def post_to_youtube(video, thumb, title, description, tags, lang, localizations=
         "snippet": {"title": title[:100], "description": description[:4900],
                     "tags": [t.lstrip("#") for t in tags][:15], "categoryId": "1",   # Film & Animation
                     "defaultLanguage": lang, "defaultAudioLanguage": lang},
-        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": env("YT_MADE_FOR_KIDS") == "1",   # children's cartoons must be marked "made for kids"
+        "status": {"privacyStatus": env("YT_PRIVACY") or "public", "selfDeclaredMadeForKids": made_for_kids(),
+                   "containsSyntheticMedia": env("YT_SYNTHETIC") != "0",       # v112: honest AI label   # children's cartoons must be marked "made for kids"
                    "containsSyntheticMedia": True},
     }
     at = extras.publish_time()
@@ -4077,6 +4091,7 @@ def main():
     if env("FORCE_CATEGORY") in CATEGORIES:          # manual run: this kind of story
         theme = (env("FORCE_CATEGORY"), random.choice(CATEGORIES[env("FORCE_CATEGORY")]))
     category = theme[0]
+    YT_KIDS[0] = category
     if category in MYTH:
         ART_STYLE = MYTH_STYLE                       # reverent devotional look for the epics and the Gita
     log(f"Language: {L['name']} | Story type: {theme[0]} / {theme[1]}" + (f" | SERIES part {part}" if part else ""))
@@ -5570,6 +5585,10 @@ def day_report():
             hist = load_history()
             kinds = extras.best_kinds(hist, (LANGS.get("bn") or {}).get("labels") or {})
             extras.daily_report(hist, "Little Lumi (cartoon)", kinds)
+            if dt.datetime.now(extras.IST).weekday() == 6 and env("MONEY_METER") != "0":   # v112: Sundays
+                meter = extras.monetization_meter(hist, os.path.join(HERE, "assets", "monet.json"), "(কার্টুন পেজ)")
+                if meter:
+                    extras.telegram("\n".join(meter))
     except Exception as e:
         log("  daily report skipped:", str(e)[:120])
 

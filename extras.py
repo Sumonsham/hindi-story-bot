@@ -4749,7 +4749,15 @@ def thumb_kind(bot, category, true_story=False):
     if env("THUMB_KIND") in USER_THUMB:
         return env("THUMB_KIND")
     if bot == "horror":
-        return "h_real" if true_story else HORROR_THUMB_KIND.get(str(category or ""), "h_cinematic")
+        if true_story:
+            return "h_real"
+        base = HORROR_THUMB_KIND.get(str(category or ""), "h_cinematic")
+        if env("THUMB_ROTATE") == "0":
+            return base
+        # v112: the picture style turns day by day (the category's own style comes first), so the channel never
+        # looks like one template repeated - 'mass-produced' is what Facebook / YouTube refuse to pay for
+        kinds = [base] + [k for k in ("h_cinematic", "h_closeup", "h_real") if k != base]
+        return kinds[(dt.datetime.now(IST).timetuple().tm_yday + len(str(category or ""))) % 3]
     return CARTOON_THUMB_KIND.get(str(category or ""), "c_3d")
 
 
@@ -6155,6 +6163,95 @@ def yt_retention(video_id):
         at, size = max(drops[1:], key=lambda x: x[1])     # (not the first second - everyone drops there)
         out["yt_drop_at"] = round(at * 100)
     return out
+
+
+def monetization_meter(history, state_path, page_label=""):
+    """v112: where the page and the channel stand against the monetisation rules (2026):
+    Facebook - 10,000 followers and 600,000 minutes watched in 60 days; YouTube - 1,000 subscribers and 4,000
+    public watch hours in 12 months (Shorts not counted) or 10 million Shorts views in 90 days. With the speed of
+    the last week: about when each is reached. Returns Telegram lines (Bengali)."""
+    snap = {}
+    page, token = env("FB_PAGE_ID"), env("FB_PAGE_TOKEN")
+    if page and token:
+        try:
+            js = requests.get(f"{GRAPH}/{page}", params={"fields": "followers_count,fan_count", "access_token": token},
+                              timeout=30).json()
+            snap["fb_f"] = int(js.get("followers_count") or js.get("fan_count") or 0)
+        except Exception:
+            pass
+        try:
+            until = int(time.time())
+            r = requests.get(f"{GRAPH}/{page}/insights", timeout=30, params={
+                "metric": "page_video_view_time", "period": "day", "since": until - 60 * 86400, "until": until,
+                "access_token": token}).json()
+            vals = [v.get("value") or 0 for d in r.get("data") or [] for v in d.get("values") or []]
+            if vals:
+                snap["fb_min"] = int(sum(float(v) for v in vals) / 60000)
+        except Exception:
+            pass
+    if "fb_min" not in snap:                          # (an estimate from our own videos' numbers)
+        cut = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=60)).isoformat()
+        est = 0.0
+        for h in history:
+            st = h.get("stats") or {}
+            if str(h.get("date", "")) >= cut and st.get("fb_views"):
+                est += float(st.get("fb_views") or 0) * float(st.get("avg_watch_ms") or 0) / 60000
+        if est:
+            snap["fb_min"], snap["fb_est"] = int(est), True
+    if env("YT_REFRESH_TOKEN"):
+        try:
+            hdr = yt_token()
+            r = requests.get(f"{YT}/channels", headers=hdr, params={"part": "statistics", "mine": "true"}, timeout=30)
+            items = r.json().get("items") or [] if r.ok else []
+            if items:
+                snap["yt_subs"] = int(items[0]["statistics"].get("subscriberCount") or 0)
+            end = dt.date.today()
+            r = requests.get(YTA, headers=hdr, timeout=30, params={
+                "ids": "channel==MINE", "startDate": (end - dt.timedelta(days=365)).isoformat(), "endDate": end.isoformat(),
+                "metrics": "estimatedMinutesWatched", "dimensions": "creatorContentType"})
+            if r.ok and r.json().get("rows"):
+                snap["yt_hours"] = int(sum(float(m) for typ, m in r.json()["rows"] if str(typ).upper() != "SHORTS") / 60)
+            r = requests.get(YTA, headers=hdr, timeout=30, params={
+                "ids": "channel==MINE", "startDate": (end - dt.timedelta(days=90)).isoformat(), "endDate": end.isoformat(),
+                "metrics": "views", "dimensions": "creatorContentType"})
+            if r.ok and r.json().get("rows"):
+                snap["yt_shorts"] = int(sum(float(v) for typ, v in r.json()["rows"] if str(typ).upper() == "SHORTS"))
+        except Exception as e:
+            log("  YouTube numbers for the meter:", str(e)[:100])
+    data = _jl(state_path, {})
+    data = data if isinstance(data, dict) else {}
+    today = dt.datetime.now(IST).date().isoformat()
+    prev_k = max((k for k in data if k <= (dt.datetime.now(IST).date() - dt.timedelta(days=6)).isoformat()), default=None)
+    prev = data.get(prev_k) or {}
+    data[today] = snap
+    _js(state_path, {k: v for k, v in data.items() if k >= (dt.datetime.now(IST).date() - dt.timedelta(days=120)).isoformat()})
+    goals = [("fb_f", 10000, "Facebook follower"), ("fb_min", 600000, "Facebook-এ ৬০ দিনে দেখা মিনিট"),
+             ("yt_subs", 1000, "YouTube subscriber"), ("yt_hours", 4000, "YouTube-এ ১২ মাসে দেখা ঘণ্টা (Shorts বাদে)"),
+             ("yt_shorts", 10000000, "YouTube Shorts view (৯০ দিনে)")]
+    lines = [f"💰 monetization মিটার {page_label}".strip()]
+    for k, goal, label in goals:
+        if k not in snap:
+            continue
+        v = snap[k]
+        pct = min(100.0, 100.0 * v / goal)
+        bar = "▓" * int(pct // 10) + "░" * (10 - int(pct // 10))
+        eta = ""
+        if v >= goal:
+            eta = " ✅ পূরণ!"
+        elif prev_k and k in prev:
+            days = max(1, (dt.date.fromisoformat(today) - dt.date.fromisoformat(prev_k)).days)
+            speed = (v - prev[k]) / days
+            if speed > 0:
+                eta = f" - এই হারে আরো ~{int((goal - v) / speed)} দিন"
+            else:
+                eta = " - গত সপ্তাহে বাড়েনি"
+        est = " (আনুমানিক)" if k == "fb_min" and snap.get("fb_est") else ""
+        lines.append(f"{bar} {label}: {v:,} / {goal:,}{est}{eta}")
+    if len(lines) == 1:
+        return []
+    lines.append("মনে রাখবেন: সংখ্যা পূরণ হলে Apply করতে হয় নিজেকে (Facebook: Professional Dashboard → Monetization; "
+                 "YouTube: Studio → Earn)।")
+    return lines
 
 
 def yt_set_thumbnail(video_id, path):
@@ -7611,6 +7708,7 @@ def yt_live_create(title, description, thumb=None):
                           "snippet": {"title": title[:100], "description": description[:4900], "scheduledStartTime": start},
                           "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
                           "contentDetails": {"enableAutoStart": True, "enableAutoStop": True, "enableDvr": True,
+                                             "recordFromStart": True,   # v112: the live stays as a public video
                                              "latencyPreference": "normal"}})
     if not b.ok:
         raise RuntimeError(f"broadcast: {b.text[:400]}")

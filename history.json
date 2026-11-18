@@ -1608,10 +1608,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 458,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T09:04+00:00"
+   "checked": "2026-11-18T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2696,12 +2696,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 0,
    "length_s": 550,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-15T09:04+00:00"
+   "yt_views": 1,
+   "yt_avg_s": 27,
+   "yt_avg_pct": 4.9,
+   "checked": "2026-11-18T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3150,7 +3150,23 @@
   "fb_story": "2350170312490788",
   "fb_reel2": "29337252415930714",
   "yt_short": "Qo0X6c3_oRU",
-  "vote_used": true
+  "vote_used": true,
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 556,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-18T09:05+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-18T09:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-17T13:31+00:00",
@@ -3220,12 +3236,7 @@
   "date": "2026-11-18T07:31+00:00",
   "lang": "bn",
   "slot": "2026-11-18@13",
-  "pending_comments": [
-   {
-    "id": "2236005274001435",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2196380457615375"
-   }
-  ],
+  "pending_comments": [],
   "category": "gopal",
   "idea": "A clever royal court jester outwits the greedy Nawab who tries to tax the monsoon clouds in a rural village. (told as a gopal story for children)",
   "episode": null,
@@ -3246,5 +3257,39 @@
   "fb_reel": "2236005274001435",
   "fb_story": "1622239219167554",
   "yt_short": "0b77rhkNjqk"
+ },
+ {
+  "date": "2026-11-18T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-18@19",
+  "pending_comments": [
+   {
+    "id": "29194413700220527",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1660559758862745"
+   }
+  ],
+  "category": "birbal",
+  "idea": "A royal court in Delhi where Birbal is challenged by the Emperor to weigh the entire sky in kilograms within one day. (told as a birbal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "আকাশের ওজন কত কিলোগ্রাম? ☁️ | বীরবলের সেরা বুদ্ধি",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "চৌরাশি কোটি"
+  },
+  "hook_style": "voice",
+  "moral": "উপস্থিত বুদ্ধি ও সঠিক যুক্তি দিয়ে সব কঠিন প্রশ্নের মোকাবেলা করা যায়।",
+  "title_b": "সম্রাট আকবরের কঠিন ধাঁধা! 👑 | কে জিতল শেষে?",
+  "question_post": null,
+  "facebook": "1660559758862745",
+  "youtube": "zUlUYp2zFLM",
+  "fb_reel": "29194413700220527",
+  "fb_story": "2366035817466632",
+  "yt_short": "FnLDxIUexoc"
  }
 ]

@@ -1,24 +1,24 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-15T22:07+00:00",
+  "made": "2026-11-18T03:07+00:00",
   "lessons": [
-   "Open stories with immediate dialogue or action rather than slow introductions, as retention drops quickly.",
-   "Keep compilation videos under 90 minutes to ensure higher completion rates based on current watch percentages.",
-   "Focus on popular categories like detective mysteries and moral tales which showed slightly better viewer response.",
-   "Include familiar character dynamics like Gopal Bhar and witty animals to naturally drive engagement.",
-   "End videos with direct interactive questions to encourage the comment actions viewers are already responding to."
+   "Focus heavily on Vikram-Betal and detective categories, as they pulled the highest view counts and engagement (e.g., Betal videos reached up to 6 views and 9.8% watch time).",
+   "Keep compilation and long-form videos under strict quality control, as 90+ minute compilations currently struggle with near-zero watch retention.",
+   "Maintain high-pacing and intrigue in the first 30 seconds since retention drops quickly if the hook is slow.",
+   "Rely on classic recurring characters like Gopal Bhar and Betal who maintain baseline audience curiosity.",
+   "Avoid overly niche or slow-paced mythological and educational entries until core storytelling pacing improves."
   ],
   "titles": [
-   "Use curiosity-driven questions and emotional hooks in titles to outperform standard descriptive ones.",
-   "Incorporate clear emoji markers that match the specific theme of the story to boost initial click-through rates.",
-   "Test alternative titles (Title B) for major slots to identify high-performing phrasing early."
+   "Titles featuring direct questions or urgent mysteries (e.g., 'কে ছড়াল বাগানে উল্টো পায়ের ছাপ?' or 'শ্মশান রাতে বেতালের অদ্ভুত গল্প') generate stronger initial curiosity.",
+   "Adding emojis that visually match the core mystery (footprints, skulls, crowns) improves click-through readability in feeds.",
+   "Swapped titles generally performed better when they emphasized a character's clever action or an impending threat rather than generic summaries."
   ],
   "requests": [
-   "A ghost story or haunted house theme",
-   "Winter-themed village settings with traditional food elements",
-   "Classic characters like Gopal Bhar and Birbal",
-   "Moral dilemmas involving sacrifice and choices",
-   "Interactive quiz questions directly inside the video"
+   "More quiz-based interactive segments where viewers guess outcomes in the comments",
+   "Character name shoutouts in upcoming episodes based on comment participation",
+   "Viewer-voted storylines where the audience decides the next plot direction",
+   "More spooky or ghostly elements integrated into detective and mystery formats",
+   "More magical objects like the 'jadu pencil' or hidden treasures in fairy-tale settings"
   ]
  }
 }

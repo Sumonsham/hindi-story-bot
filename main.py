@@ -785,6 +785,55 @@ SAYAN_LOOK = ("a slim, sweet Bengali boy of 8 in a cartoon style, short thick da
               "skin, a light-pink polo T-shirt with a short zip at the collar and darker pink collar and sleeve edges, "
               "black cargo trousers with side pockets, grey-and-white sneakers, a thin red thread on his right wrist")
 SAYAN_SKIP = SAHEB_SKIP + ("gopal",)        # (Gopal's episodes use our ready-made TV characters - Sayan has none yet)
+# v114 (18 Nov 2026): Sayan's FAMILY - the same people with the same looks in every story they appear in.
+# name -> (Bengali name, Hindi name, gender, age group, who she / he is, what Sayan calls her / him, look)
+SAYAN_FAMILY = {
+    "Trisha": ("ত্রিশা", "तृषा", "female", "young", "Sayan's cousin, 15 - the daughter of his pishimoni Priya; clever, "
+               "a little bossy, loves books", "ত্রিশাদি", "a tall, slim Bengali girl of 15 in a cartoon style, fair "
+               "skin, long straight black hair in a single plait, black rectangular power glasses, bright clever eyes, "
+               "a sky-blue salwar kameez with a white dupatta, a small black wristwatch, flat brown sandals"),
+    "Chhanda": ("ছন্দা", "छंदा", "female", "adult", "Sayan's mother, 30; gentle, beautiful, the calm heart of the "
+                "house", "মা", "a beautiful Bengali married woman of 30 in a cartoon style, fair skin, long black hair "
+                "in a loose bun, a line of red sindoor in the hair parting, a small red bindi, white shankha and red "
+                "pola bangles, a soft yellow cotton saree with a red border, a warm kind smile"),
+    "Tapati": ("তপতী", "तपती", "female", "adult", "Sayan's thakuma (his father's mother), 50; loving but strict "
+               "about food and homework", "ঠাকুমা", "a Bengali woman of 50 in a cartoon style, wheat skin, black hair "
+               "with a few grey streaks in a bun, sindoor and a red bindi, shankha-pola bangles, reading glasses on a "
+               "thin chain, a maroon-and-cream cotton tant saree, a warm strict-but-loving face"),
+    "Ajoy": ("অজয়", "अजय", "male", "old", "Sayan's dadu (his father's father), 62; fat and jolly, loves sweets, "
+             "old stories and his afternoon nap", "দাদু", "a plump, round-bellied Bengali man of 62 in a cartoon style, "
+             "bald on top with grey hair on the sides, a thick grey moustache, round gold-rimmed glasses, a white "
+             "kurta and pyjama with a brown shawl, cheerful laugh lines"),
+    "Priya": ("প্রিয়া", "प्रिया", "female", "adult", "Sayan's pishimoni (his father's sister), 38, Trisha's mother; "
+              "lively, talkative, always bringing news", "পিসিমণি", "a Bengali woman of 38 in a cartoon style, wheat-fair "
+              "skin, shoulder-length wavy black hair, sindoor and a small bindi, a green printed cotton saree, a cloth "
+              "tote bag on her shoulder, a lively smart face"),
+    "Reba": ("রেবা", "रेबा", "female", "old", "Sayan's boroma (his great-grandmother), 80, a widow; bent with age, "
+             "sharp-eyed, full of old sayings and secret recipes", "বড়মা", "a very old Bengali widow of 80 in a "
+             "cartoon style, small and bent forward with a hunched back, a wrinkled kind face, thin white hair in a tiny "
+             "bun, a plain white widow's saree (thaan) without a border, a wooden walking stick, a string of tulsi "
+             "beads, no bindi and no sindoor"),
+}
+FAMILY_CATS = ("keno", "para", "life", "festival", "bedtime", "school", "adventure", "nature", "funny", "learn",
+               "detective", "cnotun")
+
+
+def family_rule(category, lang="bn"):
+    """v114: Sayan's family may come into the stories set in his own life - 1 to 3 of them, the ones the story
+    needs, never all at once; the same names, relations and looks every time (and women always a woman's voice)"""
+    if env("FAMILY") == "0" or category not in FAMILY_CATS:
+        return ""
+    rows = []
+    for name, (bn, hi, g, age, who, call, look) in SAYAN_FAMILY.items():
+        rows.append(f"- \"{name}\" ({'Bengali ' + chr(39) + bn + chr(39) if lang == 'bn' else 'Hindi ' + chr(39) + hi + chr(39)}"
+                    f"), gender {g}, age {age}: {who}. Sayan calls her/him '{call}'. EXACT look: \"{look}\"")
+    return ("SAYAN'S FAMILY (use 1-3 of them ONLY when the story happens at home, in the para or on a family outing - "
+            "never all of them at once, never forced in): Sumon is Sayan's kaku, so Ajoy and Tapati are Sumon's "
+            "parents (he calls them 'বাবা' and 'মা'), Priya is Sumon's elder sister ('দিদি'), Chhanda is Sumon's boudi "
+            "('বৌদি'), Reba is Sumon's thakuma, and Trisha calls Sumon 'মামা'.\n" + "\n".join(rows) +
+            "\nWhoever of them appears: exactly this name, gender and look in the characters list; each has a clear "
+            "way of speaking (Reba slow with old sayings, Ajoy jolly, Tapati firm, Priya chatty, Chhanda gentle, "
+            "Trisha smart-teenager).\n")
 
 
 def saheb_rule(category):
@@ -806,6 +855,7 @@ def saheb_rule(category):
                 "'কেন?' a lot), brave, a little naughty and very funny; he notices small things the grown-ups miss and "
                 "often gives the idea that helps - children watching should feel he is one of them. Give him 3-6 natural "
                 "lines. Put him in the characters list with this exact look.\n")
+        out += family_rule(category)
     return out
 
 

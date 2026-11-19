@@ -2,147 +2,135 @@
  "cartoon_bn": {
   "date": "2026-11-19",
   "topics": [
-   "An abandoned railway station canteen where a ghost sells glowing noodles at midnight to stranded travelers.",
-   "A magical village marketplace where a talking bamboo gourd grants instant wealth to anyone who solves its riddle.",
-   "A poor boatman's daughter who finds a floating golden cooking pot in the river that multiplies every grain of rice.",
-   "A haunted banyan tree on the village outskirts where a mischievous witch challenges villagers to a spicy food eating contest.",
-   "An ancient royal kitchen in the kingdom of Gopal Bhar where the royal cook loses the king's favorite winter sweet.",
-   "A cursed pumpkin patch behind a haunted mansion that glows in the dark and traps anyone who steps on the vines after sunset."
+   "A village marketplace where Gopal tricks a greedy sweet-seller into paying double using clever logic",
+   "A royal durbar where Gopal proves the court astrologer wrong about a fake solar eclipse prediction",
+   "A quiet riverbank where Gopal helps a frightened fisherman outsmart a mischievous river spirit",
+   "A royal orchard where Gopal catches the king's stealthy midnight mango thief using a glowing pot",
+   "A village crossroads where Gopal exposes a fake holy man selling magical water that turns out to be pond mud",
+   "A grand palace kitchen where Gopal makes a spicy dish that accidentally makes the royal guards dance all night"
   ],
   "hashtags": [
+   "#GopalBhar",
+   "#BengaliCartoon",
    "#BanglaCartoon",
-   "#BhuterCartoon",
-   "#BengaliMoralStories",
-   "#BanglaGolpo",
-   "#NotunGolpo",
-   "#GhostCartoon",
-   "#BengaliAnimation",
-   "#RupkotharGolpo",
-   "#BanglaKatun",
-   "#BhoutikGolpo"
+   "#MoralStories",
+   "#GopalBharNewEpisode",
+   "#FunnyCartoon",
+   "#KidsAnimation",
+   "#ThakurmarJhuli",
+   "#BengaliStories",
+   "#CartoonVideo"
   ],
   "keywords": [
-   "bangla cartoon",
-   "bhuter cartoon",
-   "bengali horror story",
-   "bangla golpo",
-   "vuter katun",
-   "bengali animation story",
-   "notun bangla cartoon",
-   "bangla moral stories"
+   "gopal bhar new episode",
+   "bangla cartoon gopal bhar",
+   "gopal bhar comedy",
+   "bengali moral stories",
+   "gopal bhar cartoon video",
+   "gopal bhar latest episode",
+   "funny gopal bhar stories",
+   "bengali kids animation"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles combine catchy Bengali and English keywords with heavy usage of vertical separators ('|') to organize subtitles and series branding. They rely on high-curiosity hooks about moral dilemmas, strange events (like giant gourds or ghost food stalls), and popular characters to drive millions of clicks.",
-   "thumb_style": "Thumbnails feature vibrant, high-saturation 2D and 3D animated scenes capturing dramatic narrative peaks with exaggerated character expressions of shock or fear. The lighting is bright and cheerful for village and comedy stories, but adopts eerie, high-contrast night settings with supernatural green-skinned entities for horror themes.",
-   "thumb_text_style": "Zero to four words of bold, stylized Bengali text placed at the top center of the frame to instantly state the video's core topic."
+   "title_style": "The titles are moderately short and structured using vertical bars ('|') to separate the episode title, series name, and specific identifiers like episode numbers or years. They use engaging descriptive phrases in Bengali and English to highlight the core plot or character actions, pulling clicks through recognizable cultural themes and curiosity-driven hooks.",
+   "thumb_style": "The thumbnails feature clean 2D cartoon character close-ups and interactions against simple, bright outdoor or indoor backgrounds. The lighting is bright and evenly distributed with clear outlines, highlighting expressive and cheerful character faces without the use of ghosts or dark elements. Minimal corner branding is used, keeping the composition focused entirely on the main characters.",
+   "thumb_text_style": "Only 2-3 words or numbers of crisp, bold white or yellow text are placed inside a contrasting red badge in the top corner to indicate the episode number."
   },
   "real": [
    {
-    "id": "1zcsMrISV0s",
-    "title": "Bablo Se Sab Pareshan | Ghulam Rasool Cartoon Series | Islamic Cartoon | Kids Land",
-    "views": 1647387,
-    "age": "7d ago"
-   },
-   {
-    "id": "GHjvQ5hH7QQ",
-    "title": "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 1482045,
-    "age": "5d ago"
-   },
-   {
-    "id": "Hqb6svnRJzg",
-    "title": "শ্মশানে ডাইনির চাউমিনের দোকান | Bhuter cartoon | DAINIR CHOWMIN | Notun Bangla Golpo Horror Stories",
-    "views": 1290239,
-    "age": "3d ago"
-   },
-   {
-    "id": "Rp0O-NEk574",
-    "title": "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 988827,
-    "age": "7d ago"
-   },
-   {
-    "id": "n-iB_sdmURA",
-    "title": "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird",
-    "views": 826562,
-    "age": "6d ago"
-   },
-   {
-    "id": "3SD2U5i5gdE",
-    "title": "কাফনতালাশ - Kafontalash | Bhuter Cartoon | Bengali Horror Cartoon | Bhoutik Golpo | Vuter Katun",
-    "views": 795828,
-    "age": "5d ago"
-   },
-   {
-    "id": "ZKMPHUeX37Q",
-    "title": "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026",
-    "views": 642424,
-    "age": "7d ago"
-   },
-   {
-    "id": "JZ6l57mgLSg",
-    "title": "ফুচকা পাগল নতুন বউ | Fuchka Pagol Notun Bou | Bengali Animated Family Story | Bangla Cartoon Golpo",
-    "views": 586000,
-    "age": "1d ago"
-   },
-   {
-    "id": "dpALvtCExTY",
-    "title": "Poor Alu Became a Millionaire by Repairing an Abandoned Dredger Boat! 😱💰 | Bengali 3D Cartoon",
-    "views": 565089,
-    "age": "6d ago"
-   },
-   {
-    "id": "vxnVzk1-kls",
-    "title": "Two Sisters' In-laws | Bangla Cartoon Story | Bengali Moral Stories | Bangla Stories",
-    "views": 531429,
-    "age": "6d ago"
-   },
-   {
-    "id": "QGbj5dU0TcE",
-    "title": "শীতের রাতে কলস নিয়ে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 512168,
-    "age": "7d ago"
-   },
-   {
     "id": "9Nb7vmGSRBk",
     "title": "মহালয়ার প্রতিযোগিতা | Gopal Bhar | Episode - 1286",
-    "views": 496772,
+    "views": 498004,
     "age": "2d ago"
    },
    {
-    "id": "NeC1fWvQ34U",
-    "title": "টনা কোথায় পড়ল| Bangla Cartoon | Bhuter Cartoon | Rupkothar Golpo | Tuni Pakhir Golpo #shorts​",
-    "views": 494898,
+    "id": "jZCVTbNvpj4",
+    "title": "গোপালের বুদ্ধি | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 357391,
     "age": "5d ago"
    },
    {
-    "id": "iTFnx8UB5wc",
-    "title": "চার রানী পরীর নদীতে স্নান | পর্ব 1 | 4 PORIR NODITE SNAN | Rupkothar Golpo | Notun Bangla Cartoon",
-    "views": 434366,
+    "id": "_Lk9j61Mzus",
+    "title": "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026",
+    "views": 325372,
     "age": "4d ago"
    },
    {
-    "id": "UxPxXSaWVXQ",
-    "title": "🌙 চাঁদের বুড়ি! চাঁদের দেশে আলু পরিবারের জাদুকরী অভিযান ✨ | Bangla 3D Animated Story",
-    "views": 418936,
+    "id": "X8w8K0G6YuI",
+    "title": "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026",
+    "views": 298067,
+    "age": "4d ago"
+   },
+   {
+    "id": "-Co7kAeloWw",
+    "title": "নৈকবাহক গোপাল | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 293901,
+    "age": "4d ago"
+   },
+   {
+    "id": "RKBmJoz93rc",
+    "title": "যমরাজ গোপালকে নিতে এলেন। || Gopal Bhar || Latest Ep 2026 ||",
+    "views": 222797,
+    "age": "5d ago"
+   },
+   {
+    "id": "6-Q8q97s_PU",
+    "title": "দিব্যা দৃষ্টি  | Gopal Bhar (Bengali) | Double Gopal",
+    "views": 193077,
+    "age": "5d ago"
+   },
+   {
+    "id": "_Uc2EzH4G8M",
+    "title": "কৃষ্ণচন্দ্রের সমাধি | Gopal Bhar | Full Episode | Episode 500",
+    "views": 162724,
+    "age": "4d ago"
+   },
+   {
+    "id": "IWEaBAKIPX4",
+    "title": "ঝাল লঙ্কা  | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 156887,
     "age": "6d ago"
+   },
+   {
+    "id": "kdzNjF1juSw",
+    "title": "Gopal Bhar's Fish Party in the Rain in the Jungle! The King and Ministers Enjoy Fried Fish! | Gop...",
+    "views": 149753,
+    "age": "7d ago"
+   },
+   {
+    "id": "flIzoHmwtc0",
+    "title": "গোপাল রান্নাঘরে চিকেন বিরিয়ানি বানালো। || Gopal Bhar || Latest Ep 2026 ||",
+    "views": 148053,
+    "age": "6d ago"
+   },
+   {
+    "id": "mDzX9AWC9Qo",
+    "title": "গোপাল ভাঁড় রাজা-রানির জন্য তৈরি করালেন বিশাল জাহাজ | Gopal Bhar | New Episode 2026",
+    "views": 148026,
+    "age": "3d ago"
+   },
+   {
+    "id": "W-zo_KBhuzs",
+    "title": "রাজার দুধ চুরি | Gopal Bhar | Best Of Gopal Bhar",
+    "views": 144981,
+    "age": "5d ago"
+   },
+   {
+    "id": "rTl9QpbcAFY",
+    "title": "ভৌতিক টুকলি | Gopal Bhar Movie | Gopal Bhar",
+    "views": 144242,
+    "age": "3d ago"
+   },
+   {
+    "id": "kBnLNUd1rcU",
+    "title": "নদীর মাঝখানে নৌকায় গোপালের অভিনব ভোজ! | Gopal Bhar | গোপালভাঁড় | New Episode 2026",
+    "views": 105641,
+    "age": "5d ago"
    }
   ],
-  "youtube_top": [
-   "Bablo Se Sab Pareshan | Ghulam Rasool Cartoon Series | Islamic Cartoon | Kids Land (1,647,387)",
-   "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo (1,482,045)",
-   "শ্মশানে ডাইনির চাউমিনের দোকান | Bhuter cartoon | DAINIR CHOWMIN | Notun Bangla Golpo Horror Stories (1,290,239)",
-   "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo (988,827)",
-   "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird (826,562)",
-   "কাফনতালাশ - Kafontalash | Bhuter Cartoon | Bengali Horror Cartoon | Bhoutik Golpo | Vuter Katun (795,828)",
-   "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026 (642,424)",
-   "ফুচকা পাগল নতুন বউ | Fuchka Pagol Notun Bou | Bengali Animated Family Story | Bangla Cartoon Golpo (586,000)",
-   "Poor Alu Became a Millionaire by Repairing an Abandoned Dredger Boat! 😱💰 | Bengali 3D Cartoon (565,089)",
-   "Two Sisters' In-laws | Bangla Cartoon Story | Bengali Moral Stories | Bangla Stories (531,429)"
-  ],
-  "from": "youtube"
+  "from_cat": "gopal"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",
@@ -225,147 +213,147 @@
   "from": "youtube"
  },
  "cartoon_bn_gopal": {
-  "date": "2026-11-18",
+  "date": "2026-11-19",
   "topics": [
-   "A clever royal court jester outwits the greedy Nawab who tries to tax the monsoon clouds in a rural village.",
-   "King Krishnachandra gets lost in a haunted bamboo forest during a stormy night and relies on a witty courtier to escape.",
-   "A foolish royal minister tries to steal golden mangoes from a magical tree guarded by talking monkeys.",
-   "Village children challenge the royal court jesters to a spicy food-eating contest during the harvest festival.",
-   "A mysterious traveler arrives at the palace claiming he can bring back rain by singing, but his flute starts floating.",
-   "The royal guards chase a talking fish through the crowded marketplace after it escapes from the king's pond."
+   "A village marketplace where Gopal tricks a greedy sweet-seller into paying double using clever logic",
+   "A royal durbar where Gopal proves the court astrologer wrong about a fake solar eclipse prediction",
+   "A quiet riverbank where Gopal helps a frightened fisherman outsmart a mischievous river spirit",
+   "A royal orchard where Gopal catches the king's stealthy midnight mango thief using a glowing pot",
+   "A village crossroads where Gopal exposes a fake holy man selling magical water that turns out to be pond mud",
+   "A grand palace kitchen where Gopal makes a spicy dish that accidentally makes the royal guards dance all night"
   ],
   "hashtags": [
    "#GopalBhar",
-   "#BengaliCartoons",
-   "#ThakurmarJhuli",
-   "#Panchatantra",
+   "#BengaliCartoon",
+   "#BanglaCartoon",
    "#MoralStories",
+   "#GopalBharNewEpisode",
+   "#FunnyCartoon",
    "#KidsAnimation",
+   "#ThakurmarJhuli",
    "#BengaliStories",
-   "#FunnyCartoons",
-   "#NewEpisode2026",
-   "#BanglaCartoon"
+   "#CartoonVideo"
   ],
   "keywords": [
    "gopal bhar new episode",
-   "bengali cartoon",
-   "gopal bhar bangla",
-   "thakurmar jhuli stories",
-   "kids moral stories",
-   "funny gopal bhar cartoon",
-   "new cartoon 2026",
-   "bengali animation"
+   "bangla cartoon gopal bhar",
+   "gopal bhar comedy",
+   "bengali moral stories",
+   "gopal bhar cartoon video",
+   "gopal bhar latest episode",
+   "funny gopal bhar stories",
+   "bengali kids animation"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "The titles are concise and direct, primarily in Bengali, highlighting central plot elements like character names or unusual events. They frequently use vertical separators ('|') to structure the brand name, series title, and fresh episode identifiers like 'New Episode 2026'.",
-   "thumb_style": "Thumbnails feature clean, vibrant 2D cartoon art with balanced indoor and outdoor lighting. They prominently display expressive characters in action-oriented or comedic scenarios, using medium to wide compositions with minimal text overlays.",
-   "thumb_text_style": "One to three words of bold white or red text, typically denoting episode numbers or branding."
+   "title_style": "The titles are moderately short and structured using vertical bars ('|') to separate the episode title, series name, and specific identifiers like episode numbers or years. They use engaging descriptive phrases in Bengali and English to highlight the core plot or character actions, pulling clicks through recognizable cultural themes and curiosity-driven hooks.",
+   "thumb_style": "The thumbnails feature clean 2D cartoon character close-ups and interactions against simple, bright outdoor or indoor backgrounds. The lighting is bright and evenly distributed with clear outlines, highlighting expressive and cheerful character faces without the use of ghosts or dark elements. Minimal corner branding is used, keeping the composition focused entirely on the main characters.",
+   "thumb_text_style": "Only 2-3 words or numbers of crisp, bold white or yellow text are placed inside a contrasting red badge in the top corner to indicate the episode number."
   },
   "real": [
    {
-    "id": "ZKMPHUeX37Q",
-    "title": "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026",
-    "views": 637012,
-    "age": "6d ago"
-   },
-   {
-    "id": "dH9nyGATo6g",
-    "title": "তিন সিঙ্গের খাবার | Gopal Bhar | New Episode 2026",
-    "views": 537625,
-    "age": "6d ago"
-   },
-   {
     "id": "9Nb7vmGSRBk",
     "title": "মহালয়ার প্রতিযোগিতা | Gopal Bhar | Episode - 1286",
-    "views": 434488,
-    "age": "1d ago"
+    "views": 498004,
+    "age": "2d ago"
    },
    {
     "id": "jZCVTbNvpj4",
     "title": "গোপালের বুদ্ধি | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 349103,
-    "age": "4d ago"
+    "views": 357391,
+    "age": "5d ago"
    },
    {
     "id": "_Lk9j61Mzus",
-    "title": "গোপাল ভাঁড় এর কাটুন | Gopal Bhar | গোপাল ভাঁড় | New Episode2026",
-    "views": 322811,
-    "age": "3d ago"
+    "title": "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026",
+    "views": 325372,
+    "age": "4d ago"
    },
    {
     "id": "X8w8K0G6YuI",
-    "title": "গোপাল ভাঁড় এর কাটুন | Gopal Bhar | গোপাল ভাঁড় | New Episode2026",
-    "views": 295167,
-    "age": "3d ago"
+    "title": "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026",
+    "views": 298067,
+    "age": "4d ago"
    },
    {
     "id": "-Co7kAeloWw",
     "title": "নৈকবাহক গোপাল | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 286911,
-    "age": "3d ago"
+    "views": 293901,
+    "age": "4d ago"
    },
    {
     "id": "RKBmJoz93rc",
     "title": "যমরাজ গোপালকে নিতে এলেন। || Gopal Bhar || Latest Ep 2026 ||",
-    "views": 199615,
-    "age": "4d ago"
+    "views": 222797,
+    "age": "5d ago"
    },
    {
     "id": "6-Q8q97s_PU",
     "title": "দিব্যা দৃষ্টি  | Gopal Bhar (Bengali) | Double Gopal",
-    "views": 190479,
+    "views": 193077,
+    "age": "5d ago"
+   },
+   {
+    "id": "_Uc2EzH4G8M",
+    "title": "কৃষ্ণচন্দ্রের সমাধি | Gopal Bhar | Full Episode | Episode 500",
+    "views": 162724,
     "age": "4d ago"
    },
    {
     "id": "IWEaBAKIPX4",
     "title": "ঝাল লঙ্কা  | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 152495,
-    "age": "5d ago"
-   },
-   {
-    "id": "9kVSywjssnc",
-    "title": "বৃষ্টির মধ্যে গোপাল ভাঁড়ের বিশাল ভোজে হাজির রাজা কৃষ্ণচন্দ্র! | Gopal Bhar | New Episode 2026",
-    "views": 150287,
-    "age": "7d ago"
-   },
-   {
-    "id": "AisspNaPi5s",
-    "title": "বৌদ্ধের পরিচয় | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 150052,
+    "views": 156887,
     "age": "6d ago"
    },
    {
     "id": "kdzNjF1juSw",
     "title": "Gopal Bhar's Fish Party in the Rain in the Jungle! The King and Ministers Enjoy Fried Fish! | Gop...",
-    "views": 147019,
+    "views": 149753,
+    "age": "7d ago"
+   },
+   {
+    "id": "flIzoHmwtc0",
+    "title": "গোপাল রান্নাঘরে চিকেন বিরিয়ানি বানালো। || Gopal Bhar || Latest Ep 2026 ||",
+    "views": 148053,
     "age": "6d ago"
    },
    {
-    "id": "GJLK8vUj2So",
-    "title": "গোপালকে ছেড়ে মহারাজ আর মন্ত্রী চলে গেল মুর্শিদাবাদের দাওয়াতে! | Gopal Bhar | New Episode 2026",
-    "views": 146354,
-    "age": "6d ago"
+    "id": "mDzX9AWC9Qo",
+    "title": "গোপাল ভাঁড় রাজা-রানির জন্য তৈরি করালেন বিশাল জাহাজ | Gopal Bhar | New Episode 2026",
+    "views": 148026,
+    "age": "3d ago"
    },
    {
     "id": "W-zo_KBhuzs",
     "title": "রাজার দুধ চুরি | Gopal Bhar | Best Of Gopal Bhar",
-    "views": 140092,
-    "age": "4d ago"
+    "views": 144981,
+    "age": "5d ago"
+   },
+   {
+    "id": "rTl9QpbcAFY",
+    "title": "ভৌতিক টুকলি | Gopal Bhar Movie | Gopal Bhar",
+    "views": 144242,
+    "age": "3d ago"
+   },
+   {
+    "id": "kBnLNUd1rcU",
+    "title": "নদীর মাঝখানে নৌকায় গোপালের অভিনব ভোজ! | Gopal Bhar | গোপালভাঁড় | New Episode 2026",
+    "views": 105641,
+    "age": "5d ago"
    }
   ],
   "youtube_top": [
-   "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026 (637,012)",
-   "তিন সিঙ্গের খাবার | Gopal Bhar | New Episode 2026 (537,625)",
-   "মহালয়ার প্রতিযোগিতা | Gopal Bhar | Episode - 1286 (434,488)",
-   "গোপালের বুদ্ধি | Gopal Bhar | Best Of Gopal Bhar (349,103)",
-   "গোপাল ভাঁড় এর কাটুন | Gopal Bhar | গোপাল ভাঁড় | New Episode2026 (322,811)",
-   "গোপাল ভাঁড় এর কাটুন | Gopal Bhar | গোপাল ভাঁড় | New Episode2026 (295,167)",
-   "নৈকবাহক গোপাল | Gopal Bhar (Bengali) | Double Gopal (286,911)",
-   "যমরাজ গোপালকে নিতে এলেন। || Gopal Bhar || Latest Ep 2026 || (199,615)",
-   "দিব্যা দৃষ্টি  | Gopal Bhar (Bengali) | Double Gopal (190,479)",
-   "ঝাল লঙ্কা  | Gopal Bhar | Best Of Gopal Bhar (152,495)"
+   "মহালয়ার প্রতিযোগিতা | Gopal Bhar | Episode - 1286 (498,004)",
+   "গোপালের বুদ্ধি | Gopal Bhar | Best Of Gopal Bhar (357,391)",
+   "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026 (325,372)",
+   "Gopal Bhar Cartoon | Gopal Bhar | Gopal Bhar | New Episode 2026 (298,067)",
+   "নৈকবাহক গোপাল | Gopal Bhar (Bengali) | Double Gopal (293,901)",
+   "যমরাজ গোপালকে নিতে এলেন। || Gopal Bhar || Latest Ep 2026 || (222,797)",
+   "দিব্যা দৃষ্টি  | Gopal Bhar (Bengali) | Double Gopal (193,077)",
+   "কৃষ্ণচন্দ্রের সমাধি | Gopal Bhar | Full Episode | Episode 500 (162,724)",
+   "ঝাল লঙ্কা  | Gopal Bhar | Best Of Gopal Bhar (156,887)",
+   "Gopal Bhar's Fish Party in the Rain in the Jungle! The King and Ministers Enjoy Fried Fish! | Gop... (149,753)"
   ],
   "from": "youtube"
  },

@@ -362,11 +362,132 @@ MYTH_ALIASES = {"ram": "rama", "sri ram": "rama", "shri ram": "rama", "lakshman"
 DAY_SPECIAL = {0: "gopal", 1: "folk", 2: "birbal", 3: "ramayan", 4: "betal", 5: "mahabharat", 6: "gita"}
 # the weekly programme (0 = Monday) - every day and time has its own kind of story, like a children's TV channel
 MORNING_GRID = {0: "learn", 1: "cnotun", 2: "keno", 3: "learn", 4: "jataka", 5: "animal", 6: "gita"}
-# v100: Wednesday 8 AM = 'সায়নের কেন?' (Sayan asks one 'why?', Sumon kaku answers with a little adventure)
+# v100: Wednesday 8 AM = 'সায়নের কেন?' (Sayan asks one 'why?', his father Sumon answers with a little adventure)
 # v83 ('learn', Monday and Thursday 8 AM): little learning videos for small children, in order (see LEARN)
 EVENING_GRID = {0: "cnotun", 1: "detective", 2: "birbal", 3: "ramayan", 4: "betal", 5: "cnotun", 6: "mahabharat"}
 # v80 ('cnotun'): our five NEW cartoon series take turns there (see CARTOON_SERIES)
 SERIES_CATS = ("adventure", "detective", "folk", "para")      # big stories told in 2-3 parts at 7 PM
+# ---- v118 (your wish, 19 Nov 2026): EVERY NIGHT (7 PM) a devotional series - the leelas, the birth stories and the
+# folk tales of the best-loved gods, each series IN ORDER, one episode on its own night of the week. Every episode is
+# first looked up on Google (scriptures and well-known traditional tellings) and told FAITHFULLY - nothing invented.
+GOD_SERIES = {
+    "krishna": {"bn": "শ্রীকৃষ্ণের লীলা", "hi": "श्रीकृष्ण लीला", "source": "the Bhagavata Purana (10th canto), the Harivamsha and the Vishnu Purana",
+                "eps": ["the birth of Krishna in Kamsa's prison and Vasudeva carrying him across the Yamuna to Gokul",
+                        "baby Krishna and the demoness Putana", "Shakatasura and Trinavarta - the cart and the whirlwind",
+                        "Sage Garga names Krishna and Balarama", "Krishna the butter thief (Makhan Chor) of Gokul",
+                        "Yashoda sees the whole universe in Krishna's mouth",
+                        "Damodar leela - Yashoda ties Krishna to the mortar and the two Yamalarjuna trees",
+                        "the move to Vrindavan; Vatsasura and Bakasura", "Aghasura, the giant python",
+                        "Brahma hides the calves and the cowherd boys", "Krishna and the serpent Kaliya in the Yamuna",
+                        "Dhenukasura in the palm forest", "Krishna swallows the forest fire",
+                        "Krishna lifts the Govardhan hill and Indra bows", "the magic of Krishna's flute in Vrindavan",
+                        "Akrura comes to take Krishna and Balarama to Mathura", "Kamsa's end and the freeing of Devaki and Vasudeva",
+                        "Sandipani's ashram: Krishna, Balarama and Sudama study together", "the building of Dwarka",
+                        "Rukmini's letter and her marriage to Krishna", "the Syamantaka jewel",
+                        "Sudama's handful of rice in Dwarka", "Krishna and Draupadi's endless sari"]},
+    "hanuman": {"bn": "হনুমানের কথা", "hi": "हनुमान कथा", "source": "the Valmiki Ramayana, Krittivas's Bengali Ramayana and the well-known Puranic tellings",
+                "eps": ["the birth of Hanuman - Anjana, Kesari and Pavan Dev", "baby Hanuman leaps to eat the sun",
+                        "the gods' boons to Hanuman", "the sages' curse: Hanuman forgets his own strength",
+                        "Hanuman learns from Surya Dev", "Hanuman meets Rama and Lakshmana in the forest",
+                        "Hanuman makes Rama and Sugriva friends", "Jambavan reminds Hanuman of his strength",
+                        "the great leap: Mainaka, Surasa and Simhika", "Hanuman and Lankini at the gate of Lanka",
+                        "Hanuman finds Mother Sita in the Ashoka garden", "Hanuman in Ravana's court",
+                        "Lanka burns - Hanuman's tail", "Hanuman brings the news to Rama",
+                        "Hanuman carries the Sanjeevani mountain", "Hanuman rescues Rama and Lakshmana from Ahiravana",
+                        "Hanuman shows Rama and Sita in his heart (the pearl necklace)",
+                        "Hanuman and Bhima - the old monkey's tail", "Hanuman on Arjuna's chariot flag"]},
+    "mahadev": {"bn": "মহাদেবের কথা", "hi": "महादेव कथा", "source": "the Shiva Purana, the Linga Purana, the Skanda Purana and Bengali Shiva-mangal tradition",
+                "eps": ["the endless pillar of light - Brahma, Vishnu and the first Shiva Linga",
+                        "Sati, daughter of Daksha, marries Shiva", "Daksha's yajna and Sati's sacrifice",
+                        "the Shakti Peethas", "Parvati's tapasya for Shiva", "Kamadeva and Shiva's third eye",
+                        "the marriage of Shiva and Parvati", "the birth of Ganesha and his elephant head",
+                        "Kartikeya and Tarakasura", "the churning of the ocean - Shiva becomes Neelkanth",
+                        "Bhagiratha brings Ganga down to earth on Shiva's hair",
+                        "child Markandeya and Yama - Shiva protects his devotee", "the hunter Kannappa's devotion",
+                        "Ravana lifts Kailash and sings the Shiva Tandava", "Bhasmasura's boon",
+                        "Shiva as the hunter (Kirata) and Arjuna", "the hunter's night of Shivaratri",
+                        "Nandi, Shiva's devoted bull", "Ardhanarishvara - half Shiva, half Parvati",
+                        "Shiva and Annapurna - the begging bowl"]},
+    "jagannath": {"bn": "জগন্নাথের কথা", "hi": "जगन्नाथ कथा", "source": "the Skanda Purana (Utkala Khanda), Odia and Bengali Jagannath tradition",
+                  "eps": ["King Indradyumna's dream and the search for Nila Madhava",
+                          "Vidyapati, Lalita and Vishvavasu - the hidden Nila Madhava",
+                          "the holy log (daru) comes from the sea",
+                          "the old carpenter and the closed door - why the deities are unfinished",
+                          "Jagannath, Balabhadra and Subhadra - who they are", "Snana Yatra and the fortnight of rest (Anasara)",
+                          "the first Rath Yatra - three chariots", "Gundicha, the aunt's house",
+                          "Hera Panchami - Ma Lakshmi's anger", "Karma Bai's morning khichdi",
+                          "Salabega - the chariot that waited for its devotee", "Dasia Bauri's coconut",
+                          "Bandhu Mohanty's hungry family", "Manika the milkmaid and the two riders",
+                          "the 56 bhog (Chhappan Bhog) of Jagannath", "Sri Chaitanya Mahaprabhu at Puri",
+                          "Nabakalebara - the new bodies of the Lord", "the Mahesh Rath Yatra of Serampore, Bengal"]},
+    "devdevi": {"bn": "দেবদেবীর জন্মকথা", "hi": "देवी-देवताओं की कथा", "source": "the Puranas (Markandeya, Vishnu, Bhagavata, Devi Bhagavata) and Bengali Mangal-kavya tradition",
+                "eps": ["the birth of Ma Durga and Mahishasura", "Ma Kali and Raktabija (told gently)",
+                        "Ma Lakshmi rises from the churning ocean", "Ma Saraswati, goddess of learning",
+                        "Ganesha and the curse of the moon", "Kartik, the warrior god",
+                        "Ma Manasa, Chand Saudagar and Behula", "Vishnu's first avatar - Matsya, the fish",
+                        "Kurma - the tortoise under the mountain", "Varaha lifts the earth",
+                        "Prahlad and Narasimha", "Vamana and King Bali", "child Dhruva becomes the pole star",
+                        "Savitri wins back Satyavan from Yama", "Ma Lakshmi on Kojagari Purnima",
+                        "Ma Annapurna of Kashi", "Ma Shitala (told as tradition tells it)", "Shashthi Ma and the children"]},
+}
+EPIC.update({k: v["eps"] for k, v in GOD_SERIES.items()})
+MYTH = MYTH + tuple(GOD_SERIES)
+for _k, _g in GOD_SERIES.items():
+    LANGS["bn"]["labels"][_k] = LANGS["bn"]["series_titles"][_k] = _g["bn"]
+    LANGS["hi"]["labels"][_k] = LANGS["hi"]["series_titles"][_k] = _g["hi"]
+    CATEGORIES[_k] = list(_g["eps"])
+# the nights: Mon Mahadev (Somvar), Tue Hanuman, Wed Krishna, Thu Ramayan, Fri Jagannath, Sat Mahabharat, Sun the gods' births
+GOD_NIGHT_GRID = {0: "mahadev", 1: "hanuman", 2: "krishna", 3: "ramayan", 4: "jagannath", 5: "mahabharat", 6: "devdevi"}
+if os.getenv("GOD_NIGHT", "1") != "0":
+    EVENING_GRID = dict(GOD_NIGHT_GRID)
+MYTH_LOOKS.update({
+    "shiva": "Lord Shiva (Mahadev): calm, serene, compassionate face, soft blue-grey skin, matted hair in a top-knot with "
+             "the crescent moon and the river Ganga flowing from it, third eye closed as a soft mark, blue throat, a "
+             "snake around the neck, rudraksha beads, tiger-skin cloth, holding the trishul with a small damaru, ash marks",
+    "parvati": "Mother Parvati: graceful, gentle goddess, fair glowing skin, red-and-gold sari, gold crown, sindoor, "
+               "kind loving eyes, lotus in hand",
+    "ganesha": "Lord Ganesha: elephant head with one broken tusk, kind smiling eyes, round belly, four arms (a modak, a "
+               "lotus, an axe, blessing hand), red-and-gold dhoti, golden crown, his little mouse (Mushika) beside him",
+    "jagannath": "Lord Jagannath: the traditional Puri wooden deity - dark (black) round face, huge round white eyes with "
+                 "black centres, a wide red smile, short arms without hands, decorated with flowers and gold ornaments",
+    "balabhadra": "Lord Balabhadra: the traditional Puri wooden deity - white face, big round eyes, short arms, flowers",
+    "subhadra": "Mother Subhadra: the traditional Puri wooden deity - yellow face, big round eyes, no arms, between "
+                "her two brothers",
+    "yashoda": "Mother Yashoda: loving village mother of Gokul, wheat skin, simple red-bordered sari, hair in a bun, "
+               "gold nose ring, kind laughing eyes",
+    "balarama": "Balarama: Krishna's fair elder brother, white-golden skin, blue clothes, a plough (hala) on his shoulder",
+    "vishnu": "Lord Vishnu: four-armed, blue skin, golden crown, yellow silk, holding the conch, the discus (chakra), "
+              "the mace and the lotus, peaceful face, resting on the serpent Shesha or standing in golden light",
+    "lakshmi": "Mother Lakshmi: radiant goddess on a pink lotus, red-and-gold sari, gold crown, gold coins flowing "
+               "from one hand, white owl nearby",
+    "durga": "Ma Durga: ten-armed radiant goddess on a lion, red-and-gold sari, golden crown, calm powerful face, "
+             "divine weapons held gracefully, no blood",
+    "saraswati": "Ma Saraswati: serene goddess in a white sari on a white swan, playing the veena, a book in hand",
+    "kali": "Ma Kali: the loving mother form - dark blue skin, gentle eyes, protective blessing hand raised, red "
+            "flowers, golden glow; no weapons, no heads, no blood (told gently for families)",
+    "radha": "Radha: graceful young cowherd girl of Vrindavan, fair skin, pink-and-gold lehenga, flowers in her hair",
+    "nanda": "Nanda Baba: kind elderly cowherd chief of Gokul, white beard, white turban, simple yellow clothes",
+    "kamsa": "Kamsa: proud cruel king of Mathura, dark royal robes, golden crown, thick moustache (fierce, not gory)",
+    "sudama": "Sudama: thin poor Brahmin friend, kind face, tattered white dhoti, a small cloth bundle of rice",
+})
+MYTH_ALIASES.update({"shiv": "shiva", "mahadev": "shiva", "lord shiva": "shiva", "shib": "shiva", "parboti": "parvati",
+                     "ganesh": "ganesha", "gonesh": "ganesha", "jagannatha": "jagannath", "balaram": "balarama",
+                     "balabhadra": "balabhadra", "yashoda maa": "yashoda", "lokkhi": "lakshmi", "laxmi": "lakshmi",
+                     "kali maa": "kali", "ma kali": "kali", "ma durga": "durga", "saraswati maa": "saraswati",
+                     "radhe": "radha", "kansa": "kamsa"})
+GOD_RULE = (
+    "This is an episode of our nightly devotional series '{name}', told IN ORDER - episode {ep}: {topic}. Follow "
+    "{source} FAITHFULLY. Never invent an event, a miracle, a person, a boon, a curse or a dialogue's meaning that the "
+    "tradition does not have - people's faith must never be hurt. If tellings differ, follow the best-known Bengali "
+    "telling and the narrator may say 'কোনো কোনো মতে...'. Every name, relationship and place correct. The god is "
+    "shown with deep devotion, dignity and glory (bhakti) - never a joke, never silly or cute, never disrespectful; "
+    "use respectful Bengali for the gods (আপনি-forms: 'বললেন', 'গেলেন', 'শ্রীকৃষ্ণ', 'মহাদেব', 'প্রভু জগন্নাথ'). "
+    "Fights and demons with grandeur but no blood, no gore, nothing that frightens children. Make it gripping and "
+    "moving like a great devotional film: the FIRST line opens on this episode's most striking moment (a question - "
+    "e.g. the yajna fire blazing and a divine figure rising), then the leela step by step in order, its turning point, "
+    "its divine moment, then its meaning (the bhakti lesson) and one line that makes viewers wait for the next "
+    "episode. No modern people, no Sumon or Sayan inside the scripture story.")
+
 
 # v80: five ORIGINAL cartoon series with their own recurring children and friends, shaped after the kinds of
 # cartoons Indian families watch most on YouTube now (friendly-ghost cartoons, magic objects, kid detectives,
@@ -448,6 +569,7 @@ LEARN = ["the first 6 vowels of the alphabet of the story language (Bengali: অ
          "consonants 1-5 (Bengali: ক খ গ ঘ ঙ / Hindi: क ख ग घ ङ)", "consonants 6-10 (Bengali: চ ছ জ ঝ ঞ / Hindi: च छ ज झ ञ)",
          "consonants 11-15 (Bengali: ট ঠ ড ঢ ণ / Hindi: ट ठ ड ढ ण)", "consonants 16-20 (Bengali: ত থ দ ধ ন / Hindi: त थ द ध न)",
          "consonants 21-25 (Bengali: প ফ ব ভ ম / Hindi: प फ ब भ म)", "the last consonants (Bengali: য র ল শ ষ স হ / Hindi: य र ल व श ष स ह)",
+         "the special letters (Bengali: ড় ঢ় য় ৎ ং ঃ ঁ / Hindi: क्ष त्र ज्ञ श्र)",
          "numbers 1 to 5 (counting things)", "numbers 6 to 10 (counting things)", "the colours (red, blue, yellow, green, white, black)",
          "the fruits (mango, banana, jackfruit, guava, litchi, coconut)", "the animals of the village (cow, goat, dog, cat, duck, hen)",
          "the animals of the forest (tiger, elephant, monkey, deer, bear, lion)", "the birds (crow, sparrow, parrot, peacock, owl, kingfisher)",
@@ -462,12 +584,120 @@ LEARN_RULE = ("This is a LEARNING video for small children (2 to 6 years old) wi
               "At the end a tiny rhyme of all the items together. No story conflict, nothing scary. The TITLE starts with "
               "'শিখি মজায়: ' (Hindi: 'सीखो मज़े से: ').")
 
+# v118 (your wish: the letters must be SAID right and WRITTEN right): every Bengali letter with the name a teacher
+# says, how the voice says it, and a correctly spelt example word (a word that STARTS with it, or - for the letters
+# no word starts with - a word that HAS it)
+BN_ABC = [  # letter, the name said in class, roman sound for the voice, example word, starts (True) / has it (False)
+    ("অ", "স্বরে অ", "shore o", "অজগর", True), ("আ", "স্বরে আ", "shore a", "আম", True),
+    ("ই", "হ্রস্ব ই", "rosho i", "ইঁদুর", True), ("ঈ", "দীর্ঘ ঈ", "dirgho i", "ঈগল", True),
+    ("উ", "হ্রস্ব উ", "rosho u", "উট", True), ("ঊ", "দীর্ঘ ঊ", "dirgho u", "ঊষা", True),
+    ("ঋ", "ঋ", "ri", "ঋষি", True), ("এ", "এ", "e", "একতারা", True), ("ঐ", "ঐ", "oi", "ঐরাবত", True),
+    ("ও", "ও", "o", "ওল", True), ("ঔ", "ঔ", "ou", "ঔষধ", True),
+    ("ক", "ক", "ko", "কলা", True), ("খ", "খ", "kho", "খরগোশ", True), ("গ", "গ", "go", "গরু", True),
+    ("ঘ", "ঘ", "gho", "ঘড়ি", True), ("ঙ", "উঙ", "ung-o", "ব্যাঙ", False),
+    ("চ", "চ", "cho", "চাঁদ", True), ("ছ", "ছ", "chho", "ছাতা", True), ("জ", "বর্গীয় জ", "borgiyo jo", "জাহাজ", True),
+    ("ঝ", "ঝ", "jho", "ঝুড়ি", True), ("ঞ", "ইঞ", "iyo", "চঞ্চল", False),
+    ("ট", "ট", "to (hard, tongue back)", "টিয়া", True), ("ঠ", "ঠ", "tho (hard)", "ঠেলাগাড়ি", True),
+    ("ড", "ড", "do (hard)", "ডিম", True), ("ঢ", "ঢ", "dho (hard)", "ঢাক", True),
+    ("ণ", "মূর্ধন্য ণ", "murdhonno no", "হরিণ", False),
+    ("ত", "ত", "to (soft, tongue on teeth)", "তরমুজ", True), ("থ", "থ", "tho (soft)", "থালা", True),
+    ("দ", "দ", "do (soft)", "দোলনা", True), ("ধ", "ধ", "dho (soft)", "ধান", True),
+    ("ন", "দন্ত্য ন", "dontto no", "নৌকা", True),
+    ("প", "প", "po", "পাখি", True), ("ফ", "ফ", "pho", "ফুল", True), ("ব", "ব", "bo", "বই", True),
+    ("ভ", "ভ", "bho", "ভালুক", True), ("ম", "ম", "mo", "মাছ", True),
+    ("য", "অন্তঃস্থ য", "ontostho jo", "যমজ", True), ("র", "র", "ro", "রথ", True), ("ল", "ল", "lo", "লাটিম", True),
+    ("শ", "তালব্য শ", "talobbo sho", "শাপলা", True), ("ষ", "মূর্ধন্য ষ", "murdhonno sho", "ষাঁড়", True),
+    ("স", "দন্ত্য স", "dontto sho", "সূর্য", True), ("হ", "হ", "ho", "হাতি", True),
+    ("ড়", "ড-এ শূন্য ড়", "doye shunno ro", "পাহাড়", False), ("ঢ়", "ঢ-এ শূন্য ঢ়", "dhoye shunno rho", "আষাঢ়", False),
+    ("য়", "অন্তঃস্থ অ", "ontostho o", "ময়ূর", False), ("ৎ", "খণ্ড ত", "khondo to", "উৎসব", False),
+    ("ং", "অনুস্বার", "onushshar", "রং", False), ("ঃ", "বিসর্গ", "bishorgo", "দুঃখ", False),
+    ("ঁ", "চন্দ্রবিন্দু", "chondrobindu", "চাঁদ", False),
+]
+BN_ABC_MAP = {x[0]: x for x in BN_ABC}
+BN_NUM = [("১", "এক", "ek"), ("২", "দুই", "dui"), ("৩", "তিন", "tin"), ("৪", "চার", "char"), ("৫", "পাঁচ", "panch"),
+          ("৬", "ছয়", "chhoy"), ("৭", "সাত", "saat"), ("৮", "আট", "aat"), ("৯", "নয়", "noy"), ("১০", "দশ", "dosh")]
+
+
+def learn_items(idea):
+    """the letters (or Bengali numbers) this learning episode teaches, in order"""
+    m = re.search(r"Bengali:\s*([^/)]+)", str(idea))
+    if m:
+        return [c for c in m.group(1).split() if c in BN_ABC_MAP]
+    m = re.search(r"numbers\s+(\d+)\s+to\s+(\d+)", str(idea))
+    if m:
+        return [BN_NUM[i - 1][0] for i in range(int(m.group(1)), int(m.group(2)) + 1) if 1 <= i <= 10]
+    return []
+
+
+def learn_letters_rule(idea):
+    items = learn_items(idea)
+    if not items:
+        return ""
+    rows = []
+    for it in items:
+        if it in BN_ABC_MAP:
+            l_, name, snd, word, starts = BN_ABC_MAP[it]
+            rows.append(f"- {l_}: its name is '{name}' (said '{snd}'); example word '{word}' "
+                        + ("(starts with it)" if starts else f"(no Bengali word starts with {l_} - say that the letter "
+                                                             f"is INSIDE '{word}')"))
+        else:
+            n_ = next(x for x in BN_NUM if x[0] == it)
+            rows.append(f"- {n_[0]}: said '{n_[1]}' ({n_[2]})")
+    return ("\nTHE LETTERS MUST BE SAID AND WRITTEN EXACTLY RIGHT (a teacher will check every one). Teach exactly these, "
+            "in this order - ONE scene each, and put the item in that scene's \"item\" field (exactly as below, one "
+            "letter / number):\n" + "\n".join(rows) + "\nIn the lines write the letter itself together with its name "
+            "as given (e.g. 'এটা হল হ্রস্ব ই - ই'), the example word spelt EXACTLY as given (standard spelling, no "
+            "other word for the letter), Bengali numerals (১, ২, ৩) never English digits. Never draw or describe "
+            "written letters inside the PICTURES (no text in images) - the video puts the correct letter on screen "
+            "itself.\n")
+
+
+def learn_pron():
+    """the letter names / numbers as the voice must say them"""
+    out = {}
+    for l_, name, snd, word, _s in BN_ABC:
+        if len(name) > 1:
+            out[name] = snd
+    for d_, w_, r_ in BN_NUM:
+        out[w_] = r_
+    return out
+
+
+def stamp_item(src, item, dst):
+    """the correct letter / number (and its example word) drawn by the bot itself on the picture - AI pictures
+    cannot write Bengali letters correctly"""
+    from PIL import ImageDraw, ImageFont
+    img = Image.open(src).convert("RGB")
+    W_, H_ = img.size
+    d = ImageDraw.Draw(img)
+    big = ImageFont.truetype(find_font("bn"), int(H_ * 0.26))
+    small = ImageFont.truetype(find_font("bn"), int(H_ * 0.075))
+    word = BN_ABC_MAP[item][3] if item in BN_ABC_MAP else ""
+    bw = d.textbbox((0, 0), item, font=big)
+    ww = d.textbbox((0, 0), word, font=small) if word else (0, 0, 0, 0)
+    box_w = max(bw[2] - bw[0], ww[2] - ww[0]) + int(H_ * 0.08)
+    box_h = (bw[3] - bw[1]) + (ww[3] - ww[1]) + int(H_ * 0.12)
+    x0, y0 = int(W_ * 0.62), int(H_ * 0.12)            # inside the frame even when the camera moves in a little
+    d.rounded_rectangle([x0, y0, x0 + box_w, y0 + box_h], radius=int(H_ * 0.04), fill=(255, 250, 235),
+                        outline=(255, 140, 0), width=max(4, H_ // 120))
+    d.text((x0 + (box_w - (bw[2] - bw[0])) // 2 - bw[0], y0 + int(H_ * 0.03) - bw[1]), item, font=big,
+           fill=(200, 30, 30))
+    if word:
+        d.text((x0 + (box_w - (ww[2] - ww[0])) // 2 - ww[0], y0 + (bw[3] - bw[1]) + int(H_ * 0.07) - ww[1]), word,
+               font=small, fill=(30, 60, 160))
+    img.save(dst, quality=93)
+    return dst
+
 for _k, _s in CARTOON_SERIES.items():
     CATEGORIES[_k] = list(_s["ideas"])
     LANGS["bn"]["labels"][_k] = _s["bn"]
     LANGS["hi"]["labels"][_k] = _s["hi"]
     extras.CAT_QUERIES[("cartoon", _k)] = _s["q"]
 LANGS["bn"]["labels"]["learn"] = "শিখি মজায়"
+LANGS["bn"]["series_titles"].setdefault("learn", "শিখি মজায়")     # v118 (the title said only ' পর্ব ৩')
+LANGS["hi"]["series_titles"].setdefault("learn", "सीखो मज़े से")
+LANGS["bn"]["series_titles"].setdefault("keno", "সায়নের কেন?")
+LANGS["hi"]["series_titles"].setdefault("keno", "सायन का क्यों?")
 LANGS["hi"]["labels"]["learn"] = "सीखो मज़े से"
 CATEGORIES["learn"] = list(LEARN)
 
@@ -480,7 +710,7 @@ KENO = ["why the sky is blue", "why the moon changes its shape", "why it rains",
         "why the wind blows", "why fireflies glow", "why we must wash our hands", "why boats float",
         "why we hear an echo", "why the clouds are white and sometimes black", "why a seed grows into a tree"]
 KENO_RULE = ("\nOUR SERIES 'সায়নের কেন?' (Hindi 'सायन का क्यों?') - TODAY'S QUESTION: {q}.\nSAYAN (8) suddenly asks this "
-             "'why' (a real child's question, in his own funny words, in the first scene). SUMON KAKU does not give a "
+             "'why' (a real child's question, in his own funny words, in the first scene). His FATHER SUMON (Sayan calls him 'বাবা') does not give a "
              "lecture: he turns the answer into a small, funny everyday adventure that SHOWS it (an experiment at home, "
              "a walk, a game) - Sayan tries, gets it a little wrong, laughs, then understands. The science must be "
              "CORRECT but told so a 5-8 year old understands, with one simple example to remember. Sayan says the "
@@ -767,7 +997,7 @@ SAHEB_ROLE = {
     "fairy": "a kind young man from the village who helps the little hero or heroine",
     "lok": "a curious young traveller from Kolkata who hears or sees this district's tale",
     "funny": "the sensible young man in the middle of the comedy who tries to calm everyone down",
-    "keno": "Sayan's uncle Sumon kaku, who answers Sayan's 'why?' by showing it with a small funny adventure",
+    "keno": "Sayan's father Sumon (Sayan calls him 'বাবা'), who answers Sayan's 'why?' by showing it with a small funny adventure",
     "para": "the friendly young neighbour Sumon-da whom the whole para trusts",
     "detective": "Jhontu and Mini's friendly elder cousin Sumon-da who helps them get around - but the KIDS solve "
                  "the case, never Sumon",
@@ -779,7 +1009,7 @@ SAHEB_ROLE = {
     "bedtime": "the gentle elder brother who tucks the child in",
     "gita": "the young man in the modern-life example who learns the Gita's lesson",
 }
-SAHEB_SKIP = ("ramayan", "mahabharat", "divine")
+SAHEB_SKIP = ("ramayan", "mahabharat", "divine") + tuple(GOD_SERIES)
 SAYAN_LOOK = ("a slim, sweet Bengali boy of 8 in a cartoon style, short thick dark-brown hair neatly swept to one side "
               "with a soft fringe, big round dark-brown eyes, thick dark eyebrows, a small gentle smile, light wheat-brown "
               "skin, a light-pink polo T-shirt with a short zip at the collar and darker pink collar and sleeve edges, "
@@ -792,8 +1022,8 @@ SAYAN_FAMILY = {
                "a little bossy, loves books", "ত্রিশাদি", "a tall, slim Bengali girl of 15 in a cartoon style, fair "
                "skin, long straight black hair in a single plait, black rectangular power glasses, bright clever eyes, "
                "a sky-blue salwar kameez with a white dupatta, a small black wristwatch, flat brown sandals"),
-    "Chhanda": ("ছন্দা", "छंदा", "female", "adult", "Sayan's mother, 30; gentle, beautiful, the calm heart of the "
-                "house", "মা", "a beautiful Bengali married woman of 30 in a cartoon style, fair skin, long black hair "
+    "Chhanda": ("ছন্দা", "छंदा", "female", "adult", "Sayan's mother and SUMON'S WIFE, 30; gentle, beautiful, the calm "
+                "heart of the house", "মা", "a beautiful Bengali married woman of 30 in a cartoon style, fair skin, long black hair "
                 "in a loose bun, a line of red sindoor in the hair parting, a small red bindi, white shankha and red "
                 "pola bangles, a soft yellow cotton saree with a red border, a warm kind smile"),
     "Tapati": ("তপতী", "तपती", "female", "adult", "Sayan's thakuma (his father's mother), 50; loving but strict "
@@ -828,9 +1058,11 @@ def family_rule(category, lang="bn"):
         rows.append(f"- \"{name}\" ({'Bengali ' + chr(39) + bn + chr(39) if lang == 'bn' else 'Hindi ' + chr(39) + hi + chr(39)}"
                     f"), gender {g}, age {age}: {who}. Sayan calls her/him '{call}'. EXACT look: \"{look}\"")
     return ("SAYAN'S FAMILY (use 1-3 of them ONLY when the story happens at home, in the para or on a family outing - "
-            "never all of them at once, never forced in): Sumon is Sayan's kaku, so Ajoy and Tapati are Sumon's "
-            "parents (he calls them 'বাবা' and 'মা'), Priya is Sumon's elder sister ('দিদি'), Chhanda is Sumon's boudi "
-            "('বৌদি'), Reba is Sumon's thakuma, and Trisha calls Sumon 'মামা'.\n" + "\n".join(rows) +
+            "never all of them at once, never forced in): SUMON IS SAYAN'S FATHER and CHHANDA IS SUMON'S WIFE "
+            "(Sayan's mother) - Sumon and Chhanda are husband and wife (Chhanda calls him by his name or 'শুনছ', he "
+            "calls her 'ছন্দা'); Ajoy and Tapati are Sumon's parents (he calls them 'বাবা' and 'মা'; Chhanda calls them "
+            "'বাবা' and 'মা' too), Priya is Sumon's elder sister ('দিদি' to Sumon, 'দিদি' to Chhanda), Reba is Sumon's "
+            "thakuma, and Trisha calls Sumon 'মামা' and Chhanda 'মামি'. Sayan calls Sumon 'বাবা' - NEVER 'কাকু'.\n" + "\n".join(rows) +
             "\nWhoever of them appears: exactly this name, gender and look in the characters list; each has a clear "
             "way of speaking (Reba slow with old sayings, Ajoy jolly, Tapati firm, Priya chatty, Chhanda gentle, "
             "Trisha smart-teenager).\n")
@@ -848,10 +1080,11 @@ def saheb_rule(category):
            "gender male, age adult, kind human, EXACTLY this look every time: \"" + look + "\". His role: " + role +
            ". Give him 2-5 natural lines; he is warm, curious and funny, never rude. Put him in the characters "
            "list with this exact look.\n")
-    if category not in SAYAN_SKIP and env("SAYAN") != "0":       # v99: Sumon's nephew Sayan (8) is always with him
+    if category not in SAYAN_SKIP and env("SAYAN") != "0":       # v118: Sumon's SON Sayan (8) is always with him
         out += ("OUR OWN CHILD HERO: SAYAN goes everywhere with Sumon - name \"Sayan\" (Bengali 'সায়ন', Hindi "
-                "'सायन'), gender male, age child (8 years old), kind human, Sumon's nephew (he calls him 'Sumon kaku' "
-                "/ Hindi 'सुमन चाचा'), EXACTLY this look every time: \"" + SAYAN_LOOK + "\". He is curious (asks "
+                "'सायन'), gender male, age child (8 years old), kind human, SUMON'S SON - Sumon is his father and "
+                "Chhanda his mother (he calls Sumon 'বাবা' / Hindi 'पापा' - never kaku or chacha), EXACTLY this look "
+                "every time: \"" + SAYAN_LOOK + "\". He is curious (asks "
                 "'কেন?' a lot), brave, a little naughty and very funny; he notices small things the grown-ups miss and "
                 "often gives the idea that helps - children watching should feel he is one of them. Give him 3-6 natural "
                 "lines. Put him in the characters list with this exact look.\n")
@@ -1157,8 +1390,11 @@ def new_hook_line(scenes, story, lang, hk):
     prompt = (f"A {LANGS[lang]['name']} children's cartoon story. Its funniest / most exciting moment is this line by "
               f"{take[0].get('speaker', 'narrator')}: \"{extras.strip_tags(str(take[0].get('text', '')))}\"\n"
               f"Story: {str(story.get('summary') or story.get('description') or '')[:800]}\n"
-              "Write ONE NEW line for the first seconds of the video, said by the SAME character, that makes children "
-              "stay (funny, surprising, a question). Max 12 words. It must NOT repeat or copy any line of the story "
+              + ("This is a DEVOTIONAL story of the gods: write ONE NEW reverent line for the first 5 seconds that shows "
+                 "its most awe-inspiring moment as a question (e.g. 'যজ্ঞের আগুন থেকে কে উঠে এলেন?') - never a joke. "
+                 if YT_KIDS[0] in MYTH else
+                 "Write ONE NEW line for the first seconds of the video, said by the SAME character, that makes people "
+                 "stay (funny, surprising, a question). ") + "Max 12 words. It must NOT repeat or copy any line of the story "
               "and must not tell the ending. Answer ONLY JSON: {\"text\": \"the line\"}")
     for model in extras.helper_models(key)[:3] + gemini_models(key)[:2]:
         try:
@@ -1245,10 +1481,10 @@ def host_puppet(fly_in):
     return {"host": {"fly_in": fly_in}, "bg": bg, "place": "village courtyard"} if bg else None
 
 
-def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2):
-    if MOCK:
+def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2, prompt_only=False):
+    if MOCK and not prompt_only:
         return mock_story(lang)
-    key = need_env("GEMINI_API_KEY")
+    key = env("GEMINI_API_KEY") if prompt_only else need_env("GEMINI_API_KEY")
     category, idea = theme
     L = LANGS[lang]
     old_titles = [h["title"] for h in history[-60:] if h.get("lang", "hi") == lang]
@@ -1354,6 +1590,12 @@ def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2)
                      KENO_RULE.replace("{q}", str(theme[1] if isinstance(theme, (list, tuple)) else theme))
                      if category == "keno" else None) or (CARTOON_SERIES.get(category) or {}).get("rule") or
           "Do NOT retell famous copyrighted stories or use known cartoon characters. Invent new names.")
+    if category in GOD_SERIES:                       # v118: the nightly devotional series
+        g_ = GOD_SERIES[category]
+        ep_ = (g_["eps"].index(idea) + 1) if idea in g_["eps"] else ""
+        kind_rules = GOD_RULE.format(name=g_["en"] if "en" in g_ else g_["bn"], ep=ep_, topic=idea, source=g_["source"])
+    if category == "learn" and lang == "bn":
+        kind_rules += learn_letters_rule(idea)
     kind_rules = kind_rules.replace("{lang}", L["name"])
     if part == 1:
         kind_rules += ("\nSERIES: this is PART 1 of a bigger story told in parts on following days. Introduce the "
@@ -1397,8 +1639,10 @@ Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like he
 
 Story rules:
 - LENGTH: 14 to 18 scenes, 5-6 minutes when spoken - at least 750 spoken words in total. Never rush the
-  ending; the story must feel complete. The FIRST line must hook in 5 seconds (a surprise, a question
-  or a funny moment). Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
+  ending; the story must feel complete. THE FIRST 15 SECONDS DECIDE EVERYTHING (Facebook: most people left
+  in the first 15 s): the FIRST line starts INSIDE the action or the most striking moment, with a question
+  or a surprise - never a greeting, never 'আজ আমরা শুনব...', never a slow 'অনেক দিন আগে...' description;
+  the first scene moves fast, the background comes later in small pieces. Then a problem, rising curiosity, a twist, and a happy, funny or touching ending.
 - Make it emotional and memorable so families want to share it: smart humour grown-ups also laugh at, a warm
   heart, real feelings, a clear lesson.
 - Clean family entertainment for all ages: no vulgarity, no graphic violence, nothing that frightens small children.
@@ -1472,6 +1716,8 @@ Return ONLY JSON with exactly these keys:
 }}
 Every scene object also has "chapter": "2-4 word {L['name']} chapter name for YouTube chapters".
 """
+    if prompt_only:
+        return prompt
     body = {"contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 1.0, "responseMimeType": "application/json",
                                  "maxOutputTokens": 60000}}
@@ -1537,6 +1783,331 @@ Every scene object also has "chapter": "2-4 word {L['name']} chapter name for Yo
         log(f"  using the longest story written ({best[0]} words)")
         return best[1]
     raise RuntimeError(f"Gemini failed: {last_err}")
+
+
+# ----------------------------------------------------------------- v118: the STORY TEAM (each one has ONE job)
+# 19 Nov 2026 (your wish): 'use assistants, each with one role; better stories, right plotting, like the horror bot'.
+# Before, ONE request wrote the story AND every picture, sound and voice field in one big JSON - the story drowned in
+# it. Now: researcher (Google, only for the gods' series) -> plotter (step-by-step plan) -> writer (the whole story in
+# one go, as a plain script) -> editor (reads it all once: flow, repeats, ending, names, relations) -> faith checker
+# (the gods' series: every event against the researched facts, respect) -> director (pictures, sounds, voices - the
+# words stay exactly the writer's). Anything that fails: the old one-step writer, nothing is lost.
+TEAM = {}
+
+
+def _gcall(prompt, json_mode=False, temp=0.8, max_tokens=40000, tools=None, who="team"):
+    key = env("GEMINI_API_KEY")
+    if MOCK or not key:
+        return None
+    gen = {"temperature": temp, "maxOutputTokens": max_tokens}
+    if json_mode and not tools:
+        gen["responseMimeType"] = "application/json"
+    body = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": gen}
+    if tools:
+        body["tools"] = tools
+    for rnd in range(2):
+        for model in gemini_models(key)[:4]:
+            if model in TEXT_DAY_OUT:
+                continue
+            try:
+                r = requests.post(f"{GEMINI_BASE}/models/{model}:generateContent", headers={"x-goog-api-key": key},
+                                  json=body, timeout=420)
+                if not r.ok:
+                    log(f"  {who}: {model} {r.status_code}")
+                    continue
+                c = r.json()["candidates"][0]
+                txt = "".join(p_.get("text", "") for p_ in c["content"]["parts"] if not p_.get("thought"))
+                if txt.strip():
+                    if tools:
+                        return txt, c.get("groundingMetadata") or {}
+                    return txt
+            except Exception as e:
+                log(f"  {who}: {model} {str(e)[:100]}")
+        if rnd == 0:
+            time.sleep(45)
+    return None
+
+
+def god_research(category, topic):
+    """the RESEARCHER: Google (Gemini with Google Search) finds how the scriptures and the best-known tellings tell
+    this episode - the events in order, the people, places and meaning. Only answers backed by Google results."""
+    g = GOD_SERIES.get(category) or {"source": "the Valmiki Ramayana / Krittivas" if category == "ramayan" else
+                                     "Vyasa's Mahabharata / Kashiram Das"}
+    today = dt.datetime.now(extras.IST).date().isoformat()
+    prompt = (f"Search Google and find how {g['source']} tell this episode: '{topic}'. Today is {today}: also say if a "
+              "festival of this god is within the next 7 days (with its date) and which part of this story is linked "
+              "to it. Answer in English, ONLY JSON: {\"scripture\": \"which text(s) tell it (book / canto / chapter if "
+              "known)\", \"events\": [\"the events IN ORDER, one short sentence each, 8-16 of them - only what the "
+              "texts say\"], \"people\": [\"each person / god in it: who they are, their relationships\"], "
+              "\"places\": [\"\"], \"meaning\": \"the lesson / bhakti meaning tradition gives\", \"variants\": "
+              "\"where tellings differ, and which one is best known in Bengal\", \"never_say\": [\"common mistakes or "
+              "inventions to avoid\"], \"festival\": \"\" }")
+    out = _gcall(prompt, tools=[{"google_search": {}}], temp=0.2, max_tokens=8000, who="researcher")
+    if not out:
+        return None
+    txt, gm = out
+    j = extras.load_json_loose(txt)
+    chunks = gm.get("groundingChunks") or []
+    if not (isinstance(j, dict) and j.get("events")) or not chunks:
+        log("  researcher: no Google-backed answer - the writer follows the scripture from its own knowledge")
+        return None
+    srcs = []
+    for c in chunks[:6]:
+        w = c.get("web") or {}
+        u = w.get("uri", "")
+        try:
+            if "vertexaisearch" in u or "grounding-api-redirect" in u:
+                u = requests.head(u, allow_redirects=True, timeout=15).url
+        except Exception:
+            pass
+        if u:
+            srcs.append({"title": w.get("title", ""), "url": u})
+    j["sources"] = srcs
+    log(f"  researcher: {len(j['events'])} events from {j.get('scripture', '')[:80]} ({len(srcs)} Google sources)")
+    return j
+
+
+def _facts_text(f):
+    return ("\nTHE FACTS OF THIS EPISODE (researched on Google - tell ONLY these events, in this order; no new events, "
+            f"miracles or people):\nScripture: {f.get('scripture', '')}\nEvents:\n"
+            + "\n".join(f"{k + 1}. {e}" for k, e in enumerate(f.get("events") or []))
+            + "\nPeople: " + "; ".join(map(str, f.get("people") or []))
+            + "\nPlaces: " + "; ".join(map(str, f.get("places") or []))
+            + f"\nMeaning: {f.get('meaning', '')}\nWhere tellings differ: {f.get('variants', '')}"
+            + ("\nNever: " + "; ".join(map(str, f.get("never_say") or [])) if f.get("never_say") else "")
+            + (f"\nFestival soon: {f['festival']}" if f.get("festival") else "") + "\n")
+
+
+CARTOON_SCRIPT = """
+WRITE THE WHOLE STORY NOW, in ONE go, as a plain script (NOT JSON), exactly in this form:
+TITLE: <the {lang} title>
+CHARACTERS: <every person / animal / god in it, comma separated, names in English letters>
+### SCENE 1 | <where, in English> | <one mood word>
+narrator: <{lang} words>
+<Name>: <{lang} words>
+### SCENE 2 | ...
+Rules: {scenes} scenes, 4-7 lines each, at least {words} spoken words in all; narrator lines 20-45 words, dialogue
+4-20 words; ONE speaker per line; nothing else in the script (no notes, no stage directions in brackets, no English
+in the lines). Every line is said ONCE - never repeat a sentence or an idea already said.
+"""
+
+
+def _parse_cartoon_script(txt):
+    title, chars, scenes = "", [], []
+    for raw in str(txt or "").splitlines():
+        ln = raw.strip().strip("*")
+        if not ln:
+            continue
+        if ln.upper().startswith("TITLE:"):
+            title = ln.split(":", 1)[1].strip()
+        elif ln.upper().startswith("CHARACTERS:"):
+            chars = [c.strip() for c in ln.split(":", 1)[1].split(",") if c.strip()]
+        elif ln.startswith("###"):
+            bits = [b.strip() for b in ln.lstrip("#").split("|")]
+            scenes.append({"place": bits[1] if len(bits) > 1 else "", "mood": bits[2] if len(bits) > 2 else "",
+                           "lines": []})
+        elif re.match(r"(CHANGES|NOTES?|EDITOR)\s*:", ln, re.I):
+            continue
+        elif ":" in ln and scenes:
+            spk, text = ln.split(":", 1)
+            spk, text = spk.strip().strip("*- "), text.strip()
+            if spk and text and len(spk) < 40:
+                scenes[-1]["lines"].append({"speaker": spk, "text": text})
+    scenes = [s for s in scenes if s["lines"]]
+    return title, chars, scenes
+
+
+def _script_text(title, chars, scenes):
+    out = [f"TITLE: {title}", "CHARACTERS: " + ", ".join(chars)]
+    for k, s in enumerate(scenes):
+        out.append(f"### SCENE {k + 1} | {s.get('place', '')} | {s.get('mood', '')}")
+        out += [f"{ln['speaker']}: {ln['text']}" for ln in s["lines"]]
+    return "\n".join(out)
+
+
+def team_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2):
+    """v118: the story made by the team (see TEAM above); falls back to make_story()"""
+    TEAM.clear()
+    category = theme[0]
+    if MOCK or env("STORY_TEAM") == "0" or CREATOR.get("story"):
+        return make_story(lang, theme, history, extra_rules=extra_rules, part=part, prev=prev, total=total)
+    L = LANGS[lang]
+    try:
+        facts = None
+        if category in MYTH and category != "gita":
+            facts = god_research(category, theme[1])
+            TEAM["research"] = facts
+            if facts:
+                extra_rules += _facts_text(facts)
+        full = make_story(lang, theme, history, extra_rules=extra_rules, part=part, prev=prev, total=total,
+                          prompt_only=True)
+        rules, schema = full.split("Return ONLY JSON with exactly these keys:", 1)
+        story_rules = rules.split("- Think like a cartoon film director")[0]   # (the writer needs no picture rules)
+        # 1) PLOTTER
+        plan = _gcall(story_rules + "\nYOUR JOB NOW: you are the PLOTTER - before anyone writes, plan this story "
+                      "STEP BY STEP as a great children's-film writer would. Answer ONLY JSON: {\"premise\": \"\", "
+                      "\"hook\": \"what the first 10 seconds do\", \"beats\": [{\"scene\": 1, \"what happens\": \"\", "
+                      "\"why it matters\": \"what the viewer feels / wants to know now\"}], \"turn\": \"the twist or "
+                      "turning point\", \"climax\": \"\", \"ending\": \"how every thread is closed\", \"lesson\": \"\"}. "
+                      "14-18 beats; every beat follows from the one before; set-ups pay off; nothing repeats; the "
+                      "ending is complete." + (" Every beat must come from THE FACTS above, in their order."
+                                               if facts else ""),
+                      json_mode=True, temp=0.9, max_tokens=8000, who="plotter")
+        plan_j = extras.load_json_loose(plan or "")
+        if not (isinstance(plan_j, dict) and plan_j.get("beats")):
+            raise RuntimeError("no plan")
+        TEAM["beats"] = len(plan_j["beats"])
+        plan_txt = json.dumps(plan_j, ensure_ascii=False)
+        # 2) WRITER
+        sc = CARTOON_SCRIPT.format(lang=L["name"], scenes="14 to 18", words=int(env("MIN_WORDS") or 650) + 100)
+        script = _gcall(story_rules + "\nTHE PLAN (follow it beat by beat, one scene per beat):\n" + plan_txt + sc,
+                        temp=1.0, max_tokens=30000, who="writer")
+        title, chars, scenes = _parse_cartoon_script(script)
+        words = sum(len(ln["text"].split()) for s in scenes for ln in s["lines"])
+        if len(scenes) < 8 or words < 400:
+            raise RuntimeError(f"script too thin ({len(scenes)} scenes, {words} words)")
+        TEAM["writer"] = f"{len(scenes)} দৃশ্য, {words} শব্দ"
+        # 3) EDITOR (+ 4) FAITH CHECKER for the gods)
+        faith = ("\nYOU ARE ALSO THE FAITH CHECKER: check EVERY event against THE FACTS above - remove or correct "
+                 "anything invented, wrong names or relations, anything that could hurt a devotee's faith, any joke "
+                 "about a god; the gods speak and are spoken of with respect." if category in MYTH else "")
+        ed = _gcall(story_rules + "\nYOU ARE THE EDITOR. Here is the whole script:\n" + _script_text(title, chars, scenes)
+                    + "\nRead ALL of it once, like a great editor, and give it back better: every scene must follow "
+                    "from the one before (no jumps, no patched-in bits); cut every sentence or idea that is said twice "
+                    "(even in other words); the hook works in the first line; the plan's twist and ending land; the "
+                    "ending is complete and comes ONCE (nothing added after it); names, ages and family relations are "
+                    "right (Sumon is Sayan's FATHER, Chhanda Sumon's WIFE); natural, warm, everyday " + L["name"] +
+                    " for all ages; correct spelling." + faith + "\nKeep the length (do not shorten it by more than "
+                    "10%). Answer with the WHOLE corrected script in the SAME form, and after it one line "
+                    "'CHANGES: <how many things you changed, and the 3 biggest, in English>'." + sc,
+                    temp=0.4, max_tokens=30000, who="editor")
+        t2, c2, s2 = _parse_cartoon_script(ed)
+        w2 = sum(len(ln["text"].split()) for s in s2 for ln in s["lines"])
+        if len(s2) >= max(8, len(scenes) - 3) and w2 >= words * 0.8:
+            title, chars, scenes, words = t2 or title, c2 or chars, s2, w2
+            m = re.search(r"CHANGES:\s*(.+)", ed or "")
+            TEAM["editor"] = (m.group(1).strip()[:200] if m else "পড়ে ঠিক করেছে")
+        else:
+            TEAM["editor"] = "সম্পাদকের লেখা নেওয়া হয়নি (ছোট হয়ে গিয়েছিল)"
+        if category in MYTH:
+            TEAM["faith"] = "প্রতিটা ঘটনা শাস্ত্রের সঙ্গে মিলিয়েছে" if facts else "শাস्त्र অনুযায়ী দেখেছে (Google-এ খোঁজ পাওয়া যায়নি)"
+        # 5) DIRECTOR: pictures, sounds, voices, the page's words - the story's words stay the writer's
+        ids = []
+        lines_txt = []
+        for i, s in enumerate(scenes):
+            lines_txt.append(f"### SCENE {i + 1} | {s['place']} | {s['mood']}")
+            for j, ln in enumerate(s["lines"]):
+                ids.append((i, j))
+                lines_txt.append(f"[S{i + 1}L{j + 1}] {ln['speaker']}: {ln['text']}")
+        dj = _gcall(rules + "\nYOU ARE THE DIRECTOR. The story is WRITTEN and FINAL - here it is, every line with its id:\n"
+                    + f"TITLE: {title}\nCHARACTERS: {', '.join(chars)}\n" + "\n".join(lines_txt)
+                    + "\nMake the film of it: fill the JSON below for THIS story. The scenes and lines must be EXACTLY "
+                    "these, in this order, same speakers and the SAME words in \"text\" (copy them - do not change, add "
+                    "or drop a word); every line object also gets \"id\" (e.g. \"S3L2\"). You may improve the title "
+                    "only if it is weak.\nReturn ONLY JSON with exactly these keys:" + schema
+                    + "\nEvery line object has \"id\". Every scene object of a learning video also has \"item\".",
+                    json_mode=True, temp=0.6, max_tokens=60000, who="director")
+        story = extras.load_json_loose(dj or "")
+        if not (isinstance(story, dict) and story.get("scenes")):
+            raise RuntimeError("director gave no JSON")
+        by_id = {}
+        for sc_ in story.get("scenes") or []:
+            for ln in sc_.get("lines") or []:
+                if isinstance(ln, dict) and ln.get("id"):
+                    by_id[str(ln["id"]).strip("[] ").upper()] = ln
+        dsc = story.get("scenes") or []
+        out_scenes, kept = [], 0
+        for i, s in enumerate(scenes):
+            base = dict(dsc[i]) if i < len(dsc) and isinstance(dsc[i], dict) else {}
+            base.setdefault("action", s["place"])
+            base.setdefault("place", s["place"])
+            base.setdefault("mood", s["mood"] or "happy")
+            base.setdefault("characters", [])
+            new_lines = []
+            for j, ln in enumerate(s["lines"]):
+                d = dict(by_id.get(f"S{i + 1}L{j + 1}") or {})
+                kept += bool(d)
+                d.update(speaker=ln["speaker"], text=ln["text"])      # the writer's words, always
+                d.setdefault("emotion", "normal")
+                d.setdefault("en", "")
+                if not isinstance(d.get("image"), dict):
+                    d["image"] = {"prompt": base.get("action", ""), "characters": base.get("characters", [])}
+                d.pop("id", None)
+                new_lines.append(d)
+            base["lines"] = new_lines
+            out_scenes.append(base)
+        story["scenes"] = out_scenes
+        story["title"] = story.get("title") or title
+        if not story.get("characters"):
+            raise RuntimeError("director gave no characters")
+        TEAM["director"] = f"{kept} of {len(ids)} lines got pictures/sounds"
+        TEAM["ok"] = True
+        log(f"  STORY TEAM: {len(out_scenes)} scenes, {words} words - plotter {TEAM['beats']} beats, editor: "
+            f"{TEAM.get('editor', '')[:80]}, director {kept}/{len(ids)}")
+        if facts and facts.get("sources"):
+            story["sources"] = facts["sources"]
+        return story
+    except Exception as e:
+        log("  story team failed (", str(e)[:150], ") - the one-step writer writes it")
+        TEAM.clear()
+        return make_story(lang, theme, history, extra_rules=extra_rules, part=part, prev=prev, total=total)
+
+
+def team_report(story, title):
+    """the team's work on Telegram, after every story is written"""
+    if not TEAM.get("ok") or MOCK or env("TEAM_REPORT") == "0":
+        return
+    f = TEAM.get("research")
+    rows = [f"📋 কার্টুন গল্পের দল: {title}"]
+    if f is not None or "research" in TEAM:
+        rows.append("🔎 গবেষক: " + (f"Google-এ {len(f.get('sources') or [])}টা সূত্র, {len(f.get('events') or [])}টা ঘটনা "
+                                   f"({str(f.get('scripture', ''))[:70]})" if f else "Google-এ ভরসার সূত্র পায়নি"))
+    rows.append(f"🗺️ প্লট-লেখক: {TEAM.get('beats', '?')} ধাপের পরিকল্পনা")
+    rows.append(f"✍️ লেখক: {TEAM.get('writer', '')}")
+    rows.append(f"✂️ সম্পাদক: {TEAM.get('editor', '')}")
+    if TEAM.get("faith"):
+        rows.append(f"🙏 ধর্ম-পাহারাদার: {TEAM['faith']}")
+    rows.append(f"🎬 পরিচালক: {TEAM.get('director', '')}")
+    if TEAM.get("pron"):
+        rows.append(f"🗣️ উচ্চারণ-শিক্ষক: {TEAM['pron']}টা কঠিন শব্দের উচ্চারণ গলাকে বলে দিয়েছে")
+    extras.telegram("\n".join(rows))
+
+
+DEV_PRON = {"লক্ষ্মণ": "lokkhon", "লক্ষ্মী": "lokkhi", "যজ্ঞ": "jog-go", "কৃষ্ণ": "krish-no", "শ্রীকৃষ্ণ": "shri-krish-no",
+            "বিষ্ণু": "bish-nu", "ব্রহ্মা": "brom-ha", "ব্রাহ্মণ": "bram-hon", "শত্রুঘ্ন": "shotrugh-no",
+            "বিশ্বামিত্র": "bish-sha-mit-tro", "অশ্বত্থ": "osh-shot-tho", "সুগ্রীব": "shu-greeb", "বাল্মীকি": "bal-miki",
+            "দুর্গা": "dur-ga", "জগন্নাথ": "jo-gon-nath", "সুভদ্রা": "shu-bhod-dra", "বলভদ্র": "bo-lo-bhod-dro",
+            "মহাদেব": "mo-ha-deb", "পার্বতী": "par-bo-ti", "ভীষ্ম": "bhish-sho", "অর্জুন": "or-jun", "যুধিষ্ঠির": "ju-dhish-thir",
+            "দ্রৌপদী": "drou-po-di", "অভিমন্যু": "o-bhi-mon-nu", "আত্মা": "atta", "পদ্ম": "poddo", "স্বর্গ": "shor-go",
+            "বিশ্বাস": "bish-shash", "হনুমান": "ho-nu-man", "রাবণ": "ra-bon", "কৌশল্যা": "kou-shol-la", "শিব": "shib",
+            "গণেশ": "go-nesh", "সরস্বতী": "sho-rosh-shoti", "যশোদা": "jo-sho-da", "শ্মশান": "shoshan"}
+
+
+def pron_guide(story, lang):
+    """v118 'the words are not said right': the PRONUNCIATION TEACHER - the hard words of THIS story (names of gods
+    and sages, Sanskrit words, conjuncts, English words, letters) and how a Kolkata speaker says them; the voice gets
+    only the ones in the lines it is reading (extras.pron_for)"""
+    words = dict(DEV_PRON)
+    words.update(learn_pron())
+    if lang == "bn" and not MOCK and env("PRON_GUIDE") != "0":
+        text = "\n".join(str(ln.get("text", "")) for s in story.get("scenes", []) for ln in s.get("lines", []))
+        out = _gcall("You are a Bengali speech teacher from Kolkata. Below is a Bengali script that a computer voice will "
+                     "read. List the 15-35 words in it that a computer voice is likely to SAY WRONG: names of gods, "
+                     "sages and places, Sanskrit / tatsama words, words with hard conjuncts (ক্ষ, জ্ঞ, হ্ম, ত্ম, দ্ম, "
+                     "শ্ব, স্ব...), English words, single letters, numbers. For each give how it is said in standard "
+                     "Kolkata Bengali, in simple roman syllables with hyphens (e.g. লক্ষ্মণ = 'lokkhon', যজ্ঞ = "
+                     "'jog-go', ব্রহ্মা = 'brom-ha'). Copy each word EXACTLY as written in the script. Answer ONLY "
+                     "JSON: {\"word\": \"pronunciation\"}.\nSCRIPT:\n" + text[:20000],
+                     json_mode=True, temp=0.1, max_tokens=4000, who="pronunciation teacher")
+        j = extras.load_json_loose(out or "")
+        if isinstance(j, dict):
+            for w, p_ in j.items():
+                if isinstance(w, str) and isinstance(p_, str) and 1 <= len(w) <= 30 and w in text and len(p_) <= 40:
+                    words[w] = p_
+    extras.PRON_WORDS.clear()
+    extras.PRON_WORDS.update(words)
+    TEAM["pron"] = len(words)
+    log(f"  pronunciation guide: {len(words)} words")
 
 
 # ----------------------------------------------------------------- 2. pictures (Cloudflare)
@@ -2060,7 +2631,7 @@ def prepare_voices(parts_lines, voices, lang):
                     tmp_ = it["out"] + ".again.wav"
                     ok_ = False
                     try:
-                        if (extras.tts_keys() and extras.gemini_quota_left() and gem_n[0] < 4
+                        if (extras.tts_keys() and extras.gemini_quota_left() and gem_n[0] < int(env("VOICE_REMAKES") or 8)
                                 and extras.tts_budget_left(TTS_USAGE) > 0):
                             gem_n[0] += 1
                             extras.TTS_STATE["off"] = False
@@ -3409,9 +3980,12 @@ FB_LANG = ["bn"]
 
 
 def portrait_thumb(thumb):
-    """9:16 thumbnail: the whole poster in the middle, a blurred copy behind"""
+    """9:16 thumbnail: the tall poster (v118), else the whole poster in the middle, a blurred copy behind"""
     from PIL import ImageEnhance, ImageFilter
     VW, VH = 1080, 1920
+    own = os.path.join(WORK, "thumbnail_portrait.jpg")
+    if os.path.exists(own):
+        return own
     t = Image.open(thumb).convert("RGB")
     s = max(VW / t.width, VH / t.height)
     bg = t.resize((int(t.width * s) + 1, int(t.height * s) + 1))
@@ -3443,8 +4017,8 @@ def post_to_facebook(video, thumb, title, description):
             thumb = portrait_thumb(thumb) if thumb and os.path.exists(thumb) else thumb
         except Exception as e:
             log("  9:16 thumbnail skipped:", str(e)[:120])
-    else:
-        video, thumb = extras.fb_square(video, thumb, WORK)   # 1:1 ranks better on phones
+    else:                                             # v118 (your rule): Facebook = ALWAYS 9:16 - also when the
+        video, thumb = extras.fb_tall(video, thumb, WORK, portrait_thumb)   # tall cut could not be made
     description = extras.fb_caption(description)               # Facebook likes 10-400 characters
     page, token = need_env("FB_PAGE_ID"), need_env("FB_PAGE_TOKEN")
     url = f"https://graph-video.facebook.com/v21.0/{page}/videos"
@@ -3755,9 +4329,9 @@ def promo_list(lang):
                      {"icon": "star", "head": "हमारी नई कार्टून सीरीज़", "sub": ", ".join(names[:3]),
                       "sub2": ", ".join(names[3:]) + " - हर हफ़्ते नया एपिसोड"})
     out["keno"] = ({"icon": "quiz", "head": "প্রতি বুধবার সকাল ৮টা: সায়নের কেন?", "sub": "আকাশ নীল কেন? চাঁদ ছোট-বড় হয় কেন?",
-                    "sub2": "সায়নের প্রশ্ন, সুমন কাকুর মজার উত্তর"} if bn else
+                    "sub2": "সায়নের প্রশ্ন, বাবার মজার উত্তর"} if bn else
                    {"icon": "quiz", "head": "हर बुधवार सुबह 8 बजे: सायन का क्यों?", "sub": "आसमान नीला क्यों? चाँद छोटा-बड़ा क्यों?",
-                    "sub2": "सायन के सवाल, सुमन चाचा के मज़ेदार जवाब"})
+                    "sub2": "सायन के सवाल, पापा के मज़ेदार जवाब"})
     if env("GOPAL_DAILY") != "0":
         out["gopal"] = ({"icon": "clock", "head": "রোজ দুপুর ১টা: গোপাল ভাঁড়", "sub": "রাজসভার মজার কাণ্ড, নতুন নতুন",
                          "sub2": "আমাদের নিজের গোপাল, টিভি কার্টুনের মতো"} if bn else
@@ -4193,11 +4767,12 @@ def main():
                   "ending exactly as the creator wrote them; turn it into our lively cartoon with dialogue, the "
                   "narrator, sounds and fun small moments - never new main events or a different ending. Keep it "
                   "child-friendly. If something is unclear or missing, fill it in the creator's own spirit.\n")
-    story = make_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)
-    try:                                             # v100: every line follows the one before (no jumps)
-        extras.line_flow_fix(story, L["name"], kind="cartoon", inserts=category not in PUPPET_SERIES)
-    except Exception as e:
-        log("  line-by-line check skipped:", str(e)[:100])
+    story = team_story(lang, theme, history, extra_rules=extra, part=part, prev=prev, total=total)   # v118: the team
+    if not TEAM.get("ok"):                           # (the team's editor already read it all - no patching after)
+        try:                                         # v100: every line follows the one before (no jumps)
+            extras.line_flow_fix(story, L["name"], kind="cartoon", inserts=category not in PUPPET_SERIES)
+        except Exception as e:
+            log("  line-by-line check skipped:", str(e)[:100])
     if (CREATOR.get("story") or {}).get("true"):         # 'সত্য ঘটনা অবলম্বনে' everywhere
         extras.mark_true_story(story, lang)
     if part == 1:
@@ -4217,13 +4792,34 @@ def main():
                 c["look"] = MYTH_LOOKS[k]
         story["mithu_intro"] = story["mithu_outro"] = ""   # no parrot jokes in the holy stories
     title = story["title"].strip()[:85]
+    if episode or part:                              # v118: the writer's own 'পর্ব 2' / '| রামায়ণ পর্ব ২' out - added once below
+        title = re.sub(r"\s*[|:,-]?\s*(?:[\u0980-\u09FF\w]+\s+)?(?:পর্ব|भाग|एपिसोड|episode)\s*[0-9০-৯]+\s*[|:,-]?\s*", " ",
+                       title, flags=re.I).strip(" |:-,") or title
+        sname_ = L["series_titles"].get(category, "")
+        if sname_ and title.startswith(sname_):
+            title = title[len(sname_):].strip(" |:-,") or title
     if story.get("true_label"):
         title = extras.true_title(title, lang)
     if episode:
         title = f"{L['episode'].format(name=L['series_titles'].get(category, ''), n=episode)}: {title}"[:95]
     if part:
         title = f"{title} | {L['part'].format(n=part)}"[:95]
+    if lang == "bn":                                 # Bengali titles: Bengali digits (পর্ব ২, not পর্ব 2)
+        title = title.translate(str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯"))
     log("Title:", title)
+    try:                                             # v118: how the hard words are said (the voice gets them)
+        pron_guide(story, lang)
+    except Exception as e:
+        log("  pronunciation guide skipped:", str(e)[:100])
+    if story.get("sources") and category in MYTH:    # the gods' series: where the episode comes from
+        story["description"] = (str(story.get("description") or "").rstrip() + "\n\n📖 " +
+                                ("এই পর্বের কাহিনি শাস্ত্র ও প্রচলিত কথা অনুযায়ী - সূত্র:" if lang == "bn" else
+                                 "इस भाग की कथा शास्त्रों के अनुसार - स्रोत:") + "\n" +
+                                "\n".join(f"• {x.get('title', '')} {x['url']}".strip() for x in story["sources"][:4]))
+    try:
+        team_report(story, title)
+    except Exception as e:
+        log("  team report skipped:", str(e)[:100])
     with open(os.path.join(WORK, "story.json"), "w", encoding="utf-8") as f:
         json.dump(story, f, ensure_ascii=False, indent=1)
 
@@ -4331,6 +4927,29 @@ def main():
         raise RuntimeError("No pictures could be made (check CF_ACCOUNT_ID / CF_API_TOKEN).")
     imgs = [p or first_ok for p in imgs]
     shots_per_scene = [[x or imgs[i] for x in sh] for i, sh in enumerate(shots_per_scene)]
+    if category == "learn" and lang == "bn" and env("LETTER_CARD") != "0":
+        try:                                         # v118: the RIGHT letter on screen, drawn by the bot itself
+            import unicodedata as _ud
+            nf = lambda x: _ud.normalize("NFD", str(x))
+            todo_ = list(learn_items(theme[1]))
+            for i, s in enumerate(story["scenes"]):
+                if not todo_:
+                    break
+                txt_ = nf(" ".join(str(ln.get("text", "")) for ln in s.get("lines", [])) + " " + str(s.get("item", "")))
+                it_ = next((x for x in todo_ if nf(x) in txt_), None)
+                if not it_ or i >= len(shots_per_scene):
+                    continue
+                todo_.remove(it_)
+                done_ = {}
+                for k_, x in enumerate(shots_per_scene[i]):
+                    if x and os.path.exists(x):
+                        if x not in done_:
+                            done_[x] = stamp_item(x, it_, x.replace(".jpg", "") + f"_item{i}.jpg")
+                        shots_per_scene[i][k_] = done_[x]
+                imgs[i] = shots_per_scene[i][0] if shots_per_scene[i] else imgs[i]
+                log(f"  letter card '{it_}' on scene {i + 1}")
+        except Exception as e:
+            log("  letter cards skipped:", str(e)[:120])
 
     thumb_base = os.path.join(WORK, "thumb_base.jpg")
     ti = story.get("thumbnail_image") or {}
@@ -4390,6 +5009,11 @@ def main():
     if env("POSTER_STYLE") != "old":
         try:
             extras.title_poster(thumb_base, tw, thumb, tkind, small=small, fallback_font=FONT)
+            try:                                     # v118: Facebook's thumbnail is ALWAYS 9:16 - its own tall poster
+                extras.title_poster(thumb_base, tw, os.path.join(WORK, "thumbnail_portrait.jpg"), tkind, small=small,
+                                    portrait=True, fallback_font=FONT)
+            except Exception as e:
+                log("  tall thumbnail poster skipped:", str(e)[:100])
             done_ = True
             log(f"Thumbnail words: '{tw}'" + (f" + '{small}'" if small else ""))
         except Exception as e:
@@ -4421,6 +5045,15 @@ def main():
         intro.append({"speaker": "Mithu", "emotion": "excited", "text": str(story["mithu_intro"]).strip()})
     parts = [{"image": host, "lines": intro, "host_part": True,
               "sounds": ["birds"], "mood": "happy", "voices": voices}]
+    # v118 (Meta, 19 Nov 2026, the Ramayan video: 281 views, only 5 s watched on average, 3% left at 0:15 - that is
+    # exactly Lumi Didi's 'নমস্কার বন্ধুরা! আজকের গল্প...' + Mithu + the tune after the 5-second hook): NO greeting at
+    # the start any more - the hook, then the story itself at once. Lumi Didi stays at the end (lesson, goodbye).
+    # HOST_INTRO=1 brings the greeting back; a true story keeps a short one (it says 'based on true events').
+    if env("HOST_INTRO") != "1":
+        if story.get("true_label"):
+            parts[0]["lines"] = [{"speaker": "narrator", "text": said_title}]
+        else:
+            parts = []
     for img, s, sh, pz in zip(imgs, scenes, shots_per_scene, pups):
         parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []), "puppet": pz,
                       "ambience": s.get("ambience", []), "mood": s.get("mood", "happy"), "voices": voices})
@@ -4520,7 +5153,7 @@ def main():
     # COLD OPEN: people decide in 3 seconds - start INSIDE the story (its first, funniest/most gripping scene),
     # then Lumi Didi greets and says the title, then the rest of the story
     hk = None if env("HOOK_OPEN") == "0" else new_hook_line(scenes, story, lang, pick_hook(scenes))
-    if hk and parts[0].get("host_part"):         # 1) a funny moment (5 s), 2) Lumi Didi + title, 3) the story
+    if hk and (parts[0].get("host_part") or env("HOST_INTRO") != "1"):   # 1) the hook (5 s), (2) Lumi Didi), 3) the story
         hi, hlines = hk
         himg = shots_per_scene[hi][0] if shots_per_scene[hi] else imgs[hi]
         parts.insert(0, {"image": himg, "lines": hlines, "sounds": [], "mood": scenes[hi].get("mood", "happy"),
@@ -4546,7 +5179,7 @@ def main():
     if env("JINGLE") != "0":
         try:                                         # v109 (C5): the show's own little tune under Lumi Didi's hello
             hk_ = next((k for k, p_ in enumerate(parts) if p_.get("host_part")), None)
-            if hk_ is not None and TIMELINE[0] and hk_ < len(TIMELINE[0]):
+            if hk_ is not None and hk_ <= 1 and TIMELINE[0] and hk_ < len(TIMELINE[0]):   # (only a greeting at the start)
                 add_jingle(video, float(TIMELINE[0][hk_]))
         except Exception as e:
             log("  show tune skipped:", str(e)[:120])
@@ -4605,7 +5238,8 @@ def main():
                    + f"{L['ai_note']}\n\n{' '.join(tags)}")
     part_times, segs = TIMELINE[0], TIMELINE[1]
     _lab = [sc.get("chapter") or f"{k + 1}" for k, sc in enumerate(scenes)]
-    _lab = [_lab[0], L["ch_intro"]] + _lab[1:] if cold else [L["ch_intro"]] + _lab
+    lead_ = next((k for k, p_ in enumerate(parts) if not (p_.get("host_part") or p_.get("hook_part"))), 0)
+    _lab = [_lab[0], L["ch_intro"]] + _lab[1:] if cold else [L["ch_intro"]] * lead_ + _lab
     chap = extras.chapters_text(part_times, _lab + [L["ch_end"]], L["chapters"])
     yt_description = description.replace(L["ai_note"], (f"{chap}\n\n" if chap else "") + L["ai_note"])
     # YouTube: the first lines are what search shows - a short summary and the words people search for
@@ -5444,7 +6078,7 @@ def grow(video, story, title, lang, L, category, tags, results, history, page):
             names_ = {str(c.get("name", "")).lower() for c in story.get("characters", [])}
             who_ = (f"{ascii_text(main_c.get('look', ''))} {ascii_text(main_c.get('name', ''))}, happy pose")
             if "sayan" in names_:                     # v100: our two heroes on the page
-                who_ = (f"two characters: a boy of 8 ({SAYAN_LOOK}) and his kind young uncle ({SAHEB_FACE}), both "
+                who_ = (f"two characters: a boy of 8 ({SAYAN_LOOK}) and his kind young father ({SAHEB_FACE}), both "
                         "smiling, the boy pointing at something exciting")
             raw = os.path.join(WORK, "color_raw.jpg")
             prompt = ("black and white coloring book page for small children, clean thick black outlines only, no "

@@ -1945,8 +1945,8 @@ def performed(ln):
     if v:
         import re as _re
         a, b = _re.sub(r"[\W_]", "", strip_tags(v)), _re.sub(r"[\W_]", "", t)
-        if b and difflib.SequenceMatcher(None, a, b).ratio() >= 0.85:
-            return v
+        if b and a == b:                              # v118: the SAME words only (it was 85% alike - the voice then
+            return v                                  # said a few words the subtitle did not show)
     return t
 
 
@@ -2389,6 +2389,7 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
     if TTS_STATE["off"] or not tts_keys():
         return False
     plain_len = len(strip_tags(voice_text))
+    style = str(style) + pron_for(voice_text)
     for _ in range(max_tries):
         data = _tts_call(_requests_for([("Speaker1", voice_text, style)], [("Speaker1", voice)], lang_label))
         if data is None:
@@ -2407,6 +2408,17 @@ def tts_gemini(voice_text, voice, style, lang_label, out_wav, sr=44100, max_trie
     if os.path.exists(out_wav):
         os.remove(out_wav)
     return False
+
+
+PRON_WORDS = {}                 # v118: word -> how it is said ('lokkhon'); filled per story by the bot
+
+
+def pron_for(text):
+    """v118: the pronunciation notes of only the hard words that are IN this text (short - a long note can be read
+    out by the voice)"""
+    t = str(text or "")
+    hits = [(w, p) for w, p in PRON_WORDS.items() if w and w in t][:10]
+    return (" Say these words exactly: " + ", ".join(f"{w} = '{p}'" for w, p in hits) + ".") if hits else ""
 
 
 MARK_STATS = [0, 0]             # recordings cut by their marker words / by their pauses (this run)
@@ -3462,7 +3474,7 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
             return False
         x0 = g[0]
         lang = x0.get("lang", "bn")
-        note = f"Speaker1 is {x0['who']}. " + PRONOUNCE.get(lang, "")
+        note = f"Speaker1 is {x0['who']}. " + PRONOUNCE.get(lang, "") + pron_for(" ".join(x["plain"] for x in g))
         data = None
         for attempt in range(2):                      # one quiet retry for a busy server, never more
             TTS_USED[0] += 1
@@ -3474,7 +3486,8 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
                                                 for k, x in enumerate(g)], [("Speaker1", x0["voice"])], lang_label, note))
             else:
                 data = _tts_call([_single_body(mm, x0["text"], x0["voice"], f"{x0['who']}. {x0['feel']}. "
-                                               + PRONOUNCE.get(lang, ""), lang_label) for mm in NEW_TTS + OLD_TTS])
+                                               + PRONOUNCE.get(lang, "") + pron_for(x0["plain"]), lang_label)
+                                  for mm in NEW_TTS + OLD_TTS])
             if data or not gemini_quota_left() or not room(1):
                 break
             time.sleep(45)
@@ -3909,10 +3922,13 @@ def listen_check(lines, lang_name, max_minutes=12):
                       "with the script. Report ONLY real faults: (a) \"twice\": words HEARD that are not written at that "
                       "point - a sentence or part of it said twice, or words of a LATER line already heard at the end of "
                       "an earlier line; (b) \"missing\": words or a sentence WRITTEN in a line that are NOT heard at "
-                      "all (skipped, cut off at the start or the end). Ignore small mispronunciations, pauses, breaths, "
-                      "sighs and laughs. Answer ONLY JSON: [{\"line\": line number, \"kind\": \"twice\" or \"missing\", "
-                      "\"words\": \"the words exactly as written in the script\"}] - [] if every line is heard exactly "
-                      "as written, once.\nSCRIPT:\n" + script)
+                      "all (skipped, cut off at the start or the end); (c) \"wrong\": a written word that is said as a "
+                      "clearly DIFFERENT word, or a name / letter said so wrongly that a native listener would not "
+                      "recognise it (not just an accent or a slightly soft sound). Ignore small mispronunciations, "
+                      "pauses, breaths, sighs and laughs. Answer ONLY JSON: [{\"line\": line number, \"kind\": "
+                      "\"twice\", \"missing\" or \"wrong\", \"words\": \"the words exactly as written in the script\", "
+                      "\"heard\": \"for wrong: what was said instead, in roman letters\"}] - [] if every line is heard "
+                      "exactly as written, once.\nSCRIPT:\n" + script)
             body = {"contents": [{"parts": [{"text": prompt},
                                             {"inline_data": {"mime_type": "audio/mp3",
                                                              "data": base64.b64encode(open(mp3, "rb").read()).decode()}}]}],
@@ -3938,19 +3954,21 @@ def listen_check(lines, lang_name, max_minutes=12):
                 try:
                     n = int(f_.get("line")) - 1
                     q = keyt(f_.get("words") or f_.get("repeated") or "")
-                    kind = "missing" if str(f_.get("kind", "")).lower().startswith("miss") else "twice"
+                    kd_ = str(f_.get("kind", "")).lower()
+                    kind = "missing" if kd_.startswith("miss") else "wrong" if kd_.startswith("wrong") else "twice"
                 except Exception:
                     continue
                 if not (0 <= n < len(chunk)) or len(q) < 4:
                     continue
-                near = [allk[n]] if kind == "missing" else allk[max(0, n - 1):n + 3]
+                near = [allk[n]] if kind in ("missing", "wrong") else allk[max(0, n - 1):n + 3]
                 if any(in_text(q, s_) for s_ in near):
                     k0 = chunk[n][0]
-                    if k0 not in found or kind == "missing":   # (missing words: the line is made again anyway)
-                        found[k0] = {"kind": kind, "words": str(f_.get("words") or f_.get("repeated") or "")[:80]}
+                    if k0 not in found or kind in ("missing", "wrong"):   # (the line is made again anyway)
+                        found[k0] = {"kind": kind, "words": str(f_.get("words") or f_.get("repeated") or "")[:80],
+                                     "heard": str(f_.get("heard") or "")[:60]}
         log(f"  listening check ({voice}): " + ", ".join(
             f"{sum(1 for k, v in found.items() if lines[k].get('voice') == voice and v['kind'] == kd)} {kd}"
-            for kd in ("twice", "missing")))
+            for kd in ("twice", "missing", "wrong")))
     return found
 
 
@@ -3967,9 +3985,12 @@ def voice_verify(lines, lang_name, remake, max_fix=None):
     cuts = fix_heard_twice(lines)
     heard = listen_check(lines, lang_name)
     again = 0
-    for k in sorted(heard, key=lambda q: (heard[q]["kind"] != "missing", q))[:int(max_fix or env("VOICE_FIX_MAX") or 14)]:
+    rank = {"missing": 0, "wrong": 1, "twice": 2}
+    for k in sorted(heard, key=lambda q: (rank.get(heard[q]["kind"], 2), q))[:int(max_fix or env("VOICE_FIX_MAX") or 14)]:
         x, v = lines[k], heard[k]
-        log(f"  heard {'twice' if v['kind'] == 'twice' else 'NOT said'}: '{v['words'][:50]}' in '{x.get('plain', '')[:40]}...'")
+        log(f"  heard {dict(twice='twice', missing='NOT said', wrong='WRONGLY said').get(v['kind'], v['kind'])}: "
+            f"'{v['words'][:50]}'" + (f" (as '{v.get('heard')}')" if v.get("heard") else "")
+            + f" in '{x.get('plain', '')[:40]}...'")
         if v["kind"] == "twice":
             prev = next((y for y in reversed(lines[max(0, k - 6):k]) if y.get("voice") == x.get("voice")), None)
             if cut_repeat_loose(x, prev):
@@ -5283,6 +5304,48 @@ def agnes_image(prompt):
 
 # ===================== v14: Facebook quality checklist - square video + short caption =====================
 SQ = 1080        # Facebook ranks 1:1 (or 4:5) videos higher on phones than 16:9
+
+
+def fb_tall(video, thumb, workdir, tall_thumb=None):
+    """v118 (your rule, 19 Nov 2026: 'Facebook's thumbnail is ALWAYS 9:16 portrait'): a 9:16 copy of the 16:9 video
+    - the picture big in the middle, gently panning, a blurred copy of it filling above and below - and a 9:16
+    thumbnail (tall_thumb(thumb) of the bot, else the poster in the middle of a blurred copy). FB_TALL=0: the old
+    square copy. Returns (video, thumb); the square copy if anything fails."""
+    if env("FB_TALL") == "0":
+        return fb_square(video, thumb, workdir)
+    try:
+        VW, VH = 1080, 1920
+        out_v = os.path.join(workdir, "facebook_tall.mp4")
+        fh = int(VW * 1.25 * 9 / 16) // 2 * 2         # the picture a quarter wider than the screen, panning
+        fw = int(fh * 16 / 9) // 2 * 2
+        fy = (VH - fh) // 2
+        fc = (f"[0:v]split[a][b];[a]scale=-2:{VH},crop={VW}:{VH},boxblur=26:2,eq=brightness=-0.22[bg];"
+              f"[b]scale={fw}:{fh},crop={VW}:{fh}:'({fw}-{VW})/2+({fw}-{VW})*0.45*sin(2*PI*t/18)':0[fg];"
+              f"[bg][fg]overlay=0:{fy},format=yuv420p[v]")
+        _run(["ffmpeg", "-y", "-i", video, "-filter_complex", fc, "-map", "[v]", "-map", "0:a?",
+              "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-r", "25", "-c:a", "copy",
+              "-movflags", "+faststart", out_v])
+        out_t = thumb
+        if thumb and os.path.exists(thumb):
+            if tall_thumb:
+                out_t = tall_thumb(thumb)
+            else:
+                from PIL import ImageEnhance
+                t = Image.open(thumb).convert("RGB")
+                sc = max(VW / t.width, VH / t.height)
+                bg = t.resize((int(t.width * sc) + 1, int(t.height * sc) + 1))
+                bg = bg.crop(((bg.width - VW) // 2, (bg.height - VH) // 2, (bg.width - VW) // 2 + VW,
+                              (bg.height - VH) // 2 + VH))
+                bg = ImageEnhance.Brightness(bg.filter(ImageFilter.GaussianBlur(30))).enhance(0.6)
+                fg = t.resize((VW, VW * t.height // t.width))
+                bg.paste(fg, (0, (VH - fg.height) // 2))
+                out_t = os.path.join(workdir, "thumbnail_tall.jpg")
+                bg.save(out_t, quality=93)
+        log("  Facebook: 9:16 copy made (the tall cut was not there)")
+        return out_v, out_t
+    except Exception as e:
+        log("  9:16 copy failed - square instead:", str(e)[:150])
+        return fb_square(video, thumb, workdir)
 
 
 def fb_square(video, thumb, workdir):

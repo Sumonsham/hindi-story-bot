@@ -2375,10 +2375,10 @@
    "comments": 1,
    "views": 9,
    "length_s": 468,
-   "yt_views": 5,
-   "yt_avg_s": 4,
-   "yt_avg_pct": 1.0,
-   "checked": "2026-11-16T09:03+00:00"
+   "yt_views": 9,
+   "yt_avg_s": 20,
+   "yt_avg_pct": 4.4,
+   "checked": "2026-11-19T09:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2830,12 +2830,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 0,
    "length_s": 411,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T09:03+00:00"
+   "checked": "2026-11-19T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3284,7 +3284,23 @@
   "youtube": "6WlBfUqVrmk",
   "fb_reel": "2236005274001435",
   "fb_story": "1622239219167554",
-  "yt_short": "0b77rhkNjqk"
+  "yt_short": "0b77rhkNjqk",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 1,
+   "length_s": 387,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-19T09:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-19T09:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-18T13:31+00:00",
@@ -3350,12 +3366,7 @@
   "date": "2026-11-19T07:31+00:00",
   "lang": "bn",
   "slot": "2026-11-19@13",
-  "pending_comments": [
-   {
-    "id": "2554976758318809",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2299610600581686"
-   }
-  ],
+  "pending_comments": [],
   "category": "gopal",
   "idea": "A village marketplace where Gopal tricks a greedy sweet-seller into paying double using clever logic (told as a gopal story for children)",
   "episode": null,
@@ -3379,5 +3390,38 @@
   "fb_reel": "2554976758318809",
   "fb_story": "1141179585304617",
   "yt_short": "1zabJKOGxcE"
+ },
+ {
+  "date": "2026-11-19T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-19@19",
+  "pending_comments": [
+   {
+    "id": "1480789907350743",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1007977425027313"
+   }
+  ],
+  "category": "ramayan",
+  "idea": "King Dasharatha's yajna and the birth of Rama, Lakshmana, Bharata and Shatrughna",
+  "episode": 2,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রামায়ণ পর্ব 2: পুত্রকামেষ্টি যজ্ঞ ও শ্রীরামের জন্ম! 🏹 | রামায়ণ পর্ব ২",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "অগ্নিদেব"
+  },
+  "hook_style": "sound",
+  "moral": "অটল বিশ্বাস, ধৈর্য ও সৎকর্মের ফলে জীবনের চরম অন্ধকারও পরম আনন্দে রূপান্তরিত হয়।",
+  "title_b": "যজ্ঞের আগুনে এ কী অলৌকিক দৃশ্য? 👑✨ | রামায়ণ কথা",
+  "question_post": null,
+  "facebook": "1007977425027313",
+  "youtube": "S8aj22Z-ibs",
+  "fb_reel": "1480789907350743",
+  "fb_story": "1678294957239231"
  }
 ]

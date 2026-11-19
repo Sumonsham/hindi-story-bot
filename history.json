@@ -693,7 +693,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -727,7 +727,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -776,7 +776,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -808,7 +808,7 @@
    "yt_views": 3,
    "yt_avg_s": 16,
    "yt_avg_pct": 2.9,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -976,7 +976,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -1033,7 +1033,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -1068,7 +1068,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -1311,7 +1311,7 @@
    "yt_views": 1,
    "yt_avg_s": 29,
    "yt_avg_pct": 5.4,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -1346,7 +1346,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -1664,12 +1664,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 444,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1960,7 +1960,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1979,12 +1979,12 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 10,
+   "views": 13,
    "length_s": 5374,
-   "yt_views": 8,
-   "yt_avg_s": 9,
-   "yt_avg_pct": 0.2,
-   "checked": "2026-11-15T22:04+00:00"
+   "yt_views": 10,
+   "yt_avg_s": 6,
+   "yt_avg_pct": 0.1,
+   "checked": "2026-11-18T22:04+00:00"
   }
  },
  {
@@ -2744,7 +2744,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-15T22:04+00:00"
+   "checked": "2026-11-18T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3196,7 +3196,21 @@
   "fb_reel": "1397886628823834",
   "fb_story": "1468960505376456",
   "fb_reel2": "1447790810900530",
-  "yt_short": "kuVO7OLGVWU"
+  "yt_short": "kuVO7OLGVWU",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 4,
+   "length_s": 540,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-18T22:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 4
+  }
  },
  {
   "date": "2026-11-18T02:31+00:00",
@@ -3262,12 +3276,7 @@
   "date": "2026-11-18T13:31+00:00",
   "lang": "bn",
   "slot": "2026-11-18@19",
-  "pending_comments": [
-   {
-    "id": "29194413700220527",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1660559758862745"
-   }
-  ],
+  "pending_comments": [],
   "category": "birbal",
   "idea": "A royal court in Delhi where Birbal is challenged by the Emperor to weigh the entire sky in kilograms within one day. (told as a birbal story for children)",
   "episode": null,
@@ -3291,5 +3300,45 @@
   "fb_reel": "29194413700220527",
   "fb_story": "2366035817466632",
   "yt_short": "FnLDxIUexoc"
+ },
+ {
+  "date": "2026-11-19T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-19@8",
+  "pending_comments": [
+   {
+    "id": "1117933147898186",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1007065245776099"
+   },
+   {
+    "id": "1011344185352522",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1007065245776099"
+   }
+  ],
+  "category": "learn",
+  "idea": "the next vowels of the alphabet (Bengali: ঋ এ ঐ ও ঔ / Hindi: ऋ ए ऐ ओ औ)",
+  "episode": 2,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "পর্ব 2: শিখি মজায়: ঋ এ ঐ ও ঔ | স্বরবর্ণের দ্বিতীয় পর্ব! 🎨✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ঐরাবত"
+  },
+  "hook_style": "sound",
+  "moral": "আনন্দে আর খেলায় শিখলে পড়া কখনোই কঠিন মনে হয় না।",
+  "title_b": "মিঠু আর সায়নের মজার স্বরবর্ণ পাঠ: ঋ এ ঐ ও ঔ! 🦜📚",
+  "question_post": null,
+  "facebook": "1007065245776099",
+  "youtube": "PY6HLRJl_sM",
+  "fb_reel": "1117933147898186",
+  "fb_story": "1156473033532100",
+  "fb_reel2": "1011344185352522",
+  "coloring": "122139687818735948",
+  "yt_short": "8xYef2HfzOk"
  }
 ]

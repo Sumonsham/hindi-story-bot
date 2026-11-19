@@ -1,106 +1,148 @@
 {
  "cartoon_bn": {
-  "date": "2026-11-18",
+  "date": "2026-11-19",
   "topics": [
-   "A royal court in Delhi where Birbal is challenged by the Emperor to weigh the entire sky in kilograms within one day.",
-   "A village marketplace where a greedy merchant claims someone stole the sound of his ringing gold coins, and Birbal sits as judge.",
-   "A lush royal garden where Akbar loses his favorite emerald ring, and Birbal finds the actual thief using only a wooden stick.",
-   "A majestic palace hall where a visiting foreign scholar asks three impossible trick questions that leave all imperial ministers speechless.",
-   "A quiet royal bedroom at midnight where Akbar wakes up from a terrifying nightmare about losing his throne and summons Birbal instantly.",
-   "A dusty village crossroads where two farmers fight over a single magical tree that drops silver leaves every morning at sunrise."
+   "An abandoned railway station canteen where a ghost sells glowing noodles at midnight to stranded travelers.",
+   "A magical village marketplace where a talking bamboo gourd grants instant wealth to anyone who solves its riddle.",
+   "A poor boatman's daughter who finds a floating golden cooking pot in the river that multiplies every grain of rice.",
+   "A haunted banyan tree on the village outskirts where a mischievous witch challenges villagers to a spicy food eating contest.",
+   "An ancient royal kitchen in the kingdom of Gopal Bhar where the royal cook loses the king's favorite winter sweet.",
+   "A cursed pumpkin patch behind a haunted mansion that glows in the dark and traps anyone who steps on the vines after sunset."
   ],
   "hashtags": [
-   "#AkbarBirbal",
    "#BanglaCartoon",
-   "#HindiStories",
-   "#MoralStories",
-   "#BirbalStories",
-   "#BengaliStories",
-   "#KidsAnimation",
-   "#HasirGolpo",
-   "#AnimatedStories",
-   "#BedtimeStories"
+   "#BhuterCartoon",
+   "#BengaliMoralStories",
+   "#BanglaGolpo",
+   "#NotunGolpo",
+   "#GhostCartoon",
+   "#BengaliAnimation",
+   "#RupkotharGolpo",
+   "#BanglaKatun",
+   "#BhoutikGolpo"
   ],
   "keywords": [
-   "Akbar Birbal stories",
-   "Bangla cartoon",
-   "akbar birbal bangla",
-   "funny stories of akbar birbal",
-   "moral stories in bengali",
-   "animated kids stories",
-   "birbaler goppo",
-   "akbar birbal new story"
+   "bangla cartoon",
+   "bhuter cartoon",
+   "bengali horror story",
+   "bangla golpo",
+   "vuter katun",
+   "bengali animation story",
+   "notun bangla cartoon",
+   "bangla moral stories"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles are medium-length and structured with vertical bars ('|') or question marks to combine a dramatic hook with a series label. They use high-engagement elements like emojis, conversational phrasing, and bold challenges (e.g., 'Called a Living Brother Dead?') to instantly spark curiosity.",
-   "thumb_style": "Thumbnails feature brightly lit, high-contrast cartoon illustrations depicting dramatic royal court scenes with exaggerated character expressions of shock, anger, or contemplation. The compositions focus on central character confrontations—such as Akbar pointing angrily or Birbal smiling knowingly—often enhanced by glowing elements or secondary background characters.",
-   "thumb_text_style": "Short Hindi text consisting of 3 to 6 bold words in bright yellow or white with dark outlines, summarizing the core conflict or challenge of the story."
+   "title_style": "Titles combine catchy Bengali and English keywords with heavy usage of vertical separators ('|') to organize subtitles and series branding. They rely on high-curiosity hooks about moral dilemmas, strange events (like giant gourds or ghost food stalls), and popular characters to drive millions of clicks.",
+   "thumb_style": "Thumbnails feature vibrant, high-saturation 2D and 3D animated scenes capturing dramatic narrative peaks with exaggerated character expressions of shock or fear. The lighting is bright and cheerful for village and comedy stories, but adopts eerie, high-contrast night settings with supernatural green-skinned entities for horror themes.",
+   "thumb_text_style": "Zero to four words of bold, stylized Bengali text placed at the top center of the frame to instantly state the video's core topic."
   },
   "real": [
    {
-    "id": "KOoxnE3dzRo",
-    "title": "Called a Living Brother Dead? | Akbar Birbal 99 : Testimony of the Dead Landlord",
-    "views": 82027,
-    "age": "2d ago"
+    "id": "1zcsMrISV0s",
+    "title": "Bablo Se Sab Pareshan | Ghulam Rasool Cartoon Series | Islamic Cartoon | Kids Land",
+    "views": 1647387,
+    "age": "7d ago"
    },
    {
-    "id": "0sUV47p7R38",
-    "title": "পারিবারিক ধনসম্পদ | আকবর বীরবলের গল্প | সিজন ৩ পর্ব ৪০",
-    "views": 33337,
-    "age": "20h ago"
-   },
-   {
-    "id": "W1Tzei2qbFQ",
-    "title": "ষাঁড়ের দুধ নিয়ে আসো বীরবল! 😱 আকবরের চ্যালেঞ্জ | আকবর বীরবলের অসাধারণ গল্প | আকবর বীরবল",
-    "views": 2781,
+    "id": "GHjvQ5hH7QQ",
+    "title": "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 1482045,
     "age": "5d ago"
    },
    {
-    "id": "lD4a-0LPPxs",
-    "title": "अकबर का अनमोल बाज गायब! 😱 बीरबल ने कैसे पकड़ा चोर? | Akbar Birbal Story",
-    "views": 166,
-    "age": "1d ago"
+    "id": "Hqb6svnRJzg",
+    "title": "শ্মশানে ডাইনির চাউমিনের দোকান | Bhuter cartoon | DAINIR CHOWMIN | Notun Bangla Golpo Horror Stories",
+    "views": 1290239,
+    "age": "3d ago"
    },
    {
-    "id": "fIwFC6qScx4",
-    "title": "The King Amazed by Birbal's Wit! 😂 | Funny Story of Akbar and Birbal | Bengali Cartoon",
-    "views": 77,
-    "age": "4d ago"
+    "id": "Rp0O-NEk574",
+    "title": "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo",
+    "views": 988827,
+    "age": "7d ago"
    },
    {
-    "id": "HIFdSaKzAPY",
-    "title": "আকবর-বীরবলের মজার গল্প",
-    "views": 56,
-    "age": "18h ago"
-   },
-   {
-    "id": "kWvSyqkT-sQ",
-    "title": "Title:বীরবলের তিনটি প্রশ্ন! 😍 আকবরও অবাক | Bengali Akbar Birbal Story  #shorts",
-    "views": 39,
+    "id": "n-iB_sdmURA",
+    "title": "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird",
+    "views": 826562,
     "age": "6d ago"
    },
    {
-    "id": "rkpzPFOE_MY",
-    "title": "পৃথিবীর সবচেয়ে মিষ্টি জিনিস কি? : আকবর ও বীরবলের গল্প | Hasir Golpo | Bengali Comedy Audio Stories",
-    "views": 6,
+    "id": "3SD2U5i5gdE",
+    "title": "কাফনতালাশ - Kafontalash | Bhuter Cartoon | Bengali Horror Cartoon | Bhoutik Golpo | Vuter Katun",
+    "views": 795828,
     "age": "5d ago"
    },
    {
-    "id": "psWFAl0NZ6I",
-    "title": "বীরবল কীভাবে একদিনে সাতটি রাজ্যের কাক গুনেছিলেন? | বাংলা গল্প | bangla story",
-    "views": 6,
-    "age": "5d ago"
+    "id": "ZKMPHUeX37Q",
+    "title": "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026",
+    "views": 642424,
+    "age": "7d ago"
    },
    {
-    "id": "vEA8gv9g5JY",
-    "title": "এইচআর-এ বীরবল: কে চুরি করল প্রেজেন্টেশন? | আকবর ও বীরবল ২.০",
-    "views": 0,
+    "id": "JZ6l57mgLSg",
+    "title": "ফুচকা পাগল নতুন বউ | Fuchka Pagol Notun Bou | Bengali Animated Family Story | Bangla Cartoon Golpo",
+    "views": 586000,
+    "age": "1d ago"
+   },
+   {
+    "id": "dpALvtCExTY",
+    "title": "Poor Alu Became a Millionaire by Repairing an Abandoned Dredger Boat! 😱💰 | Bengali 3D Cartoon",
+    "views": 565089,
+    "age": "6d ago"
+   },
+   {
+    "id": "vxnVzk1-kls",
+    "title": "Two Sisters' In-laws | Bangla Cartoon Story | Bengali Moral Stories | Bangla Stories",
+    "views": 531429,
+    "age": "6d ago"
+   },
+   {
+    "id": "QGbj5dU0TcE",
+    "title": "শীতের রাতে কলস নিয়ে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
+    "views": 512168,
+    "age": "7d ago"
+   },
+   {
+    "id": "9Nb7vmGSRBk",
+    "title": "মহালয়ার প্রতিযোগিতা | Gopal Bhar | Episode - 1286",
+    "views": 496772,
     "age": "2d ago"
+   },
+   {
+    "id": "NeC1fWvQ34U",
+    "title": "টনা কোথায় পড়ল| Bangla Cartoon | Bhuter Cartoon | Rupkothar Golpo | Tuni Pakhir Golpo #shorts​",
+    "views": 494898,
+    "age": "5d ago"
+   },
+   {
+    "id": "iTFnx8UB5wc",
+    "title": "চার রানী পরীর নদীতে স্নান | পর্ব 1 | 4 PORIR NODITE SNAN | Rupkothar Golpo | Notun Bangla Cartoon",
+    "views": 434366,
+    "age": "4d ago"
+   },
+   {
+    "id": "UxPxXSaWVXQ",
+    "title": "🌙 চাঁদের বুড়ি! চাঁদের দেশে আলু পরিবারের জাদুকরী অভিযান ✨ | Bangla 3D Animated Story",
+    "views": 418936,
+    "age": "6d ago"
    }
   ],
-  "from_cat": "birbal"
+  "youtube_top": [
+   "Bablo Se Sab Pareshan | Ghulam Rasool Cartoon Series | Islamic Cartoon | Kids Land (1,647,387)",
+   "বাঁশ লাউ | Bash Lau | Bamboo Gourd | Bengali Animated Village Story | Bangla Cartoon Golpo (1,482,045)",
+   "শ্মশানে ডাইনির চাউমিনের দোকান | Bhuter cartoon | DAINIR CHOWMIN | Notun Bangla Golpo Horror Stories (1,290,239)",
+   "মায়ের দোয়ায় ছেলের উন্নতি | Bengali Animated Village Story | Bangla Cartoon Golpo (988,827)",
+   "শাঁকচুন্নির ভয়ংকর উৎপাত | ভৌতিক গল্প | Bhoutik Golpo | Shakchunni Horror Cartoon | Story Bird (826,562)",
+   "কাফনতালাশ - Kafontalash | Bhuter Cartoon | Bengali Horror Cartoon | Bhoutik Golpo | Vuter Katun (795,828)",
+   "নবাব গোপাল ভাঁড়কে বন্দি করল | Gopal Bhar | New Episode 2026 (642,424)",
+   "ফুচকা পাগল নতুন বউ | Fuchka Pagol Notun Bou | Bengali Animated Family Story | Bangla Cartoon Golpo (586,000)",
+   "Poor Alu Became a Millionaire by Repairing an Abandoned Dredger Boat! 😱💰 | Bengali 3D Cartoon (565,089)",
+   "Two Sisters' In-laws | Bangla Cartoon Story | Bengali Moral Stories | Bangla Stories (531,429)"
+  ],
+  "from": "youtube"
  },
  "cartoon_bn_jataka": {
   "date": "2026-11-13",

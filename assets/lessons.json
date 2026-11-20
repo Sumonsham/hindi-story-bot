@@ -1,24 +1,25 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-18T03:07+00:00",
+  "made": "2026-11-20T09:06+00:00",
   "lessons": [
-   "Focus heavily on Vikram-Betal and detective categories, as they pulled the highest view counts and engagement (e.g., Betal videos reached up to 6 views and 9.8% watch time).",
-   "Keep compilation and long-form videos under strict quality control, as 90+ minute compilations currently struggle with near-zero watch retention.",
-   "Maintain high-pacing and intrigue in the first 30 seconds since retention drops quickly if the hook is slow.",
-   "Rely on classic recurring characters like Gopal Bhar and Betal who maintain baseline audience curiosity.",
-   "Avoid overly niche or slow-paced mythological and educational entries until core storytelling pacing improves."
+   "Prioritize classic myth, legend, and moral riddle formats (like Betal, Ramayan, and Gopal Bhar) as they show higher retention and engagement compared to generic or lesser-known concepts.",
+   "Keep standard storytelling pacing tight; early metrics indicate that longer compilations or overly drawn-out setups drop in watch percentage quickly.",
+   "Introduce clear, high-stakes moral dilemmas or clever problem-solving in the first 30 seconds to capture immediate viewer attention.",
+   "Maintain recurring, beloved legacy characters (Gopal Bhar, Birbal, Betal) as anchors for consistent audience pull.",
+   "Keep episode runtimes balanced and focused on a single narrative arc to prevent audience drop-off mid-video."
   ],
   "titles": [
-   "Titles featuring direct questions or urgent mysteries (e.g., 'কে ছড়াল বাগানে উল্টো পায়ের ছাপ?' or 'শ্মশান রাতে বেতালের অদ্ভুত গল্প') generate stronger initial curiosity.",
-   "Adding emojis that visually match the core mystery (footprints, skulls, crowns) improves click-through readability in feeds.",
-   "Swapped titles generally performed better when they emphasized a character's clever action or an impending threat rather than generic summaries."
+   "Titles that pose direct questions or psychological puzzles ('কার ত্যাগ শ্রেষ্ঠ?', 'বেতালের ধাঁধা') drive higher click-through and curiosity.",
+   "Using dramatic emotional hooks and high-contrast stakes ('জীবন দিল কারা?', 'রহস্যময় তারা') outperforms descriptive or passive titles.",
+   "Keeping title testing active allows the algorithm to quickly shift traffic toward variants that promise immediate entertainment or clever twists."
   ],
   "requests": [
-   "More quiz-based interactive segments where viewers guess outcomes in the comments",
-   "Character name shoutouts in upcoming episodes based on comment participation",
-   "Viewer-voted storylines where the audience decides the next plot direction",
-   "More spooky or ghostly elements integrated into detective and mystery formats",
-   "More magical objects like the 'jadu pencil' or hidden treasures in fairy-tale settings"
+   "More stories featuring witty problem-solving by Gopal Bhar and Birbal",
+   "Engaging moral and philosophical lessons adapted from epics like Ramayana and Mahabharata",
+   "Folktales involving mysterious natural phenomena and magical elements",
+   "Interactive quiz-based engagement where viewers can guess the correct answer in comments",
+   "Character-driven regional fables with relatable village settings",
+   "Educational storytelling segments combined with fun animated visuals"
   ]
  }
 }

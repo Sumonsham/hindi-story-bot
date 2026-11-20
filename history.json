@@ -881,10 +881,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 556,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   }
  },
  {
@@ -1124,7 +1124,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   }
  },
  {
@@ -1157,10 +1157,10 @@
    "comments": 1,
    "views": 4,
    "length_s": 403,
-   "yt_views": 5,
+   "yt_views": 4,
    "yt_avg_s": 6,
    "yt_avg_pct": 1.6,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   }
  },
  {
@@ -1217,7 +1217,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   }
  },
  {
@@ -1432,7 +1432,7 @@
    "yt_views": 4,
    "yt_avg_s": 6,
    "yt_avg_pct": 1.5,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1479,7 +1479,7 @@
    "yt_views": 2,
    "yt_avg_s": 14,
    "yt_avg_pct": 3.2,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1519,7 +1519,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1756,12 +1756,12 @@
   "stats": {
    "likes": 3,
    "comments": 1,
-   "views": 6,
+   "views": 9,
    "length_s": 533,
-   "yt_views": 4,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0.2,
-   "checked": "2026-11-17T09:04+00:00"
+   "yt_views": 6,
+   "yt_avg_s": 4,
+   "yt_avg_pct": 0.9,
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1808,7 +1808,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1853,7 +1853,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2238,7 +2238,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2571,7 +2571,7 @@
    "yt_views": 1,
    "yt_avg_s": 4,
    "yt_avg_pct": 0.8,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3000,12 +3000,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 3,
    "length_s": 546,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T09:04+00:00"
+   "checked": "2026-11-20T09:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3421,7 +3421,23 @@
   "youtube": "LRyna72Svw0",
   "fb_reel": "2554976758318809",
   "fb_story": "1141179585304617",
-  "yt_short": "1zabJKOGxcE"
+  "yt_short": "1zabJKOGxcE",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 470,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-20T09:05+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-20T09:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-19T13:31+00:00",
@@ -3490,12 +3506,7 @@
   "date": "2026-11-20T07:31+00:00",
   "lang": "bn",
   "slot": "2026-11-20@13",
-  "pending_comments": [
-   {
-    "id": "1602977514964340",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2091383848185748"
-   }
-  ],
+  "pending_comments": [],
   "category": "gopal",
   "idea": "A royal village courtyard where Gopal tricks a fake astrologer who claims he can see tomorrow's weather. (told as a gopal story for children)",
   "episode": null,
@@ -3519,5 +3530,39 @@
   "fb_reel": "1602977514964340",
   "fb_story": "1291133039870235",
   "yt_short": "lvMmq3QzYSc"
+ },
+ {
+  "date": "2026-11-20T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-20@19",
+  "pending_comments": [
+   {
+    "id": "2180219736180577",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2425542397980768"
+   }
+  ],
+  "category": "jagannath",
+  "idea": "King Indradyumna's dream and the search for Nila Madhava",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "জগন্নাথের কথা পর্ব ১: রাজা ইন্দ্রদ্যুম্নের স্বপ্ন ও নীলমাধবের সন্ধান! 🕉️✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "সরষে দানা"
+  },
+  "hook_style": "voice",
+  "moral": "ভগবান জাত বা ক্ষমতার বিচারে ধরা দেন না, খাঁটি ও সরল ভক্তি দিয়েই পরমেশ্বরকে পাওয়া যায়।",
+  "title_b": "প্রভু নীলমাধবের গোপন গুহা! রাজা ইন্দ্রদ্যুম্নের অলৌকিক স্বপ্ন 🌟| New Episode 2026",
+  "question_post": null,
+  "facebook": "2425542397980768",
+  "youtube": "358I_NlSuPk",
+  "fb_reel": "2180219736180577",
+  "fb_story": "1212547171608775",
+  "yt_short": "A5lifzevxzo"
  }
 ]

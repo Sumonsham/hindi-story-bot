@@ -2129,7 +2129,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T03:05+00:00"
+   "checked": "2026-11-20T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2179,7 +2179,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T03:05+00:00"
+   "checked": "2026-11-20T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2527,7 +2527,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T03:05+00:00"
+   "checked": "2026-11-20T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2940,12 +2940,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 620,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-17T03:05+00:00"
+   "checked": "2026-11-20T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3376,7 +3376,23 @@
   "fb_story": "1156473033532100",
   "fb_reel2": "1011344185352522",
   "coloring": "122139687818735948",
-  "yt_short": "8xYef2HfzOk"
+  "yt_short": "8xYef2HfzOk",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 1,
+   "length_s": 637,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-20T03:05+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-20T03:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-19T07:31+00:00",
@@ -3439,16 +3455,7 @@
   "date": "2026-11-20T02:31+00:00",
   "lang": "bn",
   "slot": "2026-11-20@8",
-  "pending_comments": [
-   {
-    "id": "1123892707218181",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=3651587541658778"
-   },
-   {
-    "id": "2582291512258340",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=3651587541658778"
-   }
-  ],
+  "pending_comments": [],
   "category": "jataka",
   "idea": "A glowing shepherd boy in a quiet Bethlehem pasture discovers a stray lamb leading him to a starlit stable. (told as a jataka story for children)",
   "episode": null,
@@ -3478,5 +3485,39 @@
    "q": "পা নেই তবু চলে সে ভাই, মুখ নেই তবু বলে সে তাই। ডাকলে আসে, ছাড়লে যায়, বলো তো সে কী?",
    "a": "চিঠি (বা বাতাস)"
   }
+ },
+ {
+  "date": "2026-11-20T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-20@13",
+  "pending_comments": [
+   {
+    "id": "1602977514964340",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2091383848185748"
+   }
+  ],
+  "category": "gopal",
+  "idea": "A royal village courtyard where Gopal tricks a fake astrologer who claims he can see tomorrow's weather. (told as a gopal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গোপাল ভাঁড় ও ভণ্ড গণকের বৃষ্টি রহস্য! 🌧️👑 | New Episode ২০২৬",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "পিঁপড়ের ডিম তোলা"
+  },
+  "hook_style": "sound",
+  "moral": "অন্ধবিশ্বাসের চেয়ে সাধারণ বুদ্ধি ও প্রকৃতির সঙ্কেতই হলো আসল সত্যি।",
+  "title_b": "গোপালের চ্যালেঞ্জ ও ভণ্ড গণকের বৃষ্টি রহস্য! 🌧️",
+  "question_post": null,
+  "facebook": "2091383848185748",
+  "youtube": "bZwJ7mrC36w",
+  "fb_reel": "1602977514964340",
+  "fb_story": "1291133039870235",
+  "yt_short": "lvMmq3QzYSc"
  }
 ]

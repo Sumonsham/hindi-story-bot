@@ -1390,7 +1390,7 @@
    "yt_views": 3,
    "yt_avg_s": 2,
    "yt_avg_pct": 0.4,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1718,7 +1718,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2027,7 +2027,7 @@
    "yt_views": 2,
    "yt_avg_s": 9,
    "yt_avg_pct": 1.6,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2086,7 +2086,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2433,7 +2433,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2474,10 +2474,10 @@
    "comments": 1,
    "views": 2,
    "length_s": 479,
-   "yt_views": 1,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "yt_views": 2,
+   "yt_avg_s": 16,
+   "yt_avg_pct": 3.5,
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2878,7 +2878,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2902,7 +2902,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-16T22:04+00:00"
+   "checked": "2026-11-19T22:05+00:00"
   }
  },
  {
@@ -3329,7 +3329,23 @@
   "youtube": "zUlUYp2zFLM",
   "fb_reel": "29194413700220527",
   "fb_story": "2366035817466632",
-  "yt_short": "FnLDxIUexoc"
+  "yt_short": "FnLDxIUexoc",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 410,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-19T22:05+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-19T22:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-19T02:31+00:00",
@@ -3395,12 +3411,7 @@
   "date": "2026-11-19T13:31+00:00",
   "lang": "bn",
   "slot": "2026-11-19@19",
-  "pending_comments": [
-   {
-    "id": "1480789907350743",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1007977425027313"
-   }
-  ],
+  "pending_comments": [],
   "category": "ramayan",
   "idea": "King Dasharatha's yajna and the birth of Rama, Lakshmana, Bharata and Shatrughna",
   "episode": 2,
@@ -3423,5 +3434,49 @@
   "youtube": "S8aj22Z-ibs",
   "fb_reel": "1480789907350743",
   "fb_story": "1678294957239231"
+ },
+ {
+  "date": "2026-11-20T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-20@8",
+  "pending_comments": [
+   {
+    "id": "1123892707218181",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=3651587541658778"
+   },
+   {
+    "id": "2582291512258340",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=3651587541658778"
+   }
+  ],
+  "category": "jataka",
+  "idea": "A glowing shepherd boy in a quiet Bethlehem pasture discovers a stray lamb leading him to a starlit stable. (told as a jataka story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "বৃষ্টির রাতে জ্বলজ্বলে পায়ের ছাপ কার? 🐾✨ | জাতকের আশ্চর্য রাখাল বালক!",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ভাজা যবের ছাতু"
+  },
+  "hook_style": "voice",
+  "moral": "অসহায় ও দুর্বল প্রাণীকে নিঃস্বার্থভাবে ভালোবাসাই মানবজীবনের সবচেয়ে বড় পুণ্য।",
+  "title_b": "পাহাড়ের বুকে মায়াবী মেষশিশু ও রাখাল বালকের রহস্য 🌟",
+  "question_post": null,
+  "facebook": "3651587541658778",
+  "youtube": "8XUuG8wWU6Y",
+  "fb_reel": "1123892707218181",
+  "fb_story": "2671402436621827",
+  "fb_reel2": "2582291512258340",
+  "coloring": "122139814406735948",
+  "riddle_post": "122139825446735948",
+  "riddle": {
+   "q": "পা নেই তবু চলে সে ভাই, মুখ নেই তবু বলে সে তাই। ডাকলে আসে, ছাড়লে যায়, বলো তো সে কী?",
+   "a": "চিঠি (বা বাতাস)"
+  }
  }
 ]

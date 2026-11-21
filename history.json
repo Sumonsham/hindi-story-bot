@@ -3166,7 +3166,8 @@
    "views_before": 0,
    "at": "2026-11-18T09:05+00:00",
    "thumb": true
-  }
+  },
+  "hook_done": true
  },
  {
   "date": "2026-11-17T13:31+00:00",
@@ -3465,7 +3466,23 @@
   "facebook": "1007977425027313",
   "youtube": "S8aj22Z-ibs",
   "fb_reel": "1480789907350743",
-  "fb_story": "1678294957239231"
+  "fb_story": "1678294957239231",
+  "stats": {
+   "likes": 4,
+   "comments": 1,
+   "views": 0,
+   "length_s": 626,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-20T22:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-20T22:04+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-20T02:31+00:00",
@@ -3535,12 +3552,7 @@
   "date": "2026-11-20T13:31+00:00",
   "lang": "bn",
   "slot": "2026-11-20@19",
-  "pending_comments": [
-   {
-    "id": "2180219736180577",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2425542397980768"
-   }
-  ],
+  "pending_comments": [],
   "category": "jagannath",
   "idea": "King Indradyumna's dream and the search for Nila Madhava",
   "episode": 1,
@@ -3564,5 +3576,48 @@
   "fb_reel": "2180219736180577",
   "fb_story": "1212547171608775",
   "yt_short": "A5lifzevxzo"
+ },
+ {
+  "date": "2026-11-21T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-21@8",
+  "pending_comments": [
+   {
+    "id": "1164160986064375",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=4826259437593865"
+   },
+   {
+    "id": "1002751346238079",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=4826259437593865"
+   }
+  ],
+  "category": "animal",
+  "idea": "A poor farmer in a remote Bengal village discovers a magical banyan tree that grows glowing golden mangoes overnight, but a cunning fox tries to trick him into (told as a animal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "জাদুকরী সোনার আম ও চালাক শেয়ালের ধোঁকা! 🥭🦊 | Which Gift Is Purest? | Bangla Cartoon G",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "পিচ্ছিল কাদার জন্য"
+  },
+  "hook_style": "sound",
+  "moral": "সততা ও বুদ্ধির কাছে সবসময় সব প্রতারণা আর ছলচাতুরি হার মানে।",
+  "title_b": "সোনার আম ও চতুর শিয়ালের ফাঁদ! 🥭 | সততার জয়!",
+  "question_post": "2026-11-21",
+  "facebook": "4826259437593865",
+  "youtube": "1hyrU0wED6Q",
+  "fb_reel": "1164160986064375",
+  "fb_story": "3066336937045473",
+  "fb_reel2": "1002751346238079",
+  "riddle_post": "122139970658735948",
+  "riddle": {
+   "q": "ডালে ডালে বসে থাকি, মিষ্টি সুরে গান ডাকি! কালো আমার গায়ের রঙ, বলো দেখি আমার নাম?",
+   "a": "কোকিল"
+  }
  }
 ]

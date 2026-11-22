@@ -1068,7 +1068,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   }
  },
  {
@@ -1311,7 +1311,7 @@
    "yt_views": 1,
    "yt_avg_s": 29,
    "yt_avg_pct": 5.4,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   }
  },
  {
@@ -1346,7 +1346,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   }
  },
  {
@@ -1669,7 +1669,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1960,7 +1960,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1979,12 +1979,12 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 13,
+   "views": 14,
    "length_s": 5374,
-   "yt_views": 10,
-   "yt_avg_s": 6,
-   "yt_avg_pct": 0.1,
-   "checked": "2026-11-18T22:04+00:00"
+   "yt_views": 14,
+   "yt_avg_s": 9,
+   "yt_avg_pct": 0.2,
+   "checked": "2026-11-21T22:04+00:00"
   }
  },
  {
@@ -2739,12 +2739,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 501,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "checked": "2026-11-21T22:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3203,10 +3203,10 @@
    "comments": 1,
    "views": 4,
    "length_s": 540,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-18T22:04+00:00"
+   "yt_views": 4,
+   "yt_avg_s": 19,
+   "yt_avg_pct": 3.6,
+   "checked": "2026-11-21T22:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3605,7 +3605,23 @@
   "youtube": "358I_NlSuPk",
   "fb_reel": "2180219736180577",
   "fb_story": "1212547171608775",
-  "yt_short": "A5lifzevxzo"
+  "yt_short": "A5lifzevxzo",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 612,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-21T22:04+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-21T22:05+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-21T02:31+00:00",
@@ -3674,12 +3690,7 @@
   "date": "2026-11-21T13:31+00:00",
   "lang": "bn",
   "slot": "2026-11-21@19",
-  "pending_comments": [
-   {
-    "id": "1828621424814956",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1661650529004200"
-   }
-  ],
+  "pending_comments": [],
   "category": "mahabharat",
   "idea": "the birth of the Pandavas and the Kauravas",
   "episode": 2,
@@ -3700,5 +3711,44 @@
   "fb_reel": "1828621424814956",
   "fb_story": "1893443348304288",
   "yt_short": "TwlKAKzblQE"
+ },
+ {
+  "date": "2026-11-22T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-22@8",
+  "pending_comments": [
+   {
+    "id": "1109590351838666",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1863136881679991"
+   },
+   {
+    "id": "2334720404017300",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1863136881679991"
+   }
+  ],
+  "category": "gita",
+  "idea": "Chapter 2 - the soul never dies; do your duty without worrying about the result (2.47)",
+  "episode": 2,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "গীতার জ্ঞান পর্ব ২: আঁকার প্রতিযোগিতায় হারার ভয়? 🎨 | Gita Gyan Chapter ২ | ২০২৬ | শ্রীকৃষ্ণের অ",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ফলের আশা ছেড়ে কাজ করো"
+  },
+  "hook_style": "voice",
+  "moral": "ফলাফলের চিন্তা ভুলে নিষ্ঠার সঙ্গে নিজের দায়িত্ব পালন করাই হলো জীবনের প্রকৃত সাফল্য।",
+  "title_b": "ফলের আশা ছাড়াই কি জয় সম্ভব? 🏹 | গীতার জ্ঞান পর্ব ২",
+  "question_post": null,
+  "facebook": "1863136881679991",
+  "youtube": "a7wHlMWrOs8",
+  "fb_reel": "1109590351838666",
+  "fb_story": "4727343200828755",
+  "fb_reel2": "2334720404017300",
+  "coloring": "122140104416735948"
  }
 ]

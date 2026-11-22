@@ -3805,12 +3805,7 @@
   "date": "2026-11-22T13:31+00:00",
   "lang": "bn",
   "slot": "2026-11-22@19",
-  "pending_comments": [
-   {
-    "id": "2373414966728216",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1836907320792367"
-   }
-  ],
+  "pending_comments": [],
   "category": "devdevi",
   "idea": "the birth of Ma Durga and Mahishasura",
   "episode": 1,
@@ -3834,5 +3829,13 @@
   "fb_reel": "2373414966728216",
   "fb_story": "1393161812895398",
   "yt_short": "cKqU22fFxp0"
+ },
+ {
+  "date": "2026-11-22T13:36+00:00",
+  "lang": "bn",
+  "kind": "compilation",
+  "title": "152 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
+  "facebook": "1163462363256789",
+  "youtube": "NGKy8fH4qyM"
  }
 ]

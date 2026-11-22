@@ -2373,12 +2373,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 9,
+   "views": 10,
    "length_s": 468,
    "yt_views": 9,
    "yt_avg_s": 20,
    "yt_avg_pct": 4.4,
-   "checked": "2026-11-19T09:04+00:00"
+   "checked": "2026-11-22T09:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2790,7 +2790,7 @@
    "yt_views": 1,
    "yt_avg_s": 9,
    "yt_avg_pct": 1.9,
-   "checked": "2026-11-19T03:07+00:00"
+   "checked": "2026-11-22T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2835,7 +2835,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T09:04+00:00"
+   "checked": "2026-11-22T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3249,12 +3249,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 4,
+   "views": 5,
    "length_s": 519,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-19T03:07+00:00"
+   "yt_views": 4,
+   "yt_avg_s": 520,
+   "yt_avg_pct": 100.1,
+   "checked": "2026-11-22T09:04+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3289,12 +3289,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 2,
    "length_s": 387,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T09:04+00:00"
+   "checked": "2026-11-22T09:04+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3700,7 +3700,21 @@
   "youtube": "ZhRdd2nZTT8",
   "fb_reel": "1766327478443004",
   "fb_story": "1670317137779408",
-  "yt_short": "-zkgMyqox1M"
+  "yt_short": "-zkgMyqox1M",
+  "stats": {
+   "likes": 5,
+   "comments": 1,
+   "views": 4,
+   "length_s": 707,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-22T09:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 4
+  }
  },
  {
   "date": "2026-11-21T13:31+00:00",
@@ -3762,12 +3776,7 @@
   "date": "2026-11-22T07:31+00:00",
   "lang": "bn",
   "slot": "2026-11-22@13",
-  "pending_comments": [
-   {
-    "id": "1333173045560879",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1861264275303138"
-   }
-  ],
+  "pending_comments": [],
   "category": "gopal",
   "idea": "A clever court jester in the royal capital uses a trick with speaking clay pots to expose a corrupt minister trying to steal the queen's silver necklace. (told as a gopal story for children)",
   "episode": null,
@@ -3791,5 +3800,39 @@
   "fb_reel": "1333173045560879",
   "fb_story": "1466196835622554",
   "yt_short": "4TjYwPr5k74"
+ },
+ {
+  "date": "2026-11-22T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-22@19",
+  "pending_comments": [
+   {
+    "id": "2373414966728216",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1836907320792367"
+   }
+  ],
+  "category": "devdevi",
+  "idea": "the birth of Ma Durga and Mahishasura",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "দেবদেবীর জন্মকথা পর্ব ১: কার ক্রোধ থেকে জন্ম নিলেন দশভূজা? | দেবদেবীর জন্মকথা 🌺",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "সিংহ"
+  },
+  "hook_style": "voice",
+  "moral": "অন্যায় ও অহংকার যতই শক্তিশালী হোক, ঐক্য ও পরম সত্যের মহাশক্তির সামনে তার পতন অবশ্যম্ভাবী।",
+  "title_b": "মহিষাসুরের অত্যাচার ও মা দুর্গার অলৌকিক জন্ম! 🔱",
+  "question_post": null,
+  "facebook": "1836907320792367",
+  "youtube": "C71rP7rvnXo",
+  "fb_reel": "2373414966728216",
+  "fb_story": "1393161812895398",
+  "yt_short": "cKqU22fFxp0"
  }
 ]

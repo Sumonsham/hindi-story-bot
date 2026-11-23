@@ -3621,7 +3621,8 @@
    "views_before": 0,
    "at": "2026-11-21T22:05+00:00",
    "thumb": true
-  }
+  },
+  "hook_done": true
  },
  {
   "date": "2026-11-21T02:31+00:00",
@@ -3740,7 +3741,21 @@
   "youtube": "Ls1C2gRIym8",
   "fb_reel": "1828621424814956",
   "fb_story": "1893443348304288",
-  "yt_short": "TwlKAKzblQE"
+  "yt_short": "TwlKAKzblQE",
+  "stats": {
+   "likes": 4,
+   "comments": 1,
+   "views": 3,
+   "length_s": 434,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-22T22:04+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 3
+  }
  },
  {
   "date": "2026-11-22T02:31+00:00",
@@ -3837,5 +3852,44 @@
   "title": "152 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1163462363256789",
   "youtube": "NGKy8fH4qyM"
+ },
+ {
+  "date": "2026-11-23T02:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-23@8",
+  "pending_comments": [
+   {
+    "id": "1443261907971275",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2927374764322341"
+   },
+   {
+    "id": "1825309635460514",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2927374764322341"
+   }
+  ],
+  "category": "learn",
+  "idea": "consonants 1-5 (Bengali: ক খ গ ঘ ঙ / Hindi: क ख ग घ ङ)",
+  "episode": 3,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "শিখি মজায় পর্ব ৩: আকাশে ভাসলো জাদুকরী বর্ণমালার রহস্য! 🎨✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "ঘড়ি"
+  },
+  "hook_style": "sound",
+  "moral": "আনন্দের সাথে খেলার ছলে শিখলে পড়া সবসময় সহজ ও মনে রাখা সহজ হয়।",
+  "title_b": "জাদুকরী ক্যানভাসে ক খ গ ঘ ঙ শেখার আনন্দ! 🌟",
+  "question_post": null,
+  "facebook": "2927374764322341",
+  "youtube": "5gXQeuGQpu0",
+  "fb_reel": "1443261907971275",
+  "fb_story": "4465270087056477",
+  "fb_reel2": "1825309635460514",
+  "coloring": "122140240856735948"
  }
 ]

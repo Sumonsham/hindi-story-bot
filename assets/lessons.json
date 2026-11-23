@@ -1,25 +1,25 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-20T09:06+00:00",
+  "made": "2026-11-22T22:05+00:00",
   "lessons": [
-   "Prioritize classic myth, legend, and moral riddle formats (like Betal, Ramayan, and Gopal Bhar) as they show higher retention and engagement compared to generic or lesser-known concepts.",
-   "Keep standard storytelling pacing tight; early metrics indicate that longer compilations or overly drawn-out setups drop in watch percentage quickly.",
-   "Introduce clear, high-stakes moral dilemmas or clever problem-solving in the first 30 seconds to capture immediate viewer attention.",
-   "Maintain recurring, beloved legacy characters (Gopal Bhar, Birbal, Betal) as anchors for consistent audience pull.",
-   "Keep episode runtimes balanced and focused on a single narrative arc to prevent audience drop-off mid-video."
+   "Keep educational and science-backed cartoon stories concise, as demonstrated by strong retention on short science topics like sky mysteries.",
+   "Structure mythological and epic series into clear, bite-sized parts to maintain high viewer completion rates.",
+   "Incorporate moral dilemmas early in detective and folk stories to prevent viewer drop-off in the middle chapters.",
+   "Use familiar characters like Gopal Bhar consistently as anchor content since they consistently attract steady engagement slots.",
+   "End episodes with a distinct question or cliffhanger to directly drive comment section activity and viewer participation."
   ],
   "titles": [
-   "Titles that pose direct questions or psychological puzzles ('কার ত্যাগ শ্রেষ্ঠ?', 'বেতালের ধাঁধা') drive higher click-through and curiosity.",
-   "Using dramatic emotional hooks and high-contrast stakes ('জীবন দিল কারা?', 'রহস্যময় তারা') outperforms descriptive or passive titles.",
-   "Keeping title testing active allows the algorithm to quickly shift traffic toward variants that promise immediate entertainment or clever twists."
+   "Titles featuring direct questions (e.g., 'কেন?', 'কীভাবে?') successfully capture higher viewer curiosity and initial clicks.",
+   "Using emotional triggers and mystery words like 'রহস্য' or 'গোপন' in title_b variants improved overall performance over generic titles.",
+   "Keeping titles concise with strong visual emojis helps mobile scrollers quickly identify the cartoon category and premise."
   ],
   "requests": [
-   "More stories featuring witty problem-solving by Gopal Bhar and Birbal",
-   "Engaging moral and philosophical lessons adapted from epics like Ramayana and Mahabharata",
-   "Folktales involving mysterious natural phenomena and magical elements",
-   "Interactive quiz-based engagement where viewers can guess the correct answer in comments",
-   "Character-driven regional fables with relatable village settings",
-   "Educational storytelling segments combined with fun animated visuals"
+   "Nilmadhab story continuation and Vidyapati character insights",
+   "Magical mango adventure and choices related to mythical fruits",
+   "Humorous monsoon episodes featuring comical priest reactions",
+   "Detailed character deep-dives into the five Pandavas",
+   "Art and learning-based story prompts concerning fear of failure",
+   "Interactive guessing games to identify thieves or culprits in mystery plots"
   ]
  }
 }

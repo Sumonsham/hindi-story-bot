@@ -3830,7 +3830,21 @@
   "youtube": "l-ctkb2gqAc",
   "fb_reel": "1333173045560879",
   "fb_story": "1466196835622554",
-  "yt_short": "4TjYwPr5k74"
+  "yt_short": "4TjYwPr5k74",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 5,
+   "length_s": 872,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-23T09:03+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 5
+  }
  },
  {
   "date": "2026-11-22T13:31+00:00",
@@ -3903,12 +3917,7 @@
   "date": "2026-11-23T07:31+00:00",
   "lang": "bn",
   "slot": "2026-11-23@13",
-  "pending_comments": [
-   {
-    "id": "3083270495398488",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1123662253979900"
-   }
-  ],
+  "pending_comments": [],
   "category": "gopal",
   "idea": "A clever royal court jester uncovers a hidden trap set by a greedy minister deep inside the palace treasury. (told as a gopal story for children)",
   "episode": null,
@@ -3932,5 +3941,39 @@
   "fb_reel": "3083270495398488",
   "fb_story": "1169880595620799",
   "yt_short": "zeZXl6trcTg"
+ },
+ {
+  "date": "2026-11-23T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-23@19",
+  "pending_comments": [
+   {
+    "id": "2202205724024114",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1972590154118434"
+   }
+  ],
+  "category": "mahadev",
+  "idea": "the endless pillar of light - Brahma, Vishnu and the first Shiva Linga",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "মহাদেবের কথা পর্ব ১: অসীম আলোর স্তম্ভের গোপন রহস্য কী? | মহাদেবের কথা ২০২৬",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "কেতকী ফুল"
+  },
+  "hook_style": "sound",
+  "moral": "অহংকার মানুষের পতন ঘটায়, আর বিনয় ও সততাই পরমেশ্বরের কৃপা লাভের একমাত্র পথ।",
+  "title_b": "প্রথম শিবলিঙ্গ আবির্ভাবের অলৌকিক রহস্য! 🕉️",
+  "question_post": null,
+  "facebook": "1972590154118434",
+  "youtube": "lac1vjT33Gg",
+  "fb_reel": "2202205724024114",
+  "fb_story": "29753143097604023",
+  "yt_short": "xc-XSbzvKPM"
  }
 ]

@@ -1,0 +1,121 @@
+{
+ "agent": "Story Scout",
+ "title": "রাজপথের গুপ্তধন নাকি বড় প্রতারণা? | Bangla Cartoon | #shorts",
+ "bot": "kids",
+ "characters": [
+  {
+   "name": "Gopal",
+   "actor": "gopal",
+   "in_library": true
+  },
+  {
+   "name": "Raja",
+   "actor": "raja",
+   "in_library": true
+  },
+  {
+   "name": "Mantri",
+   "actor": "mantri",
+   "in_library": true
+  },
+  {
+   "name": "Gopal's wife",
+   "actor": "gopal_bou",
+   "in_library": true
+  },
+  {
+   "name": "Sumon",
+   "actor": "saheb",
+   "in_library": true
+  },
+  {
+   "name": "Mahajan",
+   "actor": "mahajan",
+   "in_library": true
+  }
+ ],
+ "new": [],
+ "elements": [
+  {
+   "scene": 1,
+   "place": "royal court with king on throne and ministers sitting around",
+   "drawn_as": "ghar",
+   "room": "hall"
+  },
+  {
+   "scene": 2,
+   "place": "gopal's modest mud home courtyard with earthen pot",
+   "drawn_as": "village_courtyard"
+  },
+  {
+   "scene": 3,
+   "place": "sunny village path lined with green banyan trees",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 4,
+   "place": "under shady banyan tree on village path",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 5,
+   "place": "grand royal court of Krishnanagar",
+   "drawn_as": "ghar",
+   "room": "hall"
+  },
+  {
+   "scene": 6,
+   "place": "heaps of heavy stone rubble blocking the village highway",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 7,
+   "place": "highway rubble pile under fading evening sunlight",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 8,
+   "place": "edge of village path near rubble site under evening sky",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 9,
+   "place": "busy market place in evening dusk with oil lamps lighting up",
+   "drawn_as": "market"
+  },
+  {
+   "scene": 10,
+   "place": "dark night village highway under starlight and torches",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 11,
+   "place": "spotless clean sunrise village road with clear horizon",
+   "drawn_as": "village_road"
+  },
+  {
+   "scene": 12,
+   "place": "royal court filled with light and royal splendor",
+   "drawn_as": "ghar",
+   "room": "hall"
+  },
+  {
+   "scene": 13,
+   "place": "royal court",
+   "drawn_as": "ghar",
+   "room": "hall"
+  },
+  {
+   "scene": 14,
+   "place": "grand royal court room",
+   "drawn_as": "ghar",
+   "room": "hall"
+  }
+ ],
+ "missing_elements": [],
+ "problems": [],
+ "built": [],
+ "failed": [],
+ "minutes": 0.0,
+ "made": "2026-11-23T18:07+00:00"
+}

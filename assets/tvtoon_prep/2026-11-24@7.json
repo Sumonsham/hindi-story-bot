@@ -1,0 +1,150 @@
+{
+ "agent": "Story Scout",
+ "title": "দিদিমার ঝুলি: আরে রাজকন্যা তুমি কোন ঘরে আছো? 🏰✨",
+ "bot": "kids",
+ "characters": [
+  {
+   "name": "Didima",
+   "actor": "didima",
+   "in_library": true
+  },
+  {
+   "name": "Pupu",
+   "actor": "pupu",
+   "in_library": true
+  },
+  {
+   "name": "Tatai",
+   "actor": "tatai",
+   "in_library": true
+  },
+  {
+   "name": "Sumon",
+   "actor": "saheb",
+   "in_library": true
+  },
+  {
+   "name": "Sayan",
+   "actor": "sayan_kid",
+   "in_library": true
+  },
+  {
+   "name": "King Hemanta",
+   "actor": "raja",
+   "in_library": true
+  },
+  {
+   "name": "Princess Mayuri",
+   "actor": "riya",
+   "in_library": true
+  },
+  {
+   "name": "Maya Demon",
+   "actor": "chashi",
+   "in_library": true
+  }
+ ],
+ "new": [],
+ "elements": [
+  {
+   "scene": 1,
+   "place": "Tatai and Pupu's Bedroom at night, soft oil lamp light",
+   "drawn_as": "ghar",
+   "room": "bedroom"
+  },
+  {
+   "scene": 2,
+   "place": "Enchanted Tower Corridor with glowing silver doors",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 3,
+   "place": "Tower corridor near door number one",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 4,
+   "place": "Palace Entrance Hall",
+   "drawn_as": "ghar",
+   "room": "hall"
+  },
+  {
+   "scene": 5,
+   "place": "Corridor of Seven Doors",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 6,
+   "place": "Bedtime Bedroom",
+   "drawn_as": "ghar",
+   "room": "bedroom"
+  },
+  {
+   "scene": 7,
+   "place": "Enchanted Tower Corridor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 8,
+   "place": "Palace Tower Window & Corridor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 9,
+   "place": "Enchanted Corridor Floor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 10,
+   "place": "Bedtime Room",
+   "drawn_as": "ghar",
+   "room": "bedroom"
+  },
+  {
+   "scene": 11,
+   "place": "Enchanted Corridor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 12,
+   "place": "Floor of Enchanted Corridor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 13,
+   "place": "In front of the True Door",
+   "drawn_as": "village_courtyard"
+  },
+  {
+   "scene": 14,
+   "place": "Opened Doorway & Corridor",
+   "drawn_as": "ghar",
+   "room": "corridor"
+  },
+  {
+   "scene": 15,
+   "place": "Royal Palace Courtyard",
+   "drawn_as": "zamindar_bari"
+  },
+  {
+   "scene": 16,
+   "place": "Tatai and Pupu's Bedroom at night",
+   "drawn_as": "ghar",
+   "room": "bedroom"
+  }
+ ],
+ "missing_elements": [],
+ "problems": [],
+ "built": [],
+ "failed": [],
+ "minutes": 0.0,
+ "made": "2026-11-23T18:07+00:00"
+}

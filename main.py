@@ -6,8 +6,9 @@ Every run makes ONE brand-new, original Hindi or Bengali kids' cartoon story vid
 a Facebook Page:
 
   1. Google Gemini          -> story with dialogue, title, description, hashtags
-  2. Cloudflare Workers AI  -> cartoon pictures, a new picture for every line, same characters
-  3. Microsoft Edge voices  -> sweet narrator + a different voice for every character (gTTS backup)
+  2. tvtoon (our own engine) -> the TV cartoon: every scene animated, the same characters every day
+  3. Gemini voices          -> sweet narrator + a different voice for every character (ALWAYS Gemini; Chirp 3 HD of
+                               the same name only when Gemini's free day is used up; never a Microsoft voice)
   4. Sound engine           -> real sound effects from freesound.org (CC0) timed to the story,
                                nature ambience and soft cheerful music
   5. FFmpeg + OpenCV        -> moving picture layers, close-ups, subtitles
@@ -18,6 +19,7 @@ Optional: PAGE_NAME, FREESOUND_API_KEY, MAX_IMAGES, DRY_RUN=1, MOCK=1
 """
 import asyncio
 import base64
+import contextlib
 import datetime as dt
 import glob
 import json
@@ -799,7 +801,12 @@ def load_history():
 # (start hour, start minute, the hour the video should be out)
 # three videos a day: 8 AM, 1 PM, 7 PM. The free voice model is slow (~2 minutes a line), so each run starts
 # about 4.5 hours before its post time (cron-job.org: 3:30, 8:30, 14:30 India time)
-TRIGGERS = [(3, 30, 8), (8, 30, 13), (14, 30, 19)]
+# 23 Nov 2026 (your new programme): the stories are written the night before (11 PM, mode=write), their new
+# characters made at 2 AM (mode=assets); each video run starts about 4.5 hours before its post time, because the
+# voices and then the cartoon (which is drawn to the voices' timing) need that long: 2:30 -> 7 AM, 8:30 -> 1 PM,
+# 14:30 -> 7 PM. MORNING_HOUR (repo variable) moves the morning video (default 7).
+MORNING_HOUR = int(os.environ.get("MORNING_HOUR") or 7)
+TRIGGERS = [(MORNING_HOUR - 5 if MORNING_HOUR >= 5 else 2, 30, MORNING_HOUR), (8, 30, 13), (14, 30, 19)]
 JOB_START = time.time()                          # GitHub stops a job after 6 hours
 
 
@@ -1481,6 +1488,25 @@ def host_puppet(fly_in):
     return {"host": {"fly_in": fly_in}, "bg": bg, "place": "village courtyard"} if bg else None
 
 
+
+STORY_STRENGTH = """
+STORY STRENGTH (the owner's rule, 23 Nov 2026 - read it before writing a single line):
+1. A clear wish or problem in the first minute (the hero wants something / something goes wrong) - children must
+   want to know how it ends.
+2. EVERY scene changes something: a new try, a new obstacle, a funny surprise, a clever idea. No scene that only
+   repeats what we already know.
+3. The trouble grows in steps (try 1 fails, try 2 fails worse, then the clever / kind solution) and the ending is
+   a real payoff of something set up earlier.
+4. The characters ACT - run, hide, climb, share, help, trick, laugh - the lesson is SHOWN by what they do, never
+   preached for long.
+5. Real fun: a running joke, a funny sound, a cheeky line from the side character - but never silly for nothing.
+6. NEVER say anything twice: no sentence, idea or explanation the children have already heard, no recap, no line
+   repeated by another character. Every line is NEW.
+7. Say plainly what the body does in the narration (comes running, jumps, sits under the tree, claps, bows,
+   flies away) - and give every spoken line the key "action": ENGLISH, 2-8 words, what the SPEAKER does while
+   saying it (e.g. "jumps up and claps"), or "" when the speaker stands still. The cartoon acts it.
+"""
+
 def make_story(lang, theme, history, extra_rules="", part=0, prev=None, total=2, prompt_only=False):
     if MOCK and not prompt_only:
         return mock_story(lang)
@@ -1632,7 +1658,7 @@ You are India's best {L['name']} storyteller for a family cartoon story page tha
 children, teenagers, parents and grandparents.
 Write ONE {L['name']} story ({L['script']} script, natural everyday {L['name']} that the whole family
 understands). Type: {category} story. Theme: {idea}.
-{kind_rules}{extra_rules}
+{kind_rules}{extra_rules}{STORY_STRENGTH}
 Never use modern copyrighted characters (no Disney, Chhota Bheem, Motu Patlu etc.).
 Must be different from these earlier stories: {json.dumps(old_titles, ensure_ascii=False)}
 Our channel host is "Lumi Didi", a warm storyteller; the narrator speaks like her (friendly, to the whole family).
@@ -1697,6 +1723,7 @@ Return ONLY JSON with exactly these keys:
                 "emotion": "one of {EMOTIONS}",
                 "delivery": "ENGLISH acting direction for the voice (pitch, speed, loudness, feeling)",
                 "voice_text": "same words as text, with 0-2 sound tags like <giggle> or <gasp> where they fit",
+                "action": "ENGLISH 2-8 words: what the SPEAKER's body does while saying this line (walks in / sits down / points at the door / runs away / looks back / claps / bows) or ''",
                 "sfx": [{{"sound": "ENGLISH short name of what HAPPENS in this line, e.g. 'wooden door opens', 'small footsteps running on grass', 'water splash', 'children laughing', 'elephant trumpet', 'crow cawing', 'clapping'",
                           "when": "before (sound first, then the line), during, or after (line first, then the sound)"}}],
                 "image": {{"prompt": "ENGLISH storyboard frame for THIS line, 35-60 words, like a cartoon film still: the exact moment of this line - who does what to whom, WHERE (which part of the setting, objects around), camera (close-up / medium / wide / over-the-shoulder / top view), time of day and light, the mood. Only things that can be SEEN",
@@ -2542,9 +2569,8 @@ def _voice_all(todo, make, label, max_minutes):
 
 
 def prepare_voices(parts_lines, voices, lang):
-    """Voice the WHOLE video before it is made, all lines or none (so a voice never changes mid-video):
-    1) Gemini expressive voices (free keys)  2) free voice model on GitHub (Indic Parler-TTS)
-    3) otherwise Microsoft voices."""
+    """Voice the WHOLE video before it is made, all lines or none (so a voice never changes mid-video): the Gemini
+    voices (this repo's one free key), Chirp 3 HD of the same name only when Gemini's day is used up."""
     if MOCK:
         return False
     todo = [(i, j, ln) for i, lines in enumerate(parts_lines) for j, ln in enumerate(lines or [])
@@ -2601,7 +2627,7 @@ def prepare_voices(parts_lines, voices, lang):
         log(f"  Gemini voiced {len(done)} of {len(order)} characters completely")
         extras.TTS_STATE["off"] = True
         waiting = [v for v in order if v not in done]
-        if waiting and extras.chirp_ok(TTS_USAGE):    # Chirp 3 HD voice of the SAME name, a whole character at a time
+        if waiting and extras.chirp_ok(TTS_USAGE) and env("CARTOON_CHIRP") != "0":   # Chirp 3 HD of the SAME name
             used0 = extras.chirp_used(TTS_USAGE)
             for v in waiting:
                 its = mine(v)
@@ -2615,7 +2641,7 @@ def prepare_voices(parts_lines, voices, lang):
                 extras.note(f"কার্টুন: Gemini-র দিনের গলা শেষ, Chirp গলা নিল {spent} অক্ষর "
                             f"(এই মাসে দুই bot মিলিয়ে সীমা {env('CHIRP_MONTH_CAP') or 900000})")
         if any(v not in done for v in order):
-            log("  not every character could get Gemini / Chirp today - the free voice for the whole video")
+            log("  not every character could get the Gemini voice today")
             for it in items:
                 if os.path.exists(it["out"]):
                     os.remove(it["out"])
@@ -2659,42 +2685,47 @@ def prepare_voices(parts_lines, voices, lang):
         log("  all lines voiced (Gemini" + (" + Chirp)" if extras.chirp_used(TTS_USAGE) else ")"))
         return True
 
-    def free_all():
-        if not (extras.parler_ok() and extras.ensure_parler()):
-            log("  free voice model not available (check the HF_TOKEN secret)")
-            return False
-        log(f"Free voice model for all {len(todo)} lines")
-        return _voice_all(todo, lambda ln, p: extras.parler_line(str(ln["text"]), parler_persona(voices, ln.get("speaker", "narrator"), lang),
-                                                                 ln.get("emotion", "normal"), p, SR),
-                          "free voice model", min(int(env("FREE_VOICE_MINUTES") or 260), max(30, job_minutes_left() - 70)))
-
-    # v85 (13 Nov 2026, your choice): CARTOONS = Gemini voices first, then Chirp 3 HD of the same name,
-    # and only if both are gone the free voice model (never a Microsoft voice)
+    # 23 Nov 2026 (your rule): the cartoon ALWAYS speaks with the Gemini voices. Only when Gemini's free share of
+    # the day is used up, a character gets the Google Chirp 3 HD voice of the SAME name (your approved fallback;
+    # repo variable CARTOON_CHIRP = 0 switches even that off). Never the free on-GitHub model, never a Microsoft
+    # voice: without a Gemini voice the video waits for the next run.
     extras.TTS_STATE["off"] = True
-    order = (gemini_all, free_all)
-    for engine in order:
-        if engine():
-            GEMINI_READY = True
-            return True
+    if gemini_all():
+        GEMINI_READY = True
+        return True
     extras.TTS_STATE["off"] = True
-    if env("ALLOW_MICROSOFT") == "1":
-        log("  using Microsoft voices for the whole video")
-        return False
     no_voice_stop()
 
 
 def no_voice_stop():
-    """No good voice today (Gemini limit over, free model failed): no robotic Microsoft voice - skip this video."""
-    log("STOPPED: no Gemini / Chirp voice left and the free voice model failed today. Nothing was posted - the next "
-        "run will try again. (Microsoft voices are switched off.)")
-    extras.telegram("⚠️ Little Lumi: today's voices could not be made (Gemini + Chirp used up, free voice model failed) "
-                    "- this video was skipped. The next run will try again.")
+    """No Gemini voice today (the free share is used up): never another voice - skip this video."""
+    log("STOPPED: no Gemini voice left today. Nothing was posted - the next run will try again.")
+    extras.telegram("⚠️ Little Lumi: আজ Gemini-র ভয়েস শেষ, তাই এই ভিডিওটা হল না (অন্য কোনো ভয়েস ব্যবহার করা হয় না)। "
+                    "পরের run আবার চেষ্টা করবে।")
     sys.exit(0)
 
 
-async def _edge(text, voice, rate, pitch, out, volume="+0%"):
-    import edge_tts
-    await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch, volume=volume).save(out)
+def one_gemini_line(ln, voices, lang, out_wav):
+    """one line that is not voiced yet (e.g. a line added at the end): the Gemini voice of its speaker, inside the
+    day's share; Chirp 3 HD of the same name only when Gemini's day is over (CARTOON_CHIRP=0: not even that)"""
+    voice, who = gemini_persona(voices, ln.get("speaker", "narrator"))
+    feel = EMOTION_WORDS.get(str(ln.get("emotion", "normal")).lower(), "naturally")
+    ok = False
+    if extras.tts_keys() and extras.tts_budget_left(TTS_USAGE) > 0:
+        extras.TTS_STATE["off"] = False
+        extras.TTS_USED[0] = 1
+        try:
+            ok = extras.tts_gemini(extras.performed(ln), voice, f"{who}. This is a children's cartoon story. {feel}. "
+                                   + extras.PRONOUNCE.get(lang, ""), LANGS[lang]["name"], out_wav, SR)
+        finally:
+            extras.TTS_STATE["off"] = True
+            try:
+                extras.tts_budget_use(TTS_USAGE)
+            except Exception:
+                pass
+    if not ok and extras.chirp_ok(TTS_USAGE) and env("CARTOON_CHIRP") != "0":
+        ok = extras.chirp_tts(extras.strip_tags(str(ln.get("text", ""))), voice, out_wav, SR, TTS_USAGE, lang)
+    return bool(ok) and os.path.exists(out_wav) and os.path.getsize(out_wav) > 2000
 
 
 # how each emotion changes the voice: (speed %, pitch Hz, volume %, extra sound filter)
@@ -2729,6 +2760,8 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", f"sine=frequency={freq}:duration={secs:.2f}",
              "-af", "volume=0.25", "-ar", str(SR), "-ac", "1", out_wav])
         return secs
+    # 23 Nov 2026: the owner's rule - no Microsoft voice, ever (the cartoon always speaks with Gemini)
+    raise RuntimeError("Microsoft voices are not used - the cartoon speaks only with the Gemini voices")
     voice, rate, pitch, ghost = voice_spec
     er, ep, ev, efx = EMOTION_VOICE.get(str(emotion).lower(), EMOTION_VOICE["normal"])
     rate, pitch = _add(rate, er, "%"), _add(pitch, ep, "Hz")
@@ -2752,7 +2785,7 @@ def tts_line(text, voice_spec, gtts_lang, out_wav, emotion="normal"):
              ("+0%", "+0Hz", "+0%", True)]
     for attempt, (r_, p_, v_, manual) in enumerate(tries):
         try:
-            asyncio.run(_edge(text, voice, r_, p_, mp3, v_))
+            raise RuntimeError("no Microsoft voice")
             ok = os.path.exists(mp3) and os.path.getsize(mp3) > 800
             if ok:
                 if manual:
@@ -3228,9 +3261,19 @@ def make_scene_audio(lines, voices, lang, idx, sounds, mood, out_wav, ambience=N
         p = os.path.join(WORK, f"v_{idx:02d}_{j:02d}.wav")
         if (idx, j) in GEMINI_CACHE:
             shutil.copy(GEMINI_CACHE[(idx, j)], p)
-        else:
+        elif MOCK:
             tts_line(extras.strip_tags(text), spec, LANGS[lang]["gtts"], p, ln.get("emotion", "normal"))
+        elif not one_gemini_line(ln, voices, lang, p):
+            no_voice_stop()                           # (never another voice)
         a = read_wav(p)
+        try:                                          # 23 Nov 2026: a voice that says its line twice / thrice is cut back
+            from tvtoon import voicecheck as _VC
+            a, rep_ = _VC.fix_repeats(a, SR, extras.strip_tags(text))
+            if rep_:
+                write_wav(p, a)
+                log(f"    the voice repeated itself in scene {idx + 1} line {j + 1} ({rep_}) - the repeat was cut")
+        except Exception as e_:
+            log("    repeat check skipped:", str(e_)[:80])
         pk = np.abs(a).max()
         if pk > 0:                                    # every voice equally clear; whispers softer
             emo = str(ln.get("emotion", "normal")).lower()
@@ -3913,8 +3956,30 @@ def build_video(scene_parts, lang, out):
             if img_k and img_k not in walks and WALK_RE.search(words):
                 walks[img_k] = 1 if re.search(r"from (the )?right|to the left", words) else -1
         d = None
+        if (sp.get("tvtoon") is not None or sp.get("tvtoon_host")) and env("ANIM_MODE") == "tvtoon":
+            try:                                 # 23 Nov 2026: the TV cartoon, on the bot's own lines and voices
+                from tvtoon import kidsbot as tvk
+                lw_ = LINE_WAVS.get(i, [])
+                if sp.get("tvtoon_host"):
+                    spec_ = tvk.host_spec(spoken, subs, lw_, duration(a), W, H, FPS)
+                else:
+                    spec_ = tvk.part_spec(tvk._STATE["ep"], sp["tvtoon"], spoken, subs, lw_, duration(a), W, H, FPS)
+                d = tvk.render_part(spec_, a, c, W, H, FPS, SR, WORK, log)
+                log(f"  cartoon scene {i + 1}: {spec_['location']}, {len(spec_['cast'])} people")
+                if env("TVTOON_PORTRAIT") != "0":    # the same scene filmed in 9:16 for Facebook / the Reels
+                    try:
+                        pv = os.path.join(WORK, f"clip_{i:02d}_v.mp4")
+                        tvk.render_part(dict(spec_, size=[720, 1280], aspect="9:16"), a, pv, 720, 1280, FPS, SR, WORK, log)
+                        PORTRAIT_CLIPS[i] = pv
+                    except Exception as e2:
+                        log(f"  9:16 cartoon of scene {i + 1} skipped: {str(e2)[:120]}")
+            except Exception as e:
+                log(f"  cartoon scene {i + 1} failed ({str(e)[:160]}) - made the old way")
+                d = None
+                if os.path.exists(c):
+                    os.remove(c)
         pz = sp.get("puppet")
-        if pz and pz.get("bg"):                  # TV-style cartoon with our own characters
+        if d is None and pz and pz.get("bg"):    # TV-style cartoon with our own characters
             try:
                 spec = dict(pz, lines=puppet_lines(sp, pz))
                 pv = os.path.join(WORK, f"clip_{i:02d}_v.mp4")      # the same scene in 9:16 for the Reels
@@ -4246,8 +4311,8 @@ CREATOR = {}                 # your own story from Telegram (if one is waiting)
 
 # ===================================================================================================== v76: growth
 ASSETS = os.path.join(HERE, "assets")
-SLOT_WORDS = {"bn": {8: "সকাল ৮টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়"},
-              "hi": {8: "सुबह 8 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे"}}
+SLOT_WORDS = {"bn": {8: "সকাল ৮টায়", 7: "সকাল ৭টায়", 6: "সকাল ৬টায়", 9: "সকাল ৯টায়", 13: "দুপুর ১টায়", 19: "সন্ধ্যা ৭টায়"},
+              "hi": {8: "सुबह 8 बजे", 7: "सुबह 7 बजे", 6: "सुबह 6 बजे", 9: "सुबह 9 बजे", 13: "दोपहर 1 बजे", 19: "शाम 7 बजे"}}
 
 
 def growth_start(history):
@@ -4580,70 +4645,147 @@ def weekly_live(history):
     extras.telegram(f"✅ কার্টুন লাইভ শেষ: {t / 60:.0f} মিনিট, চ্যাটে {len(names)} জন। {link}")
 
 
-def main():
-    global FONT
-    pass
-    shutil.rmtree(WORK, ignore_errors=True)
-    os.makedirs(WORK)
-    history = load_history()
-    if not MOCK and not DRY_RUN:
-        try:
-            changed = extras.flush_pending(history)    # comments of earlier videos that are live now
-            changed = extras.reply_fans(history, env("LANGUAGE") or "bn", kind="cartoon") or changed   # answer the fans
-            if changed:
-                save_history(history)
-        except Exception as e:
-            log("  earlier comments skipped:", str(e)[:120])
-    if not MOCK and not DRY_RUN and env("MY_STORIES") != "0":
-        try:                                         # every run collects the stories you sent on Telegram
-            extras.creator_inbox(MY_STORIES, "cartoon", bot_status)   # (Telegram keeps a message 24 h) + commands
-        except Exception as e:
-            log("  Telegram stories not read:", str(e)[:120])
-    if not MOCK and not DRY_RUN:
-        for fn_, nm_ in ((cartoon_watchdog, "missed-video check"), (cartoon_followers, "follower count")):
-            try:                                     # v109
-                fn_(history)
-            except Exception as e:
-                log(f"  {nm_} skipped:", str(e)[:120])
-    if not MOCK and not DRY_RUN:
-        try:                                         # v76: YouTube replies, fan channel, milestones
-            growth_start(history)
-        except Exception as e:
-            log("  growth start skipped:", str(e)[:150])
-    if env("MODE") == "live":
-        return weekly_live(history)
-    if extras.bot_paused(MY_STORIES) and not MOCK:
-        log("PAUSED from Telegram ('বন্ধ') - no video this time. Send 'চালু' to start again.")
-        return
+SCRIPTS_FILE = os.path.join(HERE, "assets", "cartoon_scripts.json")    # the stories written the night before
+
+
+@contextlib.contextmanager
+def pretend_now(at):
+    """While TOMORROW's stories are written at night: every 'what day / time is it' asked with a time zone (main.py
+    and extras.py) answers as if it were `at` - so tomorrow's programme, series part and festival are chosen. The
+    log clock (asked without a time zone) stays real."""
+    real = dt.datetime
+    shift = at - real.now(dt.timezone.utc)
+
+    class _Now(real):
+        @classmethod
+        def now(cls, tz=None):
+            return real.now(tz) if tz is None else real.now(tz) + shift
+
+    dt.datetime = _Now
+    try:
+        yield
+    finally:
+        dt.datetime = real
+
+
+def _scripts():
+    try:
+        with open(SCRIPTS_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def load_script(slot):
+    """the story written at 11 PM for this video (None: the run writes it itself, as before)"""
+    if not slot or env("USE_NIGHT_SCRIPT") == "0":
+        return None
+    got = _scripts().get(str(slot))
+    if isinstance(got, dict) and isinstance(got.get("story"), dict) and got["story"].get("scenes"):
+        return got
+    return None
+
+
+def save_script(slot, got):
+    d = _scripts()
+    cut = (dt.date.today() - dt.timedelta(days=3)).isoformat()
+    d = {k: v for k, v in d.items() if k[:10] >= cut}
+    d[str(slot)] = json.loads(json.dumps(got, ensure_ascii=False, default=str))
+    os.makedirs(os.path.dirname(SCRIPTS_FILE), exist_ok=True)
+    with open(SCRIPTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(d, f, ensure_ascii=False, indent=1)
+
+
+def _write_day():
+    now = dt.datetime.now(extras.IST)
+    return (now + dt.timedelta(days=1)).date() if now.hour >= 12 else now.date()   # (11 PM: tomorrow)
+
+
+def write_tomorrow(history):
+    """YOUR WISH (23 Nov 2026): at 11 PM (cron-job.org, Request body {"ref":"main","inputs":{"mode":"write"}}) the
+    three stories of TOMORROW (7 AM, 1 PM, 7 PM) are written - each exactly as its own run would write it (that
+    day's programme, series part, your Telegram story, the viewers' vote) - and saved in
+    assets/cartoon_scripts.json. Nothing else: no voice, no video, no post. The video runs take them as they are."""
     global SLOT
-    SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
-    extras.plan_publish(SLOT)
-    if env("MODE") == "compilation":
-        return make_compilation(history)
-    # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
-    if (env("EVENT") == "schedule" or env("MODE") == "auto") and (extras.slot_done(history, SLOT) or (not SLOT and recently_posted(history, hours=2))):
-        log("A video for this time slot was already posted - this backup run has nothing to do.")
-        return
-    if not MOCK:
+    day = _write_day()
+    log(f"=== WRITING RUN: the three stories of {day.isoformat()} - nothing is posted ===")
+    hist2, done, notes = list(history), [], []
+    for hh, mm, post in TRIGGERS:
+        key = f"{day.isoformat()}@{post}"
+        if load_script(key):
+            log(f"  {post}:00 - already written")
+            done.append(key)
+            continue
+        at = dt.datetime(day.year, day.month, day.day, hh, mm, tzinfo=extras.IST)
         try:
-            extras.refresh_stats(history)            # learn which kinds of stories people liked
-            if extras.yt_title_test(history, thumb_dir=THUMB_B):   # a weak video gets its 2nd thumbnail (once)
-                save_history(history)
+            SLOT = key
+            CREATOR.pop("story", None)
+            with pretend_now(at):
+                lang = pick_language(hist2)
+                got = write_story(hist2, lang, LANGS[lang], find_font(lang))
+            save_script(key, got)
+            done.append(key)
+            t_ = str(got["story"].get("title", ""))
+            notes.append(f"{post}:00 - {t_[:60]} ({got['category']})")
+            log(f"  {post}:00 - written: {t_[:80]} ({got['category']})")
+            hist2.append({"category": got["category"], "lang": got["lang"], "title": t_, "theme": got["theme"][1],
+                          "date": at.astimezone(dt.timezone.utc).isoformat(timespec="minutes")})
         except Exception as e:
-            log("  stats skipped:", str(e)[:150])
-    lang = pick_language(history)
-    L = LANGS[lang]
-    FONT = find_font(lang)
-    shout_names, shout_ids = [], []
-    lastp = extras.last_post(history, key="quiz")
-    if lastp and not MOCK and lastp.get("facebook"):
+            log(f"  {post}:00 - not written now ({str(e)[:200]}) - its own run writes it")
+            notes.append(f"{post}:00 - লেখা যায়নি, ভিডিওর run নিজেই লিখবে")
+    SLOT = None
+    if not MOCK and notes:
         try:
-            qa = lastp["quiz"]
-            shout_names, shout_ids = extras.winners(extras.post_comments(lastp.get("facebook")),
-                                                    words=(qa.get("text", ""),), label=qa.get("label"))
-            log(f"Right quiz answers last time: {len(shout_names)}")
+            extras.telegram("📝 রাতের লেখা (কার্টুন):\n" + "\n".join(notes))
+        except Exception:
+            pass
+    return done
+
+
+def night_assets():
+    """YOUR WISH (23 Nov 2026): at 2 AM (Request body {"ref":"main","inputs":{"mode":"assets"}}) ONLY the new
+    characters of the night's three stories are made: the STORY SCOUT (tvtoon/prep.py) reads each story and finds
+    every character the asset library does not have (with its details); the CHARACTER ASSET BUILDER makes each one
+    as a permanent character, draws and checks it, and saves it in assets/tvtoon_library.json. The video runs take
+    the characters from there. No voice, no video, nothing posted, no picture service."""
+    import time as _t
+    from tvtoon import prep as PRP
+    day = _write_day()
+    hours = float(env("PREP_HOURS") or 5)
+    start = _t.time()
+    log(f"=== CHARACTER ASSET RUN: the stories of {day.isoformat()} - nothing is posted ===")
+    notes = []
+    for hh, mm, post in TRIGGERS:
+        key = f"{day.isoformat()}@{post}"
+        got = load_script(key)
+        if not got:
+            log(f"  {post}:00 - no story written yet")
+            continue
+        left = hours - (_t.time() - start) / 3600.0
+        if left < 0.05:
+            break
+        try:
+            _p, rep = PRP.make_assets(got["story"], key, bot="kids", category=got.get("category", ""), hours=left, log=log)
+            notes.append(f"{post}:00 - নতুন চরিত্র {len(rep['built'])}টা"
+                         + (f" ({', '.join(b['name'] for b in rep['new'])})" if rep["new"] else ""))
         except Exception as e:
-            log("  quiz-answer check skipped:", str(e)[:120])
+            log(f"  {key}: character assets failed ({str(e)[:200]}) - the video run casts as before")
+    for fn in PRP.cleanup():
+        log("  old report removed:", fn)
+    if not MOCK and notes:
+        try:
+            extras.telegram("🎭 রাতের চরিত্র-তৈরি (কার্টুন):\n" + "\n".join(notes))
+        except Exception:
+            pass
+    return notes
+
+
+def write_story(history, lang, L, FONT):
+    """the story of THIS slot (SLOT): today's kind of story, the series part, the viewers' vote, your own
+    Telegram story, the trend, then the writers' team. Moved out of main() unchanged (23 Nov 2026) so the 11 PM
+    run can write tomorrow's three stories ahead (write_tomorrow) and the video runs take them as they are."""
+    global ART_STYLE
     theme = pick_theme(history)
     festival = None
     fest = extras.festival_today("cartoon")
@@ -4654,14 +4796,13 @@ def main():
         theme = ("divine" if fest[0] in DIVINE_FESTIVALS else "festival", fest[1])
         log(f"Festival special: {festival}")
     # ---- the weekly routine, the 7 PM serial, the viewers' vote (a festival always comes first)
-    global ART_STYLE
     slot_hour = int(str(SLOT).split("@")[1]) if SLOT and "@" in str(SLOT) else None
     weekday = dt.datetime.now(extras.IST).weekday()
     part, total, prev, episode, voted = 0, 2, None, None, None
     if not festival and env("ROUTINE") != "0":
         if slot_hour == 13:                          # every noon: the Gopal Bhar TV cartoon (our animated series)
             cat = "gopal" if (env("GOPAL_DAILY") != "0" and (puppet_ready("gopal") or STYLE_3D)) else DAY_SPECIAL[weekday]
-        elif slot_hour == 8:
+        elif slot_hour == MORNING_HOUR:
             cat = MORNING_GRID[weekday]
         else:
             cat = EVENING_GRID[weekday]
@@ -4680,7 +4821,7 @@ def main():
         else:
             theme = (cat, random.choice(CATEGORIES[cat]))
             mine = (extras.take_creator_story(os.path.join(HERE, "assets", "my_stories.json"), "cartoon")
-                    if slot_hour in (8, 19) and cat not in MYTH and cat != "gopal" else None)
+                    if slot_hour in (MORNING_HOUR, 19) and cat not in MYTH and cat != "gopal" else None)
             if mine:                                 # YOUR OWN story from Telegram is today's story
                 theme = (cat, "the creator's own story")
                 CREATOR["story"] = mine
@@ -4791,6 +4932,92 @@ def main():
             if k in MYTH_LOOKS:
                 c["look"] = MYTH_LOOKS[k]
         story["mithu_intro"] = story["mithu_outro"] = ""   # no parrot jokes in the holy stories
+    return {"lang": lang, "category": category, "continues": continues, "episode": episode, "festival": festival, "part": part, "prev": prev, "series_id": series_id, "slot_hour": slot_hour, "story": story, "theme": theme, "total": total, "vnames": vnames, "vote_ideas": vote_ideas, "voted": voted, "weekday": weekday, "creator": dict(CREATOR)}
+
+
+def main():
+    global FONT
+    pass
+    shutil.rmtree(WORK, ignore_errors=True)
+    os.makedirs(WORK)
+    history = load_history()
+    if not MOCK and not DRY_RUN:
+        try:
+            changed = extras.flush_pending(history)    # comments of earlier videos that are live now
+            changed = extras.reply_fans(history, env("LANGUAGE") or "bn", kind="cartoon") or changed   # answer the fans
+            if changed:
+                save_history(history)
+        except Exception as e:
+            log("  earlier comments skipped:", str(e)[:120])
+    if not MOCK and not DRY_RUN and env("MY_STORIES") != "0":
+        try:                                         # every run collects the stories you sent on Telegram
+            extras.creator_inbox(MY_STORIES, "cartoon", bot_status)   # (Telegram keeps a message 24 h) + commands
+        except Exception as e:
+            log("  Telegram stories not read:", str(e)[:120])
+    if not MOCK and not DRY_RUN:
+        for fn_, nm_ in ((cartoon_watchdog, "missed-video check"), (cartoon_followers, "follower count")):
+            try:                                     # v109
+                fn_(history)
+            except Exception as e:
+                log(f"  {nm_} skipped:", str(e)[:120])
+    if not MOCK and not DRY_RUN:
+        try:                                         # v76: YouTube replies, fan channel, milestones
+            growth_start(history)
+        except Exception as e:
+            log("  growth start skipped:", str(e)[:150])
+    if env("MODE") == "live":
+        return weekly_live(history)
+    if env("MODE") == "write":                       # 23 Nov 2026: 11 PM - tomorrow's three stories, written + saved
+        return write_tomorrow(history)
+    if env("MODE") == "assets":                      # 2 AM - ONLY the new characters of those stories
+        return night_assets()
+    if extras.bot_paused(MY_STORIES) and not MOCK:
+        log("PAUSED from Telegram ('বন্ধ') - no video this time. Send 'চালু' to start again.")
+        return
+    global SLOT
+    SLOT = None if env("MODE") in ("amavasya", "compilation") else extras.current_slot(TRIGGERS)
+    extras.plan_publish(SLOT)
+    if env("MODE") == "compilation":
+        return make_compilation(history)
+    # automatic runs (GitHub's clock or the cron-job.org clock) must not post twice for one time slot
+    if (env("EVENT") == "schedule" or env("MODE") == "auto") and (extras.slot_done(history, SLOT) or (not SLOT and recently_posted(history, hours=2))):
+        log("A video for this time slot was already posted - this backup run has nothing to do.")
+        return
+    if not MOCK:
+        try:
+            extras.refresh_stats(history)            # learn which kinds of stories people liked
+            if extras.yt_title_test(history, thumb_dir=THUMB_B):   # a weak video gets its 2nd thumbnail (once)
+                save_history(history)
+        except Exception as e:
+            log("  stats skipped:", str(e)[:150])
+    lang = pick_language(history)
+    L = LANGS[lang]
+    FONT = find_font(lang)
+    shout_names, shout_ids = [], []
+    lastp = extras.last_post(history, key="quiz")
+    if lastp and not MOCK and lastp.get("facebook"):
+        try:
+            qa = lastp["quiz"]
+            shout_names, shout_ids = extras.winners(extras.post_comments(lastp.get("facebook")),
+                                                    words=(qa.get("text", ""),), label=qa.get("label"))
+            log(f"Right quiz answers last time: {len(shout_names)}")
+        except Exception as e:
+            log("  quiz-answer check skipped:", str(e)[:120])
+    got = load_script(SLOT) if env("MODE") != "write" else None   # written at 11 PM (write_tomorrow)?
+    if got:
+        log(f"The story was written at night: '{str(got['story'].get('title', ''))[:80]}' ({got['category']})")
+    else:
+        got = write_story(history, lang, L, FONT)
+    (lang, category, continues, episode, festival, part, prev, series_id, slot_hour, story, theme, total, vnames,
+     vote_ideas, voted, weekday) = (got[k] for k in ("lang", "category", "continues", "episode", "festival", "part", "prev", "series_id", "slot_hour", "story", "theme", "total", "vnames", "vote_ideas", "voted", "weekday"))
+    theme = tuple(theme)
+    CREATOR.update(got.get("creator") or {})
+    L = LANGS[lang]
+    FONT = find_font(lang)
+    YT_KIDS[0] = category
+    global ART_STYLE
+    if category in MYTH:
+        ART_STYLE = MYTH_STYLE
     title = story["title"].strip()[:85]
     if episode or part:                              # v118: the writer's own 'পর্ব 2' / '| রামায়ণ পর্ব ২' out - added once below
         title = re.sub(r"\s*[|:,-]?\s*(?:[\u0980-\u09FF\w]+\s+)?(?:পর্ব|भाग|एपिसोड|episode)\s*[0-9০-৯]+\s*[|:,-]?\s*", " ",
@@ -4826,7 +5053,7 @@ def main():
     cast = Cast(story)
     voices = Voices(lang, cast)
     for c in cast.chars.values():
-        log(f"  {c['name']} ({c['gender']}, {c['age']}, {c['kind']}) -> voice {voices.map[c['name'].lower()][:3]}")
+        log(f"  {c['name']} ({c['gender']}, {c['age']}, {c['kind']}) -> Gemini voice {gemini_persona(voices, c['name'])[0]}")
     seed = random.randint(1, 1_000_000)
     scenes = story["scenes"][:24]          # never cut the story short
 
@@ -4841,8 +5068,21 @@ def main():
             + (f" (no animated character for: {', '.join(sorted(PUPPET_MISS))[:200]})" if PUPPET_MISS else ""))
     elif category in PUPPET_SERIES:
         log(f"  our animated characters are not available for {category} - check the 'characters' folder")
+    tv_ep = None
+    if env("ANIM_MODE") == "tvtoon":                 # 23 Nov 2026: every story scene is the new TV cartoon (tvtoon/)
+        try:
+            from tvtoon import kidsbot as tvk
+            tv_ep = tvk.plan(story, category)
+            pups = [None] * len(scenes)               # (the old puppets stay only as the fallback for Lumi Didi)
+            log(f"Cartoon (tvtoon): {len(tv_ep['scenes'])} scenes, cast " +
+                ", ".join(f"{k}={v['actor']}" for k, v in tv_ep.get("cast", {}).items()))
+        except Exception as e:
+            log("  cartoon plan failed - the pictures are made as before:", str(e)[:200])
+            tv_ep = None
     log("Cast reference picture")
-    if pups and all(pups):
+    if tv_ep:
+        log("  not needed - the cartoon draws every character itself")
+    elif pups and all(pups):
         log("  not needed - every scene uses our ready-made characters")
     elif not make_cast_sheet(cast, os.path.join(WORK, "cast.jpg"), seed):
         log("  no cast picture - using text descriptions only")
@@ -4855,6 +5095,15 @@ def main():
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0
     for i, (s, lines) in enumerate(zip(scenes, scene_lines)):
+        if tv_ep:                                    # the cartoon's own picture of the scene (no picture service)
+            try:
+                p_ = tvk.still(tv_ep, i, os.path.join(WORK, f"tv_still_{i:02d}.jpg"), W, H)
+                shots_per_scene.append([p_] * max(1, len(lines)))
+                imgs.append(p_)
+                last_ok = p_
+                continue
+            except Exception as e:
+                log(f"  cartoon picture of scene {i + 1} failed ({str(e)[:120]}) - a picture is made as before")
         pz = pups[i]
         if pz:                                       # TV-style scene: only an empty set picture is needed
             bg = get_set(pz.get("set"), pz.get("place") or s.get("place", ""), seed)
@@ -5054,9 +5303,11 @@ def main():
             parts[0]["lines"] = [{"speaker": "narrator", "text": said_title}]
         else:
             parts = []
-    for img, s, sh, pz in zip(imgs, scenes, shots_per_scene, pups):
+    for si_, (img, s, sh, pz) in enumerate(zip(imgs, scenes, shots_per_scene, pups)):
         parts.append({"image": img, "shots": sh, "lines": s.get("lines", []), "sounds": s.get("sounds", []), "puppet": pz,
                       "ambience": s.get("ambience", []), "mood": s.get("mood", "happy"), "voices": voices})
+        if tv_ep:
+            parts[-1]["tvtoon"] = si_
     end_lines = []
     moral = str(story.get("moral", "")).strip()
     if moral:
@@ -5131,15 +5382,15 @@ def main():
         nd = 7
         for d in range(1, 8):
             day_ = (dt.datetime.now(extras.IST).weekday() + d) % 7
-            if (slot_hour == 8 and MORNING_GRID[day_] == category) or (slot_hour == 19 and EVENING_GRID[day_] == category) \
+            if (slot_hour == MORNING_HOUR and MORNING_GRID[day_] == category) or (slot_hour == 19 and EVENING_GRID[day_] == category) \
                     or (slot_hour == 13 and category == "gopal"):
                 nd = d
                 break
         days_bn = ["সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার", "শুক্রবার", "শনিবার", "রবিবার"]
         days_hi = ["सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार", "रविवार"]
         tday = (dt.datetime.now(extras.IST) + dt.timedelta(days=nd)).weekday()
-        t_bn = {8: "সকালে", 13: "দুপুরে", 19: "সন্ধ্যায়"}.get(slot_hour, "")
-        t_hi = {8: "सुबह", 13: "दोपहर", 19: "शाम"}.get(slot_hour, "")
+        t_bn = {MORNING_HOUR: "সকালে", 13: "দুপুরে", 19: "সন্ধ্যায়"}.get(slot_hour, "")
+        t_hi = {MORNING_HOUR: "सुबह", 13: "दोपहर", 19: "शाम"}.get(slot_hour, "")
         when_ = (("কাল " if nd == 1 else days_bn[tday] + " ") + t_bn) if lang == "bn" else \
                 (("कल " if nd == 1 else days_hi[tday] + " ") + t_hi)
         end_lines.append({"speaker": "narrator", "text": (
@@ -5158,6 +5409,8 @@ def main():
         himg = shots_per_scene[hi][0] if shots_per_scene[hi] else imgs[hi]
         parts.insert(0, {"image": himg, "lines": hlines, "sounds": [], "mood": scenes[hi].get("mood", "happy"),
                          "puppet": pups[hi], "voices": voices, "hook_part": True})
+        if tv_ep:
+            parts[0]["tvtoon"] = hi
         log(f"Hook at the start (from scene {hi + 1}): {str(hlines[0].get('text', ''))[:80]}")
         cold = False
     else:
@@ -5167,8 +5420,10 @@ def main():
     first_host = True
     for k, p in enumerate(parts):                # Lumi Didi + Mithu (he flies in and sits on her shoulder)
         if p.get("host_part"):
-            p["puppet"] = host_puppet(first_host)
+            p["puppet"] = None if tv_ep else host_puppet(first_host)
             first_host = False
+            if tv_ep:
+                p["tvtoon_host"] = True              # Lumi Didi and Mithu in the cartoon courtyard
     try:
         no_line_twice(parts)
     except Exception as e:

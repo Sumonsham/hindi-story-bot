@@ -1390,7 +1390,7 @@
    "yt_views": 3,
    "yt_avg_s": 2,
    "yt_avg_pct": 0.4,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1718,7 +1718,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2027,7 +2027,7 @@
    "yt_views": 2,
    "yt_avg_s": 9,
    "yt_avg_pct": 1.6,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2086,7 +2086,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2129,7 +2129,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T03:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2179,7 +2179,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T03:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2433,7 +2433,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2477,7 +2477,7 @@
    "yt_views": 2,
    "yt_avg_s": 16,
    "yt_avg_pct": 3.5,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2527,7 +2527,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T03:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2878,7 +2878,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2897,12 +2897,12 @@
   "stats": {
    "likes": 3,
    "comments": 0,
-   "views": 0,
+   "views": 5,
    "length_s": 5964,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 1,
+   "yt_avg_pct": 0.0,
+   "checked": "2026-11-23T03:05+00:00"
   }
  },
  {
@@ -2940,12 +2940,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 3,
    "length_s": 620,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-20T03:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 467,
+   "yt_avg_pct": 75.3,
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3334,12 +3334,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 0,
+   "views": 1,
    "length_s": 410,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-19T22:05+00:00"
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3381,12 +3381,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 3,
    "length_s": 637,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-20T03:05+00:00"
+   "yt_views": 2,
+   "yt_avg_s": 2,
+   "yt_avg_pct": 0.4,
+   "checked": "2026-11-23T03:05+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3785,7 +3785,23 @@
   "fb_reel": "1109590351838666",
   "fb_story": "4727343200828755",
   "fb_reel2": "2334720404017300",
-  "coloring": "122140104416735948"
+  "coloring": "122140104416735948",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 874,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-23T03:05+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-23T03:06+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-22T07:31+00:00",
@@ -3857,16 +3873,7 @@
   "date": "2026-11-23T02:31+00:00",
   "lang": "bn",
   "slot": "2026-11-23@8",
-  "pending_comments": [
-   {
-    "id": "1443261907971275",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2927374764322341"
-   },
-   {
-    "id": "1825309635460514",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2927374764322341"
-   }
-  ],
+  "pending_comments": [],
   "category": "learn",
   "idea": "consonants 1-5 (Bengali: ক খ গ ঘ ঙ / Hindi: क ख ग घ ङ)",
   "episode": 3,
@@ -3891,5 +3898,39 @@
   "fb_story": "4465270087056477",
   "fb_reel2": "1825309635460514",
   "coloring": "122140240856735948"
+ },
+ {
+  "date": "2026-11-23T07:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-23@13",
+  "pending_comments": [
+   {
+    "id": "3083270495398488",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1123662253979900"
+   }
+  ],
+  "category": "gopal",
+  "idea": "A clever royal court jester uncovers a hidden trap set by a greedy minister deep inside the palace treasury. (told as a gopal story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রাজকোষের ভূতুড়ে তালা ও মন্ত্রীর গোপন রহস্য! 🪙 | Gopal Bhar | New Episode ২০২৬",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "নলেন গুড়ের আঠা"
+  },
+  "hook_style": "voice",
+  "moral": "পাপের পথ সর্বদাই ধ্বংস ডেকে আনে, আর চতুরতা কখনও সততাকে হারাতে পারে না।",
+  "title_b": "গোপাল ভাঁড় ও রাজকোষের ভূতুড়ে ফাঁদ! 🗝️",
+  "question_post": null,
+  "facebook": "1123662253979900",
+  "youtube": "FzxQaGRSNNM",
+  "fb_reel": "3083270495398488",
+  "fb_story": "1169880595620799",
+  "yt_short": "zeZXl6trcTg"
  }
 ]

@@ -1,0 +1,5131 @@
+{
+ "2026-11-24@7": {
+  "lang": "bn",
+  "category": "didima",
+  "continues": false,
+  "episode": null,
+  "festival": null,
+  "part": 0,
+  "prev": null,
+  "series_id": null,
+  "slot_hour": 7,
+  "story": {
+   "title": "দিদিমার ঝুলি: আরে রাজকন্যা তুমি কোন ঘরে আছো? 🏰✨",
+   "quiz": {
+    "question": "রাজকন্যাকে কোন জিনিসের গন্ধে খুঁজে পাওয়া গেল?",
+    "options": [
+     "নলেন গুড়ের সন্দেশ",
+     "আমের আচার",
+     "গোলাপ জল"
+    ],
+    "answer": 0
+   },
+   "tagline": "সাতটি দরজার রহস্য কাটিয়ে কীভাবে উদ্ধার হলো রাজকন্যা?",
+   "title_b": "সাতটি মায়াবী দরজা ও রাজকন্যার গোপন রহস্য 🏰✨",
+   "thumbnail_text": "কোন ঘরে রাজকন্যা?",
+   "description": "আজকে দিদিমার ঝুলিতে রয়েছে রূপকথার রাজপ্রাসাদের সাতটি মায়াবী দরজার এক দারুণ রহস্যময় গল্প! কীভাবে পণ্ডিত সুমন আর ছোট সায়ন তাদের বুদ্ধির জোরে মায়াদানবের চক্রান্ত ভেঙে দিল? পুরো গল্পটি শুনুন এবং বন্ধুদের সাথে শেয়ার করুন!",
+   "hashtags": [
+    "#বাংলাগল্প",
+    "#RupkotharGolpo",
+    "#DidimarJhuli",
+    "#BanglaCartoon",
+    "#FairyTaleBangla",
+    "#GrandmasBagOfTales",
+    "#MoralStories",
+    "#KidsCartoon",
+    "#BanglaGolpo",
+    "#BengaliStories"
+   ],
+   "setting": "A fairytale kingdom with a cosy traditional bedroom at night, a grand mystical palace tower corridor with seven shimmering silver enchanted doors, dark magical clouds outside, and a grand palace courtyard.",
+   "characters": [
+    {
+     "name": "Didima",
+     "gender": "female",
+     "age": "old",
+     "kind": "human",
+     "look": "a sweet Bengali grandmother of about seventy, white hair in a bun, round glasses, a white saree with a thin red border, a warm shawl, a cloth bag of stories"
+    },
+    {
+     "name": "Pupu",
+     "gender": "female",
+     "age": "child",
+     "kind": "human",
+     "look": "a little Bengali girl of about seven, short bob hair, a purple night frock"
+    },
+    {
+     "name": "Tatai",
+     "gender": "male",
+     "age": "child",
+     "kind": "human",
+     "look": "a little Bengali boy of about nine, curly hair, green striped pyjamas"
+    },
+    {
+     "name": "Sumon",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), wheat-brown skin, maroon kurta with small gold buttons, cream dhoti, cream shawl with a thin gold border over the left shoulder, small brown cloth shoulder bag, brown nagra shoes"
+    },
+    {
+     "name": "Sayan",
+     "gender": "male",
+     "age": "child",
+     "kind": "human",
+     "look": "a slim, sweet Bengali boy of 8 in a cartoon style, short thick dark-brown hair neatly swept to one side with a soft fringe, big round dark-brown eyes, thick dark eyebrows, a small gentle smile, light wheat-brown skin, a light-pink polo T-shirt with a short zip at the collar and darker pink collar and sleeve edges, black cargo trousers with side pockets, grey-and-white sneakers, a thin red thread on his right wrist"
+    },
+    {
+     "name": "King Hemanta",
+     "gender": "male",
+     "age": "old",
+     "kind": "human",
+     "look": "a tall Bengali king in rich royal blue robes, gold crown, white moustache, worried expression"
+    },
+    {
+     "name": "Princess Mayuri",
+     "gender": "female",
+     "age": "young",
+     "kind": "human",
+     "look": "a beautiful fair princess in pink and gold silk royal dress, sparkling tiara, long dark hair, holding a small sweet box"
+    },
+    {
+     "name": "Maya Demon",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "a shadow-like sorcerer with glowing red eyes, dark misty robes, carrying a glowing black wand"
+    }
+   ],
+   "source": "Original story inspired by Indian folk tales",
+   "episode_name": "মায়াবী দরজা ও রাজকন্যা",
+   "thumbnail_image": {
+    "hero": "Sayan",
+    "hero_action": "kneeling on the floor pointing down at a trail of small ants with a bright clever smile",
+    "second": "Sumon",
+    "second_action": "standing beside Sayan, smiling proudly with one hand on his shoulder in the enchanted hall",
+    "place": "a grand mystical palace tower corridor with seven glittering silver doors emitting faint blue light",
+    "moment": "Little Sayan discovers the trail of ants leading to the true door while the King watches in astonishment."
+   },
+   "scenes": [
+    {
+     "chapter": "শোবার ঘরের রাত",
+     "characters": [
+      "Didima",
+      "Pupu",
+      "Tatai"
+     ],
+     "action": "Didima opens her storytelling session while Tatai and Pupu listen in their bed.",
+     "place": "Tatai and Pupu's Bedroom at night, soft oil lamp light",
+     "mood": "scared",
+     "ambience": [
+      "crickets chirping",
+      "gentle night wind"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"smiles warmly while opening her bag of stories\" নিঝুম রাতের আঁধারে হঠাৎ শোবার ঘরের পুরোনো কাঠের সিন্দুকটা ক্যাঁচক্যাঁচ করে উঠতেই পুপু আর তাতাই ভয়ে দিদিমার ধবধবে সাদা শাড়ির আঁচল শক্ত করে আঁকড়ে ধরল।",
+       "en": "In the silent night, as the old wooden chest creaked softly, Pupu and Tatai tightly clutched Didima's white saree fringe in fear.",
+       "emotion": "whisper",
+       "delivery": "hushed, mystery-laden voice with slow steady pacing",
+       "voice_text": "<whispers> নিঝুম রাতের আঁধারে </whispers> হঠাৎ শোবার ঘরের পুরোনো কাঠের সিন্দুকটা ক্যাঁচক্যাঁচ করে উঠতেই পুপু আর তাতাই ভয়ে দিদিমার ধবধবে সাদা শাড়ির আঁচল শক্ত করে আঁকড়ে ধরল।",
+       "action": "smiles warmly while opening her bag of stories",
+       "sfx": [
+        {
+         "sound": "creaking wooden chest",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "A warm bedtime room at night. An old Bengali grandmother sitting on the bed, two scared children clutching her saree hem, oil lamp flickering warmly.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "sitting close",
+          "doing": "clutching Didima's saree with trembling hands",
+          "where": "left side of bed",
+          "feeling": "scared"
+         },
+         {
+          "name": "Didima",
+          "pose": "sitting upright",
+          "doing": "opening her fabric story bag with a gentle smile",
+          "where": "middle of bed",
+          "feeling": "warm and comforting"
+         },
+         {
+          "name": "Tatai",
+          "pose": "sitting close",
+          "doing": "holding Didima's arm",
+          "where": "right side of bed",
+          "feeling": "fearful and curious"
+         }
+        ],
+        "characters": [
+         "Pupu",
+         "Didima",
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Tatai",
+       "text": "\"points nervously towards the old corner chest\" দিদিমা, অন্ধকারের ওই বন্ধ ঘরটার ভেতরে সত্যি কি কোনো ভুতুড়ে রহস্য লুকিয়ে আছে?",
+       "en": "Didima, is there really a spooky mystery inside that dark closed room?",
+       "emotion": "scared",
+       "delivery": "trembling, anxious child voice",
+       "voice_text": "দিদিমা... <short pause> অন্ধকারের ওই বন্ধ ঘরটার ভেতরে সত্যি কি কোনো ভুতুড়ে রহস্য লুকিয়ে আছে?",
+       "action": "points nervously towards the old corner chest",
+       "sfx": [],
+       "image": {
+        "prompt": "Close-up of Tatai pointing nervously toward the dark corner of the room while leaning into Didima.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "sitting leaning forward",
+          "doing": "pointing finger at the dark wooden chest",
+          "where": "right side of bed",
+          "feeling": "anxious"
+         },
+         {
+          "name": "Didima",
+          "pose": "sitting beside Tatai",
+          "doing": "resting hand on Tatai back",
+          "where": "middle of bed",
+          "feeling": "smiling softly"
+         }
+        ],
+        "characters": [
+         "Didima",
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"adjusts her round glasses with a sweet smile\" ভয় পাবি না তাতাই, শোন তবে স্বপ্নপুরী প্রাসাদের সেই সাতটি রূপোলি মায়াবী দরজার এক আশ্চর্য গল্প!",
+       "en": "Don't be afraid Tatai, listen then to the astonishing tale of seven silver magical doors of Swapnapuri Palace!",
+       "emotion": "happy",
+       "delivery": "sweet soothing voice with animated magic tone",
+       "voice_text": "ভয় পাবি না তাতাই! <giggle> শোন তবে স্বপ্নপুরী প্রাসাদের সেই সাতটি রূপোলি মায়াবী দরজার এক আশ্চর্য গল্প!",
+       "action": "adjusts her round glasses with a sweet smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima adjusting her round glasses with a sparkling smile as she prepares to tell the story.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting center",
+          "doing": "adjusting round spectacles with right hand",
+          "where": "center of bed",
+          "feeling": "cheerful and story-telling"
+         }
+        ],
+        "characters": [
+         "Didima"
+        ]
+       }
+      },
+      {
+       "speaker": "Pupu",
+       "text": "\"claps her hands with exciting anticipation\" মায়াবী দরজা? সেখানে কি কোন সুন্দরী রাজকন্যা আটকা পড়েছিল দিদিমা?",
+       "en": "Magical doors? Was a beautiful princess trapped there, Didima?",
+       "emotion": "excited",
+       "delivery": "high-pitched, enthusiastic child question",
+       "voice_text": "মায়াবী দরজা? <gasp> সেখানে কি কোন সুন্দরী রাজকন্যা আটকা পড়েছিল দিদিমা?",
+       "action": "claps her hands with exciting anticipation",
+       "sfx": [
+        {
+         "sound": "clapping",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Pupu sitting up happily, clapping her small hands in eagerness.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "sitting upright",
+          "doing": "clapping hands near chest",
+          "where": "left side of bed",
+          "feeling": "thrilled"
+         }
+        ],
+        "characters": [
+         "Pupu"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"nods gently while pulling out a shimmering story scroll\" একদম ঠিক ধরেছিস পুপু, রাজকন্যা ময়ূরী সেদিন এক ভীষণ বিভ্রান্তির রহস্যে জড়িয়ে বিপদে পড়েছিল।",
+       "en": "You guessed it right Pupu! Princess Mayuri was trapped in a terrifying maze of confusion that day.",
+       "emotion": "calm",
+       "delivery": "expressive and intriguing narrative tone",
+       "voice_text": "একদম ঠিক ধরেছিস পুপু, রাজকন্যা ময়ূরী সেদিন এক ভীষণ বিভ্রান্তির রহস্যে জড়িয়ে বিপদে পড়েছিল।",
+       "action": "nods gently while pulling out a shimmering story scroll",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima nodding affectionately to Pupu while unrolling a fairy-tale scroll with soft magical sparks.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting center",
+          "doing": "holding open magical scroll",
+          "where": "center of bed",
+          "feeling": "wise smile"
+         },
+         {
+          "name": "Pupu",
+          "pose": "leaning forward",
+          "doing": "watching scroll eagerly",
+          "where": "left of bed",
+          "feeling": "wonder"
+         }
+        ],
+        "characters": [
+         "Pupu",
+         "Didima"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মায়াবী সাত দরজা",
+     "characters": [
+      "Princess Mayuri",
+      "King Hemanta"
+     ],
+     "action": "Princess Mayuri gets trapped behind identical silver doors while King Hemanta grieves.",
+     "place": "Enchanted Tower Corridor with glowing silver doors",
+     "mood": "adventure",
+     "ambience": [
+      "eerie magic hum",
+      "wind howling"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"gestures towards the glowing silver doors\" স্বপ্নপুরীর উঁচু চূড়ায় রাজকন্যা ময়ূরী একটি জাদুকরী ঘরে ঢুকতেই চারপাশ থরথর করে কেঁপে উঠল আর নিমেষে সাতটি হুবহু একই দেখতে মায়াবী দরজা চারদিকে ভেসে উঠল।",
+       "en": "As Princess Mayuri entered a enchanted chamber at the top tower of Swapnapuri, everything shook violently and seven identical silver doors appeared.",
+       "emotion": "excited",
+       "delivery": "dramatic fast narrative describing the sudden magic shock",
+       "voice_text": "স্বপ্নপুরীর উঁচু চূড়ায় রাজকন্যা ময়ূরী একটি জাদুকরী ঘরে ঢুকতেই চারপাশ থরথর করে কেঁপে উঠল আর নিমেষে সাতটি হুবহু একই দেখতে মায়াবী দরজা চারদিকে ভেসে উঠল।",
+       "action": "gestures towards the glowing silver doors",
+       "sfx": [
+        {
+         "sound": "magic roar quake",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "A tall grand corridor with seven glowing identical silver doors flickering with mystical blue aura.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Princess Mayuri",
+       "text": "\"knocks frantically from inside the middle wall\" বাঁচাও আমাকে! আমি কোন ঘরে আঁটকে আছি কেউ কি অন্তত বাইরে থেকে বলতে পারো?",
+       "en": "Save me! Can anyone at least tell me from outside which room I am trapped in?",
+       "emotion": "scared",
+       "delivery": "desperate high scream from inside the wall",
+       "voice_text": "<scream> বাঁচাও আমাকে! </scream> আমি কোন ঘরে আঁটকে আছি কেউ কি অন্তত বাইরে থেকে বলতে পারো?",
+       "action": "knocks frantically from inside the middle wall",
+       "sfx": [
+        {
+         "sound": "heavy banging on wooden door",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Silhouettes of doors in the corridor with magic aura as Princess Mayuri's muffled cry echoes.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"describes the swirling fog around the palace walls\" দরজাগুলো ফিসফিস করে উঠে একই জাদুকরী কণ্ঠে রাজপ্রাসাদের বাতাস কাঁপিয়ে চিৎকার করল যে রাজকন্যা তাদের ঘরের ভেতরেই বন্দি রয়েছে।",
+       "en": "The doors whispered in unison with a magically echoed voice that the princess was trapped inside their room.",
+       "emotion": "whisper",
+       "delivery": "creepy echoing whisper sound effect tone",
+       "voice_text": "<whispers> দরজাগুলো ফিসফিস করে উঠে </whispers> একই জাদুকরী কণ্ঠে রাজপ্রাসাদের বাতাস কাঁপিয়ে চিৎকার করল যে রাজকন্যা তাদের ঘরের ভেতরেই বন্দি রয়েছে।",
+       "action": "describes the swirling fog around the palace walls",
+       "sfx": [],
+       "image": {
+        "prompt": "Swirling fog creeping along the marble floors near the glowing doors in the palace tower.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"wipes tears from his eyes in deep worry\" যে বীর আমার মেয়েকে উদ্ধার করবে, তাকে আমি অর্ধেক রাজ্য আর রাজকোষের রত্ন উপহার দেব!",
+       "en": "Whichever brave hero rescues my daughter, I will reward him with half my kingdom and royal gems!",
+       "emotion": "crying",
+       "delivery": "booming king voice broken with tears and distress",
+       "voice_text": "যে বীর আমার মেয়েকে উদ্ধার করবে, <sob> তাকে আমি অর্ধেক রাজ্য </sob> আর রাজকোষের রত্ন উপহার দেব!",
+       "action": "wipes tears from his eyes in deep worry",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta in blue royal robes weeping and pointing towards the enchanted corridor in distress.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "wiping tears with royal sleeve",
+          "where": "center of corridor",
+          "feeling": "grief stricken"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "সিপাহীদের বিপদ",
+     "characters": [
+      "King Hemanta",
+      "Tatai",
+      "Didima"
+     ],
+     "action": "Royal guards try to force open the first door and turn into brass statues.",
+     "place": "Tower corridor near door number one",
+     "mood": "sad",
+     "ambience": [
+      "thunder rumble",
+      "mystical zap sound"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows the palace guards stepping forward boldly\" রাজার বলশালী সিপাহীরা তাদের চকচকে নতুন তরবারি উঁচিয়ে না ভেবেচিন্তেই চটজলদি এক নম্বর দরজাটা সজোরে ধাক্কা দিয়ে খুলে ফেলতে চাইল।",
+       "en": "The King's strong guards raised their shiny swords and recklessly tried to push open door number one.",
+       "emotion": "excited",
+       "delivery": "fast energetic narration building danger tension",
+       "voice_text": "রাজার বলশালী সিপাহীরা তাদের চকচকে নতুন তরবারি উঁচিয়ে না ভেবেচিন্তেই চটজলদি এক নম্বর দরজাটা সজোরে ধাক্কা দিয়ে খুলে ফেলতে চাইল।",
+       "action": "shows the palace guards stepping forward boldly",
+       "sfx": [
+        {
+         "sound": "armour clanking footsteps",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Two heavily armored guards rushing towards glowing door number one with raised swords.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"shouts out loudly to stop the impatient guards\" দাঁড়াও সিপাহীরা! কিছু না বুঝে কোনো দরজায় হাত দিতে যেয়ো না!",
+       "en": "Stop guards! Do not touch any door without understanding!",
+       "emotion": "angry",
+       "delivery": "loud warning shout of panic",
+       "voice_text": "<scream> দাঁড়াও সিপাহীরা! </scream> কিছু না বুঝে কোনো দরজায় হাত দিতে যেয়ো না!",
+       "action": "shouts out loudly to stop the impatient guards",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta reaching out his arm in panic trying to stop the guards.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing reaching out",
+          "doing": "shouting with wide open hand",
+          "where": "left side",
+          "feeling": "panicked warning"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"describes magical lightning flashing from the enchanted door\" কিন্তু ততক্ষণে মায়াবী নীল আলো ঠিকরে এসে দুজন সিপাহীকে মুহূর্তের মধ্যে শক্ত পিতলের নিথর মূর্তি বানিয়ে মাটিতে বসিয়ে দিল।",
+       "en": "But by then blue magical rays shot out and instantly transformed both guards into solid brass frozen statues on the floor.",
+       "emotion": "scared",
+       "delivery": "shocked dramatic tone describing magic conversion",
+       "voice_text": "কিন্তু ততক্ষণে মায়াবী নীল আলো ঠিকরে এসে দুজন সিপাহীকে মুহূর্তের মধ্যে শক্ত পিতলের নিথর মূর্তি বানিয়ে মাটিতে বসিয়ে দিল।",
+       "action": "describes magical lightning flashing from the enchanted door",
+       "sfx": [
+        {
+         "sound": "electric magic blast zap",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Blue lightning beam shooting from the door touching the guards, turning them into golden-brass statues.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Tatai",
+       "text": "\"gasps in shock while hiding under the blanket\" ওরে বাবা! না জেনে দরজা ছুঁলেই কি মানুষ এক লহমায় পিতল হয়ে যায়?",
+       "en": "Oh my! Does a person turn to brass in a second just by touching a door without knowing?",
+       "emotion": "scared",
+       "delivery": "shocked gasp from Tatai hiding under blanket",
+       "voice_text": "<gasp> ওরে বাবা! </gasp> না জেনে দরজা ছুঁলেই কি মানুষ এক লহমায় পিতল হয়ে যায়?",
+       "action": "gasps in shock while hiding under the blanket",
+       "sfx": [],
+       "image": {
+        "prompt": "Tatai pulling his blanket up to his nose with wide scared eyes.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "sitting under blanket",
+          "doing": "holding blanket to face",
+          "where": "bed center",
+          "feeling": "frightened shock"
+         }
+        ],
+        "characters": [
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"patting Tatai's shoulder softly with reassurance\" তাই তো রে বোকা, আগে থেকে মাথা না খাটিয়ে কাজ করতে গেলে বিপদের মেঘ আরও বাড়ে!",
+       "en": "That is right silly, acting without thinking beforehand only increases the dark clouds of danger!",
+       "emotion": "calm",
+       "delivery": "gentle instructional wisdom tone",
+       "voice_text": "তাই তো রে বোকা, আগে থেকে মাথা না খাটিয়ে কাজ করতে গেলে বিপদের মেঘ আরও বাড়ে!",
+       "action": "patting Tatai's shoulder softly with reassurance",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima comforting Tatai with a warm smile, patting his shoulder gently.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting",
+          "doing": "patting Tatai head gently",
+          "where": "center of bed",
+          "feeling": "affectionate wise smile"
+         },
+         {
+          "name": "Tatai",
+          "pose": "sitting",
+          "doing": "looking at Didima",
+          "where": "right of bed",
+          "feeling": "relieved"
+         }
+        ],
+        "characters": [
+         "Didima",
+         "Tatai"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "সুমন ও সায়নের আগমন",
+     "characters": [
+      "Sumon",
+      "Sayan",
+      "King Hemanta"
+     ],
+     "action": "Sumon and Sayan arrive at the royal palace corridor.",
+     "place": "Palace Entrance Hall",
+     "mood": "calm",
+     "ambience": [
+      "grand hall echo",
+      "footsteps"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"introduces the wise scholar and his young cheerful son\" ঠিক সেই জটিল সময়ে রাজপাঠাগারের নতুন বই পড়তে কাঁধে ব্যাগ ঝুলিয়ে সেখানে হাজির হলেন বুদ্ধিমান পণ্ডিত সুমন আর তার ছটফটে ছেলে ছোট সায়ন।",
+       "en": "Right at that difficult moment, wise scholar Sumon and his lively young son Sayan arrived carrying bags to read new books at the royal library.",
+       "emotion": "happy",
+       "delivery": "bright introductory tone for the clever heroes",
+       "voice_text": "ঠিক সেই জটিল সময়ে রাজপাঠাগারের নতুন বই পড়তে কাঁধে ব্যাগ ঝুলিয়ে সেখানে হাজির হলেন বুদ্ধিমান পণ্ডিত সুমন আর তার ছটফটে ছেলে ছোট সায়ন।",
+       "action": "introduces the wise scholar and his young cheerful son",
+       "sfx": [
+        {
+         "sound": "footsteps walking on marble",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Sumon walks in from the left wearing maroon kurta and cream dhoti alongside young Sayan in pink polo shirt.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "walking",
+          "doing": "adjusting shoulder bag strap",
+          "where": "left side",
+          "feeling": "calm confident smile"
+         },
+         {
+          "name": "Sayan",
+          "pose": "walking",
+          "doing": "looking around bright-eyed",
+          "where": "beside Sumon",
+          "feeling": "curious dynamic"
+         }
+        ],
+        "characters": [
+         "Sumon",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"walks in calmly adjusting his rectangular black glasses\" মহারাজ, সুন্দর রাজপ্রাসাদে এমন ভয়াবহ কান্নাকাটি আর শোরগোল কিসের জন্য হচ্ছে বলুন তো?",
+       "en": "Your Majesty, why is there such terrible weeping and noise in this beautiful royal palace?",
+       "emotion": "normal",
+       "delivery": "polite calm respectful voice",
+       "voice_text": "মহারাজ, সুন্দর রাজপ্রাসাদে এমন ভয়াবহ কান্নাকাটি আর শোরগোল কিসের জন্য হচ্ছে বলুন তো?",
+       "action": "walks in calmly adjusting his rectangular black glasses",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon standing calmly bowing slightly to King Hemanta while pushing up his black spectacles.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "adjusting glasses with right hand",
+          "where": "left side",
+          "feeling": "composed smart smile"
+         },
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "gesturing distress",
+          "where": "right side",
+          "feeling": "grieved"
+         }
+        ],
+        "characters": [
+         "Sumon",
+         "King Hemanta"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"looks around curiously with big dark brown eyes\" বাবা, ওই দুজন সিপাহী কাকুর গায়ের রঙ কেন অমন সোনালী পিতলের মূর্তির মতো দেখাচ্ছে?",
+       "en": "Father, why do those two guard uncles look like shiny gold-brass statues?",
+       "emotion": "excited",
+       "delivery": "curious inquisitive child observation",
+       "voice_text": "বাবা! <short pause> ওই দুজন সিপাহী কাকুর গায়ের রঙ কেন অমন সোনালী পিতলের মূর্তির মতো দেখাচ্ছে?",
+       "action": "looks around curiously with big dark brown eyes",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan pointing pointing finger at the brass statues on the corridor floor.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "standing",
+          "doing": "pointing at brass statues",
+          "where": "middle foreground",
+          "feeling": "wide-eyed curiosity"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"points sorrowfully towards the seven identical shimmering doors\" কড়া মায়াজাল পাতা আছে ছোকরা, ভুল দরজায় হাত দিলেই এমন ভীষণ সাজা মিলছে!",
+       "en": "A deadly magic trap is laid young lad, touching any wrong door leads to this terrifying punishment!",
+       "emotion": "sad",
+       "delivery": "grim solemn warning tone",
+       "voice_text": "কড়া মায়াজাল পাতা আছে ছোকরা! ভুল দরজায় হাত দিলেই এমন ভীষণ সাজা মিলছে!",
+       "action": "points sorrowfully towards the seven identical shimmering doors",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta pointing trembling hands toward the row of shimmering identical doors.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "pointing at silver doors",
+          "where": "right side",
+          "feeling": "desperate warning"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "সুমন কাকার পর্যবেক্ষণ",
+     "characters": [
+      "Sumon",
+      "Sayan"
+     ],
+     "action": "Sumon carefully examines the doors and senses cold mystical drafts.",
+     "place": "Corridor of Seven Doors",
+     "mood": "calm",
+     "ambience": [
+      "soft magic humming",
+      "wind draft sound"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows Sumon stepping forward near the enchanted area\" সুমন শান্ত পায়ে সাতটি রূপোলি দরজার কাছাকাছি এগিয়ে গিয়ে মনোযোগ দিয়ে চারপাশের জাদুকরী হাওয়া আর ঘরটির ঘরের তাপমাত্রা মাপতে শুরু করলেন।",
+       "en": "Sumon stepped calmly closer to the seven silver doors, carefully measuring the magic wind draft and room temperature around them.",
+       "emotion": "calm",
+       "delivery": "steady analytical narrator voice",
+       "voice_text": "সুমন শান্ত পায়ে সাতটি রূপোলি দরজার কাছাকাছি এগিয়ে গিয়ে মনোযোগ দিয়ে চারপাশের জাদুকরী হাওয়া আর ঘরটির ঘরের তাপমাত্রা মাপতে শুরু করলেন।",
+       "action": "shows Sumon stepping forward near the enchanted area",
+       "sfx": [
+        {
+         "sound": "gentle footsteps",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Sumon bending down slightly near door entrance, feeling the air with extended palms.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "bending forward",
+          "doing": "holding hands out to sense wind",
+          "where": "center foreground",
+          "feeling": "deep concentration"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"smiles gently while touching the surrounding chilly air\" মহারাজ, ভয় পেয়ে হুটহাট হাত বাড়ানো আর হুড়োহুড়ি করাই কিন্তু এখানে আপনাদের বড় ভুল ছিল।",
+       "en": "Your Majesty, acting hastily out of fear and rushing forward was your biggest mistake here.",
+       "emotion": "calm",
+       "delivery": "soft instructive tone with gentle smile",
+       "voice_text": "মহারাজ, ভয় পেয়ে হুটহাট হাত বাড়ানো আর হুড়োহুড়ি করাই কিন্তু এখানে আপনাদের বড় ভুল ছিল।",
+       "action": "smiles gently while touching the surrounding chilly air",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon turning back to King Hemanta with a reassuring smile.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing half-turned",
+          "doing": "gesturing calmly with left hand",
+          "where": "center",
+          "feeling": "gentle wise look"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"scratches his chin and looks at the floor carefully\" বাবা, কিন্তু এই সাতটা দরজার গায়ের মায়াবী নীল আলো একদম একই রকম কেন দেখাচ্ছে?",
+       "en": "Father, but why does the magical blue light on all seven doors look completely identical?",
+       "emotion": "normal",
+       "delivery": "sharp inquisitive question",
+       "voice_text": "বাবা, কিন্তু এই সাতটা দরজার গায়ের মায়াবী নীল আলো একদম একই রকম কেন দেখাচ্ছে?",
+       "action": "scratches his chin and looks at the floor carefully",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan looking closely at the glowing blue illumination on the silver doors while scratching chin.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "standing tilted",
+          "doing": "scratching chin with right finger",
+          "where": "left side",
+          "feeling": "thoughtful"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"explains softly while pointing to the subtle shadows\" কারণ বাইরের আলোটা একদম নকল, কিন্তু এই চারটে দরজার ধার দিয়ে খুব শীতল জাদুকরী বাতাস সোজা খাদের দিকে বইছে।",
+       "en": "Because the outer light is fake, but cold magical air flows out of these four doors straight toward an abyss.",
+       "emotion": "proud",
+       "delivery": "intelligent revealing deduction tone",
+       "voice_text": "কারণ বাইরের আলোটা একদম নকল, কিন্তু এই চারটে দরজার ধার দিয়ে খুব শীতল জাদুকরী বাতাস সোজা খাদের দিকে বইছে।",
+       "action": "explains softly while pointing to the subtle shadows",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon pointing finger at subtle mist drafts rising near four specific doors.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "pointing at bottom of doors",
+          "where": "center",
+          "feeling": "confident explanation"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "দিদিমার গল্প বিরতি",
+     "characters": [
+      "Pupu",
+      "Didima",
+      "Tatai"
+     ],
+     "action": "Didima pauses the story to explain courage and wisdom to Pupu and Tatai.",
+     "place": "Bedtime Bedroom",
+     "mood": "happy",
+     "ambience": [
+      "warm night ambience",
+      "crickets"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"brings the focus back to the cosy bedroom\" গল্পের ঠিক এই রোমাঞ্চকর মোড়ে এসে ছোট পুপু দিদিমার সাদা শাড়ির লাল আঁচল চেপে ধরে উৎসুক চোখে এক গাদা প্রশ্ন করতে লাগল।",
+       "en": "At this exciting juncture of the tale, little Pupu clutched Didima's red border saree and began asking eager questions.",
+       "emotion": "happy",
+       "delivery": "warm cozy narrator tone bringing back bedtime feel",
+       "voice_text": "গল্পের ঠিক এই রোমাঞ্চকর মোড়ে এসে ছোট পুপু দিদিমার সাদা শাড়ির লাল আঁচল চেপে ধরে উৎসুক চোখে এক গাদা প্রশ্ন করতে লাগল।",
+       "action": "brings the focus back to the cosy bedroom",
+       "sfx": [],
+       "image": {
+        "prompt": "Cozy bedroom with Didima surrounded by her grandchildren Pupu and Tatai.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "sitting close",
+          "doing": "holding Didima saree hem",
+          "where": "left side of bed",
+          "feeling": "eager curious"
+         },
+         {
+          "name": "Didima",
+          "pose": "sitting center",
+          "doing": "looking warmly at Pupu",
+          "where": "center bed",
+          "feeling": "loving"
+         }
+        ],
+        "characters": [
+         "Pupu",
+         "Didima"
+        ]
+       }
+      },
+      {
+       "speaker": "Pupu",
+       "text": "\"looks up curiously with wide shimmering eyes\" দিদিমা, অচেনা মায়াবী ঘর দেখে ছোট সায়ানের কি একটুও ভয় লাগছিল না পণ্ডিত কাকার পাশে?",
+       "en": "Didima, was little Sayan not scared at all seeing the strange magic chamber beside Scholar Uncle?",
+       "emotion": "whisper",
+       "delivery": "soft cute child question",
+       "voice_text": "দিদিমা, অচেনা মায়াবী ঘর দেখে ছোট সায়ানের কি একটুও ভয় লাগছিল না পণ্ডিত কাকার পাশে?",
+       "action": "looks up curiously with wide shimmering eyes",
+       "sfx": [],
+       "image": {
+        "prompt": "Pupu looking up into Didima's eyes with wide round cute eyes.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "leaning head back",
+          "doing": "gazing up at Didima",
+          "where": "left bed",
+          "feeling": "wondering"
+         }
+        ],
+        "characters": [
+         "Pupu"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"strokes Pupu's soft hair lovingly with a smile\" বিপদের দিনে যার চোখে নতুন কিছু জানার আর শেখার ইচ্ছা থাকে, ভয় তার কাছে কখনো ঘেঁষতে পারে না।",
+       "en": "In times of danger, whoever has the desire to observe and learn in their eyes can never be approached by fear.",
+       "emotion": "calm",
+       "delivery": "profound loving life lesson tone",
+       "voice_text": "বিপদের দিনে যার চোখে নতুন কিছু জানার আর শেখার ইচ্ছা থাকে, ভয় তার কাছে কখনো ঘেঁষতে পারে না।",
+       "action": "strokes Pupu's soft hair lovingly with a smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima gently stroking Pupu's head hair with affection.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting",
+          "doing": "stroking Pupu hair",
+          "where": "center",
+          "feeling": "wise warmth"
+         }
+        ],
+        "characters": [
+         "Didima",
+         "Pupu"
+        ]
+       }
+      },
+      {
+       "speaker": "Tatai",
+       "text": "\"sits up straight on the bed with excitement\" তারপর সুমন কাকা কি বাকি তিনটে দরজার গোপন রহস্য বুদ্ধি দিয়ে বের করতে পারল?",
+       "en": "Then could Uncle Sumon uncover the secret mystery of the remaining three doors using his brain?",
+       "emotion": "excited",
+       "delivery": "energetic jumpy question",
+       "voice_text": "তারপর সুমন কাকা কি বাকি তিনটে দরজার গোপন রহস্য বুদ্ধি দিয়ে বের করতে পারল?",
+       "action": "sits up straight on the bed with excitement",
+       "sfx": [],
+       "image": {
+        "prompt": "Tatai sitting upright excitedly on bed with clenched fists.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "sitting upright",
+          "doing": "clenching fists happily",
+          "where": "right side bed",
+          "feeling": "thrilled impatience"
+         }
+        ],
+        "characters": [
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"smiles mysteriously and winks at both the children\" শোন তবে রে পুপু, এবার আসছি আসল রোমাঞ্চকর বিপদের সেই চরম চক্রান্তের মোড়ে!",
+       "en": "Listen then Pupu, now comes the climax twist of real thrilling danger and conspiracy!",
+       "emotion": "happy",
+       "delivery": "playful suspenseful tone with a wink",
+       "voice_text": "শোন তবে রে পুপু! <giggle> এবার আসছি আসল রোমাঞ্চকর বিপদের সেই চরম চক্রান্তের মোড়ে!",
+       "action": "smiles mysteriously and winks at both the children",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima winking playfully at Tatai and Pupu while raising one finger.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting",
+          "doing": "winking and holding up index finger",
+          "where": "center bed",
+          "feeling": "playful mystery"
+         }
+        ],
+        "characters": [
+         "Didima"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "কাগজের পরীক্ষা",
+     "characters": [
+      "Sumon",
+      "Sayan",
+      "King Hemanta"
+     ],
+     "action": "Sumon uses paper strips to rule out four trap doors, narrowing down to three.",
+     "place": "Enchanted Tower Corridor",
+     "mood": "adventure",
+     "ambience": [
+      "paper flutter sound",
+      "wind draft"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows Sumon using a simple paper strip to check air flow\" সুমন হাতের সামান্য কাগজের ফালি বাতাসে ভাসিয়ে সাতটি দরজার মধ্যে চারটিকে বিপদের খাদ বলে মেপে বাতিল করে দূরে সরিয়ে দিলেন।",
+       "en": "Sumon floated paper strips in the air, testing the airflow to eliminate four doors leading to dangerous pits.",
+       "emotion": "calm",
+       "delivery": "clever step-by-step experiment narrative voice",
+       "voice_text": "সুমন হাতের সামান্য কাগজের ফালি বাতাসে ভাসিয়ে সাতটি দরজার মধ্যে চারটিকে বিপদের খাদ বলে মেপে বাতিল করে দূরে সরিয়ে দিলেন।",
+       "action": "shows Sumon using a simple paper strip to check air flow",
+       "sfx": [
+        {
+         "sound": "paper rustling flutter",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Sumon holding a thin paper strip near doors while watching how it bends in draft airflow.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "kneeling on one knee",
+          "doing": "holding paper strip near door crack",
+          "where": "center",
+          "feeling": "focused smart look"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"points finger confidently towards the remaining three doors\" মহারাজ, রাজকন্যা নিশ্চয়ই এবার এই তিন নম্বর, পাঁচ নম্বর বা ছয় নম্বর দরজার পেছনেই বন্দি আছেন।",
+       "en": "Your Majesty, the princess is definitely trapped behind door number three, five, or six.",
+       "emotion": "proud",
+       "delivery": "confident smart deduction statement",
+       "voice_text": "মহারাজ, রাজকন্যা নিশ্চয়ই এবার এই তিন নম্বর, পাঁচ নম্বর বা ছয় নম্বর দরজার পেছনেই বন্দি আছেন।",
+       "action": "points finger confidently towards the remaining three doors",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon pointing finger at door numbers three, five, and six.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "pointing at three doors",
+          "where": "center",
+          "feeling": "assured confident"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"walks closer to the doors looking down at the ground\" বাবা, কিন্তু বাকি থাকা এই তিনটা দরজাও তো দেখতে হুবহু একই রকম লাগছে!",
+       "en": "Father, but these remaining three doors also look completely identical!",
+       "emotion": "normal",
+       "delivery": "curious child wondering about identical doors",
+       "voice_text": "বাবা, কিন্তু বাকি থাকা এই তিনটা দরজাও তো দেখতে হুবহু একই রকম লাগছে!",
+       "action": "walks closer to the doors looking down at the ground",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan walking close to the doors looking up at the silver engravings.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "walking close to door",
+          "doing": "looking up tilting head",
+          "where": "left side",
+          "feeling": "puzzled"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"clasps his hands together in immense hope\" পণ্ডিত মশাই, আর একদম দেরি করবেন না, সূর্য ডোবার আগেই আমার একমাত্র মেয়েকে বের করে আনুন!",
+       "en": "Scholar sir, do not delay a moment longer, bring my only daughter out before sunset!",
+       "emotion": "crying",
+       "delivery": "urgent desperate appeal of a loving father",
+       "voice_text": "পণ্ডিত মশাই, আর একদম দেরি করবেন না! <sob> সূর্য ডোবার আগেই আমার একমাত্র মেয়েকে বের করে আনুন! </sob>",
+       "action": "clasps his hands together in immense hope",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta folding his hands begging Sumon urgently.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing folded hands",
+          "doing": "clasped hands in prayer gesture",
+          "where": "right side",
+          "feeling": "anxious plea"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মায়াদানবের গর্জন",
+     "characters": [
+      "Maya Demon",
+      "Sumon",
+      "Sayan"
+     ],
+     "action": "The Maya Demon appears in storm clouds threatening time limit; Sayan spots ants.",
+     "place": "Palace Tower Window & Corridor",
+     "mood": "scared",
+     "ambience": [
+      "thunder roar",
+      "wicked cackle laugh"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"describes black magical clouds gathering in the sky outside\" আচমকা রাজপ্রাসাদের জানলার বাইরের আকাশে কালো কুৎসিত মায়াবী মেঘ জমে উঠল, আর চারপাশ এক বিকট দানবীয় হাসিতে থরথর করে কেঁপে উঠল।",
+       "en": "Suddenly dark ugly magic clouds gathered in the sky outside the window, and a terrifying evil laughter shook the corridor.",
+       "emotion": "scared",
+       "delivery": "dark tense scary narrative voice",
+       "voice_text": "আচমকা রাজপ্রাসাদের জানলার বাইরের আকাশে কালো কুৎসিত মায়াবী মেঘ জমে উঠল, আর চারপাশ এক বিকট দানবীয় হাসিতে থরথর করে কেঁপে উঠল।",
+       "action": "describes black magical clouds gathering in the sky outside",
+       "sfx": [
+        {
+         "sound": "heavy thunder shockwave",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Dark misty clouds swirling outside the arched palace windows with red glowing eyes of the Maya Demon.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Maya Demon",
+       "text": "\"laughs villainously while floating in the dark clouds\" হা হা হা! সূর্যাস্ত হতে আর মাত্র পাঁচ মিনিট বাকি! তারপর রাজকন্যা চিরতরে এই মায়াজালে হারিয়ে যাবে!",
+       "en": "Ha ha ha! Only five minutes remain until sunset! After that the princess will be lost in this magic maze forever!",
+       "emotion": "angry",
+       "delivery": "wicked booming cackle roar",
+       "voice_text": "<cackle> হা হা হা! </cackle> সূর্যাস্ত হতে আর মাত্র পাঁচ মিনিট বাকি! তারপর রাজকন্যা চিরতরে এই মায়াজালে হারিয়ে যাবে!",
+       "action": "laughs villainously while floating in the dark clouds",
+       "sfx": [],
+       "image": {
+        "prompt": "Maya Demon floating in dark clouds outside window holding glowing black magic wand.",
+        "people": [
+         {
+          "name": "Maya Demon",
+          "pose": "floating in clouds",
+          "doing": "raising black magical wand with wicked cackle",
+          "where": "outside window center",
+          "feeling": "evil triumphant"
+         }
+        ],
+        "characters": [
+         "Maya Demon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"remains steady and looks firmly at the magical sky\" মিছে ভয় দেখাস না দানব, ছলনার অন্ধকার ছায়া কখনো সত্যি বুদ্ধির আলোর সামনে বেশিক্ষণ টিকতে পারে না!",
+       "en": "Do not scare us falsely demon! The dark shadow of deceit can never withstand the light of true intelligence for long!",
+       "emotion": "proud",
+       "delivery": "bold fearless courageous counter-shout",
+       "voice_text": "মিছে ভয় দেখাস না দানব! ছলনার অন্ধকার ছায়া কখনো সত্যি বুদ্ধির আলোর সামনে বেশিক্ষণ টিকতে পারে না!",
+       "action": "remains steady and looks firmly at the magical sky",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon looking up fearlessly toward the window with firm courageous posture.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing tall",
+          "doing": "looking directly at demon window",
+          "where": "center",
+          "feeling": "unshakable courage"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"notices something unusual near the bottom of door number five\" বাবা, একটু নিচে দেখো তো! এই পাঁচ নম্বর দরজাটার তল দিয়ে কালো পিঁপড়ের দল কেন লাইন দিচ্ছে?",
+       "en": "Father, look down below! Why is a line of black ants forming under door number five?",
+       "emotion": "excited",
+       "delivery": "sharp sudden discovery whisper-shout",
+       "voice_text": "বাবা! <gasp> একটু নিচে দেখো তো! </gasp> এই পাঁচ নম্বর দরজাটার তল দিয়ে কালো পিঁপড়ের দল কেন লাইন দিচ্ছে?",
+       "action": "notices something unusual near the bottom of door number five",
+       "sfx": [],
+       "image": {
+        "prompt": "Close-up of Sayan pointing at tiny black ants crawling under the gap of door number five.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "kneeling on floor",
+          "doing": "pointing finger close to doorstep",
+          "where": "left side near door 5",
+          "feeling": "sharp alert discovery"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "পিঁপড়ের ক্লু",
+     "characters": [
+      "Sayan",
+      "Sumon",
+      "King Hemanta"
+     ],
+     "action": "Sayan notices ants crawling under door number five attracted to sweets.",
+     "place": "Enchanted Corridor Floor",
+     "mood": "funny",
+     "ambience": [
+      "ant march tiny sound",
+      "soft background music"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"highlights small ants moving purposefully on the floor\" সায়ানের চটপটে তীক্ষ্ণ চোখে ধরা পড়ল পাঁচ নম্বর দরজার নিচের সূক্ষ্ম কাঠের ফাঁক দিয়ে একদল ছোট ছোট পিঁপড়ে মনের আনন্দে সার বেঁধে ঢুকছে।",
+       "en": "Sayan's sharp eyes caught a line of tiny ants happily crawling through the wooden crack under door number five.",
+       "emotion": "happy",
+       "delivery": "cheerful observant storytelling voice",
+       "voice_text": "সায়ানের চটপটে তীক্ষ্ণ চোখে ধরা পড়ল পাঁচ নম্বর দরজার নিচের সূক্ষ্ম কাঠের ফাঁক দিয়ে একদল ছোট ছোট পিঁপড়ে মনের আনন্দে সার বেঁধে ঢুকছে।",
+       "action": "highlights small ants moving purposefully on the floor",
+       "sfx": [],
+       "image": {
+        "prompt": "Floor perspective showing tiny black ants crawling in a neat line into door number five gap.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"jumps up excitedly pointing at the floor\" বাবা! পিঁপড়েরা তো ভূতেও ডরায় না, মিষ্টি সুবাস পেলেই তারা সোজা লাইন ধরে দরজার নিচ দিয়ে হাঁটে!",
+       "en": "Father! Ants aren't afraid of ghosts; as soon as they smell sweet fragrance they walk in a line right under the door!",
+       "emotion": "excited",
+       "delivery": "cheerful jumpy child logic line",
+       "voice_text": "বাবা! <giggle> পিঁপড়েরা তো ভূতেও ডরায় না, </giggle> মিষ্টি সুবাস পেলেই তারা সোজা লাইন ধরে দরজার নিচ দিয়ে হাঁটে!",
+       "action": "jumps up excitedly pointing at the floor",
+       "sfx": [
+        {
+         "sound": "child jump thud",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Sayan jumping up joyfully clapping hands while pointing down.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "jumping up",
+          "doing": "clapping hands joyfully",
+          "where": "left side",
+          "feeling": "super excited"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"bends down to look closely at the doorstep\" বাহ সায়ন! রাজকন্যার সাথে নিশ্চয়ই এমন কোনো পছন্দের খাবার ছিল যার গন্ধে এই খুদে প্রাণীরা ছুটে আসছে!",
+       "en": "Bravo Sayan! The princess must have carried her favorite sweet food whose scent attracted these tiny creatures!",
+       "emotion": "proud",
+       "delivery": "delighted proud father compliment",
+       "voice_text": "বাহ সায়ন! রাজকন্যার সাথে নিশ্চয়ই এমন কোনো পছন্দের খাবার ছিল যার গন্ধে এই খুদে প্রাণীরা ছুটে আসছে!",
+       "action": "bends down to look closely at the doorstep",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon bending down near Sayan smiling warmly and inspecting ant line.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "bending down",
+          "doing": "patting Sayan shoulder proudly",
+          "where": "center",
+          "feeling": "beaming pride"
+         },
+         {
+          "name": "Sayan",
+          "pose": "kneeling",
+          "doing": "pointing at ants",
+          "where": "left side",
+          "feeling": "happy"
+         }
+        ],
+        "characters": [
+         "Sumon",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"scratches his head in total bewilderment\" মিষ্টি? রাজকন্যা তো সকালে এই মায়াবী চূড়ায় ওঠার আগে নিজের থলিতে বিশেষ কিছু খাবার নিয়েছিল!",
+       "en": "Sweets? The princess did take some special food in her pouch before coming up to this magical tower this morning!",
+       "emotion": "excited",
+       "delivery": "gasp of sudden realization",
+       "voice_text": "মিষ্টি? <gasp> রাজকন্যা তো সকালে </gasp> এই মায়াবী চূড়ায় ওঠার আগে নিজের থলিতে বিশেষ কিছু খাবার নিয়েছিল!",
+       "action": "scratches his head in total bewilderment",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta slapping his forehead in sudden realization and wonder.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "touching forehead in realization",
+          "where": "right side",
+          "feeling": "amazed epiphany"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "তাতাই এর উত্তর",
+     "characters": [
+      "Tatai",
+      "Didima",
+      "Pupu"
+     ],
+     "action": "Tatai guesses the sweet to be Nolen Gur Sondesh during Didima's storytelling.",
+     "place": "Bedtime Room",
+     "mood": "funny",
+     "ambience": [
+      "children laughing",
+      "cozy room"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"returns to Didima and the listening children in the bedroom\" দিদিমার কথা শোনামাত্রই তাতাই বিছানার ওপর চট করে হাত তুলে গল্পের মাঝে দারুণ আনন্দের সাথে চিৎকার করে বলে উঠল।",
+       "en": "As soon as Didima said this, Tatai instantly raised his hand on the bed and shouted out joyously.",
+       "emotion": "happy",
+       "delivery": "lively interactive room scene narration",
+       "voice_text": "দিদিমার কথা শোনামাত্রই তাতাই বিছানার ওপর চট করে হাত তুলে গল্পের মাঝে দারুণ আনন্দের সাথে চিৎকার করে বলে উঠল।",
+       "action": "returns to Didima and the listening children in the bedroom",
+       "sfx": [],
+       "image": {
+        "prompt": "Tatai raising his right hand up high on the bed with a huge toothy grin.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "sitting upright",
+          "doing": "raising hand excitedly",
+          "where": "right side bed",
+          "feeling": "super happy guess"
+         }
+        ],
+        "characters": [
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Tatai",
+       "text": "\"guesses eagerly with a huge silly smile\" আমি একদম সত্যি জানি দিদিমা! রাজকন্যার কাছে নিশ্চয়ই নতুন নলেন গুড়ের সুস্বাদু সন্দেশ ভরা ছিল!",
+       "en": "I know for sure Didima! The princess must have had delicious fresh Nolen Gur Sondesh sweets!",
+       "emotion": "laughing",
+       "delivery": "joyful beaming child shout",
+       "voice_text": "<giggle> আমি একদম সত্যি জানি দিদিমা! </giggle> রাজকন্যার কাছে নিশ্চয়ই নতুন নলেন গুড়ের সুস্বাদু সন্দেশ ভরা ছিল!",
+       "action": "guesses eagerly with a huge silly smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Tatai proudly making his guess with wide open arms.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "sitting tall",
+          "doing": "gesturing wide arms",
+          "where": "right bed",
+          "feeling": "cheerful triumph"
+         }
+        ],
+        "characters": [
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"laughs cheerfully while patting Tatai's shoulder gently\" একদম সঠিক আন্দাজ তাতাই! খাঁটি নতুন গুড়ের সন্দেশের মেঠো গন্ধে চটপটে পিঁপড়েরা সেখানে সুন্দর লাইন বানিয়েছিল।",
+       "en": "Spot-on guess Tatai! The aromatic scent of pure new jaggery Sondesh attracted the busy ant line.",
+       "emotion": "happy",
+       "delivery": "warm laughing grandmother tone",
+       "voice_text": "একদম সঠিক আন্দাজ তাতাই! <laugh> খাঁটি নতুন গুড়ের সন্দেশের </laugh> মেঠো গন্ধে চটপটে পিঁপড়েরা সেখানে সুন্দর লাইন বানিয়েছিল।",
+       "action": "laughs cheerfully while patting Tatai's shoulder gently",
+       "sfx": [
+        {
+         "sound": "children laughing cheerful",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Didima laughing warmly patting Tatai's shoulder.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting center",
+          "doing": "patting Tatai shoulder",
+          "where": "center bed",
+          "feeling": "hearty laugh"
+         }
+        ],
+        "characters": [
+         "Didima"
+        ]
+       }
+      },
+      {
+       "speaker": "Pupu",
+       "text": "\"giggles happily touching her chin softly\" সায়ান কত চালাক আর বুদ্ধিমান গো দিদিমা! বড় সিপাহীরা যা দেখেনি, ও নিমেষে ধরে ফেলল!",
+       "en": "Sayan is so clever and smart Didima! What grown-up guards couldn't see, he caught in a second!",
+       "emotion": "excited",
+       "delivery": "admiring cute child tone",
+       "voice_text": "সায়ান কত চালাক আর বুদ্ধিমান গো দিদিমা! <giggle> বড় সিপাহীরা যা দেখেনি, </giggle> ও নিমেষে ধরে ফেলল!",
+       "action": "giggles happily touching her chin softly",
+       "sfx": [],
+       "image": {
+        "prompt": "Pupu giggling happily resting her hands on chin.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "sitting",
+          "doing": "resting chin on hands",
+          "where": "left bed",
+          "feeling": "admiring giggling"
+         }
+        ],
+        "characters": [
+         "Pupu"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "দরজার নম্বর অদলবদল",
+     "characters": [
+      "Maya Demon",
+      "King Hemanta",
+      "Sumon"
+     ],
+     "action": "The Maya Demon swaps door numbers with magic, but Sumon remains unfazed.",
+     "place": "Enchanted Corridor",
+     "mood": "adventure",
+     "ambience": [
+      "dark spell rumble",
+      "swirling magical gust"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows the Maya Demon suddenly casting a fresh spell\" মায়াদানব বুঝতে পারল তার কুটিল চক্রান্ত ধরা পড়ে যাচ্ছে, তাই সে এক ভয়ঙ্কর মন্ত্র বলে দরজার সংখ্যাগুলো দ্রুত অদলবদল করে দিল।",
+       "en": "The Maya Demon realized his wicked trick was being exposed, so he cast a spell swiftly swapping the door numbers.",
+       "emotion": "scared",
+       "delivery": "tense fast narration describing the demon magic counter attack",
+       "voice_text": "মায়াদানব বুঝতে পারল তার কুটিল চক্রান্ত ধরা পড়ে যাচ্ছে, তাই সে এক ভয়ঙ্কর মন্ত্র বলে দরজার সংখ্যাগুলো দ্রুত অদলবদল করে দিল।",
+       "action": "shows the Maya Demon suddenly casting a fresh spell",
+       "sfx": [
+        {
+         "sound": "magic blast spin swirl",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Glowing glowing door numbers swapping places mid-air in swirling magical smoke.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Maya Demon",
+       "text": "\"waves glowing black wand with a loud cruel laugh\" এবার কোনটা পাঁচ আর কোনটা ছয় নম্বর দরজা চিনে নিবি কীভাবে তুচ্ছ মানুষ?",
+       "en": "Now how will you tell apart door number five from door six, puny humans?",
+       "emotion": "angry",
+       "delivery": "harsh mocking villainous roar",
+       "voice_text": "<cackle> এবার কোনটা পাঁচ আর কোনটা ছয় নম্বর দরজা </cackle> চিনে নিবি কীভাবে তুচ্ছ মানুষ?",
+       "action": "waves glowing black wand with a loud cruel laugh",
+       "sfx": [],
+       "image": {
+        "prompt": "Maya Demon laughing sinisterly while waving his black wand in sky.",
+        "people": [
+         {
+          "name": "Maya Demon",
+          "pose": "floating background",
+          "doing": "waving wand cruel laugh",
+          "where": "top center",
+          "feeling": "wicked malice"
+         }
+        ],
+        "characters": [
+         "Maya Demon"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"panics seeing the glowing numbers swap places rapidly\" ওরে বাস রে! সংখ্যাগুলো সব চোখের সামনে ছানাবড়া হয়ে নিমেষে বদলে গেল!",
+       "en": "Oh my goodness! All numbers scrambled and swapped right before our eyes in an instant!",
+       "emotion": "scared",
+       "delivery": "panic stricken shouting king",
+       "voice_text": "<gasp> ওরে বাস রে! </gasp> সংখ্যাগুলো সব চোখের সামনে ছানাবড়া হয়ে নিমেষে বদলে গেল!",
+       "action": "panics seeing the glowing numbers swap places rapidly",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta holding his head in total shock looking at swapping glowing door digits.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "holding hands to cheeks in shock",
+          "where": "right side",
+          "feeling": "utter panic"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"holds Sayan's shoulder calmly with an unwavering smile\" মিছে চোখধাঁধানো ভেলকি দেখিয়ে লাভ নেই দানব! আমাদের চোখ নম্বরে নয়, মেঝের আসল হাঁটা পিঁপড়েতে আছে!",
+       "en": "It is useless showing dazzling illusions, demon! Our eyes are not on numbers, but on real walking ants on the floor!",
+       "emotion": "proud",
+       "delivery": "calm composed victorious declaration",
+       "voice_text": "মিছে চোখধাঁধানো ভেলকি দেখিয়ে লাভ নেই দানব! আমাদের চোখ নম্বরে নয়, মেঝের আসল হাঁটা পিঁপড়েতে আছে!",
+       "action": "holds Sayan's shoulder calmly with an unwavering smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon holding Sayan's shoulder reassuringly with a confident smile.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "holding Sayan shoulder",
+          "where": "center",
+          "feeling": "calm unshakable"
+         },
+         {
+          "name": "Sayan",
+          "pose": "standing",
+          "doing": "smiling back at Sumon",
+          "where": "beside Sumon",
+          "feeling": "confident"
+         }
+        ],
+        "characters": [
+         "Sumon",
+         "Sayan"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "সায়নের আসল পথ সন্ধান",
+     "characters": [
+      "Sayan",
+      "Sumon"
+     ],
+     "action": "Sayan traces the physical line of crawling ants ignoring the altered magic numbers.",
+     "place": "Floor of Enchanted Corridor",
+     "mood": "adventure",
+     "ambience": [
+      "magic fading hiss",
+      "gentle chime"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows Sayan following the physical ant trail without looking at numbers\" সায়ান মায়াবী চকচকে আলোর দিকে না তাকিয়ে একমনে মেঝের ধুলোয় হামাগুড়ি দিয়ে পিঁপড়ের সেই সরু সারিটা খুঁটিয়ে অনুসরণ করতে লাগল।",
+       "en": "Without looking at dazzle light, Sayan crawled along the dust tracing the ant trail attentively.",
+       "emotion": "calm",
+       "delivery": "steady focused tone describing Sayan's clever action",
+       "voice_text": "সায়ান মায়াবী চকচকে আলোর দিকে না তাকিয়ে একমনে মেঝের ধুলোয় হামাগুড়ি দিয়ে পিঁপড়ের সেই সরু সারিটা খুঁটিয়ে অনুসরণ করতে লাগল।",
+       "action": "shows Sayan following the physical ant trail without looking at numbers",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan crawling on knees along the marble floor tracing the ant line with his eye.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "crawling on hands and knees",
+          "doing": "following ant trail on floor",
+          "where": "center floor",
+          "feeling": "deep concentration"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"stands right in front of the true third door\" বাবা! মায়াজালে দরজার ওপরের নম্বর পাল্টালেও মেঝের আসল জীবন্ত পিঁপড়েরা তো একচুলও নিজেদের পথ পাল্টায়নি!",
+       "en": "Father! Even though door numbers changed in the illusion magic, real living ants on floor haven't shifted their path an inch!",
+       "emotion": "excited",
+       "delivery": "triumphant intelligent child call out",
+       "voice_text": "বাবা! <gasp> মায়াজালে দরজার ওপরের নম্বর পাল্টালেও </gasp> মেঝের আসল জীবন্ত পিঁপড়েরা তো একচুলও নিজেদের পথ পাল্টায়নি!",
+       "action": "stands right in front of the true third door",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan standing up right in front of the actual true door pointing down.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "standing proud",
+          "doing": "pointing at doorstep ant trail",
+          "where": "in front of true door",
+          "feeling": "triumphant smile"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"claps Sayan's back proudly with a broad smile\" একদম খাঁটি সত্যি কথা সায়ন! চোখ যাকে ধাঁধায় ফেলে, সূক্ষ্ম মনোযোগের নজর তাকে নিমেষে চিনে নেয়!",
+       "en": "Absolute truth Sayan! What tricks the eye is instantly recognized by sharp attentive focus!",
+       "emotion": "proud",
+       "delivery": "warm applauding father praise",
+       "voice_text": "একদম খাঁটি সত্যি কথা সায়ন! <laugh> চোখ যাকে ধাঁধায় ফেলে, </laugh> সূক্ষ্ম মনোযোগের নজর তাকে নিমেষে চিনে নেয়!",
+       "action": "claps Sayan's back proudly with a broad smile",
+       "sfx": [
+        {
+         "sound": "clapping proud",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Sumon clapping his hands and patting Sayan's back proudly.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "clapping hands and patting Sayan",
+          "where": "center",
+          "feeling": "beaming proud"
+         },
+         {
+          "name": "Sayan",
+          "pose": "standing",
+          "doing": "smiling happily",
+          "where": "left side",
+          "feeling": "joyful"
+         }
+        ],
+        "characters": [
+         "Sumon",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"describes the magical spell flickering and weakening around them\" সায়ানের শান্ত আর স্থির বুদ্ধির সামনে ছায়াদানবের জাদুকরী মায়াজাল দপদপ করে নিভে গিয়ে ধীরে ধীরে বাতাসে মিলিয়ে যেতে শুরু করল।",
+       "en": "Before Sayan's calm sharp intellect, the shadow demon's illusion magic flickered out and dissolved into air.",
+       "emotion": "happy",
+       "delivery": "glorious victorious narrative flourish",
+       "voice_text": "সায়ানের শান্ত আর স্থির বুদ্ধির সামনে ছায়াদানবের জাদুকরী মায়াজাল দপদপ করে নিভে গিয়ে ধীরে ধীরে বাতাসে মিলিয়ে যেতে শুরু করল।",
+       "action": "describes the magical spell flickering and weakening around them",
+       "sfx": [
+        {
+         "sound": "magic dissipate hiss",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Dark misty illusions around the corridor dissolving into golden sparkles.",
+        "people": [],
+        "characters": []
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "আসল দরজা খোলার মুহূর্ত",
+     "characters": [
+      "Sumon",
+      "King Hemanta"
+     ],
+     "action": "Sumon opens the handle of the true door releasing golden warm light.",
+     "place": "In front of the True Door",
+     "mood": "adventure",
+     "ambience": [
+      "brass door creak",
+      "golden glow shine sound"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows Sumon stepping up to handle the identified door\" পণ্ডিত সুমন পরম ভরসা আর আনন্দে সায়ানের দেখানো সেই আসল দরজার ভারী পিতলের হাতলে সজোরে নিজের হাত শক্ত করে রাখলেন।",
+       "en": "Scholar Sumon placed his hand firmly on the heavy brass handle of the true door indicated by Sayan.",
+       "emotion": "calm",
+       "delivery": "steady climax narrator build up",
+       "voice_text": "পণ্ডিত সুমন পরম ভরসা আর আনন্দে সায়ানের দেখানো সেই আসল দরজার ভারী পিতলের হাতলে সজোরে নিজের হাত শক্ত করে রাখলেন।",
+       "action": "shows Sumon stepping up to handle the identified door",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon holding the heavy ornamental brass handle of the wooden door.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing beside door",
+          "doing": "holding brass handle firmly",
+          "where": "center right",
+          "feeling": "confident steady"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"turns the metal brass handle with complete confidence\" হে সত্যের আলো, শয়তানের মিথ্যা মায়াজাল চুরমার করে রাজকন্যার বন্দি ঘরের পথ খুলে দাও!",
+       "en": "O light of truth, shatter the devil's false illusion spell and open the path to the princess's captive room!",
+       "emotion": "proud",
+       "delivery": "strong commanding righteous voice",
+       "voice_text": "হে সত্যের আলো, শয়তানের মিথ্যা মায়াজাল চুরমার করে রাজকন্যার বন্দি ঘরের পথ খুলে দাও!",
+       "action": "turns the metal brass handle with complete confidence",
+       "sfx": [
+        {
+         "sound": "heavy lock click open",
+         "when": "after"
+        }
+       ],
+       "image": {
+        "prompt": "Sumon turning the door handle as bright golden light emanates from cracks.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing turning handle",
+          "doing": "turning handle counter-clockwise",
+          "where": "center",
+          "feeling": "powerful smile"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"holds his breath in intense emotional tension\" হে ভগবান আমার রাজ্য রক্ষা কোরো, এই দরজাটার পেছনে যেন আমার সোনা রাজকন্যাই নিরাপদে থাকে!",
+       "en": "O Lord protect my kingdom, may my beloved princess be safe behind this door!",
+       "emotion": "crying",
+       "delivery": "anxious prayer tone",
+       "voice_text": "<sob> হে ভগবান আমার রাজ্য রক্ষা কোরো, </sob> এই দরজাটার পেছনে যেন আমার সোনা রাজকন্যাই নিরাপদে থাকে!",
+       "action": "holds his breath in intense emotional tension",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta holding his hands together in heartfelt prayer.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "praying hands close to chest",
+          "where": "left side",
+          "feeling": "emotional hope"
+         }
+        ],
+        "characters": [
+         "King Hemanta"
+        ]
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"describes the golden door opening with a bright warm glow\" দরজাটা সশব্দে খুলতেই এক উজ্জ্বল মিষ্টি আলো চারিদিকে ছড়িয়ে পড়ল আর মায়াদানব বিকট চিৎকার করে বাতাসে ধোঁয়া হয়ে মিলিয়ে গেল।",
+       "en": "As the door opened with a resonant sound, warm golden light streamed out, and the Maya Demon shrieked dissolving into smoke.",
+       "emotion": "happy",
+       "delivery": "triumphant sweeping resolution narration",
+       "voice_text": "দরজাটা সশব্দে খুলতেই এক উজ্জ্বল মিষ্টি আলো চারিদিকে ছড়িয়ে পড়ল আর মায়াদানব বিকট চিৎকার করে বাতাসে ধোঁয়া হয়ে মিলিয়ে গেল।",
+       "action": "describes the golden door opening with a bright warm glow",
+       "sfx": [
+        {
+         "sound": "demon scream disintegrate magic chime",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Door opening wide bathing everyone in magical golden light while dark smoke vanishes outside.",
+        "people": [],
+        "characters": []
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "রাজকন্যার মুক্তি",
+     "characters": [
+      "Princess Mayuri",
+      "Sayan"
+     ],
+     "action": "Princess Mayuri emerges safely holding her sweet box; guards return to human form.",
+     "place": "Opened Doorway & Corridor",
+     "mood": "happy",
+     "ambience": [
+      "joyful harp music",
+      "cheering"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows Princess Mayuri stepping out safely with a sweet box\" অন্ধ কুঠুরির ভেতর থেকে রাজকন্যা ময়ূরী নলেন গুড়ের সন্দেশের হাঁড়ি হাতে হেঁসে মিষ্টি মুখে সবার সামনে বাইরে বেরিয়ে এলেন।",
+       "en": "From inside the chamber, Princess Mayuri stepped out with a happy smile holding her pot of Nolen Gur Sondesh.",
+       "emotion": "happy",
+       "delivery": "sweet graceful narrative tone",
+       "voice_text": "অন্ধ কুঠুরির ভেতর থেকে রাজকন্যা ময়ূরী নলেন গুড়ের সন্দেশের হাঁড়ি হাতে হেঁসে মিষ্টি মুখে সবার সামনে বাইরে বেরিয়ে এলেন।",
+       "action": "shows Princess Mayuri stepping out safely with a sweet box",
+       "sfx": [],
+       "image": {
+        "prompt": "Princess Mayuri walking out of door holding a traditional earthen pot of sweets smiling brightly.",
+        "people": [
+         {
+          "name": "Princess Mayuri",
+          "pose": "walking out of door",
+          "doing": "holding sweet pot in hands",
+          "where": "center doorway",
+          "feeling": "radiant joyful smile"
+         }
+        ],
+        "characters": [
+         "Princess Mayuri"
+        ]
+       }
+      },
+      {
+       "speaker": "Princess Mayuri",
+       "text": "\"smiles happily bowing to Sumon and little Sayan\" অশেষ ধন্যবাদ পণ্ডিত মশাই আর এই পুঁচকে বীর সায়ানকে! আমি একদম নিরাপদে ভালো আছি!",
+       "en": "Endless thanks to Scholar Sir and this little hero Sayan! I am completely safe and fine!",
+       "emotion": "happy",
+       "delivery": "sweet grateful princess voice",
+       "voice_text": "<giggle> অশেষ ধন্যবাদ পণ্ডিত মশাই </giggle> আর এই পুঁচকে বীর সায়ানকে! আমি একদম নিরাপদে ভালো আছি!",
+       "action": "smiles happily bowing to Sumon and little Sayan",
+       "sfx": [],
+       "image": {
+        "prompt": "Princess Mayuri bowing gently in gratitude to Sumon and Sayan.",
+        "people": [
+         {
+          "name": "Princess Mayuri",
+          "pose": "bowing slightly",
+          "doing": "holding sweet pot while bowing",
+          "where": "center",
+          "feeling": "thankful smile"
+         },
+         {
+          "name": "Sayan",
+          "pose": "standing",
+          "doing": "waving cheerfully",
+          "where": "left side",
+          "feeling": "happy proud"
+         }
+        ],
+        "characters": [
+         "Princess Mayuri",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"shows the brass statues turning back into living palace guards\" একইসাথে জাদুমন্ত্র চুরমার হয়ে গিয়ে নিথর পিতলের সিপাহীরা আবার আগের মতো রক্তমাংসের জ্যান্ত মানুষ হয়ে আনন্দে লাফিয়ে উঠল।",
+       "en": "Simultaneously as the magic broke, the brass guard statues transformed back into living humans and jumped in joy.",
+       "emotion": "excited",
+       "delivery": "lively cheerful narration describing transformation back to human",
+       "voice_text": "একইসাথে জাদুমন্ত্র চুরমার হয়ে গিয়ে নিথর পিতলের সিপাহীরা আবার আগের মতো রক্তমাংসের জ্যান্ত মানুষ হয়ে আনন্দে লাফিয়ে উঠল।",
+       "action": "shows the brass statues turning back into living palace guards",
+       "sfx": [
+        {
+         "sound": "magic chime unfreeze cheer",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "The two guards returning from brass back to real humans with colorful armor, jumping joyfully.",
+        "people": [],
+        "characters": []
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"giggles loudly while waving at the amazed guards\" সিপাহী কাকুরা! এরপর না বুঝে ভুল দরজায় আর ধাক্কা মারতে যেয়ো না যেন!",
+       "en": "Guard uncles! Next time don't push open unknown doors without thinking!",
+       "emotion": "laughing",
+       "delivery": "playful teasing child comment",
+       "voice_text": "<giggle> সিপাহী কাকুরা! </giggle> এরপর না বুঝে ভুল দরজায় আর ধাক্কা মারতে যেয়ো না যেন!",
+       "action": "giggles loudly while waving at the amazed guards",
+       "sfx": [
+        {
+         "sound": "child giggling",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Sayan pointing playfully at guards with a teasing laugh.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "standing",
+          "doing": "pointing index finger playful laugh",
+          "where": "left side",
+          "feeling": "playful teasing"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "রাজবাড়ির উৎসব",
+     "characters": [
+      "King Hemanta",
+      "Sayan",
+      "Sumon"
+     ],
+     "action": "King Hemanta rewards Sumon and Sayan; Sayan shares sweets with everyone.",
+     "place": "Royal Palace Courtyard",
+     "mood": "happy",
+     "ambience": [
+      "festive royal flute trumpet",
+      "crowd applause"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"shows the King hosting a grand sweet feast for everyone\" রাজা হেমন্ত মহা আনন্দে পণ্ডিত সুমন আর ছোট সায়ানকে রত্নহারের সাথে রাজ পাঠাগারের আজীবন সম্মানীয় সদস্যপদ উপহার দিলেন।",
+       "en": "In immense joy, King Hemanta honored Scholar Sumon and Sayan with diamond necklaces and lifetime royal library memberships.",
+       "emotion": "happy",
+       "delivery": "grand festive narration tone",
+       "voice_text": "রাজা হেমন্ত মহা আনন্দে পণ্ডিত সুমন আর ছোট সায়ানকে রত্নহারের সাথে রাজ পাঠাগারের আজীবন সম্মানীয় সদস্যপদ উপহার দিলেন।",
+       "action": "shows the King hosting a grand sweet feast for everyone",
+       "sfx": [
+        {
+         "sound": "applause crowd cheering",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "King Hemanta placing a jeweled necklace around young Sayan's neck in courtyard.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "bending forward",
+          "doing": "putting necklace around Sayan neck",
+          "where": "center",
+          "feeling": "grateful proud"
+         },
+         {
+          "name": "Sayan",
+          "pose": "standing straight",
+          "doing": "accepting necklace smile",
+          "where": "left side",
+          "feeling": "thrilled"
+         }
+        ],
+        "characters": [
+         "King Hemanta",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "King Hemanta",
+       "text": "\"offers a huge silver plate full of sweets\" এই নে ছোট বুদ্ধিমান সায়ন, তোর উপস্থিত বুদ্ধির পুরস্কার হিসেবে এই এক হাঁড়ি নলেন গুড়ের সন্দেশ!",
+       "en": "Here little smart Sayan, take this pot of Nolen Gur Sondesh as reward for your presence of mind!",
+       "emotion": "happy",
+       "delivery": "warm generous king tone",
+       "voice_text": "এই নে ছোট বুদ্ধিমান সায়ন, তোর উপস্থিত বুদ্ধির পুরস্কার হিসেবে এই এক হাঁড়ি নলেন গুড়ের সন্দেশ!",
+       "action": "offers a huge silver plate full of sweets",
+       "sfx": [],
+       "image": {
+        "prompt": "King Hemanta handing a decorative pot of Sondesh sweets to Sayan.",
+        "people": [
+         {
+          "name": "King Hemanta",
+          "pose": "standing",
+          "doing": "offering sweet pot",
+          "where": "center",
+          "feeling": "smiling reward"
+         },
+         {
+          "name": "Sayan",
+          "pose": "reaching out hands",
+          "doing": "taking sweet pot",
+          "where": "left side",
+          "feeling": "delighted eyes"
+         }
+        ],
+        "characters": [
+         "King Hemanta",
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sayan",
+       "text": "\"takes the plate and shares sweets with guards\" বাবা, একা একা মিষ্টি খেলে কিন্তু পেটে ব্যথা হয়! এসো সবাই মিলে ভাগ করে খাই!",
+       "en": "Father, eating sweets alone causes a stomach ache! Come let us all share together!",
+       "emotion": "laughing",
+       "delivery": "cute generous child line",
+       "voice_text": "<giggle> বাবা, একা একা মিষ্টি খেলে কিন্তু পেটে ব্যথা হয়! </giggle> এসো সবাই মিলে ভাগ করে খাই!",
+       "action": "takes the plate and shares sweets with guards",
+       "sfx": [],
+       "image": {
+        "prompt": "Sayan handing sweets out to palace guards and everyone around.",
+        "people": [
+         {
+          "name": "Sayan",
+          "pose": "standing center",
+          "doing": "distributing sweets with both hands",
+          "where": "center",
+          "feeling": "generous joyful smile"
+         }
+        ],
+        "characters": [
+         "Sayan"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "\"smiles warmly looking proudly at his kind young son\" যে জ্ঞান অন্যকে বিপদে সাহায্য করে আর আনন্দ ভাগ করে নিতে শেখায়, সেটাই মানুষের আসল শিক্ষা।",
+       "en": "The knowledge that helps others in danger and teaches sharing joy is true education.",
+       "emotion": "proud",
+       "delivery": "warm inspirational moral concluding delivery",
+       "voice_text": "যে জ্ঞান অন্যকে বিপদে সাহায্য করে আর আনন্দ ভাগ করে নিতে শেখায়, সেটাই মানুষের আসল শিক্ষা।",
+       "action": "smiles warmly looking proudly at his kind young son",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon watching Sayan share sweets with a deeply proud warm smile.",
+        "people": [
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "resting hand on heart smile",
+          "where": "right side",
+          "feeling": "loving proud father"
+         }
+        ],
+        "characters": [
+         "Sumon"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "শান্তির ঘুম",
+     "characters": [
+      "Didima",
+      "Pupu",
+      "Tatai"
+     ],
+     "action": "Didima tucks Tatai and Pupu into bed as they peacefully fall asleep.",
+     "place": "Tatai and Pupu's Bedroom at night",
+     "mood": "calm",
+     "ambience": [
+      "lullaby soft music",
+      "night crickets"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "\"brings the story back to the quiet midnight room\" জাদুকরী গল্প শেষ হতেই দিদিমা তার সুতির কাপড়ের গল্পের ঝুলিটি আলতো করে সুন্দর করে মুড়ে পাশে রেখে দিলেন।",
+       "en": "As the magical story concluded, Didima gently folded her cloth story bag and set it aside.",
+       "emotion": "calm",
+       "delivery": "gentle peaceful closing narrative voice",
+       "voice_text": "জাদুকরী গল্প শেষ হতেই দিদিমা তার সুতির কাপড়ের গল্পের ঝুলিটি আলতো করে সুন্দর করে মুড়ে পাশে রেখে দিলেন।",
+       "action": "brings the story back to the quiet midnight room",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima folding her story bag neatly on the bedside table under soft lamp glow.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting on bed edge",
+          "doing": "folding white cotton story bag",
+          "where": "center",
+          "feeling": "peaceful loving"
+         }
+        ],
+        "characters": [
+         "Didima"
+        ]
+       }
+      },
+      {
+       "speaker": "Didima",
+       "text": "\"covers both children with the warm soft blanket\" দেখলি তো তোরা, জীবনে বড় কোনো বিপদ এলে ভয় পেয়ে না ভেবে সিদ্ধান্ত নিতে নেই, চোখকান খোলা রাখলেই জয় আসে!",
+       "en": "You see children, in any big danger of life never decide rashly out of fear; victory comes when you keep eyes and ears open!",
+       "emotion": "calm",
+       "delivery": "tender bedtime advice tone",
+       "voice_text": "দেখলি তো তোরা, জীবনে বড় কোনো বিপদ এলে ভয় পেয়ে না ভেবে সিদ্ধান্ত নিতে নেই, চোখকান খোলা রাখলেই জয় আসে!",
+       "action": "covers both children with the warm soft blanket",
+       "sfx": [],
+       "image": {
+        "prompt": "Didima gently pulling up the soft warm quilt blanket over Tatai and Pupu.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "leaning over children",
+          "doing": "tucking blanket around children",
+          "where": "bed center",
+          "feeling": "motherly care"
+         },
+         {
+          "name": "Pupu",
+          "pose": "lying down",
+          "doing": "eyes half closed under blanket",
+          "where": "left bed",
+          "feeling": "sleepy"
+         },
+         {
+          "name": "Tatai",
+          "pose": "lying down",
+          "doing": "eyes half closed under blanket",
+          "where": "right bed",
+          "feeling": "cozy"
+         }
+        ],
+        "characters": [
+         "Didima",
+         "Pupu",
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "Pupu",
+       "text": "\"rubs her sleepy eyes softly with a warm smile\" সায়ানের মতো আমিও কাল থেকে স্কুলে চারপাশের ছোট ছোট বিষয় খুব মন দিয়ে খেয়াল করব দিদিমা...",
+       "en": "Like Sayan, I will also pay close attention to tiny details around me at school from tomorrow, Didima...",
+       "emotion": "whisper",
+       "delivery": "sleepy cute child murmur",
+       "voice_text": "<whispers> সায়ানের মতো আমিও কাল থেকে স্কুলে </whispers> চারপাশের ছোট ছোট বিষয় খুব মন দিয়ে খেয়াল করব দিদিমা...",
+       "action": "rubs her sleepy eyes softly with a warm smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Pupu rubbing her sleepy eyes with tiny fist under blanket.",
+        "people": [
+         {
+          "name": "Pupu",
+          "pose": "lying in bed",
+          "doing": "rubbing sleepy eyes with fist",
+          "where": "left bed",
+          "feeling": "peaceful sleepiness"
+         }
+        ],
+        "characters": [
+         "Pupu"
+        ]
+       }
+      },
+      {
+       "speaker": "Tatai",
+       "text": "\"yawns deeply while closing his heavy eyelids gently\" আর কখনও অন্ধকারের বন্ধ ঘর দেখে একদম ভয় পাব না... শুভরাত্রি দিদিমা...",
+       "en": "And I will never be scared of dark closed rooms again... Goodnight Didima...",
+       "emotion": "whisper",
+       "delivery": "drowsy yawning voice",
+       "voice_text": "<whispers> আর কখনও অন্ধকারের বন্ধ ঘর দেখে </whispers> একদম ভয় পাব না... শুভরাত্রি দিদিমা...",
+       "action": "yawns deeply while closing his heavy eyelids gently",
+       "sfx": [
+        {
+         "sound": "yawn child soft",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Tatai yawning softly and closing his eyes peacefully on pillow.",
+        "people": [
+         {
+          "name": "Tatai",
+          "pose": "lying on pillow",
+          "doing": "yawning with eyes closed",
+          "where": "right bed",
+          "feeling": "asleep"
+         }
+        ],
+        "characters": [
+         "Tatai"
+        ]
+       }
+      },
+      {
+       "speaker": "narrator",
+       "text": "\"whispers gently as the moonlight falls softly on the bed\" খুদে দুটোর চোখ বুজতেই শোবার ঘরে নামল মিষ্টি ঘুমের শান্তি, আর এভাবেই শেষ হলো দিদিমার ঝুলি গল্পের মায়াবী পর্ব।",
+       "en": "As the two little ones closed their eyes, sweet peaceful sleep descended on the room, ending this magical episode of Didima's Bag of Tales.",
+       "emotion": "calm",
+       "delivery": "soft whispering finale tone",
+       "voice_text": "<whispers> খুদে দুটোর চোখ বুজতেই শোবার ঘরে নামল মিষ্টি ঘুমের শান্তি, </whispers> আর এভাবেই শেষ হলো দিদিমার ঝুলি গল্পের মায়াবী পর্ব।",
+       "action": "whispers gently as the moonlight falls softly on the bed",
+       "sfx": [],
+       "image": {
+        "prompt": "Wide cozy bedroom shot with moonlight falling softly through window on peaceful sleeping children.",
+        "people": [
+         {
+          "name": "Didima",
+          "pose": "sitting on bed edge",
+          "doing": "watching children sleep with loving smile",
+          "where": "center",
+          "feeling": "tender affection"
+         }
+        ],
+        "characters": [
+         "Didima"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "moral": "বিপদের সময় ভয় না পেয়ে উপস্থিত বুদ্ধি আর সূক্ষ্ম পর্যবেক্ষণ দিয়েই কঠিনতম সমস্যার সমাধান করা যায়।",
+   "ending_line": "আজ তবে আসি, কাল রাতে আবার আসব দিদিমার ঝুলির নতুন এক রূপকথার গল্প নিয়ে!",
+   "comment_question": "তোমাদের যদি সাতটি রহস্যময় দরজা দেওয়া হতো, তোমরা কীভাবে আসল ঘর চিনতে? কমেন্টে জানাও! 🚪✨",
+   "teaser_scene": 8,
+   "mithu_intro": "টুইট টুইট! আজ দিদিমার ঝুলিতে রয়েছে সাতটি মায়াবী দরজা ও রাজকন্যার এক রোমাঞ্চকর রহস্য!",
+   "mithu_outro": "টুইট টুইট! সায়ানের বুদ্ধির প্রশংসা করতে ভুলে যেও না কিন্তু! আবার দেখা হবে!",
+   "english_words": [
+    {
+     "en": "Door",
+     "meaning": "দরজা"
+    },
+    {
+     "en": "Ant",
+     "meaning": "পিঁপড়ে"
+    },
+    {
+     "en": "Magic",
+     "meaning": "জাদু / মায়াজাল"
+    }
+   ],
+   "riddle": {
+    "q": "পা নেই তবু চলে অনবরত, দিন-রাত পার করে কত শত শত! বল তো সেটা কী?",
+    "a": "ঘড়ি"
+   }
+  },
+  "theme": [
+   "didima",
+   "an ORIGINAL new story on the same topic as this week's much-watched video 'আরে জর্জিনা তুমি কোন ঘরে আছো bangla  Rupkothar golpo' (only the topic - our own place, people, events and twist) (told as a didima story for children)"
+  ],
+  "total": 2,
+  "vnames": [],
+  "vote_ideas": null,
+  "voted": null,
+  "weekday": 1,
+  "creator": {}
+ },
+ "2026-11-24@13": {
+  "lang": "bn",
+  "category": "gopal",
+  "continues": false,
+  "episode": null,
+  "festival": null,
+  "part": 0,
+  "prev": null,
+  "series_id": null,
+  "slot_hour": 13,
+  "story": {
+   "title": "রাজপথের গুপ্তধন নাকি বড় প্রতারণা? | Bangla Cartoon | #shorts",
+   "quiz": {
+    "question": "গোপাল হাঁড়ির ভেতরে কী লুকিয়ে রেখেছিল?",
+    "options": [
+     "একটি লেখা কাগজ",
+     "হিরে আর জহরত",
+     "সোনার মুদ্রা"
+    ],
+    "answer": 0
+   },
+   "tagline": "বিনামূল্যে ধ্বংসাবশেষ সরানোর চতুর গোপালী ফন্দি!",
+   "title_b": "ধ্বংসাবশেষ অপসারণে গোপালের নতুন কিস্তিমাত! 🏺✨",
+   "thumbnail_text": "গুপ্তধন নাকি ধোঁকা?",
+   "description": "কৃষ্ণনগরের প্রধান রাজপথের ধ্বংসাবশেষ অপসারণ নিয়ে মন্ত্রী মশাই চক্রান্ত করতে চাইলে গোপাল আর সুমন মিলে তৈরি করল এক নতুন ফন্দি! লোভের বশে রাতারাতি সব পাথর সরানোর এই হাসি-মজার গল্পটি দেখুন। শেষে কী হলো তা জানতে ভিডিওটি শেষ পর্যন্ত দেখুন!",
+   "hashtags": [
+    "#GopalBhar",
+    "#BanglaCartoon",
+    "#BengaliStories",
+    "#GopalBharCartoon",
+    "#GopalBharGolpo",
+    "#BanglaGolpo",
+    "#FunnyBengaliCartoon",
+    "#KolkataAnimation",
+    "#MoralStory",
+    "#KidsBengaliCartoon",
+    "#GopalBharEpisode"
+   ],
+   "setting": "18th-century Krishnanagar kingdom, Bengal, with royal court, traditional mud huts, rustic village paths, and bustling town streets during daytime and night.",
+   "characters": [
+    {
+     "name": "Gopal",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "round, plump, cheerful Bengali man, clean-shaven round face, big bright eyes, small black tuft of hair (tiki) on a fully shaved head, a sandalwood tilak line on the forehead, short leaf-green kurta with a small white collar, white dhoti, maroon-and-white checked gamchha on the left shoulder, barefoot",
+     "rig": "gopal"
+    },
+    {
+     "name": "Raja",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "tall dignified kind king about 50, neat black moustache with curled tips, cream-white turban with a red ruby and a white feather plume, royal-blue silk robe with a gold border, maroon shawl over one shoulder, pearl necklace, gold embroidered shoes",
+     "rig": "raja"
+    },
+    {
+     "name": "Mantri",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "tall very thin jealous royal minister, long narrow face, thin pointed moustache and small pointed beard, grey streaks in his hair, small orange turban, purple robe with a silver border",
+     "rig": "mantri"
+    },
+    {
+     "name": "Gopal's wife",
+     "gender": "female",
+     "age": "adult",
+     "kind": "human",
+     "look": "plump cheerful Bengali village wife, hair in a bun, sindoor, red bindi, white saree with a red border, red and white bangles, a bunch of keys tucked at the waist",
+     "rig": "gopal_bou"
+    },
+    {
+     "name": "Sumon",
+     "gender": "male",
+     "age": "adult",
+     "kind": "human",
+     "look": "friendly calm clever Bengali young man about 32, soft oval face with slightly full cheeks, gentle confident smile, brown eyes behind rectangular black-framed glasses, thick straight black eyebrows, short thick black hair brushed forward with a soft fringe, clean-shaven (no moustache, no beard), wheat-brown skin, maroon kurta with small gold buttons, cream dhoti, cream shawl with a thin gold border over the left shoulder, small brown cloth shoulder bag, brown nagra shoes",
+     "rig": "saheb"
+    },
+    {
+     "name": "Mahajan",
+     "gender": "male",
+     "age": "old",
+     "kind": "human",
+     "look": "greedy pot-bellied village moneylender, bald head with grey sides, thin curled moustache, cream kurta with a brown waistcoat, white dhoti, red account book under his arm",
+     "rig": "mahajan"
+    }
+   ],
+   "source": "Inspired by Gopal Bhar Folk Tales",
+   "episode_name": "ধ্বংসাবশেষ অপসারণ",
+   "thumbnail_image": {
+    "hero": "Gopal",
+    "hero_action": "raising one finger with a sly cheerful smile holding a red-cloth wrapped pot",
+    "second": "Mantri",
+    "second_action": "covered in grey dust, eyes wide in shock holding a small piece of paper",
+    "place": "grand royal court of Krishnanagar with carved wooden pillars and gold decorations",
+    "moment": "Gopal reveals the secret note inside the pot while the minister stands embarrassed."
+   },
+   "scenes": [
+    {
+     "chapter": "রাজসভায় চক্রান্ত",
+     "characters": [
+      "Raja",
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Mantri demands five thousand gold coins to clear the rubble while Gopal questions the inflated cost in court.",
+     "place": "royal court with king on throne and ministers sitting around",
+     "mood": "dramatic",
+     "ambience": [
+      "court murmur",
+      "distant royal drums"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "কৃষ্ণনগরের প্রধান রাজপথের মুখে এক প্রকাণ্ড পুরোনো প্রাসাদের ভাঙা পাথর আর ধ্বংসাবশেষ পড়েছিল। সেই বিরাট ধ্বংসাবশেষ সরাতে মন্ত্রী মশাই রাজকোষ থেকে অঢেল টাকা হাতিয়ে নেওয়ার চক্রান্ত করলেন।",
+       "en": "At the entrance of Krishnanagar's main highway lay the heavy stone rubble of an old palace. Seeing this, the minister schemed to siphon off a huge sum from the royal treasury for clearing it.",
+       "emotion": "normal",
+       "delivery": "engaging, intriguing storyteller voice with mild dramatic pause",
+       "voice_text": "কৃষ্ণনগরের প্রধান রাজপথের মুখে এক প্রকাণ্ড পুরোনো প্রাসাদের ভাঙা পাথর আর ধ্বংসাবশেষ পড়েছিল। <short pause> সেই বিরাট ধ্বংসাবশেষ সরাতে মন্ত্রী মশাই রাজকোষ থেকে অঢেল টাকা হাতিয়ে নেওয়ার চক্রান্ত করলেন।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "court murmur",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Wide shot of 18th-century royal court of Bengal. Raja sits on an ornate gold throne in the middle. Mantri stands on the left pointing dramatically. Gopal stands on the right watching closely.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "pointing finger forward greedily",
+          "where": "left side of frame",
+          "feeling": "scheming and ambitious"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "sitting regal on throne looking puzzled",
+          "where": "middle of frame",
+          "feeling": "dignified thoughtful"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "listening intently with arms crossed",
+          "where": "right side of frame",
+          "feeling": "curious and alert"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "মহারাজ, প্রধান সড়কের ওই ভারী ভাঙা পাথর অপসারণ করতে অন্তত পাঁচ হাজার স্বর্ণমুদ্রা লাগবে!",
+       "en": "Your Majesty, it will take at least five thousand gold coins to remove those heavy stone ruins from the main road!",
+       "emotion": "proud",
+       "delivery": "loud boasting greedy voice with authoritative hand gesture",
+       "voice_text": "মহারাজ! <short pause> প্রধান সড়কের ওই ভারী ভাঙা পাথর অপসারণ করতে অন্তত পাঁচ হাজার স্বর্ণমুদ্রা লাগবে!",
+       "action": "points finger upwards boastfully",
+       "sfx": [],
+       "image": {
+        "prompt": "Medium close-up of Mantri bowing slightly towards Raja, holding out five fingers greedily in royal court.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "showing five fingers with open palm",
+          "where": "left foreground",
+          "feeling": "greedy and theatrical"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "leaning forward attentively",
+          "where": "center throne",
+          "feeling": "surprised"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "watching Mantri with eyebrows raised",
+          "where": "right background",
+          "feeling": "amused suspicious"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "পাঁচ হাজার স্বর্ণমুদ্রা? সামান্য কিছু ইঁট-পাথর রাজপথ থেকে সরাতে এত টাকা কেন মন্ত্রী মশাই?",
+       "en": "Five thousand gold coins? Why so much money minister just to move some bricks and stones from the road?",
+       "emotion": "excited",
+       "delivery": "surprised, loud royal voice leaning forward",
+       "voice_text": "<gasp> পাঁচ হাজার স্বর্ণমুদ্রা? সামান্য কিছু ইঁট-পাথর রাজপথ থেকে সরাতে এত টাকা কেন মন্ত্রী মশাই?",
+       "action": "leans forward on throne with open hands",
+       "sfx": [],
+       "image": {
+        "prompt": "Medium shot of Raja looking astonished on his throne, leaning forward while looking at Mantri.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "standing stiffly looking thin and cunning",
+          "where": "left",
+          "feeling": "scheming"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "raising hand in disbelief",
+          "where": "center",
+          "feeling": "astonished questioning"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "smiling slightly while observing",
+          "where": "right",
+          "feeling": "thinking"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "ওহে মহারাজ, ওই বিশাল ধ্বংসাবশেষ সরাতে শ-খানেক শক্তিশালী মজুর আর বড় বড় হাজারটা ঠেলাগাড়ি লাগবে!",
+       "en": "Oh King, to clear that colossal rubble, we will need a hundred strong laborers and a thousand big handcarts!",
+       "emotion": "proud",
+       "delivery": "convincing urgent tone waving both hands",
+       "voice_text": "ওহে মহারাজ, ওই বিশাল ধ্বংসাবশেষ সরাতে শ-খানেক শক্তিশালী মজুর আর বড় বড় হাজারটা ঠেলাগাড়ি লাগবে!",
+       "action": "gestures broadly with both hands",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri talking dramatically with wide arms, explaining to Raja.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "waving arms wide in exaggeration",
+          "where": "left",
+          "feeling": "dramatic convincing"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "stroking moustache thoughtfully",
+          "where": "center",
+          "feeling": "doubtful"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "hand on chin",
+          "where": "right",
+          "feeling": "clever plan forming"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "কিন্তু রাজকোষ থেকে অহেতুক এত অর্থ খরচ করা কি ঠিক হবে?",
+       "en": "But would it be right to spend so much money unnecessarily from the royal treasury?",
+       "emotion": "normal",
+       "delivery": "grave concerned tone shaking head",
+       "voice_text": "কিন্তু রাজকোষ থেকে অহেতুক এত অর্থ খরচ করা কি ঠিক হবে?",
+       "action": "shakes head with deep concern",
+       "sfx": [],
+       "image": {
+        "prompt": "Close-up on Raja shaking head with serious expression.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "frowning slightly",
+          "where": "left",
+          "feeling": "impatient"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "resting hand on chin thoughtfully",
+          "where": "center",
+          "feeling": "worried frugal"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "walking forward one step",
+          "where": "right",
+          "feeling": "ready to speak"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহারাজ, একটু ভেবে দেখুন! সামান্য ধ্বংসাবশেষ সরাতে পাঁচ হাজার স্বর্ণমুদ্রা জলফেলা করা মোটেও অনুচিত হবে না কি?",
+       "en": "Your Majesty, think a bit! Wouldn't it be quite improper to throw away five thousand gold coins just for moving minor rubble?",
+       "emotion": "happy",
+       "delivery": "cheerful, bold and respectful voice with one finger raised",
+       "voice_text": "মহারাজ, একটু ভেবে দেখুন! <short pause> সামান্য ধ্বংসাবশেষ সরাতে পাঁচ হাজার স্বর্ণমুদ্রা জলফেলা করা মোটেও অনুচিত হবে না কি?",
+       "action": "raises one finger with a bright cheerful smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal steps into center court, finger raised towards Raja with a confident smirk while Mantri glares at him.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "glaring angrily at Gopal",
+          "where": "left",
+          "feeling": "annoyed envious"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "smiling with interest",
+          "where": "center",
+          "feeling": "hopeful intrigued"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "raising index finger smiling warmly",
+          "where": "right",
+          "feeling": "cheerful smart"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "গোপালের ঘরে অশান্তি",
+     "characters": [
+      "Gopal",
+      "Gopal's wife"
+     ],
+     "action": "Gopal returns home where his wife complains about tripping over the street rubble.",
+     "place": "gopal's modest mud home courtyard with earthen pot",
+     "mood": "funny",
+     "ambience": [
+      "village morning birds",
+      "utensil clinking"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "দরবার শেষে গোপাল চিন্তিত মুখে বাড়ি ফিরতেই তার স্ত্রী মাটির হাঁড়ি হাতে রাগে ফুঁসতে ফুঁসতে তার সামনে এসে দাঁড়াল।",
+       "en": "As Gopal returned home thoughtfully after court, his wife stood before him fuming with anger, holding an earthen pot.",
+       "emotion": "normal",
+       "delivery": "lively narrating voice describing domestic scene",
+       "voice_text": "দরবার শেষে গোপাল চিন্তিত মুখে বাড়ি ফিরতেই তার স্ত্রী মাটির হাঁড়ি হাতে রাগে ফুঁসতে ফুঁসতে তার সামনে এসে দাঁড়াল।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "utensil clinking",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal walks into his rustic mud house courtyard. Gopal's wife stands in front of him angrily holding a clay pot on her hip.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in from left holding gamchha",
+          "where": "left side",
+          "feeling": "worried defensive"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "standing",
+          "doing": "holding clay pot on waist, pointing other hand",
+          "where": "right side",
+          "feeling": "furious exasperated"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal's wife",
+       "text": "ওগো, জল আনতে গিয়ে সেই রাজপথের ভাঙা পাথরের ঢিপিতে ধাক্কা খেয়ে পড়ে যাচ্ছিলাম!",
+       "en": "Listen! While fetching water I almost tripped and fell over that pile of broken stones on the highway!",
+       "emotion": "angry",
+       "delivery": "sharp scolding tone stomping foot slightly",
+       "voice_text": "<scold> ওগো, জল আনতে গিয়ে সেই রাজপথের ভাঙা পাথরের ঢিপিতে ধাক্কা খেয়ে পড়ে যাচ্ছিলাম!",
+       "action": "scolds with hand on waist",
+       "sfx": [],
+       "image": {
+        "prompt": "Close shot of Gopal's wife scolding Gopal angrily.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "shrinking back with hands raised placatingly",
+          "where": "left",
+          "feeling": "embarrassed timid"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "standing",
+          "doing": "scolding forcefully",
+          "where": "right",
+          "feeling": "angry dramatic"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "আহা, অত রাগ করছ কেন? মন্ত্রী মশাই তো ওটা পরিষ্কারের জন্য দরবারে প্রস্তাব দিয়েছেন।",
+       "en": "Ah, why get so angry? The minister has already put forward a proposal in court to clean it.",
+       "emotion": "calm",
+       "delivery": "soothing pacifying voice smiling sheepishly",
+       "voice_text": "আহা, অত রাগ করছ কেন? <short pause> মন্ত্রী মশাই তো ওটা পরিষ্কারের জন্য দরবারে প্রস্তাব দিয়েছেন।",
+       "action": "waves hand gently to calm her down",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal trying to calm his wife down with gentle hands.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "smiling sheepishly with open palms",
+          "where": "left",
+          "feeling": "soothing cheerful"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "standing",
+          "doing": "pouting with key ring at waist",
+          "where": "right",
+          "feeling": "unconvinced"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal's wife",
+       "text": "প্রস্তাব তো দিয়েছেন, কিন্তু দিনরাত ওই ভারী পাথর ডিঙিয়ে পথ চলতে গিয়ে মানুষের পা ভাঙছে!",
+       "en": "Proposal he gave, but day and night people are breaking their legs stumbling over those heavy boulders!",
+       "emotion": "angry",
+       "delivery": "fast agitated voice shaking her fist",
+       "voice_text": "প্রস্তাব তো দিয়েছেন, কিন্তু দিনরাত ওই ভারী পাথর ডিঙিয়ে পথ চলতে গিয়ে মানুষের পা ভাঙছে!",
+       "action": "points finger sharply",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal's wife pointing outdoors emphatically.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "scratching head thoughtfully",
+          "where": "left",
+          "feeling": "thinking hard"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "standing",
+          "doing": "pointing finger outside courtyard",
+          "where": "right",
+          "feeling": "indignant"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "শান্ত হও, আমি খুব শিগগিরই রাজকোষের এক কানাকড়ি খরচ না করে ওটা অপসারণের রাস্তা বের করছি!",
+       "en": "Calm down! I am very soon finding a way to remove it without spending a single penny from the royal treasury!",
+       "emotion": "happy",
+       "delivery": "confident upbeat voice patting chest",
+       "voice_text": "শান্ত হও! আমি খুব শিগগিরই রাজকোষের এক কানাকড়ি খরচ না করে ওটা অপসারণের রাস্তা বের করছি!",
+       "action": "pats chest confidently",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal smiling brightly and reassuring his wife.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "patting chest proudly",
+          "where": "left",
+          "feeling": "confident clever"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "standing",
+          "doing": "crossing arms looking curious",
+          "where": "right",
+          "feeling": "skeptical"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal's wife",
+       "text": "তাড়াতাড়ি করো! রাজপথ পরিষ্কার না হলে আজ রাতে তোমায় কিন্তু না খেয়ে থাকতে হবে!",
+       "en": "Do it quickly! If the main road isn't cleared, you will have to sleep hungry tonight!",
+       "emotion": "laughing",
+       "delivery": "playful strict warning voice with a tiny chuckle",
+       "voice_text": "তাড়াতাড়ি করো! <giggle> রাজপথ পরিষ্কার না হলে আজ রাতে তোমায় কিন্তু না খেয়ে থাকতে হবে!",
+       "action": "turns around with keys jingling at waist",
+       "sfx": [
+        {
+         "sound": "keys jingling",
+         "when": "after"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal's wife turning to go inside hut with a playful smirk while Gopal looks shocked.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "gasping with hand on belly",
+          "where": "left",
+          "feeling": "alarmed humorous"
+         },
+         {
+          "name": "Gopal's wife",
+          "pose": "walking",
+          "doing": "walks towards hut door smiling",
+          "where": "right",
+          "feeling": "teasing playful"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Gopal's wife"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "বন্ধুর পরামর্শ",
+     "characters": [
+      "Gopal",
+      "Sumon"
+     ],
+     "action": "Gopal meets Sumon on the village path and discusses the minister's outrageous budget.",
+     "place": "sunny village path lined with green banyan trees",
+     "mood": "calm",
+     "ambience": [
+      "gentle wind in trees",
+      "birds chirping"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "পরদিন সকালে গোপাল গ্রামের পথ দিয়ে হেঁটে যাওয়ার সময় তার বুদ্ধিমান তরুণ বন্ধু সুমনের মুখোমুখি হলো।",
+       "en": "The next morning while Gopal was walking along the village path, he met his clever young friend Sumon.",
+       "emotion": "normal",
+       "delivery": "warm pleasant narration setting morning scene",
+       "voice_text": "পরদিন সকালে গোপাল গ্রামের পথ দিয়ে হেঁটে যাওয়ার সময় তার বুদ্ধিমান তরুণ বন্ধু সুমনের মুখোমুখি হলো।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "birds chirping",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal walks into the dirt village path from left. Sumon is standing under a banyan tree carrying a cloth shoulder bag.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in smiling warmly",
+          "where": "left side",
+          "feeling": "friendly cheerful"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "standing near tree, adjusting glasses",
+          "where": "right side",
+          "feeling": "calm intellectual"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "গোপালদাদা, রাজপথের ওই সামান্য ধ্বংসাবশেষ অপসারণ করতে মন্ত্রী মশাই পাঁচ হাজার স্বর্ণমুদ্রা কেন চাইলেন?",
+       "en": "Gopal-dada, why did the minister ask for five thousand gold coins just to clear that minor rubble from the highway?",
+       "emotion": "excited",
+       "delivery": "curious inquisitive tone adjusting black-framed glasses",
+       "voice_text": "গোপালদাদা, রাজপথের ওই সামান্য ধ্বংসাবশেষ অপসারণ করতে মন্ত্রী মশাই পাঁচ হাজার স্বর্ণমুদ্রা কেন চাইলেন?",
+       "action": "adjusts glasses on nose bridge",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon asking Gopal curiously on village path.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "listening warmly with gamchha on shoulder",
+          "where": "left",
+          "feeling": "attentive"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "finger touching spectacles rim",
+          "where": "right",
+          "feeling": "curious logical"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মন্ত্রী মশাইয়ের আসল নজর রাজকোষের ধনের ওপর, ভাই সুমন!",
+       "en": "The minister's true sight is set on looting the treasury's wealth, brother Sumon!",
+       "emotion": "whisper",
+       "delivery": "secretive low voice leaning closer",
+       "voice_text": "<whispers> মন্ত্রী মশাইয়ের আসল নজর রাজকোষের ধনের ওপর, ভাই সুমন! </whispers>",
+       "action": "leans closer and whispers quietly",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal leaning close to Sumon, whispering slyly.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "bending",
+          "doing": "hand near mouth whispering",
+          "where": "left",
+          "feeling": "secretive sly"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "listening carefully, eyebrows raised",
+          "where": "right",
+          "feeling": "surprised clear"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "সামান্য পাথর সরাতে এত বড় চক্রান্ত প্রজারা সহ্য করবে কেন?",
+       "en": "Why should the subjects tolerate such a massive scam just to move a few stones?",
+       "emotion": "sad",
+       "delivery": "concerned dissatisfied voice shaking head",
+       "voice_text": "সামান্য পাথর সরাতে এত বড় চক্রান্ত প্রজারা সহ্য করবে কেন?",
+       "action": "shakes head with dismay",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon looking concerned for village folk.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "nods solemnly",
+          "where": "left",
+          "feeling": "thoughtful"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "hands clasped thoughtfully",
+          "where": "right",
+          "feeling": "troubled earnest"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "কিন্তু কাজটা তো বিনামূল্যে আর দ্রুত করাতে হবে, তা না হলে পথচলতি মানুষের কষ্ট কমবে না!",
+       "en": "But the work must be done free of cost and quickly, otherwise the misery of passers-by won't ease!",
+       "emotion": "calm",
+       "delivery": "earnest determined tone looking ahead",
+       "voice_text": "কিন্তু কাজটা তো বিনামূল্যে আর দ্রুত করাতে হবে, <short pause> তা না হলে পথচলতি মানুষের কষ্ট কমবে না!",
+       "action": "points toward the distant road",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal pointing towards village direction while talking earnest.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "pointing arm down the path",
+          "where": "left",
+          "feeling": "determined caring"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "thinking deeply",
+          "where": "right",
+          "feeling": "pondering idea"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "বুদ্ধির চমক",
+     "characters": [
+      "Gopal",
+      "Sumon"
+     ],
+     "action": "Sumon suggests a brilliant idea about spreading a treasure rumor, sparking Gopal's plan.",
+     "place": "under shady banyan tree on village path",
+     "mood": "happy",
+     "ambience": [
+      "birds chirping",
+      "soft rustling leaves"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "সুমন কিছু মুহূর্ত চিন্তাভাবনা করে মিটিমিটি হেসে গোপালকে একটা চমৎকার ফন্দি দিল, যা শুনে গোপাল দারুণ উৎসাহিত হলো।",
+       "en": "Sumon thought for a few moments, smiled slyly, and shared a brilliant trick with Gopal, hearing which Gopal got tremendously excited.",
+       "emotion": "normal",
+       "delivery": "cheerful narrative voice building anticipation",
+       "voice_text": "সুমন কিছু মুহূর্ত চিন্তাভাবনা করে মিটিমিটি হেসে গোপালকে একটা চমৎকার ফন্দি দিল, <short pause> যা শুনে গোপাল দারুণ উৎসাহিত হলো।",
+       "action": "",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon smiling cunningly and whispering into Gopal's ear on village path.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "listening wide-eyed with smile",
+          "where": "left",
+          "feeling": "delighted astonished"
+         },
+         {
+          "name": "Sumon",
+          "pose": "bending",
+          "doing": "hand near mouth sharing secret",
+          "where": "right",
+          "feeling": "clever amused"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "গোপালদাদা, মানুষ যদি ভাবে ওই ধ্বংসাবশেষের নিচে গুপ্তধন চাপা আছে, তবে তো তারা নিজেরাই সব পাথর সরিয়ে ফেলবে!",
+       "en": "Gopal-dada, if people think there's hidden treasure buried under that rubble, they themselves will clear all the stones!",
+       "emotion": "happy",
+       "delivery": "bright clever voice with a gentle smile",
+       "voice_text": "<giggle> গোপালদাদা, মানুষ যদি ভাবে ওই ধ্বংসাবশেষের নিচে গুপ্তধন চাপা আছে, তবে তো তারা নিজেরাই সব পাথর সরিয়ে ফেলবে!",
+       "action": "taps forehead lightly with finger",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon giving the witty suggestion to Gopal.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "eyes wide open in excitement",
+          "where": "left",
+          "feeling": "thrilled illuminated"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "pointing finger up smartly",
+          "where": "right",
+          "feeling": "confident smiling"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "বাহ্ সুমন! তুমি তো সত্যি এক আশ্চর্য আর বুদ্ধিমত্তার দিশা দেখালে!",
+       "en": "Bravo Sumon! You have truly shown a direction of wonderful intelligence!",
+       "emotion": "excited",
+       "delivery": "joyful praise clapping hands together",
+       "voice_text": "বাহ্ সুমন! <short pause> তুমি তো সত্যি এক আশ্চর্য আর বুদ্ধিমত্তার দিশা দেখালে!",
+       "action": "claps hands joyfully",
+       "sfx": [
+        {
+         "sound": "clapping",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal clapping hands joyfully in front of Sumon.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "clapping hands happily",
+          "where": "left",
+          "feeling": "joyful excited"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "bowing modestly",
+          "where": "right",
+          "feeling": "humble smiling"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "আমার এই সাধারণ ভাবনা কি সত্যি কাজ দেবে গোপালদাদা?",
+       "en": "Will my simple idea really work, Gopal-dada?",
+       "emotion": "normal",
+       "delivery": "modest curious tone smiling softly",
+       "voice_text": "আমার এই সাধারণ ভাবনা কি সত্যি কাজ দেবে গোপালদাদা?",
+       "action": "scratches back of neck modestly",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon asking Gopal with modest smile.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "grabs Sumon's shoulders playfully",
+          "where": "left",
+          "feeling": "reassuring"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "smiling gently",
+          "where": "right",
+          "feeling": "curious modest"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "অবশ্যই! এবার দেখো রাজপথের সব পাথর কীভাবে চোখের নিমেষে সাফ হয়ে যায়!",
+       "en": "Of course! Now watch how all the stones on the highway vanish in the blink of an eye!",
+       "emotion": "happy",
+       "delivery": "triumphant lively tone winking",
+       "voice_text": "অবশ্যই! এবার দেখো রাজপথের সব পাথর কীভাবে চোখের নিমেষে সাফ হয়ে যায়!",
+       "action": "winks playfully and nods",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal winking playfully with confidence.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "winking finger raised playfully",
+          "where": "left",
+          "feeling": "triumphant witty"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "laughing heartily",
+          "where": "right",
+          "feeling": "amused excited"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মহারাজের কাছে বাজি",
+     "characters": [
+      "Raja",
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Gopal returns to court and wagers that he will clear the road in 24 hours for free.",
+     "place": "grand royal court of Krishnanagar",
+     "mood": "adventure",
+     "ambience": [
+      "court chatter",
+      "soft sitar melody"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "গোপাল তখনই রাজসভায় ফিরে গিয়ে মহারাজার কাছে এক অদ্ভুত বাজি রেখে বসল, যা শুনে সবাই অবাক হয়ে গেল।",
+       "en": "Gopal returned to the royal court right away and placed a strange wager before the King, leaving everyone amazed.",
+       "emotion": "normal",
+       "delivery": "dramatic narrative voice",
+       "voice_text": "গোপাল তখনই রাজসভায় ফিরে গিয়ে মহারাজার কাছে এক অদ্ভুত বাজি রেখে বসল, <short pause> যা শুনে সবাই অবাক হয়ে গেল।",
+       "action": "",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal walks into the court room from right. Raja looks attentive on throne. Mantri glares.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in briskly bowing slightly",
+          "where": "right",
+          "feeling": "confident posture"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "leaning forward expecting news",
+          "where": "center",
+          "feeling": "curious"
+         },
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "arms folded smirking",
+          "where": "left",
+          "feeling": "mocking"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহারাজ, আমি কথা দিচ্ছি মাত্র চব্বিশ ঘণ্টার মধ্যে বিনামূল্যে রাজপথের সব ধ্বংসাবশেষ অপসারণ করে দেব!",
+       "en": "Your Majesty, I promise that within just twenty-four hours I will remove all rubble from the highway free of cost!",
+       "emotion": "proud",
+       "delivery": "clear confident declaration bowing slightly",
+       "voice_text": "মহারাজ, আমি কথা দিচ্ছি মাত্র চব্বিশ ঘণ্টার মধ্যে বিনামূল্যে রাজপথের সব ধ্বংসাবশেষ অপসারণ করে দেব!",
+       "action": "bows respectfully then stands tall",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal standing proudly in center court addressing Raja.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "holding hands in namaste gesture",
+          "where": "right",
+          "feeling": "bold solemn"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "eyes wide in surprise",
+          "where": "center",
+          "feeling": "astonished"
+         },
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "laughing mockingly",
+          "where": "left",
+          "feeling": "disbelieving"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "হা হা! গোপাল, তুমি কি পাগল হলে? শ-খানেক মজুর যা পারবে না, তুমি তা একা করবে?",
+       "en": "Ha ha! Gopal, have you gone mad? What a hundred laborers cannot do, will you do alone?",
+       "emotion": "laughing",
+       "delivery": "mocking loud laughter clapping hand on thigh",
+       "voice_text": "<cackle> হা হা! </cackle> গোপাল, তুমি কি পাগল হলে? শ-খানেক মজুর যা পারবে না, তুমি তা একা করবে?",
+       "action": "laughs mocking Gopal with pointed finger",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri laughing mockingly at Gopal in court.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "throwing head back laughing loudly",
+          "where": "left",
+          "feeling": "mocking arrogant"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "raising hand for silence",
+          "where": "center",
+          "feeling": "fair attentive"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "calm smile holding head high",
+          "where": "right",
+          "feeling": "unbothered confident"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "গোপাল, তুমি যদি রাজকোষের অর্থ না খরচ করে এই কাজ করতে পারো, তবে তোমায় বড় পুরস্কার দেব!",
+       "en": "Gopal, if you can accomplish this without spending the treasury's funds, I will give you a grand reward!",
+       "emotion": "happy",
+       "delivery": "encouraging noble royal voice",
+       "voice_text": "গোপাল, তুমি যদি রাজকোষের অর্থ না খরচ করে এই কাজ করতে পারো, তবে তোমায় বড় পুরস্কার দেব!",
+       "action": "raises hand offering blessing gesture",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja raising hand offering royal reward gesture to Gopal.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "frowning in jealousy",
+          "where": "left",
+          "feeling": "resentful"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "smiling generously",
+          "where": "center",
+          "feeling": "generous hopeful"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "bowing gratefully",
+          "where": "right",
+          "feeling": "thankful cheerful"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহারাজ, আপনি শুধু ধৈর্য ধরুন, কাল সকালেই আসল কেরামতি স্বচক্ষে দেখতে পাবেন!",
+       "en": "Your Majesty, just have patience, tomorrow morning you will see the real magic with your own eyes!",
+       "emotion": "happy",
+       "delivery": "cheerful parting words with namaste",
+       "voice_text": "মহারাজ, আপনি শুধু ধৈর্য ধরুন, <short pause> কাল সকালেই আসল কেরামতি স্বচক্ষে দেখতে পাবেন!",
+       "action": "does a deep humble bow",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal doing a bow in court with a sly grin.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "watching distrustfully",
+          "where": "left",
+          "feeling": "suspicious"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "nodding approvingly",
+          "where": "center",
+          "feeling": "pleased"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "bowing with namaste",
+          "where": "right",
+          "feeling": "witty confident"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মহাজনের কানে খবর",
+     "characters": [
+      "Gopal",
+      "Mahajan"
+     ],
+     "action": "Gopal hides a red pot under stone rubble and drops secret treasure hints to greedy Mahajan.",
+     "place": "heaps of heavy stone rubble blocking the village highway",
+     "mood": "funny",
+     "ambience": [
+      "afternoon cicadas",
+      "distant ox cart"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "বিকেলবেলা গোপাল লাল কাপড়ে মোড়া একটি পুরোনো মাটির হাঁড়ি এনে ভাঙা পাথরের নিচে লুকিয়ে রাখল এবং কৃপণ মহাজনকে যেতে দেখে ডেকে বলল।",
+       "en": "In the afternoon, Gopal brought an old clay pot wrapped in red cloth, hid it under the stone rubble, and seeing the miserly Mahajan passing by, called out to him.",
+       "emotion": "normal",
+       "delivery": "lively narrative voice describing sly setup",
+       "voice_text": "বিকেলবেলা গোপাল লাল কাপড়ে মোড়া একটি পুরোনো মাটির হাঁড়ি এনে ভাঙা পাথরের নিচে লুকিয়ে রাখল এবং কৃপণ মহাজনকে যেতে দেখে ডেকে বলল।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "distant ox cart",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal hiding a red cloth wrapped pot under big stones on dirt highway. Mahajan walks in from right with red account book.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "bending",
+          "doing": "tucking red pot into stone gap",
+          "where": "left",
+          "feeling": "sly secretive"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "walking",
+          "doing": "walks in holding red ledger under arm",
+          "where": "right",
+          "feeling": "curious greedy"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহাজন মশাই, খবরদার কাউকে বলবেন না, ওই ধ্বংসাবশেষের নিচে এক প্রকাণ্ড হিরে-জহরত ভর্তি হাঁড়ি চাপা পড়ে আছে!",
+       "en": "Mahajan-moshai, beware don't tell anyone! Beneath that rubble lies a giant pot stuffed with diamonds and jewels!",
+       "emotion": "whisper",
+       "delivery": "dramatic whisper holding hands around mouth",
+       "voice_text": "<whispers> মহাজন মশাই, খবরদার কাউকে বলবেন না! </whispers> ওই ধ্বংসাবশেষের নিচে এক প্রকাণ্ড হিরে-জহরত ভর্তি হাঁড়ি চাপা পড়ে আছে!",
+       "action": "whispers dramatically looking around",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal whispering in Mahajan's ear near stone pile.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "bending",
+          "doing": "cupping hand near mouth whispering",
+          "where": "left",
+          "feeling": "mischievous"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "standing",
+          "doing": "dropping ledger slightly in shock",
+          "where": "right",
+          "feeling": "stunned greedy"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Mahajan",
+       "text": "অ্যাঁ! সত্যি বলছ গোপাল? মাটির নিচে ওমন মহামূল্যবান রত্নভরা গুপ্তধন রয়েছে?",
+       "en": "Ah! Are you telling the truth Gopal? Is such priceless jewel-filled treasure buried under the ground?",
+       "emotion": "excited",
+       "delivery": "breathless greedy gasp with bulging eyes",
+       "voice_text": "<gasp> অ্যাঁ! </gasp> সত্যি বলছ গোপাল? মাটির নিচে ওমন মহামূল্যবান রত্নভরা গুপ্তধন রয়েছে?",
+       "action": "clasping hands in greed with bulging eyes",
+       "sfx": [],
+       "image": {
+        "prompt": "Close-up of Mahajan's greedy wide eyes.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "nodding solemnly",
+          "where": "left",
+          "feeling": "serious pretend"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "standing",
+          "doing": "holding hands near chest avariciously",
+          "where": "right",
+          "feeling": "greedy ecstatic"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "একদম সত্যি! কিন্তু সাবধান, রাজবাড়ির মন্ত্রী মশাই যেন ভুলেও এই গুপ্তধনের কথা না টের পান!",
+       "en": "Absolutely true! But beware, the royal court minister must not get wind of this hidden treasure by mistake!",
+       "emotion": "whisper",
+       "delivery": "warning urgent whisper finger on lips",
+       "voice_text": "<whispers> একদম সত্যি! কিন্তু সাবধান, রাজবাড়ির মন্ত্রী মশাই যেন ভুলেও এই গুপ্তধনের কথা না টের পান! </whispers>",
+       "action": "puts index finger on lips softly",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal placing finger on lips warning Mahajan.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "finger on lips shushing",
+          "where": "left",
+          "feeling": "cunning dramatic"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "standing",
+          "doing": "nodding frantically",
+          "where": "right",
+          "feeling": "eager secret-keeper"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Mahajan",
+       "text": "চুপ চুপ! আমি কাউকেই কিচ্ছু বলব না, একদম মুখ বন্ধ রাখব!",
+       "en": "Hush hush! I won't say anything to anyone, I will keep my mouth tight shut!",
+       "emotion": "whisper",
+       "delivery": "rapid quiet whisper zipping lips gesture",
+       "voice_text": "<whispers> চুপ চুপ! আমি কাউকেই কিচ্ছু বলব না, একদম মুখ বন্ধ রাখব! </whispers>",
+       "action": "touches hand to lips zipping them",
+       "sfx": [],
+       "image": {
+        "prompt": "Mahajan making mouth closed gesture eagerly.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks out towards left smiling",
+          "where": "left",
+          "feeling": "satisfied secret win"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "standing",
+          "doing": "hand over mouth looking around stealthily",
+          "where": "right",
+          "feeling": "greedy sneaky"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মহাজনের হাড়ভাঙা খাটুনি",
+     "characters": [
+      "Mahajan",
+      "Gopal"
+     ],
+     "action": "Mahajan starts digging and hauling stones greedily while Gopal watches hidden behind trees.",
+     "place": "highway rubble pile under fading evening sunlight",
+     "mood": "funny",
+     "ambience": [
+      "heavy stone dragging",
+      "panting breathing"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "গোপাল পথ থেকে সরে যেতেই লোভী মহাজন আনন্দে আত্মহারা হয়ে কোদাল আর গাঁইতি নিয়ে পাথর সরাতে লেগে পড়ল।",
+       "en": "As soon as Gopal stepped off the path, the greedy Mahajan, beside himself with joy, grabbed a pickaxe and shovel and set to work moving stones.",
+       "emotion": "normal",
+       "delivery": "amused energetic narration",
+       "voice_text": "গোপাল পথ থেকে সরে যেতেই লোভী মহাজন আনন্দে আত্মহারা হয়ে কোদাল আর গাঁইতি নিয়ে পাথর সরাতে লেগে পড়ল।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "heavy stone dragging",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Mahajan lifting heavy stone boulders at dusk. Gopal peeking from behind a tree on the left.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "peeking behind tree trunk laughing quietly",
+          "where": "left tree",
+          "feeling": "highly amused"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "bending",
+          "doing": "lifting a huge grey stone rock sweating",
+          "where": "center rubble",
+          "feeling": "exhausted yet greedy"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Mahajan",
+       "text": "বাব্বা! পাথরগুলো যে ভীষণ ভারী! কিন্তু গুপ্তধন পেতে হলে আজকেই সব ইঁট-পাথর সরাতে হবে!",
+       "en": "My goodness! These stones are so extremely heavy! But to get the treasure, I must move all bricks and stones today itself!",
+       "emotion": "sad",
+       "delivery": "panting, exhausted groan while heaving a rock",
+       "voice_text": "<breath> বাব্বা! </breath> পাথরগুলো যে ভীষণ ভারী! কিন্তু গুপ্তধন পেতে হলে আজকেই সব ইঁট-পাথর সরাতে হবে!",
+       "action": "heaves heavy boulder with great effort",
+       "sfx": [
+        {
+         "sound": "panting breathing",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Mahajan panting heavily carrying a rock.",
+        "people": [
+         {
+          "name": "Mahajan",
+          "pose": "bending",
+          "doing": "holding rock with both arms strain on face",
+          "where": "center rubble",
+          "feeling": "strained red-faced"
+         }
+        ],
+        "characters": [
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "আড়াল থেকে মহাজনের এই উদয়াস্ত খাটুনি দেখতে কিন্তু ভারী মিষ্টি লাগছে!",
+       "en": "Watching the Mahajan's backbreaking toil from hiding feels sweet indeed!",
+       "emotion": "happy",
+       "delivery": "soft chuckle talking to himself from behind bush",
+       "voice_text": "<giggle> আড়াল থেকে মহাজনের এই উদয়াস্ত খাটুনি দেখতে কিন্তু ভারী মিষ্টি লাগছে! </giggle>",
+       "action": "chuckles quietly rubbing hands",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal behind bush chuckling quietly.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "kneeling",
+          "doing": "peeking over green bush rubbing hands",
+          "where": "left",
+          "feeling": "delighted cheeky"
+         },
+         {
+          "name": "Mahajan",
+          "pose": "bending",
+          "doing": "throwing stone aside",
+          "where": "right background",
+          "feeling": "sweating hard"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mahajan"
+        ]
+       }
+      },
+      {
+       "speaker": "Mahajan",
+       "text": "আমি দ্রুত সব ভারী পাথর সরিয়ে লাল কাপড়ের হাঁড়িটা নিজের কব্জায় নিয়ে নিই!",
+       "en": "Let me quickly move all heavy stones and take that red-cloth pot into my own possession!",
+       "emotion": "excited",
+       "delivery": "desperate eager mutter digging faster",
+       "voice_text": "আমি দ্রুত সব ভারী পাথর সরিয়ে লাল কাপড়ের হাঁড়িটা নিজের কব্জায় নিয়ে নিই!",
+       "action": "digs faster with hands clearing rocks",
+       "sfx": [],
+       "image": {
+        "prompt": "Mahajan frantically tossing smaller stones away.",
+        "people": [
+         {
+          "name": "Mahajan",
+          "pose": "kneeling",
+          "doing": "tossing stones behind him furiously",
+          "where": "center rubble",
+          "feeling": "frenzied greedy"
+         }
+        ],
+        "characters": [
+         "Mahajan"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "ফাঁদ প্রস্তুত",
+     "characters": [
+      "Gopal",
+      "Sumon"
+     ],
+     "action": "Sumon meets Gopal again and laughs watching Mahajan work, anticipating the minister's trap.",
+     "place": "edge of village path near rubble site under evening sky",
+     "mood": "funny",
+     "ambience": [
+      "crickets chirping",
+      "evening wind"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "গ্রামের পথে সুমনের সঙ্গে গোপালের ফের দেখা হলো; সুমন আড়ালে দাঁড়িয়ে মহাজনের কসরত দেখে হেসে আকুল হচ্ছিল।",
+       "en": "Gopal met Sumon again on the village lane; Sumon stood hidden watching Mahajan's struggle and broke into laughter.",
+       "emotion": "normal",
+       "delivery": "amused cheerful narrator voice",
+       "voice_text": "গ্রামের পথে সুমনের সঙ্গে গোপালের ফের দেখা হলো; <short pause> সুমন আড়ালে দাঁড়িয়ে মহাজনের কসরত দেখে হেসে আকুল হচ্ছিল।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "crickets chirping",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal and Sumon standing behind wall watching Mahajan dig down the path. Sumon giggling.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "pointing towards Mahajan with sly grin",
+          "where": "left",
+          "feeling": "satisfied clever"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "covering mouth laughing",
+          "where": "right",
+          "feeling": "amused joyous"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "গোপালদাদা, মহাজন মশাই তো নিজের গাঁটের কড়ি খরচ না করে একাই রাজপথের পাথর সরিয়ে ফেলছে!",
+       "en": "Gopal-dada, the Mahajan is moving the highway stones all by himself without spending a dime from his pocket!",
+       "emotion": "laughing",
+       "delivery": "laughing heartily suppressing sound behind hand",
+       "voice_text": "<giggle> গোপালদাদা! মহাজন মশাই তো নিজের গাঁটের কড়ি খরচ না করে একাই রাজপথের পাথর সরিয়ে ফেলছে! </giggle>",
+       "action": "covers mouth to hide giggles",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon giggling behind hand while talking to Gopal.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "folding arms with contentment",
+          "where": "left",
+          "feeling": "cheerful"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "holding belly while laughing quietly",
+          "where": "right",
+          "feeling": "hilarious delight"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "বুঝতে পারছ সুমন, লোভে পাপ আর পাপে পরিশ্রম!",
+       "en": "Do you understand Sumon, greed leads to sin, and sin leads to hard labor!",
+       "emotion": "happy",
+       "delivery": "witty proverb tone shaking finger knowingly",
+       "voice_text": "বুঝতে পারছ সুমন, লোভে পাপ আর পাপে পরিশ্রম!",
+       "action": "shakes index finger wisely",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal teaching a proverb wise smile.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "finger raised in proverbs posture",
+          "where": "left",
+          "feeling": "wise funny"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "nodding enthusiastically",
+          "where": "right",
+          "feeling": "impressed smiling"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Sumon",
+       "text": "কিন্তু এত বড় রাস্তার ধ্বংসাবশেষ কি ওই একা মহাজন পুরোটা সরাতে পারবে?",
+       "en": "But will that Mahajan alone be able to clear the rubble of such a huge highway completely?",
+       "emotion": "normal",
+       "delivery": "thoughtful practical query adjusting glasses",
+       "voice_text": "কিন্তু এত বড় রাস্তার ধ্বংসাবশেষ কি ওই একা মহাজন পুরোটা সরাতে পারবে?",
+       "action": "adjusts glasses thoughtfully",
+       "sfx": [],
+       "image": {
+        "prompt": "Sumon questioning Gopal thoughtfully.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "shrugging shoulders slyly",
+          "where": "left",
+          "feeling": "confident plot twist ready"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "tilting head curiously",
+          "where": "right",
+          "feeling": "questioning"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "একদম না! মহাজনের হাঁপানো দেখে লোভী মন্ত্রী মশাই এবার নিশ্চয়ই সুযোগ নিতে লাফিয়ে পড়বেন!",
+       "en": "Not at all! Seeing Mahajan panting, the greedy minister will surely pounce to jump on the opportunity now!",
+       "emotion": "happy",
+       "delivery": "confident laughing tone winking",
+       "voice_text": "একদম না! <short pause> মহাজনের হাঁপানো দেখে লোভী মন্ত্রী মশাই এবার নিশ্চয়ই সুযোগ নিতে লাফিয়ে পড়বেন!",
+       "action": "claps hands once with victory smile",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal clapping once happily predicting Mantri's trap.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "clapping hands with sly smile",
+          "where": "left",
+          "feeling": "mastermind happy"
+         },
+         {
+          "name": "Sumon",
+          "pose": "standing",
+          "doing": "giving thumbs up gesture",
+          "where": "right",
+          "feeling": "admiring Gopal"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Sumon"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "মন্ত্রীর কানে খবর",
+     "characters": [
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Gopal ensures the treasure news reaches Mantri at the market, stoking his greed.",
+     "place": "busy market place in evening dusk with oil lamps lighting up",
+     "mood": "scheming",
+     "ambience": [
+      "busy village market",
+      "chatter of buyers"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "হাটে বাজারে রটে যাওয়া গুপ্তধনের কথা শুনতেই মন্ত্রীর কান খাড়া হয়ে উঠল; তিনি হিংসায় আর লোভ লালসায় জ্বলে উঠলেন।",
+       "en": "As soon as the minister heard rumors of hidden treasure spreading in the market, his ears perked up; he burned with envy and intense greed.",
+       "emotion": "normal",
+       "delivery": "dramatic narration describing greedy minister",
+       "voice_text": "হাটে বাজারে রটে যাওয়া গুপ্তধনের কথা শুনতেই মন্ত্রীর কান খাড়া হয়ে উঠল; <short pause> তিনি হিংসায় আর লোভ লালসায় জ্বলে উঠলেন।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "busy village market",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Mantri standing near market stalls. Gopal walks into market scene from right talking casually.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "eyes wide twirling thin moustache",
+          "where": "left",
+          "feeling": "greedy excited"
+         },
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in casually casually eating a laddu",
+          "where": "right",
+          "feeling": "innocent pretend"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "কী বললে! রাজপথের ধ্বংসাবশেষের নিচে গুপ্তধন আছে আর সাধারণ প্রজারা তা লুটে নেবে?",
+       "en": "What did you say! There's treasure under the road rubble and common villagers will loot it?",
+       "emotion": "excited",
+       "delivery": "shocked outraged tone stepping closer",
+       "voice_text": "<gasp> কী বললে! </gasp> রাজপথের ধ্বংসাবশেষের নিচে গুপ্তধন আছে আর সাধারণ প্রজারা তা লুটে নেবে?",
+       "action": "steps forward grabbing Gopal's arm",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri grabbing Gopal's sleeve in market frantically.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "clutching Gopal's elbow urgently",
+          "where": "left",
+          "feeling": "panicked greedy"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "looking innocent shrugging",
+          "where": "right",
+          "feeling": "pretending ignorance"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মন্ত্রী মশাই, মহাজন যদি আগে কুড়িয়ে পায়, তবে তো সব সম্পদ ওরই দখলে চলে যাবে!",
+       "en": "Minister-moshai, if Mahajan finds it first, then all wealth will belong solely to him!",
+       "emotion": "whisper",
+       "delivery": "instigating sly tone poking oil into fire",
+       "voice_text": "<whispers> মন্ত্রী মশাই, মহাজন যদি আগে কুড়িয়ে পায়, তবে তো সব সম্পদ ওরই দখলে চলে যাবে! </whispers>",
+       "action": "whispers provoking Mantri",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal instigating Mantri in market scene.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "teeth clenching angrily",
+          "where": "left",
+          "feeling": "envious furious"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "whispering behind hand",
+          "where": "right",
+          "feeling": "sly provocateur"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "কক্ষনও না! আমি রাজপরিবারের প্রধান মন্ত্রী, ওই গুপ্তধনের ওপর একমাত্র আমারই অধিকার রয়েছে!",
+       "en": "Never! I am the chief minister of the royal kingdom, only I have the sole right over that treasure!",
+       "emotion": "angry",
+       "delivery": "arrogant fierce yell puffing chest",
+       "voice_text": "কক্ষনও না! আমি রাজপরিবারের প্রধান মন্ত্রী, ওই গুপ্তধনের ওপর একমাত্র আমারই অধিকার রয়েছে!",
+       "action": "puffs chest arrogant chest bump",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri standing arrogant shouting in market.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "beating chest proudly",
+          "where": "left",
+          "feeling": "arrogant possessive"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "suppressing a laugh",
+          "where": "right",
+          "feeling": "amused secret victory"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "তবে আর বসে আছেন কেন? জলদি গিয়ে মহাজনকে তাড়িয়ে পাথর সরাতে লাগুন!",
+       "en": "Then why are you sitting idle? Go quickly, chase away Mahajan and start moving the stones!",
+       "emotion": "happy",
+       "delivery": "hurried teasing tone urging him on",
+       "voice_text": "তবে আর বসে আছেন কেন? জলদি গিয়ে মহাজনকে তাড়িয়ে পাথর সরাতে লাগুন!",
+       "action": "pushes Mantri gently forward",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal gesturing Mantri towards the highway path.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "walking",
+          "doing": "turns rapidly to march away",
+          "where": "left",
+          "feeling": "eager greedy"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "waving goodbye slyly",
+          "where": "right",
+          "feeling": "witty mastermind"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "রাতের হাড়ভাঙা খাটুনি",
+     "characters": [
+      "Mantri"
+     ],
+     "action": "Mantri works through the night with carts clearing all rubble to get the treasure pot.",
+     "place": "dark night village highway under starlight and torches",
+     "mood": "adventure",
+     "ambience": [
+      "night owls",
+      "heavy stones dumping"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "নিঝুম মাঝরাতে মন্ত্রী মশাই কাউকে না জানিয়ে নিজের পাহাড়াদার ও সৈন্যদের নিয়ে এসে দ্রুত গতিতে পাথর সরাতে লাগলেন।",
+       "en": "In the quiet dead of night, the minister came secretly without telling anyone, bringing his guards to swiftly move the stones.",
+       "emotion": "normal",
+       "delivery": "suspenseful night atmosphere narrative voice",
+       "voice_text": "নিঝুম মাঝরাতে মন্ত্রী মশাই কাউকে না জানিয়ে নিজের পাহাড়াদার ও সৈন্যদের নিয়ে এসে দ্রুত গতিতে পাথর সরাতে লাগলেন।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "night owls",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Dark night scene illuminated by flaming torches. Mantri covered in soot lifting heavy rocks onto wooden handcarts.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "bending",
+          "doing": "lifting heavy stone in torch light sweating dark soot",
+          "where": "center rubble",
+          "feeling": "tired greedy obsessed"
+         }
+        ],
+        "characters": [
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "ধুর! এত বড় বড় পাথর ঠেলাগাড়িতে চাপানো যে এত কষ্টের কাজ তা তো আগে বুঝিনি!",
+       "en": "Darn! I didn't realize before that loading such gigantic stones onto handcarts was such painful work!",
+       "emotion": "sad",
+       "delivery": "sweating groaning voice wiping brow",
+       "voice_text": "<sigh> ধুর! </sigh> এত বড় বড় পাথর ঠেলাগাড়িতে চাপানো যে এত কষ্টের কাজ তা তো আগে বুঝিনি!",
+       "action": "wipes sweat from forehead with dirty sleeve",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri sweating holding his aching waist under torchlight.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "holding lower back aching, face dirty with soot",
+          "where": "center",
+          "feeling": "exhausted suffering"
+         }
+        ],
+        "characters": [
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "তোরা হাত চালা! সূর্য ওঠার আগেই সব পাথর এখান থেকে তুলে নদীপাড়ে ফেলে দে!",
+       "en": "Move your hands fast! Before sunrise, lift all stones from here and dump them at the riverbank!",
+       "emotion": "angry",
+       "delivery": "harsh desperate order to invisible helpers",
+       "voice_text": "তোরা হাত চালা! <short pause> সূর্য ওঠার আগেই সব পাথর এখান থেকে তুলে নদীপাড়ে ফেলে দে!",
+       "action": "shouts pointing towards river side",
+       "sfx": [
+        {
+         "sound": "heavy stones dumping",
+         "when": "after"
+        }
+       ],
+       "image": {
+        "prompt": "Mantri shouting commands frantically under torchlight.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "pointing order toward riverbank",
+          "where": "center",
+          "feeling": "desperate bossy"
+         }
+        ],
+        "characters": [
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "সারারাত গাধার মতো খেটেও যদি লাল হাঁড়িটা না পাই, তবে তো আমার কপালে বড় দুঃখ আছে!",
+       "en": "If after slogging like a donkey all night I don't get that red pot, great sorrow awaits my fate!",
+       "emotion": "sad",
+       "delivery": "muttering nervously to himself digging deeper",
+       "voice_text": "সারারাত গাধার মতো খেটেও যদি লাল হাঁড়িটা না পাই, তবে তো আমার কপালে বড় দুঃখ আছে!",
+       "action": "digs eagerly looking for red cloth pot",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri frantically searching under last few stones.",
+        "people": [
+         {
+          "name": "Mahajan",
+          "pose": "standing",
+          "doing": "absent",
+          "where": "none",
+          "feeling": "none"
+         },
+         {
+          "name": "Mantri",
+          "pose": "kneeling",
+          "doing": "digging earth with dusty hands",
+          "where": "center",
+          "feeling": "anxious obsessed"
+         }
+        ],
+        "characters": [
+         "Mantri"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "পরিষ্কার রাজপথ",
+     "characters": [
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "At dawn, the highway is completely cleared, and Mantri finds the red pot while Gopal greets him.",
+     "place": "spotless clean sunrise village road with clear horizon",
+     "mood": "happy",
+     "ambience": [
+      "morning roosters",
+      "morning breeze"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "পরদিন ভোরে দেখা গেল পুরো প্রধান রাজপথ একবারে চকচকে ও পরিষ্কার হয়ে গেছে, আর মাঝরাস্তায় পড়ে রয়েছে সেই লাল হাঁড়ি।",
+       "en": "At dawn the next day, the entire main highway was found sparkling clean and cleared, with that red pot lying in the middle of the road.",
+       "emotion": "normal",
+       "delivery": "bright fresh morning narrative tone",
+       "voice_text": "পরদিন ভোরে দেখা গেল পুরো প্রধান রাজপথ একবারে চকচকে ও পরিষ্কার হয়ে গেছে, <short pause> আর মাঝরাস্তায় পড়ে রয়েছে সেই লাল হাঁড়ি।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "morning roosters",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Bright clean dirt road with golden morning sun rays. Mantri stands covered in grey dust holding a red cloth pot tightly. Gopal walks in from left.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in holding gamchha smiling brightly",
+          "where": "left",
+          "feeling": "cheerful morning smile"
+         },
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "dirty with dust holding red pot under arm",
+          "where": "center road",
+          "feeling": "triumphant exhausted"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "হা হা! অবশেষে সব ধ্বংসাবশেষ পরিষ্কার করা শেষ হলো আর আমিই গুপ্তধনের হাঁড়িটা পেয়ে গেলাম!",
+       "en": "Ha ha! Finally clearing all rubble is complete, and I am the one who got the treasure pot!",
+       "emotion": "laughing",
+       "delivery": "weary triumphant victory laugh holding pot high",
+       "voice_text": "<cackle> হা হা! </cackle> অবশেষে সব ধ্বংসাবশেষ পরিষ্কার করা শেষ হলো আর আমিই গুপ্তধনের হাঁড়িটা পেয়ে গেলাম!",
+       "action": "holds pot high in victory pose",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri triumphantly holding red pot high on clean road.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "folding hands behind back watching",
+          "where": "left",
+          "feeling": "amused smug"
+         },
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "lifting pot overhead dirty face smiling",
+          "where": "center",
+          "feeling": "ecstatic exhausted"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মন্ত্রী মশাই, সকাল সকাল ধুলামাখা গায়ে ওই হাঁড়িটি বগলে চেপে কোথায় দৌড়াচ্ছেন?",
+       "en": "Minister-moshai, early morning in a dust-covered body, where are you running holding that pot under your arm?",
+       "emotion": "happy",
+       "delivery": "cheerful teasing voice pointing at dirty minister",
+       "voice_text": "মন্ত্রী মশাই, সকাল সকাল ধুলামাখা গায়ে ওই হাঁড়িটি বগলে চেপে কোথায় দৌড়াচ্ছেন?",
+       "action": "points at Mantri's dirty face smiling",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal asking dirty Mantri teasingly.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "pointing at Mantri's soot-covered face",
+          "where": "left",
+          "feeling": "playful teasing"
+         },
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "clutching pot tightly under arm",
+          "where": "center",
+          "feeling": "possessive hasty"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mantri"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "সরো গোপাল! আমি এখনই রাজসভায় গিয়ে মহারাজের সামনে এই রত্নভরা হাঁড়ি উন্মোচন করব!",
+       "en": "Move Gopal! I am going straight to the royal court right now to unveil this jewel-filled pot before the King!",
+       "emotion": "proud",
+       "delivery": "hasty arrogant push walking away fast",
+       "voice_text": "সরো গোপাল! আমি এখনই রাজসভায় গিয়ে মহারাজের সামনে এই রত্নভরা হাঁড়ি উন্মোচন করব!",
+       "action": "marches past Gopal holding pot tight",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri walking past Gopal hurriedly towards court.",
+        "people": [
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "saluting mockingly following him",
+          "where": "left",
+          "feeling": "witty cheerful"
+         },
+         {
+          "name": "Mantri",
+          "pose": "walking",
+          "doing": "marching fast holding red pot",
+          "where": "right",
+          "feeling": "arrogant proud"
+         }
+        ],
+        "characters": [
+         "Gopal",
+         "Mantri"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "রাজসভায় ধামাকা",
+     "characters": [
+      "Raja",
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Mantri enters the crowded court covered in dirt and boasts about finding the treasure pot.",
+     "place": "royal court filled with light and royal splendor",
+     "mood": "funny",
+     "ambience": [
+      "court murmur",
+      "gasping noise"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "রাজসভায় তখন সব দরবারী উপস্থিত; ধূলিধূসরিত ও পরিশ্রান্ত মন্ত্রী মশাই সগর্বে রাজসভায় ঢুকে আনন্দের হাসি হাসলেন।",
+       "en": "All courtiers were present in court then; the dust-covered, weary minister entered proudly and broke into a joyful smile.",
+       "emotion": "normal",
+       "delivery": "dramatic grand storytelling voice",
+       "voice_text": "রাজসভায় তখন সব দরবারী উপস্থিত; <short pause> ধূলিধূসরিত ও পরিশ্রান্ত মন্ত্রী মশাই সগর্বে রাজসভায় ঢুকে আনন্দের হাসি হাসলেন।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "court murmur",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Mantri walks into royal court covered in grey dust holding red pot. Raja sits on throne surprised. Gopal walks in right behind.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "walking",
+          "doing": "walks in holding pot up, dirty clothes",
+          "where": "left",
+          "feeling": "proud dirty exhausted"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "staring wide-eyed in astonishment",
+          "where": "center",
+          "feeling": "shocked amused"
+         },
+         {
+          "name": "Gopal",
+          "pose": "walking",
+          "doing": "walks in behind smiling broadly",
+          "where": "right",
+          "feeling": "cheerful victorious"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "মহারাজ! আমি রাজপথের সব ধ্বংসাবশেষ নিজ দায়িত্বে সরিয়ে সেখান থেকে এই মহামূল্যবান গুপ্তধন উদ্ধার করেছি!",
+       "en": "Your Majesty! I have cleared all rubble from the highway on my own initiative and recovered this priceless treasure!",
+       "emotion": "proud",
+       "delivery": "boastful breathless loud announcement presenting pot",
+       "voice_text": "মহারাজ! আমি রাজপথের সব ধ্বংসাবশেষ নিজ দায়িত্বে সরিয়ে সেখান থেকে এই মহামূল্যবান গুপ্তধন উদ্ধার করেছি!",
+       "action": "presents pot before Raja proudly",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri offering red pot to Raja in court.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "holding red pot out dramatically",
+          "where": "left",
+          "feeling": "boastful theatrical"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "looking at pot curiously",
+          "where": "center",
+          "feeling": "surprised intrigued"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "arms folded watching scene",
+          "where": "right",
+          "feeling": "witty ready"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "বাহ্ মন্ত্রী মশাই! গোপাল তো বলেছিল চব্বিশ ঘণ্টার মধ্যে সরাবে, আর আপনি নিজেই তা সাফ করে দিলেন?",
+       "en": "Bravo Minister-moshai! Gopal said he would remove it within twenty-four hours, and you cleared it all yourself?",
+       "emotion": "happy",
+       "delivery": "amused royal tone chuckling slightly",
+       "voice_text": "<giggle> বাহ্ মন্ত্রী মশাই! </giggle> গোপাল তো বলেছিল চব্বিশ ঘণ্টার মধ্যে সরাবে, আর আপনি নিজেই তা সাফ করে দিলেন?",
+       "action": "smiles warmly looking between Mantri and Gopal",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja chuckling on throne.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "glaring back at Gopal smugly",
+          "where": "left",
+          "feeling": "arrogant"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "smiling amused",
+          "where": "center",
+          "feeling": "enjoying spectacle"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "bowing slightly with wink",
+          "where": "right",
+          "feeling": "clever cheerful"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "গোপাল এক নম্বরের মিথ্যুক! আমিই রাত জেগে সব পাথর সরিয়েছি, এখন এই হাঁড়ির হিরে-জহরত রাজকোষে রাখা হোক!",
+       "en": "Gopal is a liar of the highest order! I cleared all stones staying awake all night; now let this pot's diamonds be placed in the treasury!",
+       "emotion": "angry",
+       "delivery": "spiteful angry shout pointing accusingly at Gopal",
+       "voice_text": "গোপাল এক নম্বরের মিথ্যুক! আমিই রাত জেগে সব পাথর সরিয়েছি, এখন এই হাঁড়ির হিরে-জহরত রাজকোষে রাখা হোক!",
+       "action": "points finger angrily at Gopal",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri pointing angrily at Gopal in front of Raja.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "pointing sharp finger at Gopal",
+          "where": "left",
+          "feeling": "furious triumphant"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "gesturing to open pot",
+          "where": "center",
+          "feeling": "curious ready"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "stepping forward gracefully",
+          "where": "right",
+          "feeling": "calm playful"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "বেশ, গোপাল তুমিই হাঁড়িটা খুলে ভেতরের মহার্ঘ রত্ন সবাইকে পড়ে দেখাও।",
+       "en": "Very well! Gopal, you open the pot and show everyone the precious jewels inside.",
+       "emotion": "calm",
+       "delivery": "authoritative grand command waving hand",
+       "voice_text": "বেশ, গোপাল তুমিই হাঁড়িটা খুলে ভেতরের মহার্ঘ রত্ন সবাইকে পড়ে দেখাও।",
+       "action": "gestures towards pot for Gopal",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja commanding Gopal to open the red pot.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "holding pot forward proudly",
+          "where": "left",
+          "feeling": "confident fool"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "pointing hand toward pot",
+          "where": "center",
+          "feeling": "expectant"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "reaching hands to uncover red cloth",
+          "where": "right",
+          "feeling": "witty ready"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "গোপালের আসল রহস্যপ্রকাশ",
+     "characters": [
+      "Raja",
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Gopal unveils the pot to reveal a note explaining hard work, exposing Mantri's foolish greed.",
+     "place": "royal court",
+     "mood": "funny",
+     "ambience": [
+      "gasps of crowd",
+      "sudden silence"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "গোপাল হাসিমুখে লাল কাপড় খুলে মাটির হাঁড়িটি উল্টাতেই তার ভেতর থেকে কোন সোনাদানার বদলে একটি ছোট্ট লেখা কাগজ বের হলো।",
+       "en": "As Gopal smilingly removed the red cloth and turned the pot upside down, instead of any gold, a small written paper came out.",
+       "emotion": "normal",
+       "delivery": "exciting dramatic reveal tone",
+       "voice_text": "গোপাল হাসিমুখে লাল কাপড় খুলে মাটির হাঁড়িটি উল্টাতেই তার ভেতর থেকে কোন সোনাদানার বদলে একটি ছোট্ট লেখা কাগজ বের হলো।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "gasps of crowd",
+         "when": "after"
+        }
+       ],
+       "image": {
+        "prompt": "Gopal unwrapping red cloth and turning pot over. A folded piece of paper falls into his hand. Mantri looks stunned.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "eyes popping out in shock looking into empty pot",
+          "where": "left",
+          "feeling": "horrified flabbergasted"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "leaning forward gazing intently",
+          "where": "center",
+          "feeling": "surprised intrigued"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "holding small paper note smiling",
+          "where": "right",
+          "feeling": "triumphant cheerful"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "গোপাল, সেই কাগজে কী লিখে রেখেছ, সবাই শুনুক এমনভাবে স্পষ্ট করে পড়ে শোনাও!",
+       "en": "Gopal, read out clearly what is written on that paper so that everyone may hear!",
+       "emotion": "excited",
+       "delivery": "eager voice leaning closer",
+       "voice_text": "গোপাল, সেই কাগজে কী লিখে রেখেছ, <short pause> সবাই শুনুক এমনভাবে স্পষ্ট করে পড়ে শোনাও!",
+       "action": "points to note encouragingly",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja listening eagerly as Gopal unfolds paper.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "sweating shaking in panic",
+          "where": "left",
+          "feeling": "mortified"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "cupping hand near ear curiously",
+          "where": "center",
+          "feeling": "amused expectant"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "unfolding paper holding it high",
+          "where": "right",
+          "feeling": "proud articulate"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "লেখা আছে—'পরিশ্রমই হলো আসল ধন, যার লোভে না চাইতেও এক কানাকড়ি খরচ না করে রাজপথের সব ধ্বংসাবশেষ অপসারণ করা সম্ভব হলো!'",
+       "en": "It is written—'Hard work is the true wealth, out of greed for which all highway rubble was successfully cleared without spending a single penny!'",
+       "emotion": "happy",
+       "delivery": "clear loud dramatic voice reading note with relish",
+       "voice_text": "লেখা আছে—'পরিশ্রমই হলো আসল ধন, <short pause> যার লোভে না চাইতেও এক কানাকড়ি খরচ না করে রাজপথের সব ধ্বংসাবশেষ অপসারণ করা সম্ভব হলো!'",
+       "action": "reads note aloud with dramatic flourish",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal reading from note aloud in court with bright smile.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "jaw dropped holding head in hands",
+          "where": "left",
+          "feeling": "utter ruin embarrassed"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "bursting into massive laughter",
+          "where": "center",
+          "feeling": "laughing joyously"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "holding note reading aloud proudly",
+          "where": "right",
+          "feeling": "witty heroic"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Mantri",
+       "text": "অ্যাঁ! এ তো গোপালের নিজের হাতের লেখা! তার মানে হাঁড়ির ভেতর কোনো আসল সোনা নেই?",
+       "en": "Ah! This is Gopal's own handwriting! Does that mean there is no real gold inside the pot?",
+       "emotion": "sad",
+       "delivery": "screaming horror realization trembling voice",
+       "voice_text": "<gasp> অ্যাঁ! </gasp> এ তো গোপালের নিজের হাতের লেখা! তার মানে হাঁড়ির ভেতর কোনো আসল সোনা নেই?",
+       "action": "clutches head with both dirty hands",
+       "sfx": [],
+       "image": {
+        "prompt": "Mantri realizing he was tricked, holding head in distress.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "clutching head with both hands groaning",
+          "where": "left",
+          "feeling": "foolish broken"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "slapping knee laughing heartily",
+          "where": "center",
+          "feeling": "hilarious joy"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "bowing cheekily",
+          "where": "right",
+          "feeling": "triumphant"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "হা হা হা! মন্ত্রী মশাই, গোপাল আপনাকে আর মহাজনকে দিয়েই রাজপথের পাথর পরিষ্কার করিয়ে রাজকোষের পাঁচ হাজার টাকা বাঁচাল!",
+       "en": "Ha ha ha! Minister-moshai, Gopal made you and the Mahajan clear all stones from the road and saved five thousand coins for the treasury!",
+       "emotion": "laughing",
+       "delivery": "bursting with booming royal laughter clapping hands",
+       "voice_text": "<cackle> হা হা হা! </cackle> মন্ত্রী মশাই, গোপাল আপনাকে আর মহাজনকে দিয়েই রাজপথের পাথর পরিষ্কার করিয়ে রাজকোষের পাঁচ হাজার টাকা বাঁচাল!",
+       "action": "claps hands laughing out loud on throne",
+       "sfx": [
+        {
+         "sound": "clapping",
+         "when": "during"
+        }
+       ],
+       "image": {
+        "prompt": "Raja laughing uncontrollably on his throne.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "looking down ashamed and dirty",
+          "where": "left",
+          "feeling": "humiliated"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "throwing head back laughing heartily",
+          "where": "center",
+          "feeling": "extremely happy"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "cheerful smile holding note",
+          "where": "right",
+          "feeling": "clever hero"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "chapter": "গোপালের পুরস্কার ও শিক্ষা",
+     "characters": [
+      "Raja",
+      "Mantri",
+      "Gopal"
+     ],
+     "action": "Raja rewards Gopal with a pearl necklace while poking fun at the minister's labor.",
+     "place": "grand royal court room",
+     "mood": "happy",
+     "ambience": [
+      "royal court applause",
+      "joyful music"
+     ],
+     "lines": [
+      {
+       "speaker": "narrator",
+       "text": "সারা রাজসভা গোপালের উপস্থিত বুদ্ধিতে হাসিতে ফেটে পড়ল; মহারাজ গোপালের এমন অভাবনীয় চতুরতায় আনন্দে আত্মহারা হয়ে তাকে পুরস্কৃত করলেন।",
+       "en": "The entire court erupted in laughter at Gopal's quick wit; the King, overwhelmed with joy at such unbelievable intelligence, rewarded him.",
+       "emotion": "normal",
+       "delivery": "warm celebratory storytelling voice",
+       "voice_text": "সারা রাজসভা গোপালের উপস্থিত বুদ্ধিতে হাসিতে ফেটে পড়ল; <short pause> মহারাজ গোপালের এমন অভাবনীয় চতুরতায় আনন্দে আত্মহারা হয়ে তাকে পুরস্কৃত করলেন।",
+       "action": "",
+       "sfx": [
+        {
+         "sound": "royal court applause",
+         "when": "before"
+        }
+       ],
+       "image": {
+        "prompt": "Raja taking off a gold pearl necklace to give Gopal. Mantri standing sulking on left.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "sulking with head low",
+          "where": "left",
+          "feeling": "dejected defeated"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "holding out gold pearl necklace generously",
+          "where": "center",
+          "feeling": "generous delighted"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "stepping forward with cupped hands",
+          "where": "right",
+          "feeling": "honored grateful"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "গোপাল! তোমার বুদ্ধি সত্যি প্রশংসনীয়, রাজকোষের প্রচুর অর্থ বাঁচিয়ে তুমি রাজপথের জনগণের বড় উপকার করেছ!",
+       "en": "Gopal! Your intelligence is truly praiseworthy; saving vast treasury wealth, you did a huge service to the highway folk!",
+       "emotion": "happy",
+       "delivery": "grand appreciative royal tone",
+       "voice_text": "গোপাল! তোমার বুদ্ধি সত্যি প্রশংসনীয়, <short pause> রাজকোষের প্রচুর অর্থ বাঁচিয়ে তুমি রাজপথের জনগণের বড় উপকার করেছ!",
+       "action": "places gold necklace around Gopal's neck",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja placing pearl necklace around Gopal's neck.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "looking away grumpily",
+          "where": "left",
+          "feeling": "jealous"
+         },
+         {
+          "name": "Raja",
+          "pose": "standing",
+          "doing": "putting necklace over Gopal's neck",
+          "where": "center",
+          "feeling": "proud generous"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "bowing head respectfully to accept necklace",
+          "where": "right",
+          "feeling": "happy modest"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহারাজের জয় হোক! প্রজার যাতায়াতের পথ সুগম হওয়া আর রাজকোষ সুরক্ষিত থাকাই গোপালের সেরা প্রাপ্তি!",
+       "en": "Victory to the King! Making the travel path smooth for subjects and keeping the treasury safe is Gopal's greatest reward!",
+       "emotion": "proud",
+       "delivery": "humble respectful tone with folded hands",
+       "voice_text": "মহারাজের জয় হোক! প্রজার যাতায়াতের পথ সুগম হওয়া আর রাজকোষ সুরক্ষিত থাকাই গোপালের সেরা প্রাপ্তি!",
+       "action": "does deep namaste to Raja",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal doing respectful namaste with gold necklace.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "standing",
+          "doing": "rubbing dirty forehead",
+          "where": "left",
+          "feeling": "exhausted embarrassed"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "smiling warmly",
+          "where": "center",
+          "feeling": "pleased"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "namaste posture with glowing pearl necklace",
+          "where": "right",
+          "feeling": "cheerful humble"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Raja",
+       "text": "নাও গোপাল, এই মহামূল্য রত্নহারটি তোমার উপহার! আর মন্ত্রী মশাই, আপনি বাড়ি গিয়ে শরীর জুড়ান!",
+       "en": "Take this Gopal, this priceless jewel necklace is your gift! And Minister-moshai, you go home and rest your body!",
+       "emotion": "happy",
+       "delivery": "cheerful teasing voice towards dusty minister",
+       "voice_text": "নাও গোপাল, এই মহামূল্য রত্নহারটি তোমার উপহার! <short pause> আর মন্ত্রী মশাই, আপনি বাড়ি গিয়ে শরীর জুড়ান!",
+       "action": "points smilingly to dusty Mantri",
+       "sfx": [],
+       "image": {
+        "prompt": "Raja pointing at dirty Mantri with chuckles.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "walking",
+          "doing": "slumping shoulders walking out dirty",
+          "where": "left",
+          "feeling": "defeated sleepy"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "pointing at Mantri laughing",
+          "where": "center",
+          "feeling": "amused"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "holding new necklace proudly",
+          "where": "right",
+          "feeling": "beaming happy"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      },
+      {
+       "speaker": "Gopal",
+       "text": "মহারাজ, এরপর রাজপথে কোথাও ভাঙা পাথর দেখলে যেন মন্ত্রী মশাইয়ের এই হাড়ভাঙা পরিশ্রমের কথা সবার আগে মনে পড়ে!",
+       "en": "Your Majesty, hereafter whenever someone sees broken stones on the road, may they remember Minister-moshai's backbreaking toil first of all!",
+       "emotion": "laughing",
+       "delivery": "witty closing joke with mischievous wink",
+       "voice_text": "<giggle> মহারাজ, </giggle> এরপর রাজপথে কোথাও ভাঙা পাথর দেখলে যেন মন্ত্রী মশাইয়ের এই হাড়ভাঙা পরিশ্রমের কথা সবার আগে মনে পড়ে!",
+       "action": "winks playfully to camera",
+       "sfx": [],
+       "image": {
+        "prompt": "Gopal winking towards camera as whole court laughs.",
+        "people": [
+         {
+          "name": "Mantri",
+          "pose": "walking",
+          "doing": "walks out completely humbled",
+          "where": "left edge",
+          "feeling": "sulking"
+         },
+         {
+          "name": "Raja",
+          "pose": "sitting",
+          "doing": "clapping hands laughing heartily",
+          "where": "center",
+          "feeling": "joyful"
+         },
+         {
+          "name": "Gopal",
+          "pose": "standing",
+          "doing": "winking finger raised playfully",
+          "where": "right",
+          "feeling": "witty mastermind hero"
+         }
+        ],
+        "characters": [
+         "Mantri",
+         "Raja",
+         "Gopal"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "moral": "লোভ আর অসৎ চক্রান্তের পরিণতি সবসময় চরম ভোগান্তি ডেকে আনে!",
+   "ending_line": "আজকের গোপাল ভাঁড়ের চতুর বুদ্ধির গল্পটি তোমাদের কেমন লাগল, কমেন্ট করে কিন্তু অবশ্যই জানিও!",
+   "comment_question": "গোপালের এমন বুদ্ধিদীপ্ত ফন্দি কি তোমাদের হাসি ফুটাল? কমেন্টে জানাও! 😊",
+   "teaser_scene": 10,
+   "mithu_intro": "হ্যালো বন্ধুদের দল! আজ গোপাল আর তার বন্ধু সুমনের এক হাসির কিস্তিমাত শোনো!",
+   "mithu_outro": "হাহাহা! মন্ত্রী মশাই সারারাত পাথর বয়ে শেষ! আগামী পর্বে আবার দেখা হবে!",
+   "english_words": [
+    {
+     "en": "Rubble",
+     "meaning": "ধ্বংসাবশেষ"
+    },
+    {
+     "en": "Treasure",
+     "meaning": "গুপ্তধন"
+    },
+    {
+     "en": "Highway",
+     "meaning": "রাজপথ"
+    }
+   ],
+   "riddle": {
+    "q": "পা নেই কিন্তু চলে, মুখ নেই কিন্তু বলে, জল পেলে সে মরে যায়, বলো তো সে কে?",
+    "a": "আগুন"
+   }
+  },
+  "theme": [
+   "gopal",
+   "an ORIGINAL new story on the same topic as this week's much-watched video 'ধ্বংসাবশেষ অপসারণ' (only the topic - our own place, people, events and twist) (told as a gopal story for children)"
+  ],
+  "total": 2,
+  "vnames": [],
+  "vote_ideas": null,
+  "voted": null,
+  "weekday": 1,
+  "creator": {}
+ }
+}

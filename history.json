@@ -1562,7 +1562,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1611,7 +1611,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T09:05+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1896,7 +1896,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2276,12 +2276,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 5,
+   "views": 6,
    "length_s": 431,
    "yt_views": 5,
    "yt_avg_s": 1,
    "yt_avg_pct": 0.5,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2329,7 +2329,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T09:05+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2611,10 +2611,10 @@
    "comments": 1,
    "views": 5,
    "length_s": 599,
-   "yt_views": 4,
+   "yt_views": 5,
    "yt_avg_s": 58,
    "yt_avg_pct": 9.8,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2659,10 +2659,10 @@
    "comments": 1,
    "views": 5,
    "length_s": 613,
-   "yt_views": 4,
+   "yt_views": 5,
    "yt_avg_s": 2,
    "yt_avg_pct": 0.5,
-   "checked": "2026-11-21T09:05+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2699,9 +2699,9 @@
    "views": 0,
    "length_s": 550,
    "yt_views": 0,
-   "yt_avg_s": 27,
-   "yt_avg_pct": 4.9,
-   "checked": "2026-11-21T09:05+00:00"
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3051,7 +3051,7 @@
    "yt_views": 4,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3094,10 +3094,10 @@
    "comments": 1,
    "views": 2,
    "length_s": 516,
-   "yt_views": 0,
+   "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T09:05+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3159,7 +3159,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T09:05+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3521,12 +3521,12 @@
   "stats": {
    "likes": 4,
    "comments": 1,
-   "views": 0,
+   "views": 2,
    "length_s": 927,
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T03:04+00:00"
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3566,12 +3566,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 2,
+   "views": 3,
    "length_s": 766,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-21T09:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 7,
+   "yt_avg_pct": 1.0,
+   "checked": "2026-11-24T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3948,6 +3948,12 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-23T22:32+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-24T09:34+00:00",
+   "thumb": true
   }
  },
  {
@@ -3977,7 +3983,21 @@
   "youtube": "FzxQaGRSNNM",
   "fb_reel": "3083270495398488",
   "fb_story": "1169880595620799",
-  "yt_short": "zeZXl6trcTg"
+  "yt_short": "zeZXl6trcTg",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 2,
+   "length_s": 801,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-24T09:34+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 2
+  }
  },
  {
   "date": "2026-11-23T13:31+00:00",
@@ -4006,22 +4026,23 @@
   "youtube": "lac1vjT33Gg",
   "fb_reel": "2202205724024114",
   "fb_story": "29753143097604023",
-  "yt_short": "xc-XSbzvKPM"
+  "yt_short": "xc-XSbzvKPM",
+  "stats": {
+   "likes": 5,
+   "comments": 1,
+   "views": 0,
+   "length_s": 979,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-24T09:34+00:00"
+  }
  },
  {
   "date": "2026-11-24T01:31+00:00",
   "lang": "bn",
   "slot": "2026-11-24@7",
-  "pending_comments": [
-   {
-    "id": "1459145862363382",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1175525408367036"
-   },
-   {
-    "id": "1661326922358113",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1175525408367036"
-   }
-  ],
+  "pending_comments": [],
   "category": "didima",
   "idea": "an ORIGINAL new story on the same topic as this week's much-watched video 'আরে জর্জিনা তুমি কোন ঘরে আছো bangla  Rupkothar golpo' (only the topic - our own place, people, events and twist) (told as a didima story for children)",
   "episode": null,
@@ -4050,5 +4071,39 @@
    "q": "পা নেই তবু চলে অনবরত, দিন-রাত পার করে কত শত শত! বল তো সেটা কী?",
    "a": "ঘড়ি"
   }
+ },
+ {
+  "date": "2026-11-24T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-24@19",
+  "pending_comments": [
+   {
+    "id": "2424597711281003",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1689730739466673"
+   }
+  ],
+  "category": "hanuman",
+  "idea": "the birth of Hanuman - Anjana, Kesari and Pavan Dev",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "হনুমানের কথা পর্ব ১: হনুমানের জন্ম রহস্য: কিসের টানে আকাশ থেকে নেমে এলো শক্তি? 🕉️✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "পবনদেব"
+  },
+  "hook_style": "sound",
+  "moral": "একনিষ্ঠ ভক্তি ও মহাদেবের কৃপায় অসম্ভবকেও সম্ভব করা যায়।",
+  "title_b": "পবনপুত্র হনুমানের জন্মকথা: অলৌকিক পায়েস ও অঞ্জনার সাধনা! 🌺✨",
+  "question_post": null,
+  "facebook": "1689730739466673",
+  "youtube": "7RyyQzJPip0",
+  "fb_reel": "2424597711281003",
+  "fb_story": "3135849323412794",
+  "yt_short": "Tv_mgmYp9K4"
  }
 ]

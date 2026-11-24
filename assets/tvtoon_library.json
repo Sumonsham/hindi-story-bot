@@ -1,0 +1,261 @@
+{
+ "characters": {
+  "lib_k_anjana_4b7e8": {
+   "spec": {
+    "name_bn": "Anjana",
+    "name_en": "lib_k_anjana_4b7e8",
+    "category": "adult_female",
+    "age": 34,
+    "cast": "story_lib",
+    "personality": "a village wife, practical and brave; lights the evening lamp, hears the knock at midnight",
+    "voice": "adult female, warm",
+    "height": 0.883,
+    "heads": 5.0,
+    "head": {
+     "shape": "heart",
+     "w": 0.897,
+     "ear": 0.9
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.08,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "button",
+     "nose_size": 1.06,
+     "mouth_w": 0.95,
+     "lashes": true,
+     "brow_thick": 0.85,
+     "blush": true
+    },
+    "hair": {
+     "style": "bun_black"
+    },
+    "body": {
+     "shoulder": 0.66,
+     "chest": 0.68,
+     "waist": 0.6,
+     "hip": 0.72,
+     "belly": 0.05,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.45,
+     "arm": 0.41,
+     "shoe": "sandal",
+     "foot": 0.85
+    },
+    "costume": {
+     "type": "saree",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#e0aa82",
+     "hair": "#2a1a10",
+     "saree": "#2e7d32",
+     "border": "#e0b030",
+     "blouse": "#e0b030",
+     "shoe": "#6a3a2a",
+     "lip": "#a0404a"
+    },
+    "accessories": [
+     "bindi",
+     "bangles",
+     "earrings",
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Anjana"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Beautiful vanara queen with fair glowing skin, elegant green-and-gold silk sari, hair adorned with fresh flowers, wearing gold ornaments, hands held in prayer with deep devotion.",
+    "doing": [],
+    "gender": "female",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "হনুমানের জন্ম রহস্য: কিসের টানে আকাশ থেকে নেমে এলো শক্তি? 🕉️✨",
+   "key": "",
+   "made": "2026-11-24T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     72182,
+     42993
+    ],
+    "unlike_others": 3
+   }
+  },
+  "lib_k_kesari_052dd": {
+   "spec": {
+    "name_bn": "Kesari",
+    "name_en": "lib_k_kesari_052dd",
+    "category": "adult_male",
+    "age": 55,
+    "cast": "story_lib",
+    "personality": "the village priest; round, nervous, recites mantras very fast when frightened",
+    "voice": "middle-aged male, nasal",
+    "height": 0.956,
+    "heads": 4.4,
+    "head": {
+     "shape": "heart",
+     "w": 0.982,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.075,
+     "eye_spacing": 0.42,
+     "iris": "#3a2410",
+     "nose": "pointed",
+     "nose_size": 1.14,
+     "mouth_w": 1.05,
+     "brow_thick": 1.0,
+     "blush": true
+    },
+    "hair": {
+     "style": "crop"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.86,
+     "waist": 0.88,
+     "hip": 0.78,
+     "belly": 0.2,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.42,
+     "arm": 0.4,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#d9a07a",
+     "hair": "#120e0c",
+     "kurta": "#7a2a22",
+     "dhoti": "#f57c00",
+     "shoe": "#6a4020",
+     "lip": "#a05a48",
+     "shawl": "#7a1a2a"
+    },
+    "accessories": [
+     "crown",
+     "shawl",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Kesari"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Strong, heroic vanara king with golden crown, reddish-brown muscular body, bright orange dhoti, holding a heavy golden gada on his shoulder, alert protective eyes.",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "হনুমানের জন্ম রহস্য: কিসের টানে আকাশ থেকে নেমে এলো শক্তি? 🕉️✨",
+   "key": "",
+   "made": "2026-11-24T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     93719,
+     65144
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_pavan_dev_21729": {
+   "spec": {
+    "name_bn": "Pavan Dev",
+    "name_en": "lib_k_pavan_dev_21729",
+    "category": "adult_male",
+    "age": 45,
+    "cast": "story_lib",
+    "personality": "the night watchman with a lantern and a whistle; brave voice, shaking knees",
+    "voice": "adult male, loud",
+    "height": 0.972,
+    "heads": 5.0,
+    "head": {
+     "shape": "round",
+     "w": 0.843,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.069,
+     "eye_spacing": 0.43,
+     "iris": "#2a1a0a",
+     "nose": "pointed",
+     "nose_size": 0.96,
+     "mouth_w": 1.05,
+     "moustache": "thick",
+     "brow_thick": 1.3
+    },
+    "hair": {
+     "style": "curly"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.78,
+     "waist": 0.7,
+     "hip": 0.64,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.45,
+     "arm": 0.43,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "shirt_trousers",
+     "sleeve": "half"
+    },
+    "colours": {
+     "skin": "#8e5e40",
+     "hair": "#120e0c",
+     "shirt": "#f2f0e8",
+     "trousers": "#5a3a7a",
+     "shoe": "#2a2018",
+     "lip": "#6a3a2a"
+    },
+    "accessories": [
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Pavan Dev"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Radiant wind god with glowing skin, soft blowing white angavastram, golden crown, gentle calm smile, surrounded by swirling cool aura and flying flower petals.",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "হনুমানের জন্ম রহস্য: কিসের টানে আকাশ থেকে নেমে এলো শক্তি? 🕉️✨",
+   "key": "",
+   "made": "2026-11-24T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     70341,
+     43603
+    ],
+    "unlike_others": 5
+   }
+  }
+ }
+}

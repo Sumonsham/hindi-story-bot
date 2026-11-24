@@ -1427,12 +1427,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 4,
+   "views": 6,
    "length_s": 430,
    "yt_views": 4,
    "yt_avg_s": 6,
    "yt_avg_pct": 1.5,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1479,7 +1479,7 @@
    "yt_views": 2,
    "yt_avg_s": 14,
    "yt_avg_pct": 3.2,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1519,7 +1519,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1756,12 +1756,12 @@
   "stats": {
    "likes": 3,
    "comments": 1,
-   "views": 9,
+   "views": 10,
    "length_s": 533,
-   "yt_views": 6,
-   "yt_avg_s": 4,
-   "yt_avg_pct": 0.9,
-   "checked": "2026-11-20T09:05+00:00"
+   "yt_views": 10,
+   "yt_avg_s": 12,
+   "yt_avg_pct": 2.4,
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -1808,7 +1808,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1853,7 +1853,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2238,7 +2238,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2571,7 +2571,7 @@
    "yt_views": 1,
    "yt_avg_s": 4,
    "yt_avg_pct": 0.8,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3000,12 +3000,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 3,
+   "views": 7,
    "length_s": 546,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 13,
+   "yt_avg_pct": 2.5,
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3431,7 +3431,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T09:05+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3475,7 +3475,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-20T22:04+00:00"
+   "checked": "2026-11-23T22:32+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3755,7 +3755,8 @@
   "title_test": {
    "result": "kept",
    "views": 3
-  }
+  },
+  "hook_done": true
  },
  {
   "date": "2026-11-22T02:31+00:00",
@@ -3873,7 +3874,23 @@
   "youtube": "C71rP7rvnXo",
   "fb_reel": "2373414966728216",
   "fb_story": "1393161812895398",
-  "yt_short": "cKqU22fFxp0"
+  "yt_short": "cKqU22fFxp0",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 1,
+   "length_s": 1265,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-23T22:32+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 1,
+   "at": "2026-11-23T22:33+00:00",
+   "thumb": true
+  }
  },
  {
   "date": "2026-11-22T13:36+00:00",
@@ -3881,7 +3898,17 @@
   "kind": "compilation",
   "title": "152 মিনিটের সেরা গল্প 🎬 | সপ্তাহের 12টি গল্প একসাথে",
   "facebook": "1163462363256789",
-  "youtube": "NGKy8fH4qyM"
+  "youtube": "NGKy8fH4qyM",
+  "stats": {
+   "likes": 0,
+   "comments": 0,
+   "views": 0,
+   "length_s": 9101,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-23T22:32+00:00"
+  }
  },
  {
   "date": "2026-11-23T02:31+00:00",
@@ -3911,7 +3938,17 @@
   "fb_reel": "1443261907971275",
   "fb_story": "4465270087056477",
   "fb_reel2": "1825309635460514",
-  "coloring": "122140240856735948"
+  "coloring": "122140240856735948",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 626,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-23T22:32+00:00"
+  }
  },
  {
   "date": "2026-11-23T07:31+00:00",
@@ -3970,5 +4007,48 @@
   "fb_reel": "2202205724024114",
   "fb_story": "29753143097604023",
   "yt_short": "xc-XSbzvKPM"
+ },
+ {
+  "date": "2026-11-24T01:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-24@7",
+  "pending_comments": [
+   {
+    "id": "1459145862363382",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1175525408367036"
+   },
+   {
+    "id": "1661326922358113",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1175525408367036"
+   }
+  ],
+  "category": "didima",
+  "idea": "an ORIGINAL new story on the same topic as this week's much-watched video 'আরে জর্জিনা তুমি কোন ঘরে আছো bangla  Rupkothar golpo' (only the topic - our own place, people, events and twist) (told as a didima story for children)",
+  "episode": null,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "দিদিমার ঝুলি: আরে রাজকন্যা তুমি কোন ঘরে আছো? 🏰✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "নলেন গুড়ের সন্দেশ"
+  },
+  "hook_style": "voice",
+  "moral": "বিপদের সময় ভয় না পেয়ে উপস্থিত বুদ্ধি আর সূক্ষ্ম পর্যবেক্ষণ দিয়েই কঠিনতম সমস্যার সমাধান করা যায়।",
+  "title_b": "সাতটি মায়াবী দরজা ও রাজকন্যার গোপন রহস্য 🏰✨",
+  "question_post": "2026-11-24",
+  "facebook": "1175525408367036",
+  "youtube": "1rgvt-rzhl8",
+  "fb_reel": "1459145862363382",
+  "fb_story": "1176715621967435",
+  "fb_reel2": "1661326922358113",
+  "riddle_post": "122140377248735948",
+  "riddle": {
+   "q": "পা নেই তবু চলে অনবরত, দিন-রাত পার করে কত শত শত! বল তো সেটা কী?",
+   "a": "ঘড়ি"
+  }
  }
 ]

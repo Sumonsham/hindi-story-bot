@@ -5,6 +5,7 @@ Every character differs in head shape, face structure, eyes, nose, hairstyle, bo
 personality - never 'the same body in other clothes'."""
 import copy
 import random
+import re
 
 CATEGORIES = ["adult_male", "adult_female", "elderly_male", "elderly_female", "boy", "girl"]
 HORROR_CATEGORIES = CATEGORIES + ["ghost"]
@@ -377,7 +378,7 @@ DISGUISE = {
 def human_form(cid):
     """the ghost's ordinary-person disguise (same face and body, living colours, no ghost effects)"""
     s = copy.deepcopy(SPECS[cid])
-    d = DISGUISE.get(cid, {})
+    d = DISGUISE.get(cid) or DISGUISE.get(re.sub(r"_v[0-9a-f]{6}$", "", cid), {})   # (a dressed ghost: its own disguise)
     s.pop("ghost", None)
     s["face"]["ghost_eyes"] = False
     s["face"].pop("glow", None)

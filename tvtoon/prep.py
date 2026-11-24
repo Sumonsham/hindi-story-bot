@@ -75,7 +75,20 @@ def _norm(name):
     return re.sub(r"\s+", " ", str(name or "").strip().lower())
 
 
-def find(name, bot=None, gender=None, species=None):
+def _look_words(t):
+    return {w for w in re.findall(r"[a-z\u0980-\u09ff\u0900-\u097f]{3,}", str(t or "").lower())
+            if w not in ("with", "and", "the", "his", "her", "a", "about", "bengali", "indian", "cartoon", "style")}
+
+
+def same_look(a, b):
+    """two descriptions of the same person? (no description on one side: yes)"""
+    wa, wb = _look_words(a), _look_words(b)
+    if not wa or not wb:
+        return True
+    return len(wa & wb) / max(1, min(len(wa), len(wb))) >= 0.3
+
+
+def find(name, bot=None, gender=None, species=None, look=None):
     """the library character built for this story name (None if there is none) -> (actor id, kind). A different
     person with the same name (other gender, other animal) is not taken."""
     lib = load_library()
@@ -91,12 +104,14 @@ def find(name, bot=None, gender=None, species=None):
                 continue
             if species and rec.get("species") and rec["species"] != species:
                 continue
+            if look and not same_look(look, b.get("look")):
+                continue                                    # another person with the same name
             return cid, rec.get("kind", "human")
     return None
 
 
-def actor_for(name, bot=None, gender=None, species=None):
-    hit = find(name, bot, gender, species)
+def actor_for(name, bot=None, gender=None, species=None, look=None):
+    hit = find(name, bot, gender, species, look)
     if not hit:
         return None
     cid, kind = hit
@@ -163,12 +178,12 @@ class StoryScout:
         chars = [c for c in story.get("characters") or [] if isinstance(c, dict)]
         if self.bot == "kids":
             from tvtoon import kids as K
-            return K.kids_cast({"characters": chars}, self.category, use_library=False)
+            return K.kids_cast({"characters": chars, "title": story.get("title", "")}, self.category, build=False)
         from tvtoon import story as STY
         reveal = {}
         for n_, v_ in (story.get("ghost_reveal") or {}).items():
             reveal[n_] = v_
-        return STY.cast_story(chars, reveal, use_library=False)
+        return STY.cast_story(chars, reveal, build=False)
 
     def run(self, story):
         report = {"agent": self.name, "title": story.get("title", ""), "bot": self.bot, "characters": [], "new": [],
@@ -188,17 +203,9 @@ class StoryScout:
             kind = str(ch.get("kind", "human")).lower()
             row = {"name": name, "actor": actor}
             report["characters"].append(row)
-            if find(name, self.bot):
-                row["in_library"] = True
-                row["actor"] = actor_for(name, self.bot)
+            if actor != "NEW":
+                row["in_library"] = True                   # a recurring / already built character plays it
                 continue
-            role = None
-            if actor and not actor.split("__")[0].startswith(("ep_", "kp_", "ka_")):
-                role = role_missing(ch.get("look", ""), CH.get(actor.split("__")[0])) if not CH.get(actor.split("__")[0]).get("animal") else None
-                if not role:
-                    row["in_library"] = True               # an existing character plays it well
-                    continue
-                row["why"] = f"the story's '{role}' is not shown by {actor}"
             from tvtoon import animals as AM
             species = AM.species_of(f"{name} {ch.get('look', '')}") if (kind in ("animal", "bird") or self.bot == "kids") else None
             if kind in ("animal", "bird") and not species:
@@ -250,7 +257,7 @@ UPPER = {"shirt": "shirt", "kurta": "kurta", "panjabi": "kurta", "punjabi": "kur
          "kurti": "kurta", "জামা": "shirt", "শার্ট": "shirt", "পাঞ্জাবি": "kurta", "শাড়ি": "saree", "ফ্রক": "frock",
          "কুর্তা": "kurta", "कुर्ता": "kurta", "कमीज": "shirt", "साड़ी": "saree", "शर्ट": "shirt", "फ्रॉक": "frock"}
 LOWER = {"trousers": "trousers", "pant": "trousers", "pants": "trousers", "jeans": "trousers", "pyjama": "dhoti",
-         "pajama": "dhoti", "dhoti": "dhoti", "lungi": "dhoti", "salwar": "dhoti", "shorts": "shorts", "border": "border",
+         "pajama": "dhoti", "pyjamas": "dhoti", "pajamas": "dhoti", "cargo": "trousers", "dhoti": "dhoti", "lungi": "dhoti", "salwar": "dhoti", "shorts": "shorts", "border": "border",
          "ধুতি": "dhoti", "লুঙ্গি": "dhoti", "প্যান্ট": "trousers", "পাড়": "border", "धोती": "dhoti", "पैंट": "trousers"}
 SADHU = ("sadhu", "sanyasi", "monk", "hermit", "tantrik", "tantric", "saint", "fakir", "সাধু", "সন্ন্যাসী", "তান্ত্রিক",
          "फकीर", "साधु", "संन्यासी", "तांत्रिक")
@@ -258,6 +265,10 @@ PRIEST = ("priest", "pandit", "purohit", "brahmin", "পুরোহিত", "�
 SHIRT_WORDS = ("shirt", "trousers", "pant", "jeans", "uniform", "coat", "suit", "jacket", "police", "officer", "doctor",
                "inspector", "babu", "clerk", "teacher", "master", "driver", "জামা", "শার্ট", "প্যান্ট", "পুলিশ", "ডাক্তার",
                "शर्ट", "पैंट", "पुलिस", "डॉक्टर")
+DEMON = ("demon", "sorcerer", "wizard", "witch", "monster", "rakshas", "rakshasa", "daitya", "asura", "shadow-like",
+         "evil spirit", "দানব", "রাক্ষস", "জাদুকর", "ডাইনি", "দৈত্য", "दानव", "राक्षस", "जादूगर", "डायन", "दैत्य")
+ROYAL_F = ("princess", "queen", "rani", "rajkumari", "gown", "lehenga", "ghagra", "royal dress", "silk dress", "রাজকন্যা",
+           "রানি", "राजकुमारी", "रानी", "लहंगा")
 KURTA_WORDS = ("dhoti", "kurta", "panjabi", "punjabi", "fatua", "lungi", "robe", "ধুতি", "পাঞ্জাবি", "লুঙ্গি", "धोती", "कुर्ता") \
     + SADHU + PRIEST
 
@@ -275,13 +286,15 @@ class AssetBuilder:
     def _base(self, b, look):
         g, age = b["gender"], self._age(b)
         if g == "male":
-            if any(w in look for w in KURTA_WORDS):
+            if any(w in look for w in KURTA_WORDS + ("robe", "king", "raja", "prince", "emperor") + DEMON):
                 return {"old": "nibaran_dadu", "adult": "bhattacharya", "young": "sayan", "child": "bappa"}[age] \
                     if age != "young" else "sayan"
+            if any(w in look for w in ("t-shirt", "tshirt", "t shirt", "টি-শার্ট", "टी-शर्ट")) and age in ("young", "child"):
+                return "sayan" if age == "young" else "bappa"
             if any(w in look for w in SHIRT_WORDS) and age in ("adult", "young"):
                 return "ramu_chowkidar" if age == "adult" else "abhishek"
         else:
-            if any(w in look for w in ("saree", "sari", "শাড়ি", "साड़ी")) and age in ("adult", "old", "young"):
+            if any(w in look for w in ("saree", "sari", "শাড়ি", "साड़ी") + ROYAL_F + DEMON) and age in ("adult", "old", "young"):
                 return "mokkhoda" if age == "old" else "parul"
             if any(w in look for w in ("salwar", "kurti", "kameez", "kurta", "সালোয়ার", "सलवार")) and age in ("young", "adult"):
                 return "riya"
@@ -294,103 +307,191 @@ class AssetBuilder:
         from tvtoon import story as STY
         return STY._age(b.get("age"))
 
-    def _apply_look(self, s, b, look):
+    def _apply_look(self, s, b, look, dress_only=False):
+        """the script's words -> the design. dress_only (a recurring character): only what is WORN changes"""
         cols = s["colours"]
-        words = re.findall(r"[\w\-ঀ-৿ऀ-ॿ]+", look)
+        words = re.findall(r"[\w\u0980-\u09ff\u0900-\u097f]+(?:-shirt)?", look.replace("light-", "").replace("dark-", "dark ")
+                           .replace("t shirt", "t-shirt"))
+        upper = next((k for k in ("shirt", "kurta", "tshirt", "frock", "saree") if k in cols), None)
+        lower = next((k for k in ("trousers", "dhoti", "shorts") if k in cols), None)
+        firsts, done = [], set()
+        second = {"saree": "border", "kurta": "dhoti" if "dhoti" in cols else None, "frock": "trim" if "trim" in cols else None,
+                  "tshirt": "stripe" if "stripe" in cols else None}
+
+        def put(key, col):
+            if key in done:                              # "pink AND gold": the second colour is the trim / border
+                k2 = second.get(key) or ("blouse" if "blouse" in cols else None)
+                if k2 and k2 not in done:
+                    cols[k2] = col
+                    done.add(k2)
+                return
+            cols[key] = col
+            done.add(key)
         for i, w in enumerate(words):                    # "<colour> <garment>" -> that garment in that colour
             col = COLOURS.get(w)
             if not col:
                 continue
-            for nxt in words[i + 1:i + 3]:
+            firsts.append(col)
+            for nxt in words[i + 1:i + 5]:
+                if nxt in COLOURS or nxt in ("and", "with", "or", "polo", "cotton", "silk", "royal", "striped", "check",
+                                             "long", "short", "simple", "old", "new", "plain", "thin", "big", "small"):
+                    if nxt == "silk" and upper and words[i + 1:i + 5][-1:] and not any(
+                            UPPER.get(x) or LOWER.get(x) for x in words[i + 1:i + 5]):
+                        put(upper, col)
+                        break
+                    continue
                 key = UPPER.get(nxt) or LOWER.get(nxt)
-                if key:
-                    if key in cols or key in ("shirt", "kurta", "tshirt", "frock", "saree"):
-                        tgt = key if key in cols else next((k for k in ("shirt", "kurta", "tshirt", "frock", "saree") if k in cols), None)
-                        if tgt:
-                            cols[tgt] = col
-                    elif key == "trousers" and "dhoti" in cols:
-                        cols["dhoti"] = col
-                    elif key == "dhoti" and "trousers" in cols:
-                        cols["trousers"] = col
+                if key in ("blouse", "border") and key in cols:
+                    put(key, col)
                     break
-                if nxt in ("hair", "চুল", "बाल"):
+                if key and key in UPPER.values() and upper:
+                    put(upper, col)
+                    break
+                if key and lower:
+                    put(lower, col)
+                    break
+                if nxt in ("robe", "robes", "gown", "dress", "clothes", "outfit", "উর্দি", "पोशाक", "জামাকাপড়"):
+                    if upper:
+                        put(upper, col)
+                    if lower and nxt in ("robe", "robes", "gown", "dress") and lower not in done:
+                        put(lower, col)
+                    break
+                if nxt in ("hair", "চুল", "बाल") and not dress_only:
                     cols["hair"] = col if col not in ("#c62828", "#2e7d32", "#1e5aa8") else cols["hair"]
+                    break
+                if nxt in ("moustache", "mustache", "beard", "গোঁফ", "দাড়ি", "मूंछ", "दाढ़ी") and not dress_only:
+                    cols["moustache" if nxt in ("moustache", "mustache", "গোঁফ", "मूंछ") else "beard"] = col
+                    if nxt in ("beard", "দাড়ি", "दाढ़ी"):
+                        s["face"]["beard"] = max(0.6, s["face"].get("beard", 0) or 0)
+                    break
+                if nxt in ("eyes", "eye", "চোখ", "आंखें", "आँखें") and not dress_only:
+                    s["face"]["iris"] = col
+                    if "glow" in look:
+                        s["face"]["glow"] = "#ffe680" if col != COLOURS["red"] else "#ff6a5a"
                     break
         acc = s.setdefault("accessories", [])
         has = lambda *ws: any(w in look for w in ws)
+
+        def add(*names):
+            for a in names:
+                if a not in acc:
+                    acc.append(a)
+        if has("glasses", "spectacle", "চশমা", "चश्मा"):
+            add("glasses_round")
+        if has("turban", "pagri", "pagdi", "পাগড়ি", "पगड़ी"):
+            add("turban")
+        if has("crown", "tiara", "mukut", "diadem", "মুকুট", "टियारा", "मुकुट", "ताज"):
+            add("crown")
+            if "turban" in acc and not has("turban", "pagri", "পাগড়ি", "पगड़ी"):
+                acc.remove("turban")
+        if has("shawl", "chador", "চাদর", "शॉल"):
+            add("shawl")
+        if has("full sleeve", "long sleeve", "robe", "robes", "gown", "coat") and s.get("costume"):
+            s["costume"]["sleeve"] = "full"
+        if dress_only:
+            return s
+        for a, words_ in (("glasses_round", ("glasses", "spectacle", "চশমা", "चश्मा")), ("tilak", ("tilak", "তিলক", "तिलक") + PRIEST + SADHU),
+                          ("sacred_thread", PRIEST), ("sindoor", ("sindoor", "সিঁদুর", "सिंदूर", "married", "wife", "বিবাহিত",
+                                                                  "বউ", "विवाहित", "mother", "মা ", "माँ")), ("shawl", ("shawl", "chador", "চাদর", "शॉल", "king", "raja", "zamindar"))):
+            if a in acc and not has(*words_):
+                acc.remove(a)
+        if "tilak" in cols and not has("tilak", "তিলক", "तिलक", *PRIEST, *SADHU):
+            cols.pop("tilak", None)
         if has("grey hair", "gray hair", "white hair", "silver hair", "পাকা চুল", "सफेद बाल"):
             cols["hair"] = "#c8c8c0"
         if has("bald", "টাক", "गंजा"):
             s["hair"] = {"style": "bald_sides"}
         elif has("curly", "কোঁকড়া", "घुंघराले"):
             s["hair"] = {"style": "curly"}
-        elif b["gender"] == "female" and has("open hair", "loose hair", "long hair", "এলো চুল", "খোলা চুল", "खुले बाल"):
+        elif b["gender"] == "female" and has("open hair", "loose hair", "long hair", "long dark hair", "এলো চুল", "খোলা চুল",
+                                              "खुले बाल", "लंबे बाल"):
             s["hair"] = {"style": "open_long"}
         elif b["gender"] == "female" and has("bun", "খোঁপা", "जूड़ा"):
             s["hair"] = {"style": "bun_black" if self._age(b) != "old" else "bun_white"}
         elif has("braid", "plait", "বেণি", "चोटी"):
             s["hair"] = {"style": "braid_long" if b["gender"] == "female" else s["hair"]["style"]}
+        elif b["gender"] == "female" and has("bob", "short hair"):
+            s["hair"] = {"style": "bun_black"}
         if has(*SADHU):
             s["hair"] = {"style": "jata"}
-            for a in ("rudraksha", "tilak"):
-                if a not in acc:
-                    acc.append(a)
-            cols["kurta"] = cols.get("kurta") and COLOURS["saffron"] or cols.get("kurta")
-            if "dhoti" in cols:
-                cols["dhoti"] = COLOURS["saffron"]
+            add("rudraksha", "tilak")
+            for k in ("kurta", "dhoti"):
+                if k in cols:
+                    cols[k] = COLOURS["saffron"]
             s["face"]["beard"] = 1.0
             cols.setdefault("beard", cols["hair"])
         if has(*PRIEST):
-            for a in ("tilak", "sacred_thread"):
-                if a not in acc:
-                    acc.append(a)
-        if has("glasses", "spectacle", "চশমা", "चश्मा") and "glasses_round" not in acc:
-            acc.append("glasses_round")
+            add("tilak", "sacred_thread")
         if b["gender"] == "male" and has("beard", "দাড়ি", "दाढ़ी"):
             s["face"]["beard"] = max(0.6, s["face"].get("beard", 0) or 0)
             cols.setdefault("beard", cols["hair"])
         if b["gender"] == "male" and has("moustache", "mustache", "গোঁফ", "मूंछ"):
-            cols["moustache"] = cols["hair"]
-        if has("turban", "pagri", "pagdi", "পাগড়ি", "पगड़ी") and "turban" not in acc:
-            acc.append("turban")
-        if has("shawl", "chador", "চাদর", "शॉल") and "shawl" not in acc:
-            acc.append("shawl")
+            cols.setdefault("moustache", cols["hair"])
+            if has("white moustache", "white mustache", "grey moustache", "gray moustache"):
+                cols["moustache"] = "#e8e8e0"
         if b["gender"] == "female" and has("sindoor", "সিঁদুর", "सिंदूर", "married", "বিবাহিত", "विवाहित"):
-            for a in ("sindoor", "bindi"):
-                if a not in acc:
-                    acc.append(a)
-        if b["gender"] == "female" and has("bangle", "চুড়ি", "चूड़ी") and "bangles" not in acc:
-            acc.append("bangles")
-        # the roles (so that the role reads at once, as the scout asked)
+            add("sindoor", "bindi")
+        if b["gender"] == "female" and has("bangle", "চুড়ি", "चूड़ी", "jewel", "gold", "royal"):
+            add("bangles", "earrings")
         if has("police", "constable", "daroga", "inspector", "khaki", "পুলিশ", "দারোগা", "पुलिस", "दरोगा") and "shirt" in cols:
-            if cols["shirt"] not in COLOURS.values() or not has("shirt", "coat", "uniform") or has("khaki"):
-                cols["shirt"] = COLOURS["khaki"]
+            cols["shirt"] = COLOURS["khaki"]
             cols["trousers"] = COLOURS["khaki"]
         if has("doctor", "ডাক্তার", "डॉक्टर") and "shirt" in cols and not has("blue coat", "black coat"):
             cols["shirt"] = COLOURS["white"]
         if has("sahib", "british", "englishman", "memsahib", "সাহেব", "अंग्रेज"):
             cols["skin"] = "#f2d2b0"
             cols["hair"] = "#8a5a32" if self._age(b) != "old" else "#d8d8d0"
-        if has("king", "raja", "maharaja", "zamindar", "রাজা", "জমিদার", "राजा", "ज़मींदार", "जमींदार") and b["gender"] == "male":
-            for a in ("turban", "shawl"):
-                if a not in acc:
-                    acc.append(a)
-            cols.setdefault("turban", COLOURS["cream"])
-        if has("queen", "rani", "রানি", "রাণী", "रानी") and b["gender"] == "female" and "crown" not in acc:
-            acc.append("crown")
+        if has("king", "raja", "maharaja", "emperor", "zamindar", "রাজা", "জমিদার", "राजा", "ज़मींदार", "जमींदार") and b["gender"] == "male":
+            add("shawl", "jewel")
+            if "crown" not in acc:
+                add("turban")
+                cols.setdefault("turban", COLOURS["cream"])
+            cols.setdefault("shawl", COLOURS["maroon"])
+            if s.get("costume"):
+                s["costume"]["sleeve"] = "full"
+        if has("queen", "rani", "princess", "rajkumari", "রানি", "রাণী", "রাজকন্যা", "রাজকুমারী", "रानी", "राजकुमारी") \
+                and b["gender"] == "female":
+            add("crown", "earrings", "bangles", "bindi")
+            if "border" in cols and not has("border"):
+                cols["border"] = COLOURS["golden"]
+            if "blouse" in cols and len(firsts) >= 2:
+                cols["blouse"] = firsts[1]
+        if has("prince", "rajkumar", "রাজকুমার", "राजकुमार") and b["gender"] == "male":
+            add("crown", "jewel")
+        if has(*DEMON):                                   # a demon / sorcerer / witch: dark, glowing eyes, floats
+            cols["skin"] = "#5a4a6a" if not has("green") else "#4a6a4a"
+            for k in ("kurta", "dhoti", "shirt", "trousers", "saree", "blouse", "border", "frock"):
+                if k in cols and cols[k] not in firsts:
+                    cols[k] = "#2a1a3a"
+            s["face"]["iris"] = COLOURS["red"] if not has("yellow eyes", "green eyes") else s["face"].get("iris")
+            s["face"]["glow"] = "#ff6a5a"
+            s["face"]["ghost_eyes"] = True
+            if s.get("costume"):
+                s["costume"]["sleeve"] = "full"
+            if has("shadow", "misty", "float", "smoke", "ghost", "spirit", "ছায়া", "भूत", "छाया"):
+                s["ghost"] = {"float": 0.06, "alpha": 0.93, "tint": "#c8b0ff"}
         if has("tall", "লম্বা", "लंबा", "लंबी"):
             s["height"] = round(s["height"] * 1.08, 3)
         if has("short ", "বেঁটে", "नाटा", "छोटे कद"):
             s["height"] = round(s["height"] * 0.92, 3)
-        if has("fat", "plump", "pot-belly", "potbelly", "stout", "মোটা", "ভুঁড়ি", "मोटा", "मोटी"):
+        if has("fat", "plump", "pot-belly", "potbelly", "stout", "chubby", "মোটা", "ভুঁড়ি", "मोटा", "मोटी"):
             s["body"]["belly"] = max(0.25, s["body"].get("belly", 0) or 0)
-        if has("thin", "lean", "skinny", "রোগা", "পাতলা", "दुबला", "पतला"):
+        if has("thin", "lean", "skinny", "slim", "রোগা", "পাতলা", "दुबला", "पतला"):
             s["body"]["belly"] = 0.0
             s["body"]["shoulder"] = round(s["body"].get("shoulder", 0.7) * 0.9, 3)
-        if has("dark skin", "dark-skinned", "কালো রং", "শ্যামলা", "सांवला", "सांवली"):
-            s["colours"]["skin"] = "#8e5e40"
-        if has("fair", "ফর্সা", "गोरा", "गोरी"):
-            s["colours"]["skin"] = "#e0aa82"
+        if has("dark skin", "dark-skinned", "কালো রং", "শ্যামলা", "सांवला", "सांवली") or re.search(r"dark(?:\s+\w+)?\s+skin", look):
+            cols["skin"] = "#8e5e40"
+        if has("hunch", "stoop", "bent back", "কুঁজো", "कुबड़"):
+            s["body"]["stoop"] = max(0.12, s["body"].get("stoop", 0) or 0)
+        if has("towel", "gamchha", "gamcha", "গামছা", "गमछा") and "shawl" not in acc:
+            acc.append("shawl")
+            cols["shawl"] = "#d8c8a0" if not has("red towel", "red gamchha") else COLOURS["red"]
+        if has("lungi", "লুঙ্গি", "लुंगी") and s.get("costume", {}).get("type") == "kurta_dhoti" and not has("kurta", "shirt", "vest"):
+            s["costume"]["sleeve"] = "none"
+        if has("fair", "ফর্সা", "गोरा", "गोरी") and not has(*DEMON):
+            cols["skin"] = "#e0aa82"
+        if has("wheat", "wheatish"):
+            cols["skin"] = "#c48a62"
         return s
 
     def _distance(self, spec, cid):
@@ -427,7 +528,7 @@ class AssetBuilder:
         for b in briefs:
             look = f" {b.get('look', '')} {' '.join(b.get('doing') or [])} ".lower()
             slug = re.sub(r"[^a-z0-9]+", "_", str(b["name"]).lower()).strip("_")[:16] or "x"
-            cid = f"lib_{self.bot[:1]}_{slug}_{hashlib.sha1((b['name'] + b.get('story', '')).encode()).hexdigest()[:5]}"
+            cid = f"lib_{self.bot[:1]}_{slug}_{hashlib.sha1((b['name'] + '|' + b.get('look', '')).encode()).hexdigest()[:5]}"
             best = None
             for k in range(self.TRIES):
                 try:
@@ -526,3 +627,47 @@ def cleanup(keep_days=4):
             os.remove(os.path.join(REPORT_DIR, fn))
             gone.append(fn)
     return gone
+
+
+# ===================================================================================================== at video time
+def brief_of(ch, bot, species=None, story_title=""):
+    kind = str(ch.get("kind", "human")).lower()
+    look = str(ch.get("look", "") or "")
+    for k in ("clothes", "costume", "dress", "appearance", "description"):
+        if ch.get(k):
+            look += " " + str(ch[k])
+    return {"name": ch["name"], "name_local": ch.get("name_local") or ch["name"],
+            "gender": "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male",
+            "age": ch.get("age"), "kind": "animal" if species else ("ghost" if any(w in kind for w in GHOST_KINDS) else "human"),
+            "species": species, "look": look, "doing": [], "story": story_title}
+
+
+def ensure(ch, bot, species=None, story_title="", log=lambda *a: None):
+    """the character built for exactly this name and look: from the library, or built right now (and kept)"""
+    b = brief_of(ch, bot, species, story_title)
+    hit = actor_for(b["name"], bot, b["gender"] if not species else None, species, b["look"])
+    if hit:
+        return hit
+    made, _failed = AssetBuilder(bot, log=log).build([b])
+    if not made:
+        return None
+    return made[0] + "__ghost" if b["kind"] == "ghost" else made[0]
+
+
+def dressed(actor, look, ch=None):
+    """a recurring character (same face, same body) wearing what the script describes this time - colours of each
+    garment, glasses, crown, shawl ... - so 'Sayan in a pink polo shirt' is Sayan in a pink polo shirt"""
+    base = CH.SPECS.get(actor)
+    if not base or not str(look or "").strip():
+        return actor
+    vid = f"{actor}_v{hashlib.sha1(str(look).encode()).hexdigest()[:6]}"
+    if vid in CH.SPECS:
+        return vid
+    s = copy.deepcopy(base)
+    b = {"gender": "female" if (ch or {}).get("gender", s.get("gender", "")).lower().startswith("f") or
+         CH.profile(actor)[1] == "female" else "male", "age": (ch or {}).get("age") or s.get("age")}
+    keep = {k: copy.deepcopy(s[k]) for k in ("head", "face") if k in s}
+    s = AssetBuilder("kids", log=lambda *a: None)._apply_look(s, b, f" {str(look).lower()} ", dress_only=True)
+    s.update(keep)                                          # (the face is never changed)
+    CH.SPECS[vid] = s
+    return vid

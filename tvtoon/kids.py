@@ -261,8 +261,25 @@ def _match(name, ids=None):
     return best[0] if best else None
 
 
-def kids_cast(story, category="", use_library=True):
-    """story character name -> (actor id, name shown) for a kids' story"""
+GENERIC_ROLES = {"raja", "mantri", "rani", "paharadar", "senapati", "rajvaidya", "pandit", "mahajan", "moyra", "bonik",
+                 "zamindar", "chashi", "gramer_bou"}       # Gopal's court: a role word ("king") is NOT Gopal's king elsewhere
+
+
+def _exact_alias(name, actor):
+    n = str(name or "").lower().strip()
+    return any(n == w.lower() for w in ALIASES.get(actor, []))
+
+
+def kids_cast(story, category="", use_library=True, build=True):
+    """story character name -> (actor id, name shown) for a kids' story - EXACTLY as the script describes them
+    (owner, 24 Nov 2026):
+      * our recurring characters (Gopal, Birbal, Krishna, Bhutu, Tukai, Didima, Sumon, Sayan ...) by name - dressed
+        the way the script describes them this time (colours, glasses, crown ...), the face stays theirs;
+      * 'King Hemanta' is not Gopal's king: a role word only means Gopal's court in the Gopal stories (or when the
+        name is just that word);
+      * everyone else is the character built for exactly this name and look (the night's library, prep.py) - or is
+        built from the script's look right now; animals by their species.
+    build=False (the night scout): whoever would be built is marked ("NEW", shown)."""
     out, used = {}, set()
     try:
         from tvtoon import prep as PRP
@@ -277,37 +294,42 @@ def kids_cast(story, category="", use_library=True):
         kind = str(ch.get("kind", "human")).lower()
         look = str(ch.get("look", ""))
         actor = _match(name, series) or _match(name)
+        if actor in GENERIC_ROLES and category != "gopal" and not _exact_alias(name, actor) and not _exact_alias(shown, actor):
+            actor = None
         if actor and actor in used:
             actor = None
+        if actor and look.strip() and PRP is not None and not CH.SPECS.get(actor, {}).get("animal"):
+            actor = PRP.dressed(actor, look, ch) or actor     # the recurring face, dressed as the script says
+        g_ = "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male"
+        sp_ = AM.species_of(f"{name} {look}") if (kind in ("animal", "bird") or AM.species_of(name)
+                                                  or (kind != "human" and AM.species_of(look))) else None
         if actor is None and use_library and PRP is not None:   # built for this name at night (prep.py)
-            g_ = "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male"
-            sp_ = AM.species_of(f"{name} {look}") if (kind in ("animal", "bird") or AM.species_of(name)) else None
-            actor = PRP.actor_for(name, "kids", g_ if not sp_ else None, sp_) or \
-                PRP.actor_for(ch.get("name_local"), "kids", g_ if not sp_ else None, sp_)
+            actor = PRP.actor_for(name, "kids", g_ if not sp_ else None, sp_, look) or \
+                PRP.actor_for(ch.get("name_local"), "kids", g_ if not sp_ else None, sp_, look)
             if actor and actor in used:
                 actor = None
-        if actor is None and (kind in ("animal", "bird") or AM.species_of(name) or (kind != "human" and AM.species_of(look))):
-            sp = AM.species_of(f"{name} {look}") or ("parrot" if kind == "bird" else "dog")
+        if actor is None and kind == "robot" and "robi" not in used:
+            actor = "robi"
+        if actor is None and kind in ("magic friend", "spirit") and not look.strip() and "bhutu" not in used:
+            actor = "bhutu"
+        if actor is None and not build:
+            out[name] = ("NEW", shown)
+            continue
+        if actor is None and PRP is not None:                 # build it now, from the script's own words
+            try:
+                actor = PRP.ensure(ch, "kids", species=sp_, story_title=story.get("title", ""))
+            except Exception:
+                actor = None
+        if actor is None and sp_:
             cid = "ka_" + hashlib.sha1(f"{name}|{look}".encode()).hexdigest()[:8]
             if cid not in CH.SPECS:
-                CH.SPECS[cid] = AM.make_spec(shown, sp, look, str(ch.get("gender", "male")), STY._age(ch.get("age")))
+                CH.SPECS[cid] = AM.make_spec(shown, sp_, look, str(ch.get("gender", "male")), STY._age(ch.get("age")))
             actor = cid
-        if actor is None and kind in ("magic friend", "ghost", "spirit"):
-            actor = "bhutu" if "bhutu" not in used else None
-        if actor is None and kind == "robot":
-            actor = "robi"
-        if actor is None:                                   # a person: a library extra who fits, or a new character
-            g = "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male"
-            age = STY._age(ch.get("age"))
-            pool = [x for x in EXTRAS + CH.library() if x not in used and x in CH.SPECS and CH.profile(x) == ("human", g, age)
-                    and CH.SPECS[x].get("ghost") is None]
-            if pool:
-                actor = pool[0]
-            else:
-                cid = "kp_" + hashlib.sha1(str(name).encode()).hexdigest()[:8]
-                if cid not in CH.SPECS:
-                    CH.new_character(cid, shown, g, age, look, seed=len(used))
-                actor = cid
+        if actor is None:                                   # (last resort) a new face from the look
+            cid = "kp_" + hashlib.sha1(str(name).encode()).hexdigest()[:8]
+            if cid not in CH.SPECS:
+                CH.new_character(cid, shown, g_, STY._age(ch.get("age")), look, seed=len(used))
+            actor = cid
         used.add(actor)
         out[name] = (actor, shown)
     return out

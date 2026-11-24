@@ -74,7 +74,7 @@ def _age(a):
     return "adult"
 
 
-def cast_story(characters, reveal=None, use_library=True):
+def cast_story(characters, reveal=None, use_library=True, build=True):
     """story character name -> (actor id, name shown). A MALE ghost that first comes as an ordinary man (the story
     has a 'ghost_reveal' for him) is played by a human actor of his age, whose ghost form is that same man as a
     ghost ('<actor>__ghost'): the dead person himself. Female ghosts keep the designed ghosts (petni, shakchunni),
@@ -90,12 +90,28 @@ def cast_story(characters, reveal=None, use_library=True):
         if use_library:                                     # built for this name at night (prep.py): that character
             try:
                 from tvtoon import prep as _PRP
-                lib_ = _PRP.actor_for(name, "horror", g) or _PRP.actor_for(ch.get("name_local"), "horror", g)
+                lib_ = _PRP.actor_for(name, "horror", g, look=ch.get("look")) or \
+                    _PRP.actor_for(ch.get("name_local"), "horror", g, look=ch.get("look"))
             except Exception:
                 lib_ = None
             if lib_ and lib_.split("__")[0] not in used:
                 used.add(lib_.split("__")[0])
                 out[name] = (lib_, ch.get("name_local") or name)
+                continue
+        if kind == "human" and str(ch.get("look", "")).strip():
+            # (owner, 24 Nov 2026) a person the script DESCRIBES is drawn exactly so: the character built for this
+            # name and look at night (prep.py) - or built now; build=False (the night scout): marked as new
+            if not build:
+                out[name] = ("NEW", ch.get("name_local") or name)
+                continue
+            try:
+                from tvtoon import prep as _PRP
+                made_ = _PRP.ensure(ch, "horror", story_title="")
+            except Exception:
+                made_ = None
+            if made_ and made_.split("__")[0] not in used:
+                used.add(made_.split("__")[0])
+                out[name] = (made_, ch.get("name_local") or name)
                 continue
         if kind == "ghost" and g == "male" and name in reveal:
             prefs = [a for a in ACTORS.get(("human", "male", _age(ch.get("age"))), []) if a not in used and a in CH.SPECS]
@@ -120,6 +136,13 @@ def cast_story(characters, reveal=None, use_library=True):
                 if g == "female":
                     VO.FEMALE.add(cid)
             actor = cid + ("__ghost" if kind == "ghost" else "")
+        if kind == "ghost" and str(ch.get("look", "")).strip() and build and actor.split("__")[0] in ("petni", "shakchunni",
+                                                                                                    "brahmadaitya", "mechho_bhoot"):
+            try:                                            # the designed ghost, dressed as the script says (black saree...)
+                from tvtoon import prep as _PRP
+                actor = _PRP.dressed(actor, ch.get("look", ""), ch) or actor
+            except Exception:
+                pass
         used.add(actor.split("__")[0])
         out[name] = (actor, ch.get("name_local") or name)
     return out

@@ -657,7 +657,7 @@ class Scene:
         W, H = self.W, self.H
         yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
         r = np.sqrt(((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2) / math.sqrt(2)
-        strength = {"horror": 0.55, "film": 0.32, "kids": 0.16}.get(look, 0.3)
+        strength = {"horror": 0.3, "film": 0.18, "kids": 0.07}.get(look, 0.18)      # (owner 24 Nov: brighter videos)
         vig = 1.0 - strength * np.clip((r - 0.35) / 0.65, 0, 1) ** 1.7
         self._vig = cv2.merge([(vig * 255).astype(np.uint8)] * 3)
         rng = np.random.default_rng(7)
@@ -673,8 +673,16 @@ class Scene:
         x = np.arange(256, dtype=np.float32) / 255.0
         night = hour >= 19.5 or hour < 5.0
         dusk = 16.5 <= hour < 19.5 or 5.0 <= hour < 7.0
-        s_amt = {"horror": 0.22, "film": 0.14, "kids": 0.07}.get(look, 0.12)
-        curve = x + s_amt * (x - 0.5) * (1 - np.abs(2 * x - 1)) * 1.6        # contrast around the middle
+        s_amt = {"horror": 0.14, "film": 0.1, "kids": 0.05}.get(look, 0.1)
+        # brighter (owner, 24 Nov 2026): the picture is exposed up (more at night, so the faces are always seen);
+        # TVTOON_BRIGHT scales it (1.0 = this, 1.2 = still brighter, 0.8 = darker)
+        try:
+            bk = float(os.environ.get("TVTOON_BRIGHT") or 1.0)
+        except ValueError:
+            bk = 1.0
+        gain = 1.0 + bk * ({"horror": 0.16, "film": 0.12, "kids": 0.12}.get(look, 0.1) + (0.22 if night else 0.0))
+        xe = 1.0 - (1.0 - x) ** gain                                         # lifts darks and mids, keeps whites
+        curve = xe + s_amt * (xe - 0.5) * (1 - np.abs(2 * xe - 1)) * 1.6      # contrast around the middle
         sh = np.clip(1 - x * 2.2, 0, 1)                                    # how much a value is a shadow
         hi = np.clip(x * 2.0 - 1.0, 0, 1)                                  # ... a highlight
         if look == "horror":
@@ -687,7 +695,7 @@ class Scene:
             warm, cool, lift = ((0.06, 0.02, -0.035) if dusk else (0.03, 0.012, -0.015)), (-0.02, 0.0, 0.03), 0.01
         chans = []
         for c in range(3):                                 # the frame is B, G, R (cairo): the tuples above are R, G, B
-            v = curve + warm[2 - c] * hi + cool[2 - c] * sh + lift * (1 - x)
+            v = curve + warm[2 - c] * hi + cool[2 - c] * sh * (0.6 if look == "horror" else 1.0) + lift * (1 - x)
             chans.append((np.clip(v, 0, 1) * 255).astype(np.uint8))
         lut = np.dstack(chans).reshape(1, 256, 3)
         self._luts[key] = lut
@@ -710,7 +718,7 @@ class Scene:
         out = cv2.multiply(out, self._vig, scale=1 / 255.0)                # the lens vignette
         if look in ("horror", "film"):                                     # a fine film grain, alive every frame
             g = self._grain[int(t * 24) % len(self._grain)]
-            a = 0.05 if look == "horror" else 0.03
+            a = 0.035 if look == "horror" else 0.02
             out = cv2.addWeighted(out, 1.0, g, a, -a * 128)
         return out
 

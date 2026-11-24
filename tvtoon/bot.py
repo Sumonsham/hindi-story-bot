@@ -147,12 +147,23 @@ def render_part(spec, audio, out, W, H, fps, sr, work_dir, log=print):
     """render the cartoon scene and encode it exactly like main.py's clips (the bot's own scene sound)"""
     from tvtoon import scene as SC
     raw = os.path.join(work_dir, os.path.basename(out).replace(".mp4", "_tvtoon.mp4"))
-    SC.render(spec, raw, work_dir=os.path.join(work_dir, "_tvtoon_" + os.path.basename(out).replace(".mp4", "")),
-              log=lambda *a: None)
+    _st, sc = SC.render(spec, raw, work_dir=os.path.join(work_dir, "_tvtoon_" + os.path.basename(out).replace(".mp4", "")),
+                        log=lambda *a: None)
     d = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", audio],
                              capture_output=True, text=True).stdout.strip() or 0)
-    r = subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", raw, "-i", audio, "-map", "0:v", "-map", "1:a",
-                        "-t", f"{d:.2f}", "-vf", f"scale={W}:{H},tpad=stop_mode=clone:stop_duration=30,format=yuv420p",
+    fol = None
+    if os.environ.get("TVTOON_FOLEY") != "0":            # the footsteps, the door, the falls - exactly on the picture
+        try:
+            fol = sc.foley_wav(raw.replace(".mp4", "_foley.wav"), sr)
+        except Exception:
+            fol = None
+    if fol:
+        aud_in = ["-i", audio, "-i", fol, "-filter_complex", "[1:a][2:a]amix=inputs=2:duration=first:normalize=0[a]",
+                  "-map", "0:v", "-map", "[a]"]
+    else:
+        aud_in = ["-i", audio, "-map", "0:v", "-map", "1:a"]
+    r = subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", raw] + aud_in +
+                       ["-t", f"{d:.2f}", "-vf", f"scale={W}:{H},tpad=stop_mode=clone:stop_duration=30,format=yuv420p",
                         "-r", str(fps), "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-maxrate", "3500k",
                         "-bufsize", "7000k", "-c:a", "aac", "-b:a", "160k", "-ar", str(sr), "-ac", "2", out],
                        capture_output=True, text=True)

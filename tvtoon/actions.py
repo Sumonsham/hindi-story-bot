@@ -417,8 +417,12 @@ class Director:
             acts_ = plan[a]
             if "leave" in acts_ and ({"run", "fly"} & set(acts_)):
                 plan[a] = ["run_away" if x == "leave" else x for x in acts_ if x not in ("run", "fly")]
-            elif "leave" in acts_ or "run_away" in acts_:
+            elif "run_away" in acts_:                    # "দৌড়ে পালাল" = one long run away, not a short run
+                plan[a] = [x for x in acts_ if x not in ("walk", "approach", "enter", "run", "leave")]
+            elif "leave" in acts_:
                 plan[a] = [x for x in acts_ if x not in ("walk", "approach", "enter")]
+            if "scared" in plan[a] and "angry" in plan[a]:   # "ভয়ে চিৎকার" is fear, not anger
+                plan[a] = [x for x in plan[a] if x != "angry"]
         for a in list(plan):                            # the moves first, then the jumps / gestures / faces
             if not a.startswith("_"):
                 plan[a].sort(key=lambda x: 0 if x in MOVES else 1)

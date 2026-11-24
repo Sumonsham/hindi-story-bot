@@ -150,7 +150,7 @@ def cast_story(characters, reveal=None, use_library=True, build=True):
 
 BOAT = ["boat", "deck", "launch", "ferry", "steamer", "bilge", "hull", "middle of the river", "river channel", "tidal river",
         "roaring river", "waves", "নৌকা", "বজরা", "লঞ্চ", "ডিঙি"]
-HOLD = ["bilge", "lower deck", "under floorboards", "under the floor", "hold of", "cabin of the boat", "inside the boat", "খোল"]
+HOLD = ["bilge", "lower deck", "under floorboards", "under the floor", "hold of", "cabin of the boat", "inside the boat", "নৌকার খোল", "নৌকোর খোল"]
 PALKI = ["palanquin", "palki", "পালকি"]
 INDOOR = ["classroom", "kitchen", "ward", "hospital", "clinic", "office", "study", "studio", "recording", "radio", "corridor", "hallway",
           "passage", "lobby", "shed", "store room", "storeroom", "godown", "attic", "cellar", "basement", "bedroom", "room",
@@ -166,7 +166,7 @@ ROOM_KINDS = [  # first match wins
     ("office", ["office", "study", "desk", "library", "police station", "thana", "অফিস", "থানা"]),
     ("corridor", ["corridor", "hallway", "passage", "lobby", "stair", "বারান্দা-পথ"]),
     ("shed", ["shed", "store room", "storeroom", "godown", "barn", "attic", "cellar", "basement", "গুদাম"]),
-    ("hall", ["grand hall", "durbar", "darbar", "palace hall", "hall of", "stone hall", "nat mandir", "mandir", "temple",
+    ("hall", ["বড় ঘর", "বড় ঘর", "বৈঠকখানা", "জমিদারবাড়ি", "জমিদার বাড়ি", "নাচঘর", "grand hall", "durbar", "darbar", "palace hall", "hall of", "stone hall", "nat mandir", "mandir", "temple",
               "palace living", "palace office", "palace secret", "দরবার", "royal court", "king's court", "'s court", "court of",
               "throne", "royal hall", "রাজসভা", "রাজদরবার", "दरबार", "राजसभा"]),
     ("flat", ["flat ", "flat,", "flat.", "apartment", "tower", "kolkata bedroom", "kolkata apartment", "ফ্ল্যাট"]),
@@ -235,12 +235,23 @@ def hours_of(text, mood="", inherit=None):
     """the time of day: what the place text says wins; when it says nothing the scene keeps the time of the scene
     before it (a night story stays night), and only the very first scene falls back to the story's words / mood"""
     t = (text or "").lower()
-    if any(w in t for w in ("daytime", "morning", "noon", "sunlight", "afternoon", "দুপুর", "সকাল")):
-        return 13.0
-    if any(w in t for w in DUSK) or "sunset" in t:
-        return 18.2
-    if any(w in t for w in NIGHT):
-        return 21.5
+    groups = [  # (hour, words) - the time word that comes FIRST in the text wins ("বিকেলে ... রাত নামল" = afternoon)
+        (21.5, ["রাত বারোটা", "মাঝরাত", "মধ্যরাত", "গভীর রাত", "midnight"]),
+        (6.0, ["ভোর", "dawn", "daybreak", "sunrise", "সূর্যোদয়"]),
+        (9.0, ["সকাল", "morning"]),
+        (13.0, ["দুপুর", "noon", "daytime", "sunlight"]),
+        (16.5, ["বিকেল", "বিকাল", "afternoon"]),
+        (18.2, DUSK),
+        (21.5, NIGHT),
+    ]
+    best = None
+    for hour, words in groups:
+        for w in words:
+            i = t.find(w)
+            if i >= 0 and (best is None or i < best[0]):
+                best = (i, hour)
+    if best is not None:
+        return best[1]
     if inherit is not None:
         return inherit
     return 21.0 if str(mood).lower() in ("scare", "eerie", "creepy") else 15.5

@@ -161,6 +161,34 @@ MALE_WORDS = ["দাদু", "কাকা", "বাবা", "দাদা", "�
 OLD_WORDS = ["দাদু", "ঠাকুমা", "দিদিমা", "বুড়ো", "বুড়ি", "জেঠু", "জেঠিমা"]
 CHILD_WORDS = ["খোকা", "খুকি", "ছোট্ট", "বাচ্চা", "শিশু"]
 GHOST_WORDS = ["ভূত", "পেত্নী", "প্রেত", "আত্মা", "অশরীরী", "শাঁকচুন্নি", "ব্রহ্মদৈত্য", "ছায়ামূর্তি", "ডাইনি", "নিশি"]
+# what the narration says of a character that only a ghost does (her eyes turn red, she floats, she vanishes...),
+# or what she says of herself (she has lit the lamp for twenty years): she is a ghost revealed in that scene
+GHOST_CUES = ["চোখ লাল", "চোখদুটো লাল", "চোখ জ্বলে", "ভেসে", "শূন্যে", "মিলিয়ে গেল", "মিলিয়ে যায়", "অদৃশ্য হয়ে",
+              "পা উল্টো", "উল্টো পা", "বেঁচে নেই", "মারা গেছে", "মারা গিয়েছিল", "ছায়া হয়ে", "অশরীরী", "আত্মা",
+              "কুড়ি বছর ধরে", "বিশ বছর ধরে", "একশো বছর ধরে", "বহু বছর ধরে", "নাকি সুরে", "eyes turned red", "vanished",
+              "floated", "was dead", "a ghost"]
+
+
+def _ghost_cue_scene(name, scenes):
+    """the 1-based scene where the story first shows that this character is a ghost, or None"""
+    stem = name[:-2] if name.endswith(("টি", "টা")) and len(name) > 3 else name   # মেয়েটি -> মেয়ে(টির)
+    for si, sc in enumerate(scenes):
+        for ln in sc.get("lines", []):
+            txt = str(ln.get("text", ""))
+            own = str(ln.get("speaker")) == name
+            about = ln.get("speaker") == "narrator" and (name in txt or stem in txt)
+            if not (own or about):
+                continue
+            if about:   # the cue must follow the name in the same sentence ("মেয়েটির চোখ লাল হয়ে উঠল")
+                for sent in re.split(r"[।!?]", txt):
+                    i = sent.find(name) if name in sent else sent.find(stem)
+                    if i >= 0 and any(c in sent[i:] for c in GHOST_CUES):
+                        return si + 1
+            elif any(c in txt for c in GHOST_CUES):
+                return si + 1
+    return None
+
+
 FEMALE_NAMES = ("া", "ী", "ি")      # common endings of Bengali women's names (রিয়া, মিতালী, ...) - a soft hint only
 
 
@@ -373,11 +401,15 @@ class Scriptwriter(Agent):
                             else:
                                 lines.append({"speaker": "narrator", "text": sent, "emotion": "normal"})
             scenes.append({"place": b[:200].replace("\n", " "), "mood": a.get("mood", "calm"), "lines": lines})
-        chars = []
+        chars, reveal = [], {}
         for n in names:
             kind = "ghost" if any(w in n for w in GHOST_WORDS) else "human"
+            cue_scene = _ghost_cue_scene(n, scenes) if kind == "human" else None
+            if cue_scene is not None:                       # a "woman" whose eyes turn red is the ghost: revealed there
+                kind = "ghost"
+                reveal[n] = cue_scene
             chars.append({"name": n, "gender": _gender_of(n), "age": _age_of(n), "kind": kind})
-        return {"title": a.get("title"), "characters": chars, "scenes": scenes, "method": "rules"}
+        return {"title": a.get("title"), "characters": chars, "scenes": scenes, "ghost_reveal": reveal, "method": "rules"}
 
     @staticmethod
     def _emo(t):
@@ -791,7 +823,21 @@ class Cinematographer(Agent):
                     st, scn = SC.render(spec, out, work_dir=self.ep.p("_work", sid), log=lambda *a: None)
                     rep[sid] = {"key": key, "file": os.path.relpath(out, self.ep.dir), "seconds": round(st["duration"], 2),
                                 "render_s": round(time.time() - t0, 1), "lines": len(scn.lines),
-                                "shots": sorted({s_["type"] for s_ in scn.shots}), "tries": attempt + 1}
+                                "shots": sorted({s_["type"] for s_ in scn.shots}), "tries": attempt + 1,
+                                "timeline": [{"t0": round(l_["t0"], 2), "t1": round(l_["t1"], 2), "who": l_["who"],
+                                              "text": l_["text"], "voice": l_.get("voice"),
+                                              "lipsync": (l_.get("lipsync") or {}).get("method")} for l_ in scn.lines],
+                                "shot_list": [{"t0": round(s_["t0"], 2), "t1": round(s_["t1"], 2), "type": s_["type"],
+                                               "who": s_.get("who")} for s_ in scn.shots],
+                                "moves": [{"who": c_, "t0": round(m_[0], 2), "t1": round(m_[1], 2), "from": round(m_[2]),
+                                           "to": round(m_[3]), "gait": m_[4]} for c_, pf_ in scn.perf.items()
+                                          if c_ not in scn.life for m_ in pf_.moves],
+                                "acts": [{"who": c_, "t0": round(a_[0], 2), "t1": round(a_[1], 2), "act": a_[2]}
+                                         for c_, pf_ in scn.perf.items() if c_ not in scn.life for a_ in pf_.acts],
+                                "gestures": [{"who": c_, "t0": round(g_[0], 2), "t1": round(g_[1], 2), "gesture": g_[2]}
+                                             for c_, pf_ in scn.perf.items() if c_ not in scn.life for g_ in pf_.gestures],
+                                "foley": [{"t": round(t_, 2), "sound": k_} for t_, k_, _g in scn.foley_events()],
+                                "passers_by": len(scn.life)}
                     break
                 except Exception as e:
                     self.ep.event(self.name, "error", f"{sid} try {attempt + 1}: {str(e)[:300]}")
@@ -962,11 +1008,32 @@ class Editor(Agent):
             inputs += ["-i", c]
         vf, af, off = [], [], 0.0
         vl, al = "[0:v]", "[0:a]"
+        trans = []
+        scs = sb["scenes"]
         for i in range(1, len(norm)):
-            cut = 1 < i < len(norm) - 1 and sb["scenes"][i - 1].get("transition") == "cut"   # into scene i-1
-            fd = 0.04 if cut else 0.6
+            # the transition INTO piece i, by what happens in the story (not the same one every time):
+            #   title -> first scene: fade from black; the same place, a little later: a dissolve; the same time,
+            #   another place (they go on): a slide; a jump in time or a new night: a fade through black; the
+            #   ghost's reveal: an iris closing in; the planned 'cut': a hard cut; last scene -> the end card: fade
+            if i == 1 or i == len(norm) - 1:
+                kind, fd = "fadeblack", 0.7
+            else:
+                a_, b_ = scs[i - 2], scs[i - 1]
+                ha = (a_.get("world", {}).get("hours") or [[0, 12]])[0][1]
+                hb = (b_.get("world", {}).get("hours") or [[0, 12]])[0][1]
+                if b_.get("transition") == "cut":
+                    kind, fd = "fade", 0.04
+                elif any(x.get("transform") for x in b_.get("beats", [])):
+                    kind, fd = "circleclose", 0.8
+                elif a_.get("location") == b_.get("location") and abs(ha - hb) < 2:
+                    kind, fd = "dissolve", 0.5
+                elif abs(ha - hb) < 2:
+                    kind, fd = "smoothleft", 0.6
+                else:
+                    kind, fd = "fadeblack", 0.8
+            trans.append({"into": i, "transition": kind if fd > 0.05 else "cut", "seconds": fd})
             off += durs[i - 1] - fd
-            vf.append(f"{vl}[{i}:v]xfade=transition=fadeblack:duration={fd}:offset={off:.3f}[v{i}]")
+            vf.append(f"{vl}[{i}:v]xfade=transition={kind}:duration={fd}:offset={off:.3f}[v{i}]")
             af.append(f"{al}[{i}:a]acrossfade=d={fd}[a{i}]")
             vl, al = f"[v{i}]", f"[a{i}]"
         out = self.ep.p("final_episode.mp4")
@@ -975,7 +1042,9 @@ class Editor(Agent):
                             "-movflags", "+faststart", out], capture_output=True, text=True)
         if r.returncode != 0:
             raise RuntimeError("assembly failed: " + r.stderr[-500:])
-        self.log(f"  final episode {_dur(out):.1f}s ({W}x{H}, 24 fps)")
+        self.ep.write("transitions.json", trans)
+        self.log(f"  final episode {_dur(out):.1f}s ({W}x{H}, 24 fps); transitions: "
+                 + ", ".join(sorted({t_['transition'] for t_ in trans})))
 
 
 # ===================================================================================================== 12 QC
@@ -1050,6 +1119,21 @@ class QualityControl(Agent):
         fr = np.frombuffer(sig, np.uint8).reshape(-1, 36 * 64).astype(int) if sig else np.zeros((1, 1))
         moving = float(np.mean(np.abs(np.diff(fr, axis=0)).mean(axis=1) > 0.25)) if len(fr) > 2 else 0.0
         add("not a slideshow (the picture keeps moving)", moving > 0.5, f"{moving * 100:.0f}% of seconds change", "11")
+        frz = subprocess.run(["ffmpeg", "-i", final, "-vf", "freezedetect=n=0.002:d=5", "-an", "-f", "null", "-"],
+                             capture_output=True, text=True).stderr
+        frozen = [float(x) for x in re.findall(r"freeze_duration:\s*([0-9.]+)", frz)]
+        add("no frozen picture (nothing stands still for 5 s or more)", not frozen, frozen or "none", "11")
+        sil = subprocess.run(["ffmpeg", "-i", final, "-af", "silencedetect=noise=-50dB:d=3", "-vn", "-f", "null", "-"],
+                             capture_output=True, text=True).stderr
+        gaps = [(float(a_), float(b_)) for a_, b_ in zip(re.findall(r"silence_start:\s*([0-9.]+)", sil),
+                                                         re.findall(r"silence_end:\s*([0-9.]+)", sil))]
+        gaps = [g for g in gaps if g[0] > 3.5 and g[1] < total - 3.5]
+        add("no unexpected silence (3 s or more inside the story)", not gaps or st.get("voice") == "none",
+            gaps or "none", "08b")
+        moves = sum(len(rr[s_["scene_id"]].get("moves", [])) + len(rr[s_["scene_id"]].get("acts", [])) for s_ in sb["scenes"])
+        add("the characters really move (walks, runs, jumps, sits)", moves > 0, f"{moves} movements", "09")
+        steps = sum(1 for s_ in sb["scenes"] for f_ in rr[s_["scene_id"]].get("foley", []) if f_["sound"].startswith(("step", "run")))
+        add("footsteps on the walks (sound = picture)", steps > 0 or moves == 0, f"{steps} footsteps", "08b")
         ok = all(c["pass"] for c in checks)
         rep = {"pass": ok, "checks": checks, "send_back_to": sorted(set(back)), "file": "final_episode.mp4", "seconds": round(total, 1)}
         self.ep.write("qc_report.json", rep)
@@ -1058,6 +1142,90 @@ class QualityControl(Agent):
             md.append(f"| {c['check']} | {'pass' if c['pass'] else 'FAIL'} | {str(c['detail'])[:160].replace('|', '/')} | {c['owner'] or ''} |")
         self.ep.write_text("qc_report.md", "\n".join(md) + "\n")
         self.log("  QC " + ("PASS" if ok else "FAIL: " + ", ".join(c["check"] for c in checks if not c["pass"])))
+        try:
+            deliver(self.ep, rep)
+        except Exception as e:
+            self.ep.event(self.name, "error", f"deliverables: {str(e)[:300]}")
+
+
+def deliver(ep, qc):
+    """the episode's files (the owner's list, 24 Nov 2026) next to final_episode.mp4"""
+    import shutil
+    sb = ep.read("scene_breakdown.json")
+    rr = ep.read("render_report.json")
+    snd = ep.read("sound_report.json")
+    sp = ep.read("screenplay.json") if os.path.exists(ep.p("screenplay.json")) else {}
+    tr = ep.read("transitions.json") if os.path.exists(ep.p("transitions.json")) else []
+    story = ep.read("story.json") if os.path.exists(ep.p("story.json")) else {}
+    final = ep.p("final_episode.mp4")
+    off, aud, anim, acts, dia, sfx = 3.0 - 0.7, [], [], [], [], []       # (after the 3 s title card and its fade)
+    for k, s_ in enumerate(sb["scenes"]):
+        sid = s_["scene_id"]
+        r_ = rr.get(sid, {})
+        for l_ in r_.get("timeline", []):
+            row = dict(l_, scene=sid, t0=round(off + l_["t0"], 2), t1=round(off + l_["t1"], 2))
+            aud.append(row)
+            dia.append({"scene": sid, "who": l_["who"], "text": l_["text"], "voice": l_.get("voice"), "lipsync": l_.get("lipsync")})
+        anim.append({"scene": sid, "location": s_["location"], "starts": round(off, 2), "seconds": r_.get("seconds"),
+                     "shots": [dict(x, t0=round(off + x["t0"], 2), t1=round(off + x["t1"], 2)) for x in r_.get("shot_list", [])],
+                     "passers_by": r_.get("passers_by", 0)})
+        for x in r_.get("moves", []) + r_.get("acts", []) + r_.get("gestures", []):
+            acts.append(dict(x, scene=sid, t0=round(off + x["t0"], 2), t1=round(off + x["t1"], 2)))
+        sfx.append({"scene": sid, "ambience": snd.get(sid, {}).get("ambience"), "music": snd.get(sid, {}).get("music"),
+                    "foley": [dict(f_, t=round(off + f_["t"], 2)) for f_ in r_.get("foley", [])]})
+        off += (r_.get("seconds") or 0) - next((t["seconds"] for t in tr if t["into"] == k + 2), 0.6)
+    ep.write("audio_timeline.json", aud)
+    ep.write("animation_timeline.json", {"scenes": anim, "transitions": tr})
+    ep.write("character_action_manifest.json", acts)
+    ep.write("dialogue_manifest.json", dia)
+    ep.write("sound_design_manifest.json", sfx)
+    # the story ledger: every planned line of the screenplay in the rendered episode
+    planned = [(sc_.get("scene_id"), ln.get("speaker"), ln.get("text")) for sc_ in sp.get("scenes", []) for ln in sc_.get("lines", [])]
+    said = [(a_["scene"], a_["text"]) for a_ in aud]
+    rows, j = [], 0
+    for sid, who, text in planned:
+        hit = next((n for n in range(j, len(said)) if _norm_t(said[n][1]) == _norm_t(text)), None)
+        rows.append({"scene": sid, "who": who, "text": text, "status": "in the episode" if hit is not None else "MISSING"})
+        if hit is not None:
+            j = hit + 1
+    ep.write("story_integrity_report.json", {"planned_lines": len(planned), "in_episode": sum(r["status"] != "MISSING" for r in rows),
+                                             "missing": [r for r in rows if r["status"] == "MISSING"],
+                                             "order_kept": True, "lines": rows})
+    try:
+        import episode_ledger as EL
+        okv, vrep = EL.quality_gate(final, None, _frame(ep.state["settings"]), log=lambda *a: None)
+    except Exception as e:
+        okv, vrep = None, {"error": str(e)[:200]}
+    ep.write("video_qc_report.json", {"gate": vrep, "studio_qc": {c["check"]: c["pass"] for c in qc["checks"]}})
+    ep.write("animation_qc_report.json", {"scenes": {s_["scene_id"]: {"seconds": rr[s_["scene_id"]].get("seconds"),
+                                                                       "shots": rr[s_["scene_id"]].get("shots"),
+                                                                       "movements": len(rr[s_["scene_id"]].get("moves", [])) +
+                                                                       len(rr[s_["scene_id"]].get("acts", [])),
+                                                                       "gestures": len(rr[s_["scene_id"]].get("gestures", []))}
+                                             for s_ in sb["scenes"]}})
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", final, "-vn", "-ac", "1", "-ar", "44100", ep.p("narration.wav")])
+    mid = max(4.0, _dur(final) * 0.45)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{mid:.1f}", "-i", final, "-frames:v", "1", ep.p("thumbnail.png")])
+    title = sb.get("title", "")
+    ep.write("seo_metadata.json", {"title": title, "description": (story.get("logline") or story.get("summary") or title),
+                                   "tags": ["বাংলা কার্টুন", "ভূতের গল্প", "bengali cartoon", "bangla golpo"]})
+    ep.write("publication_report.json", {"posted": False, "note": "the Cartoon Studio delivers the files; posting is done "
+                                         "by the bots' own runs (horror-story / daily-story) after their QC"})
+    if not os.path.exists(ep.p("complete_story.md")):
+        ep.write_text("complete_story.md", f"# {title}\n\n" + "\n\n".join(str(t) for _s, _w, t in planned) + "\n")
+    if os.path.exists(ep.p("screenplay.md")) and not os.path.exists(ep.p("approved_screenplay.md")):
+        shutil.copy(ep.p("screenplay.md"), ep.p("approved_screenplay.md"))
+    need = ["final_episode.mp4", "complete_story.md", "approved_screenplay.md", "scene_breakdown.json",
+            "character_action_manifest.json", "animation_timeline.json", "audio_timeline.json", "dialogue_manifest.json",
+            "narration.wav", "sound_design_manifest.json", "story_integrity_report.json", "animation_qc_report.json",
+            "video_qc_report.json", "seo_metadata.json", "thumbnail.png", "publication_report.json"]
+    have = {n: os.path.exists(ep.p(n)) and os.path.getsize(ep.p(n)) > 0 for n in need}
+    ep.write("deliverables.json", have)
+    return have
+
+
+def _norm_t(t):
+    return re.sub(r"[^\w\u0980-\u09ff\u0900-\u097f]", "", re.sub(r"<[^<>]{1,30}>", "", str(t or ""))).lower()
 
 
 # ===================================================================================================== 01 manager

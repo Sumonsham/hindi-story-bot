@@ -833,9 +833,104 @@ class Scene:
         ctx.set_source_rgba(0, 0, 0, 0.16)
         ctx.fill()
 
+    # -------------------------------------------------------------- foley (owner, 24 Nov 2026: sound = picture)
+    def foley_events(self):
+        """[(time, kind, gain)] - every footstep of every walk / run (the step rhythm of the walk cycle: about 0.52 s
+        a step walking, 0.31 s running), the door that opens, a jump's landing, a fall, a sit-down"""
+        ev = []
+        indoor = self.spec.get("location") in ("ghar", "train_inside", "bus_inside", "tram_inside", "zamindar_bari")
+        for cid, pf in self.perf.items():
+            far = self.depth.get(cid, 0.0)
+            g = (0.3 if cid in self.life else 1.0) * (1.0 - 0.6 * far)
+            if pf.pp.spec.get("ghost") or (pf.pp.spec.get("animal") or {}).get("species") in ("crow", "parrot", "sparrow",
+                                                                                              "owl", "peacock", "bhutu"):
+                continue                                       # (a ghost floats; a bird flies or hops lightly)
+            for t0, t1, xa, xb, gait in pf.moves:
+                step = 0.31 if gait == "run" else 0.52
+                t = t0 + step * 0.5
+                k = 0
+                while t < t1 - 0.05:
+                    ev.append((t, ("run" if gait == "run" else "step") + ("_in" if indoor else ""), g * (0.9 + 0.2 * (k % 2))))
+                    t += step
+                    k += 1
+            for a0, a1, kind in getattr(pf, "acts", []):
+                if kind == "jump":
+                    ev.append((a0 + 0.62 * 0.82, "thud", g))
+                elif kind == "fall":
+                    ev.append((a0 + 0.45, "fall", g))
+                elif kind == "dance":
+                    t = a0 + 0.4
+                    while t < a1:
+                        ev.append((t, "step_in" if indoor else "step", g * 0.8))
+                        t += 0.48
+            for s0, s1, *_r in getattr(pf, "sits", []):
+                if 0.2 < s0 < 1e8 and cid not in self.life:
+                    ev.append((s0 - 0.6, "sit", g))
+            for g0, g1, gname, *_r in getattr(pf, "gestures", []):
+                if gname == "clap":
+                    t = g0 + 0.45
+                    while t < min(g1, g0 + 2.2):
+                        ev.append((t, "clap", g * 0.8))
+                        t += 0.33
+        door = getattr(self.world, "door_t", None) if self.world is not None else None
+        if door is not None and door < 1e8:
+            ev.append((door, "door", 1.0))
+        dur = float(getattr(self, "duration", 0) or 0)
+        return sorted(e for e in ev if e[0] >= 0 and (dur <= 0 or e[0] < dur))
+
+    def foley(self, n, sr):
+        rng = np.random.default_rng(int(self.duration * 100) % 9973)
+        out = np.zeros(n, np.float32)
+
+        def burst(ms, decay, low, gain):
+            m = int(sr * ms / 1000)
+            x = rng.standard_normal(m).astype(np.float32)
+            k = max(1, int(low))
+            x = np.convolve(x, np.ones(k) / k, mode="same")
+            x *= np.exp(-np.arange(m) / (sr * decay)).astype(np.float32)
+            return x / (np.abs(x).max() + 1e-6) * gain
+        for t, kind, g in self.foley_events():
+            i = int(t * sr)
+            if i < 0 or i >= n:
+                continue
+            if kind.startswith(("step", "run")):
+                snd = burst(90, 0.018, 14 if kind.endswith("_in") else 6, 0.16 * g * (1.25 if kind.startswith("run") else 1.0))
+            elif kind == "thud":
+                snd = burst(160, 0.05, 30, 0.3 * g)
+            elif kind == "fall":
+                snd = burst(320, 0.09, 26, 0.42 * g)
+            elif kind == "sit":
+                snd = burst(260, 0.08, 40, 0.1 * g)
+            elif kind == "clap":
+                snd = burst(60, 0.01, 2, 0.22 * g)
+            elif kind == "door":                               # a slow wooden creak
+                m = int(sr * 1.6)
+                tt = np.arange(m) / sr
+                f = 180 + 70 * np.sin(2 * np.pi * 0.7 * tt) + 40 * tt
+                ph = 2 * np.pi * np.cumsum(f) / sr
+                saw = (2 * ((ph / (2 * np.pi)) % 1.0) - 1) * (0.6 + 0.4 * (np.sin(2 * np.pi * 23 * tt) > 0))
+                snd = (0.12 * saw * np.minimum(1, tt / 0.15) * np.exp(-tt * 0.8)).astype(np.float32)
+            else:
+                continue
+            j = min(n, i + len(snd))
+            out[i:j] += snd[: j - i]
+        return out
+
+    def foley_wav(self, path, sr=44100):
+        n = int((self.duration + 0.5) * sr)
+        f = np.clip(self.foley(n, sr), -1, 1)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(sr), "-ac", "1", "-i", "-", path],
+                       input=f.astype(np.float32).tobytes(), check=True)
+        return path
+
     def audio_track(self, path):
         n = int((self.duration + 0.5) * AUDIO_SR)
         mix = np.zeros(n, np.float32)
+        if self.spec.get("foley", True):
+            try:
+                mix += self.foley(n, AUDIO_SR)
+            except Exception:
+                pass
         for ln in self.lines:
             if not ln["audio"]:
                 continue

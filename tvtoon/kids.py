@@ -351,7 +351,7 @@ def kids_place(p):
     """the place of a kids' story scene, said so the engine finds the right place (never an empty bedroom for 'under
     the big tree')"""
     low = str(p or "").lower()
-    if STY.place_of(p) != "ghar" or any(w in low for w in INSIDE_WORDS):
+    if STY.place_of(p, outdoor_guess=False) != "ghar" or any(w in low for w in INSIDE_WORDS):
         return p
     for words, to in OUT_PLACES:
         if any(w in low for w in words):

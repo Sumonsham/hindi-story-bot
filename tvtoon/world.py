@@ -75,6 +75,7 @@ class World:
         self.hours = spec.get("hours") or [[0.0, 15.5]]
         self.rain = spec.get("rain") or []
         self.fog = float(spec.get("fog", 0.0))
+        self.lightning = float(spec.get("lightning", 0.0))
         r = self.rnd
         self.clouds = [(r.uniform(-600, 3800), r.uniform(70, 300), r.uniform(45, 90), r.uniform(5, 16)) for _ in range(9)]
         self.hill_pts = [(x, 600 - 120 * math.sin(x / 520.0 + 0.7) - 50 * math.sin(x / 190.0) + r.uniform(-8, 8))
@@ -418,9 +419,36 @@ class World:
         if self.fog > 0:
             g = cairo.LinearGradient(0, H * 0.3, 0, H)
             g.add_color_stop_rgba(0, 0.9, 0.92, 0.95, 0.0)
-            g.add_color_stop_rgba(1, 0.9, 0.92, 0.95, self.fog * 0.6)
+            g.add_color_stop_rgba(1, 0.9, 0.92, 0.95, self.fog * 0.45)
             ctx.set_source(g)
             ctx.paint()
+            # (24 Nov 2026) the fog MOVES: soft banks drifting across at three depths, each at its own speed
+            r = random.Random(11)
+            for depth, n, sp in ((0.5, 5, 14.0), (0.75, 4, 26.0), (1.0, 3, 42.0)):
+                for i in range(n):
+                    w_ = W * r.uniform(0.35, 0.6) * depth
+                    x = (r.uniform(0, W + w_) + t * sp * (1 if i % 2 else 0.7)) % (W + 2 * w_) - w_
+                    y = H * (0.55 + 0.38 * depth) + 18 * math.sin(t * 0.4 + i)
+                    hh = H * 0.16 * depth
+                    rg = cairo.RadialGradient(x, y, 0, x, y, w_ * 0.5)
+                    a_ = self.fog * 0.32 * depth * (0.75 + 0.25 * math.sin(t * 0.3 + i * 1.7))
+                    rg.add_color_stop_rgba(0, 0.9, 0.92, 0.95, a_)
+                    rg.add_color_stop_rgba(1, 0.9, 0.92, 0.95, 0.0)
+                    ctx.save()
+                    ctx.translate(x, y)
+                    ctx.scale(1.0, hh / max(1.0, w_ * 0.5))
+                    ctx.translate(-x, -y)
+                    ctx.set_source(rg)
+                    ctx.arc(x, y, w_ * 0.5, 0, 2 * math.pi)
+                    ctx.fill()
+                    ctx.restore()
+        light = float(getattr(self, "lightning", 0.0) or 0.0)
+        if light > 0:                                           # a storm: lightning flashes now and then
+            k = t % 9.3
+            fl = (0.55 if k < 0.08 else 0.0) + (0.35 if 0.2 < k < 0.27 else 0.0)
+            if fl > 0:
+                ctx.set_source_rgba(0.85, 0.9, 1.0, fl * light)
+                ctx.paint()
         if tint[3] > 0:                                         # the light of the hour over everything
             ctx.set_source_rgba(*tint)
             ctx.set_operator(cairo.OPERATOR_MULTIPLY)

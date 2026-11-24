@@ -29,6 +29,12 @@ GESTURES = {
     "scared": {"a": ("ik", 0.95, -0.12, -165, "open"), "b": ("ik", 0.95, -0.12, -165, "open"), "over": True},
     "think": {"a": ("ik", 0.1, -0.14, -170, "fist"), "over": True},
     "belly_laugh": {"a": ("ik", 0.55, 0.92, -110, "open"), "b": ("ik", 0.55, 0.92, -110, "open")},
+    # (24 Nov 2026, the owner's audit: more acting) holding a lantern / torch out, reaching for someone, a hand over
+    # the mouth or nose, arms folded while listening
+    "hold_lamp": {"a": (22, 96, 96, "fist")},
+    "reach": {"a": (64, 78, 82, "open")},
+    "cover_mouth": {"a": ("ik", 0.02, -0.24, -172, "open"), "over": True},
+    "arms_crossed": {"a": ("ik", -0.42, 0.40, -150, "fist"), "b": ("ik", -0.42, 0.40, -150, "fist"), "over": True},
 }
 
 
@@ -265,16 +271,19 @@ class Perf:
             self.turn_s, self.turn_v, side_d = want, 0.0, want
         st["head_turn"] = st["turn"]
         # ---- breathing, weight shift, idle head
+        # (24 Nov 2026: the owner saw "the same standing pose" - the idle is now big enough to read on screen:
+        # a visible breath in the chest and shoulders, the weight moving from foot to foot, the head never dead still)
         br = math.sin(2 * math.pi * t / 3.6 + self.rng.random() * 0.0)
-        rot["spine"] = D(0.6) * br + D(P.get("stoop", 0) * 40)
+        rot["spine"] = D(1.5) * br + D(P.get("stoop", 0) * 40)
         sway = math.sin(2 * math.pi * t / 7.3 + len(self.cid))
-        root_dx = sway * P["H"] * 0.004
-        root_dy = 0.0
-        rot["head"] = D(1.8) * math.sin(2 * math.pi * t / 4.1 + 1.3) + D(-P.get("stoop", 0) * 30)
-        rot["neck"] = D(0.8) * math.sin(2 * math.pi * t / 5.7)
+        root_dx = sway * P["H"] * 0.009
+        root_dy = -abs(br) * P["H"] * 0.0025
+        rot["head"] = D(3.0) * math.sin(2 * math.pi * t / 4.1 + 1.3) + D(-P.get("stoop", 0) * 30)
+        rot["neck"] = D(1.4) * math.sin(2 * math.pi * t / 5.7)
         for s in ("a", "b"):
             sgn = 1 if s == "a" else -1
-            rot["uarm_" + s] = sgn * D(1.2) * br
+            rot["uarm_" + s] = sgn * D(2.6) * br + sgn * D(1.5) * sway
+            rot["farm_" + s] = sgn * D(3.0) * (0.5 + 0.5 * math.sin(2 * math.pi * t / 5.1 + sgn))
         # ---- emotion and face
         emo = self.emotion(t)
         speaking = sp is not None

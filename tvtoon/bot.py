@@ -127,7 +127,21 @@ def part_spec(ep, si, lines, subs, line_wavs, dur, W, H, fps):
             beats += AC.timed(items, st, du)
             last = actor
         else:
-            b = {"narrate": text or tx, "at": st, "shot_type": "wide"}
+            # (24 Nov 2026) the narration no longer sits on one wide shot: the first line shows the place, then the
+            # camera goes to whom the line is about - medium, a two-shot, a close-up on the frightening lines
+            named = [a_ for a_ in dr.who_in(text + " " + str(ln.get("en", "")) + " " + str(ln.get("action", ""))) if a_ in ids]
+            n_nar = sum(1 for x_ in beats if "narrate" in x_)
+            if n_nar == 0:
+                shot_t = "wide"
+            elif raw in ("eerie", "scared", "terrified", "scare", "shocked", "creepy", "chilling", "tense", "panic"):
+                shot_t = "close" if n_nar % 2 else "medium"
+            else:
+                shot_t = ("medium", "two", "wide", "medium", "full")[n_nar % 5]
+            b = {"narrate": text or tx, "at": st, "shot_type": shot_t}
+            if named or shot_t != "wide":
+                b["who"] = named[0] if named else (spec["cast"][n_nar % len(spec["cast"])]["id"] if spec["cast"] else None)
+                if b["who"] is None:
+                    b.pop("who")
             if wav:
                 b["audio"] = wav
             beats.append(b)

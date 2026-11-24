@@ -203,6 +203,22 @@ class Scene:
                                    "voice": how, "emotion": "neutral", "lipsync": {"method": "voice-over"}, "to": None})
                 t1 += 0.3
                 shot = b.get("shot_type") and {"type": b["shot_type"]}
+                if self.order and t1 - t0 > 7.0 and (shot or {}).get("type") in ("wide", "establish", None):
+                    # (24 Nov 2026) a long narration is not one held wide shot: the place for ~4 s, then the camera
+                    # goes in on the people (medium, then a two-shot) while the voice goes on
+                    sub = [c for c in self.order if c in self.perf and not getattr(self.perf[c], "extra", False)]
+                    main = who if who in sub else (sub[0] if sub else None)
+                    if main:
+                        k_ = t0 + 4.0
+                        seq = [{"type": "medium", "who": main}, {"type": "two", "who": main,
+                                                                 "to": next((c for c in sub if c != main), None)}]
+                        j = 0
+                        while k_ < t1 - 1.5:
+                            auto.append((k_, min(t1, k_ + 5.0), dict(seq[j % 2])))
+                            k_ += 5.0
+                            j += 1
+                        auto.append((t0, t0 + 4.0, dict(shot or {"type": "wide"}, who=who)))
+                        shot = None
             elif "drive_to" in b:                              # a vehicle drives (accelerate, cruise, brake)
                 v = self.vehicles[b["vehicle"]]
                 x0 = v.x_at(t0)
@@ -314,7 +330,91 @@ class Scene:
         for t0, t1, sh in auto:
             sh.update(t0=t0, t1=t1)
             self.shots.append(sh)
+        if self.spec.get("idle_acting", os.environ.get("TVTOON_IDLE_ACT") != "0"):
+            self._idle_acting(t + 0.6)
         return t + 0.6
+
+    # -------------------------------------------------------------- the acting between the story's own beats
+    IDLE_MOODS = {  # look -> the small acts a character does by itself while no one asks it to do anything
+        "horror": ["look_back", "think", "glance", "arms_crossed", "nod", "step", "hold_breath", "look_back", "glance"],
+        "film": ["think", "glance", "arms_crossed", "nod", "step", "look_back", "hips"],
+        "kids": ["nod", "glance", "hips", "think", "step", "arms_crossed", "bounce"],
+    }
+
+    def _idle_acting(self, end):
+        """(owner's audit, 24 Nov 2026: "characters stand in nearly identical static poses"). Wherever a character has
+        nothing to do for more than ~3 s - most often under the narration - it acts by itself: looks round over its
+        shoulder, glances at the other one, folds its arms, puts a hand to its chin, nods, shifts a step and back,
+        holds its breath (a frightened flinch) in a horror story. Each character on its own clock; nothing during its
+        own lines, walks, sitting-down or a ghost's change, and never on the place's passers-by."""
+        import random as _r
+        look = (os.environ.get("TVTOON_LOOK") or self.spec.get("look") or "film").lower()
+        menu = self.IDLE_MOODS.get("horror" if look in ("horror", "cinematic") else look, self.IDLE_MOODS["film"])
+        for cid in self.order:
+            pf = self.perf[cid]
+            if getattr(pf, "extra", False) or cid in self.life:
+                continue
+            spec_c = CH.get(cid)
+            if spec_c.get("animal"):
+                continue
+            busy = [(a, b) for a, b, *_ in pf.speech] + [(a, b) for a, b, *_ in pf.moves] + \
+                   [(a, b) for a, b, *_ in pf.gestures] + [(a, b) for a, b, *_ in pf.acts] + list(pf.lookbacks) + \
+                   [(a - 1.0, a + 1.0) for a, _b, *_ in getattr(pf, "sits", [])] + \
+                   [(a, b) for a, b, w in self.transforms if w == cid] + \
+                   [(a, a + 1.2) for a, b, *_ in getattr(pf, "rides", [])]
+            busy = sorted((max(0.0, a), min(end, b)) for a, b in busy if b > 0)
+            rng = _r.Random(hash(cid) % 9973 + int(end))
+            free, t0 = [], 0.6
+            for a, b in busy + [(end, end)]:
+                if a - t0 > 3.0:
+                    free.append((t0, a))
+                t0 = max(t0, b)
+            ghost = spec_c.get("ghost") is not None and not any(c.get("id") == cid and c.get("disguise") for c in self.spec["cast"])
+            sitting_at = lambda tt: pf.sit_amount(tt)[0] > 0.2 or any(r_[0] <= tt < r_[1] for r_ in getattr(pf, "rides", []))
+            for a, b in free:
+                t = a + rng.uniform(0.8, 1.8)
+                last = None
+                while t + 1.6 < b - 0.4:
+                    kind = rng.choice(menu)
+                    if kind == last:
+                        continue
+                    last = kind
+                    if ghost and kind in ("step", "nod", "hold_breath", "arms_crossed"):
+                        kind = "glance"
+                    if kind == "step" and sitting_at(t):
+                        kind = "think"
+                    sec = rng.uniform(1.8, 2.8)
+                    if kind == "look_back":
+                        pf.lookbacks.append((t, t + 1.6))
+                        sec = 1.6
+                    elif kind == "glance":          # turns the head to the other side and back (a wary look)
+                        side = rng.choice((-1.0, 1.0))
+                        pf.looks.append((t, t + 1.5, pf.x_at(t) + side * 900.0))
+                        sec = 1.5
+                    elif kind == "nod":
+                        pf.acts.append((t, t + 0.9, "nod"))
+                        sec = 0.9
+                    elif kind == "step" and not ghost:   # shifts its weight: a small step aside, and back later
+                        x = pf.x_at(t)
+                        d = rng.choice((-1.0, 1.0)) * rng.uniform(60, 110)
+                        sp_ = pf.pp.P["leg"] * 0.85 / 1.05 * self.cscale(cid)
+                        dt_ = abs(d) / sp_
+                        if t + 2 * dt_ + 2.0 < b - 0.4:
+                            pf.moves.append((t, t + dt_, x, x + d, "walk"))
+                            pf.moves.append((t + dt_ + 1.6, t + 2 * dt_ + 1.6, x + d, x, "walk"))
+                            pf.moves.sort(key=lambda m: m[0])
+                            sec = 2 * dt_ + 1.6
+                        else:
+                            continue
+                    elif kind == "hold_breath":       # a frightened flinch: the scared face for a moment
+                        pf.emotions.append((t, t + 1.6, "scared"))
+                        sec = 1.6
+                    elif kind == "bounce":
+                        pf.emotions.append((t, t + 1.8, "happy"))
+                    else:                                # think (hand to chin), arms_crossed, hips
+                        pf.gestures.append((t, t + sec, kind, None, None))
+                    self.log.append(f"idle {cid} {kind} {t:.1f}")
+                    t += sec + rng.uniform(1.0, 2.4)
 
     # -------------------------------------------------------------- queries used by the performances
     def x_of(self, cid, t):

@@ -46,7 +46,8 @@ CUES = [
     ("run", ["ran", "runs", "running", "rushed", "rushes", "dashed", "raced", "sprint", "hurried", "দৌড়", "ছুটে", "ছুটল",
              "ছুটলো", "ছুট", "दौड़", "भागा", "भागी", "भागते", "भागने"]),
     ("fly", ["flew", "flies", "flying", "fly", "উড়ে", "উড়ল", "উড়তে", "उड़", "उड़ते", "उड़ा"]),
-    ("approach", ["came closer", "comes closer", "came near", "went up to", "goes up to", "walked up", "walks up",
+    ("approach", ["steps closer", "stepped closer", "stepping closer", "moves closer", "leans closer", "leaned closer",
+                  "came closer", "comes closer", "came near", "went up to", "goes up to", "walked up", "walks up",
                   "approached", "approaches", "moved closer", "stepped forward", "এগিয়ে এল", "এগিয়ে গেল", "এগিয়ে", "কাছে এল",
                   "কাছে গেল", "কাছে এসে", "पास आया", "पास आई", "पास गया", "पास गई", "पास आकर", "आगे बढ़"]),
     ("walk", ["walked", "walks", "walking", "strolled", "stepped", "হাঁট", "পায়চারি", "टहल", "चलते हुए", "चलने लगा",
@@ -60,7 +61,21 @@ CUES = [
     ("fall", ["fell", "falls down", "tripped", "slipped", "tumbled", "পড়ে গেল", "পড়ে গেলেন", "হোঁচট", "পিছলে", "गिर",
               "फिसल", "लड़खड़"]),
     ("hide", ["hid", "hide", "hiding", "লুকি", "লুকোল", "লুকাল", "छिप", "छुप"]),
-    ("look_back", ["looked back", "looks back", "look back", "turned around", "turned round", "turns around", "glanced back",
+    ("step_back", ["steps back", "stepped back", "stepping back", "backs away", "backed away", "backing away", "recoil",
+                   "recoils", "recoiled", "shrinks back", "jumps back", "পিছিয়ে", "পিছু হট", "পিছনে সরে", "पीछे हट"]),
+    ("grab", ["grabs", "grabbed", "grabbing", "clutches", "clutched", "seizes", "seized", "catches hold", "জাপটে", "চেপে ধর",
+              "আঁকড়ে", "হাত ধরে", "हाथ पकड़", "पकड़ लिया", "जकड़"]),
+    ("cover", ["covers his nose", "covers his mouth", "covers her mouth", "covers her nose", "covers his face",
+               "covers her face", "covered his", "covered her", "handkerchief", "নাক চেপে", "মুখ চেপে", "মুখ ঢেকে",
+               "नाक दबा", "मुँह दबा", "मुंह ढ"]),
+    ("hold", ["holding a lantern", "holding his lantern", "holding the lantern", "holding her lantern", "holds the lantern",
+              "holds his lantern", "holds torch", "holds the torch", "holds his torch", "holding a torch", "holding his torch",
+              "holding the lamp", "holding a lamp", "holds the lamp", "holds up", "with a lantern", "with his lantern",
+              "with a torch", "with a small lantern", "লণ্ঠন হাতে", "টর্চ হাতে", "হ্যারিকেন হাতে", "প্রদীপ হাতে",
+              "लालटेन लिए", "टॉर्च लिए"]),
+    ("look_back", ["looks around", "looked around", "looking around", "glances around", "glanced around", "peers", "peered",
+                   "peering", "চারদিকে তাকা", "চারপাশে তাকা", "এদিক-ওদিক", "এদিক ওদিক", "इधर-उधर",
+                   "looked back", "looks back", "look back", "turned around", "turned round", "turns around", "glanced back",
                    "পিছন ফিরে", "পেছন ফিরে", "ঘুরে তাকা", "ফিরে তাকা", "पीछे मुड़", "मुड़कर", "पलटकर", "पीछे देख"]),
     ("bow", ["bowed", "bows", "touched his feet", "touched her feet", "touched the feet", "প্রণাম কর", "মাথা নত", "পায়ে হাত",
              "চরণ", "चरण स्पर्श", "पैर छू", "सिर झुका", "प्रणाम किया"]),
@@ -78,13 +93,15 @@ CUES = [
                "হি হি", "হো হো", "हँस", "हंसने", "हंसते", "हंसी", "हंसा", "हा हा", "ही ही"]),
     ("cry", ["cried", "cries", "crying", "wept", "weep", "sobbed", "in tears", "কাঁদ", "কেঁদে", "কান্না", "চোখে জল", "रो पड़",
              "रोने", "रोते", "रोया", "रोई", "आँसू", "आंसू"]),
-    ("scared", ["afraid", "scared", "frightened", "terrified", "trembl", "shiver", "help!", "save me", "ভয়", "বাঁচাও", "কাঁপ",
+    ("scared", ["scream", "screams", "screamed", "shriek", "frozen", "froze", "horrified", "in horror", "trembling",
+                "আর্তনাদ", "আঁতকে", "শিউরে", "afraid", "scared", "frightened", "terrified", "trembl", "shiver", "help!", "save me", "ভয়", "বাঁচাও", "কাঁপ",
                 "डर", "बचाओ", "काँप", "कांप"]),
     ("angry", ["angry", "angrily", "shouted", "yelled", "furious", "scolded", "roared", "রেগে", "রাগ", "ধমক", "চেঁচিয়ে",
                "চিৎকার", "গর্জ", "गुस्से", "गुस्सा", "क्रोध", "चिल्ला", "डांट", "डाँट", "दहाड़", "गरज"]),
     ("surprised", ["surprised", "shocked", "amazed", "astonished", "what!", "অবাক", "চমকে", "আশ্চর্য", "ওমা", "হায় হায়",
                    "हैरान", "चौंक", "आश्चर्य", "अरे!"]),
-    ("think", ["thought", "thinks", "wondered", "thinking", "hmm", "let me think", "ভাবল", "ভাবলেন", "ভাবতে", "ভেবে",
+    ("think", ["adjusts his spectacles", "adjusted his spectacles", "adjusts his glasses", "rubs his chin", "চশমা ঠিক",
+               "thought", "thinks", "wondered", "thinking", "hmm", "let me think", "ভাবল", "ভাবলেন", "ভাবতে", "ভেবে",
                "ভাবছি", "চিন্তা", "হুম", "सोच", "विचार", "हम्म"]),
     ("shrug", ["shrugged", "shrugs", "don't know", "no idea", "জানি না", "কী জানি", "কে জানে", "पता नहीं",
                "मालूम नहीं", "कंधे उचका"]),
@@ -107,14 +124,14 @@ ORDERS = [
                   "यहाँ आओ", "पास आओ"]),
     ("stand", ["stand up", "get up", "উঠে দাঁড়াও", "ওঠো", "উঠে পড়ো", "खड़े हो जाओ", "उठो"]),
 ]
-MOVES = {"run_away", "chase", "leave", "enter", "run", "fly", "approach", "walk", "stand", "sit", "hide"}
+MOVES = {"run_away", "chase", "leave", "enter", "run", "fly", "approach", "walk", "stand", "sit", "hide", "step_back", "grab"}
 ACTS = {"dance": "dance", "jump": "jump", "fall": "fall", "bow": "bow", "nod": "nod", "shake": "shake"}
 GESTURE = {"namaste": "namaste", "wave": "wave", "point_up": "point_up", "point": "point", "clap": "clap",
            "laugh": "belly_laugh", "cry": None, "scared": "scared", "angry": "hips", "surprised": "raise_hand",
            "think": "think", "shrug": "shrug", "bless": "raise_hand", "give": "explain", "eat": "think", "proud": "hips",
-           "bow": "namaste"}
+           "bow": "namaste", "grab": "reach", "cover": "cover_mouth", "hold": "hold_lamp"}
 EMOTION = {"laugh": "laughing", "cry": "crying", "scared": "scared", "angry": "angry", "surprised": "surprised",
-           "dance": "happy", "jump": "happy", "clap": "happy", "fall": "surprised", "hide": "scared", "run_away": "scared",
+           "dance": "happy", "jump": "happy", "clap": "happy", "fall": "surprised", "hide": "scared", "run_away": "scared", "step_back": "scared",
            "proud": "happy"}
 NEG = re.compile(r"^.{0,10}?(না(?![ঀ-৿])|নেই|নি(?![ঀ-৿])|मत|नहीं|न |don't|do not|not |never|no need)", re.I)
 NEG_BEFORE = re.compile(r"(don't|do not|not|never|no|मत|न)\s+\S*\s*$", re.I)
@@ -294,6 +311,13 @@ class Director:
                     out.append(("before", self._walk(a, self.x[a] - 260 * (1 if d > 0 else -1))))
             else:
                 out.append(("before", self._walk(a, self.x[a] + (1 if self.x[a] < 1600 else -1) * 420)))
+        elif act == "step_back":                            # a quick step or two back, away from the other one
+            away = 1.0 if o is None or self.x[a] >= self.x[o] else -1.0
+            out.append(("during", self._walk(a, self.x[a] + away * 190, "walk")))
+        elif act == "grab":                                 # goes right up to the other one (the hand: 'reach')
+            if o is not None and abs(self.x[o] - self.x[a]) > 230:
+                d = self.x[o] - self.x[a]
+                out.append(("before", self._walk(a, self.x[o] - 200 * (1 if d > 0 else -1), "run")))
         elif act == "sit" and a not in self.sitting:
             out.append(("before", {"who": a, "sit": True}))
             self.sitting.add(a)
@@ -453,6 +477,9 @@ class Director:
                     k = ACTS[x] if not (self.animal(a) and x == "bow") else "nod"
                     out.append(("during" if k in ("nod", "shake") else "before", {"who": a, "act": k}))
                     self.log.append(f"{a}: {x}")
+                if x == "look_back" and a not in self.fixed:   # (was named but never acted before 24 Nov 2026)
+                    out.append(("during", {"who": a, "look_back": 1.7}))
+                    self.log.append(f"{a}: look_back")
                 if x in GESTURE and GESTURE[x]:
                     if a == speaker:
                         gest = gest or GESTURE[x]

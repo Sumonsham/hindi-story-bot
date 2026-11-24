@@ -195,7 +195,7 @@ def room_kind(text):
     return "bedroom"
 
 
-def place_of(text):
+def place_of(text, outdoor_guess=True):
     t = (text or "").lower()
     if any(w in t for w in PALKI) and not any(w in t for w in ("inside", "interior", "cramped", "ভেতর")) and \
             any(w in t for w in BOAT):
@@ -204,8 +204,11 @@ def place_of(text):
         return "ghar"
     if any(w in t for w in HOLD):
         return "ghar"
+    if any(w in t for w in BOAT) and not (any(w in t for w in ("ghat", "ঘাট", "bank", "shore", "পাড়")) and
+                                          any(w in t for w in ("moored", "tied", "docked", "beside", "near", "বাঁধা"))):
+        return "boat"                                       # (a boat MOORED at the ghat: the scene is on the ghat)
     if any(w in t for w in BOAT):
-        return "boat"
+        return "pukur_ghat"
     if "radio station" in t or "police station" in t:
         return "ghar"
     for loc, words in PLACE_WORDS[:4]:                      # inside a train / bus / tram, or riding
@@ -228,7 +231,25 @@ def place_of(text):
                 return loc
         elif any(w in t for w in words):
             return loc
+    # (24 Nov 2026: "Iron gate outside Dormitory #3 under towering old trees" was drawn as a room) - an OUTDOOR place
+    # the lists above do not name goes to the nearest outdoor world, never to a room
+    if outdoor_guess and any(w in t for w in OUTSIDE_WORDS):
+        if any(w in t for w in ("dormitor", "hostel", "boarding", "campus", "compound", "school", "ছাত্রাবাস", "হস্টেল")):
+            return "school"
+        if any(w in t for w in ("river", "ghat", "নদী", "ঘাট")):
+            return "pukur_ghat"
+        if any(w in t for w in ("forest", "jungle", "woods", "bamboo", "banyan", "trees", "জঙ্গল", "বন", "গাছ")):
+            return "bansh_bon"
+        if any(w in t for w in ("mansion", "zamindar", "rajbari", "জমিদার", "রাজবাড়ি")):
+            return "zamindar_bari"
+        if any(w in t for w in ("road", "path", "lane", "street", "রাস্তা", "পথ")):
+            return "village_road"
+        return "village_courtyard"
     return "ghar"
+
+
+OUTSIDE_WORDS = ["outside", "outdoor", "gate", "under the", "trees", "path", "road", "lane", "field", "garden", "compound",
+                 "courtyard", "yard", "fog", "mist", "open air", "sky", "বাইরে", "উঠোন", "মাঠ", "রাস্তা", "পথ", "গাছতলা"]
 
 
 def hours_of(text, mood="", inherit=None):
@@ -336,6 +357,8 @@ def episode_from_story(story, max_scenes=None, max_lines=None, aspect="16:9", ca
             world["wind"] = 0.9 if "storm" in pl or "ঝড়" in pl else 0.6
         if any(w in pl for w in ("mist", "fog", "কুয়াশা")) and not indoor_loc:
             world["fog"] = 0.45
+        if any(w in pl for w in ("storm", "thunder", "lightning", "ঝড়", "বাজ", "বিদ্যুৎ চমক")):
+            world["lightning"] = 1.0                        # flashes through the sky / the windows
         beats = [{"pause": 1.4}]
         vehicles = []
         if inside:

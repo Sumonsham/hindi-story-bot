@@ -1,25 +1,25 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-22T22:05+00:00",
+  "made": "2026-11-24T22:34+00:00",
   "lessons": [
-   "Keep educational and science-backed cartoon stories concise, as demonstrated by strong retention on short science topics like sky mysteries.",
-   "Structure mythological and epic series into clear, bite-sized parts to maintain high viewer completion rates.",
-   "Incorporate moral dilemmas early in detective and folk stories to prevent viewer drop-off in the middle chapters.",
-   "Use familiar characters like Gopal Bhar consistently as anchor content since they consistently attract steady engagement slots.",
-   "End episodes with a distinct question or cliffhanger to directly drive comment section activity and viewer participation."
+   "Keep educational and science episodes concise and visually stimulating, as demonstrated by the strong retention on learning content.",
+   "Avoid overly long compilation videos or low-pacing mythologies if retention drops to zero early on.",
+   "Start mythological and historical stories directly with the core conflict rather than slow exposition to reduce early drop-offs.",
+   "Utilize relatable characters like Gopal Bhar or children in mysteries to maintain viewer engagement past the introduction.",
+   "Keep overall narrative arcs tightly edited to prevent audience fatigue in the middle chapters."
   ],
   "titles": [
-   "Titles featuring direct questions (e.g., 'কেন?', 'কীভাবে?') successfully capture higher viewer curiosity and initial clicks.",
-   "Using emotional triggers and mystery words like 'রহস্য' or 'গোপন' in title_b variants improved overall performance over generic titles.",
-   "Keeping titles concise with strong visual emojis helps mobile scrollers quickly identify the cartoon category and premise."
+   "Titles featuring direct questions or urgent mysteries (e.g., about footprints or glowing objects) secure higher initial clicks.",
+   "Using Title B variants that emphasize character action and curiosity generally outperform passive descriptive titles.",
+   "Adding relevant emojis helps visually anchor the theme and improves click-through rates on mobile feeds."
   ],
   "requests": [
-   "Nilmadhab story continuation and Vidyapati character insights",
-   "Magical mango adventure and choices related to mythical fruits",
-   "Humorous monsoon episodes featuring comical priest reactions",
-   "Detailed character deep-dives into the five Pandavas",
-   "Art and learning-based story prompts concerning fear of failure",
-   "Interactive guessing games to identify thieves or culprits in mystery plots"
+   "Interactive quiz questions about the thief's identity in mystery episodes",
+   "Preferences on different forms of Goddess Durga and devotional stories",
+   "Favorite Bengali alphabet or learning characters from the kids' segments",
+   "Creative ideas and food-related solutions from Gopal Bhar stories",
+   "Reflections and moral lessons from Lord Mahadev's divine acts",
+   "Choices regarding navigating mystical doors and fantasy settings"
   ]
  }
 }

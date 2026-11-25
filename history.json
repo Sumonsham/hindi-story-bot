@@ -1669,7 +1669,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1960,7 +1960,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -1979,12 +1979,12 @@
   "stats": {
    "likes": 0,
    "comments": 0,
-   "views": 14,
+   "views": 15,
    "length_s": 5374,
    "yt_views": 14,
    "yt_avg_s": 9,
    "yt_avg_pct": 0.2,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   }
  },
  {
@@ -2741,10 +2741,10 @@
    "comments": 1,
    "views": 1,
    "length_s": 501,
-   "yt_views": 0,
+   "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3201,12 +3201,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 4,
+   "views": 5,
    "length_s": 540,
    "yt_views": 4,
    "yt_avg_s": 19,
    "yt_avg_pct": 3.6,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3614,7 +3614,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-21T22:04+00:00"
+   "checked": "2026-11-24T22:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -4036,6 +4036,12 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-24T09:34+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-24T22:33+00:00",
+   "thumb": true
   }
  },
  {
@@ -4070,6 +4076,16 @@
   "riddle": {
    "q": "পা নেই তবু চলে অনবরত, দিন-রাত পার করে কত শত শত! বল তো সেটা কী?",
    "a": "ঘড়ি"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 3,
+   "length_s": 833,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-24T22:33+00:00"
   }
  },
  {
@@ -4100,5 +4116,50 @@
   "fb_reel": "2424597711281003",
   "fb_story": "3135849323412794",
   "yt_short": "Tv_mgmYp9K4"
+ },
+ {
+  "date": "2026-11-25T01:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-25@7",
+  "pending_comments": [
+   {
+    "id": "1165614519548424",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1842894193709274"
+   },
+   {
+    "id": "1833117101329933",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1842894193709274"
+   }
+  ],
+  "category": "keno",
+  "idea": "why the moon changes its shape",
+  "episode": 2,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "সায়নের কেন? পর্ব ২: আকাশে চাঁদ কেন রূপ বদলায়? 🌙✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "না, নেই"
+  },
+  "hook_style": "voice",
+  "moral": "যেকোনো অন্ধ বিশ্বাসের চেয়ে বিজ্ঞানের সহজ যুক্তি অনেক বেশি সুন্দর ও সত্যি।",
+  "title_b": "সায়নের কেন?: চাঁদের আকারের গোপন রহস্য! 🌙🔍",
+  "question_post": null,
+  "facebook": "1842894193709274",
+  "youtube": "qzpT6esNAlk",
+  "fb_reel": "1165614519548424",
+  "fb_story": "2210575143148866",
+  "fb_reel2": "1833117101329933",
+  "coloring": "122140494650735948",
+  "yt_short": "Hp4VYqXFcW0",
+  "riddle_post": "122140501628735948",
+  "riddle": {
+   "q": "সোনার থালা গোলগাল, রাতে জ্বলে সকাল হলে গায়েব! বলতো দেখি কী?",
+   "a": "চাঁদ"
+  }
  }
 ]

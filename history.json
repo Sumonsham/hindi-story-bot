@@ -2375,10 +2375,10 @@
    "comments": 1,
    "views": 10,
    "length_s": 468,
-   "yt_views": 9,
-   "yt_avg_s": 20,
-   "yt_avg_pct": 4.4,
-   "checked": "2026-11-22T09:04+00:00"
+   "yt_views": 10,
+   "yt_avg_s": 17,
+   "yt_avg_pct": 3.7,
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2785,12 +2785,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 1,
+   "views": 3,
    "length_s": 504,
-   "yt_views": 1,
-   "yt_avg_s": 9,
-   "yt_avg_pct": 1.9,
-   "checked": "2026-11-22T09:04+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 164,
+   "yt_avg_pct": 32.5,
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2835,7 +2835,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-22T09:04+00:00"
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3251,10 +3251,10 @@
    "comments": 1,
    "views": 5,
    "length_s": 519,
-   "yt_views": 4,
-   "yt_avg_s": 520,
-   "yt_avg_pct": 100.1,
-   "checked": "2026-11-22T09:04+00:00"
+   "yt_views": 5,
+   "yt_avg_s": 440,
+   "yt_avg_pct": 84.7,
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3291,10 +3291,10 @@
    "comments": 1,
    "views": 2,
    "length_s": 387,
-   "yt_views": 1,
+   "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-22T09:04+00:00"
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3660,12 +3660,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 3,
    "length_s": 911,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-22T03:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 18,
+   "yt_avg_pct": 2,
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3705,12 +3705,12 @@
   "stats": {
    "likes": 5,
    "comments": 1,
-   "views": 4,
+   "views": 6,
    "length_s": 707,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-22T09:04+00:00"
+   "yt_views": 5,
+   "yt_avg_s": 173,
+   "yt_avg_pct": 24.4,
+   "checked": "2026-11-25T09:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -4086,6 +4086,10 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-24T22:33+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 3
   }
  },
  {
@@ -4115,22 +4119,23 @@
   "youtube": "7RyyQzJPip0",
   "fb_reel": "2424597711281003",
   "fb_story": "3135849323412794",
-  "yt_short": "Tv_mgmYp9K4"
+  "yt_short": "Tv_mgmYp9K4",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 4,
+   "length_s": 935,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-25T09:33+00:00"
+  }
  },
  {
   "date": "2026-11-25T01:31+00:00",
   "lang": "bn",
   "slot": "2026-11-25@7",
-  "pending_comments": [
-   {
-    "id": "1165614519548424",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1842894193709274"
-   },
-   {
-    "id": "1833117101329933",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1842894193709274"
-   }
-  ],
+  "pending_comments": [],
   "category": "keno",
   "idea": "why the moon changes its shape",
   "episode": 2,
@@ -4161,5 +4166,39 @@
    "q": "সোনার থালা গোলগাল, রাতে জ্বলে সকাল হলে গায়েব! বলতো দেখি কী?",
    "a": "চাঁদ"
   }
+ },
+ {
+  "date": "2026-11-25T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-25@19",
+  "pending_comments": [
+   {
+    "id": "1683254529911715",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2130032550951681"
+   }
+  ],
+  "category": "krishna",
+  "idea": "the birth of Krishna in Kamsa's prison and Vasudeva carrying him across the Yamuna to Gokul",
+  "episode": 1,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "শ্রীকৃষ্ণের লীলা পর্ব ১: শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "যমুনা নদী"
+  },
+  "hook_style": "sound",
+  "moral": "ঈশ্বরের ওপর অটল বিশ্বাস ও ভক্তি থাকলে জীবনের সবচেয়ে উত্তাল নদীর মতো বাধাও নিজে থেকেই শান্ত হয়ে পথ করে দেয়।",
+  "title_b": "দুর্যোগের রাতে শ্রীকৃষ্ণের অলৌকিক জন্ম ও যমুনা পারাপার! ⚡",
+  "question_post": null,
+  "facebook": "2130032550951681",
+  "youtube": "118SRi_crUA",
+  "fb_reel": "1683254529911715",
+  "fb_story": "29660618373546904",
+  "yt_short": "iXGrC9d5DIo"
  }
 ]

@@ -256,6 +256,441 @@
     ],
     "unlike_others": 5
    }
+  },
+  "lib_k_vasudeva_805a6": {
+   "spec": {
+    "name_bn": "Vasudeva",
+    "name_en": "lib_k_vasudeva_805a6",
+    "category": "adult_male",
+    "age": 55,
+    "cast": "story_lib",
+    "personality": "the village priest; round, nervous, recites mantras very fast when frightened",
+    "voice": "middle-aged male, nasal",
+    "height": 0.971,
+    "heads": 4.4,
+    "head": {
+     "shape": "egg",
+     "w": 0.86,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.074,
+     "eye_spacing": 0.42,
+     "iris": "#3a2410",
+     "nose": "button",
+     "nose_size": 0.98,
+     "mouth_w": 1.05,
+     "brow_thick": 1.0,
+     "blush": true,
+     "beard": 1.0
+    },
+    "hair": {
+     "style": "crop"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.86,
+     "waist": 0.88,
+     "hip": 0.78,
+     "belly": 0.2,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.42,
+     "arm": 0.4,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "half"
+    },
+    "colours": {
+     "skin": "#c48a62",
+     "hair": "#120e0c",
+     "kurta": "#5a3a7a",
+     "dhoti": "#c62828",
+     "shoe": "#6a4020",
+     "lip": "#a05a48",
+     "beard": "#120e0c",
+     "moustache": "#120e0c"
+    },
+    "accessories": [
+     "crown",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Vasudeva"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Dignified noble prince, wheatish complexion, thick dark beard and moustache, wearing torn red silk dhoti, heavy iron chains around wrists and ankles, anxious devoted eyes.",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+   "key": "",
+   "made": "2026-11-25T09:49+00:00",
+   "check": {
+    "front_side_pixels": [
+     94097,
+     63460
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_devaki_ba6e6": {
+   "spec": {
+    "name_bn": "Devaki",
+    "name_en": "lib_k_devaki_ba6e6",
+    "category": "adult_female",
+    "age": 34,
+    "cast": "story_lib",
+    "personality": "a village wife, practical and brave; lights the evening lamp, hears the knock at midnight",
+    "voice": "adult female, warm",
+    "height": 0.858,
+    "heads": 5.0,
+    "head": {
+     "shape": "square",
+     "w": 0.848,
+     "ear": 0.9
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.087,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "broad",
+     "nose_size": 1.12,
+     "mouth_w": 0.95,
+     "lashes": true,
+     "brow_thick": 0.85,
+     "blush": true
+    },
+    "hair": {
+     "style": "braid_long"
+    },
+    "body": {
+     "shoulder": 0.66,
+     "chest": 0.68,
+     "waist": 0.6,
+     "hip": 0.72,
+     "belly": 0.05,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.45,
+     "arm": 0.41,
+     "shoe": "sandal",
+     "foot": 0.85
+    },
+    "costume": {
+     "type": "saree",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#e0aa82",
+     "hair": "#2a2a2a",
+     "saree": "#2e7d32",
+     "border": "#e0b030",
+     "blouse": "#2e7d32",
+     "shoe": "#6a3a2a",
+     "lip": "#a0404a"
+    },
+    "accessories": [
+     "bindi",
+     "bangles",
+     "earrings",
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Devaki"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Graceful royal princess, fair skin, long disheveled black hair, wearing faded green silk sari with gold border, tearful compassionate eyes, iron shackles.",
+    "doing": [],
+    "gender": "female",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+   "key": "",
+   "made": "2026-11-25T09:49+00:00",
+   "check": {
+    "front_side_pixels": [
+     69458,
+     40315
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_lord_vishnu_173b0": {
+   "spec": {
+    "name_bn": "Lord Vishnu",
+    "name_en": "lib_k_lord_vishnu_173b0",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.831,
+    "heads": 4.2,
+    "head": {
+     "shape": "oval",
+     "w": 0.839,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.104,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "pointed",
+     "nose_size": 0.97,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "spiky"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#a87452",
+     "hair": "#2a1a10",
+     "tshirt": "#e0b030",
+     "stripe": "#f9c02a",
+     "shorts": "#a8862a",
+     "shoe": "#333333",
+     "lip": "#9a5040"
+    },
+    "accessories": [
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Lord Vishnu"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Four-armed, blue skin, golden crown, yellow silk, holding the conch, the discus (chakra), the mace and the lotus, peaceful face, resting on the serpent Shesha or standing in golden light.",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+   "key": "",
+   "made": "2026-11-25T09:49+00:00",
+   "check": {
+    "front_side_pixels": [
+     48774,
+     33160
+    ],
+    "unlike_others": 5
+   }
+  },
+  "lib_k_kamsa_bdc6e": {
+   "spec": {
+    "name_bn": "Kamsa",
+    "name_en": "lib_k_kamsa_bdc6e",
+    "category": "adult_male",
+    "age": 55,
+    "cast": "story_lib",
+    "personality": "the village priest; round, nervous, recites mantras very fast when frightened",
+    "voice": "middle-aged male, nasal",
+    "height": 0.931,
+    "heads": 4.4,
+    "head": {
+     "shape": "round",
+     "w": 0.965,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.067,
+     "eye_spacing": 0.42,
+     "iris": "#3a2410",
+     "nose": "pointed",
+     "nose_size": 1.09,
+     "mouth_w": 1.05,
+     "brow_thick": 1.0,
+     "blush": true
+    },
+    "hair": {
+     "style": "side_part"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.86,
+     "waist": 0.88,
+     "hip": 0.78,
+     "belly": 0.2,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.42,
+     "arm": 0.4,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#a87452",
+     "hair": "#1e1410",
+     "kurta": "#8a4a2a",
+     "dhoti": "#6a6a2a",
+     "shoe": "#6a4020",
+     "lip": "#a05a48",
+     "moustache": "#e0b030",
+     "shawl": "#7a1a2a"
+    },
+    "accessories": [
+     "crown",
+     "shawl",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Kamsa"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Kamsa: proud cruel king of Mathura, dark royal robes, golden crown, thick moustache (fierce, not gory)",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+   "key": "",
+   "made": "2026-11-25T09:49+00:00",
+   "check": {
+    "front_side_pixels": [
+     89771,
+     61479
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_yogamaya_9aeec": {
+   "spec": {
+    "name_bn": "Yogamaya",
+    "name_en": "lib_k_yogamaya_9aeec",
+    "category": "adult_female",
+    "age": 34,
+    "cast": "story_lib",
+    "personality": "a village wife, practical and brave; lights the evening lamp, hears the knock at midnight",
+    "voice": "adult female, warm",
+    "height": 0.863,
+    "heads": 5.0,
+    "head": {
+     "shape": "egg",
+     "w": 0.78,
+     "ear": 0.9
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.082,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "round",
+     "nose_size": 1.02,
+     "mouth_w": 0.95,
+     "lashes": true,
+     "brow_thick": 0.85,
+     "blush": true
+    },
+    "hair": {
+     "style": "braid_long"
+    },
+    "body": {
+     "shoulder": 0.66,
+     "chest": 0.68,
+     "waist": 0.6,
+     "hip": 0.72,
+     "belly": 0.05,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.45,
+     "arm": 0.41,
+     "shoe": "sandal",
+     "foot": 0.85
+    },
+    "costume": {
+     "type": "saree",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#a87452",
+     "hair": "#120e0c",
+     "saree": "#e0b030",
+     "border": "#c62828",
+     "blouse": "#5a3a7a",
+     "shoe": "#6a3a2a",
+     "lip": "#a0404a"
+    },
+    "accessories": [
+     "bindi",
+     "bangles",
+     "earrings",
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Yogamaya"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Ten-armed radiant goddess ascending into sky, glowing golden complexion, resplendent red sari, dazzling crown, holding celestial weapons, majestic aura.",
+    "doing": [],
+    "gender": "female",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "শ্রীকৃষ্ণের জন্ম রহস্য: উত্তাল যমুনার বুকে কোন অলৌকিক পথ? 🌊✨",
+   "key": "",
+   "made": "2026-11-25T09:49+00:00",
+   "check": {
+    "front_side_pixels": [
+     69197,
+     39907
+    ],
+    "unlike_others": 4
+   }
   }
  }
 }

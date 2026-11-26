@@ -691,6 +691,314 @@
     ],
     "unlike_others": 4
    }
+  },
+  "lib_k_lakshmana_3a2dd": {
+   "spec": {
+    "name_bn": "Lakshmana",
+    "name_en": "lib_k_lakshmana_3a2dd",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.833,
+    "heads": 4.2,
+    "head": {
+     "shape": "egg",
+     "w": 0.887,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.093,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "round",
+     "nose_size": 1.07,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "spiky"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#e0aa82",
+     "hair": "#1e1410",
+     "tshirt": "#2f3e5c",
+     "stripe": "#c5e1a5",
+     "shorts": "#e0b030",
+     "shoe": "#333333",
+     "lip": "#9a5040"
+    },
+    "accessories": [
+     "crown",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Lakshmana"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Lakshmana: loyal young prince, fair complexion, golden crown, saffron dhoti, bow and quiver, alert devoted expression",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "রামায়ণ পর্ব ৩: রাক্ষসী তাড়কা বধ ও মহর্ষি বিশ্বামিত্রের যজ্ঞ! 🏹✨",
+   "key": "",
+   "made": "2026-11-26T11:01+00:00",
+   "check": {
+    "front_side_pixels": [
+     49356,
+     34035
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_vishwamitra_72084": {
+   "spec": {
+    "name_bn": "Vishwamitra",
+    "name_en": "lib_k_vishwamitra_72084",
+    "category": "elderly_male",
+    "sample": false,
+    "age": 74,
+    "personality": "a wise, teasing grandfather and story-teller; slow, gentle, loves riddles",
+    "voice": "old male, slightly husky",
+    "height": 0.955,
+    "heads": 4.8,
+    "head": {
+     "shape": "long",
+     "w": 0.696,
+     "ear": 1.2
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.07,
+     "eye_spacing": 0.42,
+     "iris": "#3a2a1a",
+     "nose": "broad",
+     "nose_size": 0.95,
+     "mouth_w": 0.95,
+     "moustache": "bushy",
+     "brow_thick": 1.1,
+     "brow_col": "#efefef",
+     "wrinkles": true,
+     "eye_y": 0.52,
+     "beard": 1.0
+    },
+    "hair": {
+     "style": "bald_sides"
+    },
+    "body": {
+     "shoulder": 0.7,
+     "chest": 0.64,
+     "waist": 0.56,
+     "hip": 0.56,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.44,
+     "arm": 0.42,
+     "stoop": 0.08,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#8e5e40",
+     "hair": "#d8d8d0",
+     "moustache": "#f4f4f2",
+     "kurta": "#f57c00",
+     "dhoti": "#f57c00",
+     "shoe": "#5a3a22",
+     "lip": "#8a5040",
+     "beard": "#f2f0e8"
+    },
+    "accessories": [],
+    "cast": "story_lib"
+   },
+   "names": [
+    "Vishwamitra"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "venerable ancient sage, long white beard, matted hair bundle, rudraksha beads, simple orange bark cloth robes, holding a wooden kamandalu wand, glowing spiritual face",
+    "doing": [],
+    "gender": "male",
+    "age": "old",
+    "kind": "human"
+   },
+   "story": "রামায়ণ পর্ব ৩: রাক্ষসী তাড়কা বধ ও মহর্ষি বিশ্বামিত্রের যজ্ঞ! 🏹✨",
+   "key": "",
+   "made": "2026-11-26T11:01+00:00",
+   "check": {
+    "front_side_pixels": [
+     65314,
+     40381
+    ],
+    "unlike_others": 3
+   }
+  },
+  "lib_k_king_dasharatha_d97a3": {
+   "spec": {
+    "name_bn": "King Dasharatha",
+    "category": "animal",
+    "cast": "story_lib",
+    "age": 30,
+    "animal": {
+     "species": "mouse",
+     "size": 1.0
+    },
+    "colours": {
+     "body": "#f2f0ea"
+    },
+    "accessories": [],
+    "gender": "male",
+    "look": "elderly kind king, white beard, golden crown, royal red and gold silk robes, glowing regal appearance",
+    "sample": false
+   },
+   "names": [
+    "King Dasharatha"
+   ],
+   "kind": "animal",
+   "bot": "kids",
+   "species": "mouse",
+   "brief": {
+    "look": "elderly kind king, white beard, golden crown, royal red and gold silk robes, glowing regal appearance",
+    "doing": [],
+    "gender": "male",
+    "age": "old",
+    "kind": "animal"
+   },
+   "story": "রামায়ণ পর্ব ৩: রাক্ষসী তাড়কা বধ ও মহর্ষি বিশ্বামিত্রের যজ্ঞ! 🏹✨",
+   "key": "",
+   "made": "2026-11-26T11:01+00:00",
+   "check": {
+    "front_side_pixels": [
+     6390,
+     6390
+    ],
+    "unlike_others": 99
+   }
+  },
+  "lib_k_tadaka_f9ad5": {
+   "spec": {
+    "name_bn": "Tadaka",
+    "name_en": "lib_k_tadaka_f9ad5",
+    "category": "adult_female",
+    "age": 34,
+    "cast": "story_lib",
+    "personality": "a village wife, practical and brave; lights the evening lamp, hears the knock at midnight",
+    "voice": "adult female, warm",
+    "height": 0.89,
+    "heads": 5.0,
+    "head": {
+     "shape": "long",
+     "w": 0.788,
+     "ear": 0.9
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.084,
+     "eye_spacing": 0.43,
+     "iris": "#f9c02a",
+     "nose": "long",
+     "nose_size": 0.92,
+     "mouth_w": 0.95,
+     "lashes": true,
+     "brow_thick": 0.85,
+     "blush": true,
+     "glow": "#ff6a5a",
+     "ghost_eyes": true
+    },
+    "hair": {
+     "style": "braid_long"
+    },
+    "body": {
+     "shoulder": 0.66,
+     "chest": 0.68,
+     "waist": 0.6,
+     "hip": 0.72,
+     "belly": 0.05,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.45,
+     "arm": 0.41,
+     "shoe": "sandal",
+     "foot": 0.85
+    },
+    "costume": {
+     "type": "saree",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#8e5e40",
+     "hair": "#2a2a2a",
+     "saree": "#2a1a3a",
+     "border": "#2a1a3a",
+     "blouse": "#2a1a3a",
+     "shoe": "#6a3a2a",
+     "lip": "#a0404a"
+    },
+    "accessories": [
+     "bindi",
+     "bangles",
+     "earrings"
+    ],
+    "sample": false,
+    "ghost": {
+     "float": 0.06,
+     "alpha": 0.93,
+     "tint": "#c8b0ff"
+    }
+   },
+   "names": [
+    "Tadaka"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "gigantic fierce demoness, shadowy dark grey skin, wild unruly black hair, glowing yellow eyes, ragged dark clothes, wielding huge stone boulders, menacing but not gory",
+    "doing": [],
+    "gender": "female",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "রামায়ণ পর্ব ৩: রাক্ষসী তাড়কা বধ ও মহর্ষি বিশ্বামিত্রের যজ্ঞ! 🏹✨",
+   "key": "",
+   "made": "2026-11-26T11:01+00:00",
+   "check": {
+    "front_side_pixels": [
+     72865,
+     41030
+    ],
+    "unlike_others": 4
+   }
   }
  }
 }

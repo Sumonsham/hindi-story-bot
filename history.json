@@ -1718,7 +1718,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2027,7 +2027,7 @@
    "yt_views": 2,
    "yt_avg_s": 9,
    "yt_avg_pct": 1.6,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2086,7 +2086,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2124,12 +2124,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 1,
+   "views": 2,
    "length_s": 433,
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2179,7 +2179,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2433,7 +2433,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2472,12 +2472,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 2,
+   "views": 3,
    "length_s": 479,
    "yt_views": 2,
    "yt_avg_s": 16,
    "yt_avg_pct": 3.5,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2527,7 +2527,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2878,7 +2878,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2897,12 +2897,12 @@
   "stats": {
    "likes": 3,
    "comments": 0,
-   "views": 5,
+   "views": 6,
    "length_s": 5964,
-   "yt_views": 3,
-   "yt_avg_s": 1,
-   "yt_avg_pct": 0.0,
-   "checked": "2026-11-23T03:05+00:00"
+   "yt_views": 6,
+   "yt_avg_s": 33,
+   "yt_avg_pct": 0.6,
+   "checked": "2026-11-26T09:33+00:00"
   }
  },
  {
@@ -2945,7 +2945,7 @@
    "yt_views": 3,
    "yt_avg_s": 467,
    "yt_avg_pct": 75.3,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3339,7 +3339,7 @@
    "yt_views": 1,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3383,10 +3383,10 @@
    "comments": 1,
    "views": 3,
    "length_s": 637,
-   "yt_views": 2,
-   "yt_avg_s": 2,
-   "yt_avg_pct": 0.4,
-   "checked": "2026-11-23T03:05+00:00"
+   "yt_views": 3,
+   "yt_avg_s": 1,
+   "yt_avg_pct": 0.3,
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3795,7 +3795,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-23T03:05+00:00"
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3835,12 +3835,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 5,
+   "views": 7,
    "length_s": 872,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-23T09:03+00:00"
+   "yt_views": 6,
+   "yt_avg_s": 159,
+   "yt_avg_pct": 18.1,
+   "checked": "2026-11-26T09:33+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -4181,6 +4181,12 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-25T22:32+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-26T09:34+00:00",
+   "thumb": true
   }
  },
  {
@@ -4210,22 +4216,23 @@
   "youtube": "118SRi_crUA",
   "fb_reel": "1683254529911715",
   "fb_story": "29660618373546904",
-  "yt_short": "iXGrC9d5DIo"
+  "yt_short": "iXGrC9d5DIo",
+  "stats": {
+   "likes": 1,
+   "comments": 1,
+   "views": 11,
+   "length_s": 1204,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-26T09:33+00:00"
+  }
  },
  {
   "date": "2026-11-26T01:31+00:00",
   "lang": "bn",
   "slot": "2026-11-26@7",
-  "pending_comments": [
-   {
-    "id": "1509557027739734",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2210770669856677"
-   },
-   {
-    "id": "1712061700433554",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2210770669856677"
-   }
-  ],
+  "pending_comments": [],
   "category": "learn",
   "idea": "consonants 6-10 (Bengali: চ ছ জ ঝ ঞ / Hindi: च छ ज झ ञ)",
   "episode": 4,
@@ -4250,5 +4257,39 @@
   "fb_story": "2278730756318596",
   "fb_reel2": "1712061700433554",
   "coloring": "122140617368735948"
+ },
+ {
+  "date": "2026-11-26T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-26@19",
+  "pending_comments": [
+   {
+    "id": "1144604088327317",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1811158156805841"
+   }
+  ],
+  "category": "ramayan",
+  "idea": "Sage Vishwamitra takes young Rama and Lakshmana to protect the yajna (Tadaka is defeated)",
+  "episode": 3,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "রামায়ণ পর্ব ৩: রাক্ষসী তাড়কা বধ ও মহর্ষি বিশ্বামিত্রের যজ্ঞ! 🏹✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "সরযূ নদী"
+  },
+  "hook_style": "sound",
+  "moral": "অন্যায় ও অধর্মের বিরুদ্ধে সাহসের সাথে রুখে দাঁড়ানোই প্রকৃত ধর্মের পরিচয়।",
+  "title_b": "তাড়কার তান্ডব ও শ্রীরামের অধর্ম বিনাশ! 🏹✨",
+  "question_post": null,
+  "facebook": "1811158156805841",
+  "youtube": "mHoxyNpT4JA",
+  "fb_reel": "1144604088327317",
+  "fb_story": "1116037141270030",
+  "yt_short": "1UQWvCZ1k0o"
  }
 ]

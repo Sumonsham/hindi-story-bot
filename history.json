@@ -3745,12 +3745,12 @@
   "stats": {
    "likes": 4,
    "comments": 1,
-   "views": 3,
+   "views": 6,
    "length_s": 434,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-22T22:04+00:00"
+   "yt_views": 5,
+   "yt_avg_s": 6,
+   "yt_avg_pct": 1.5,
+   "checked": "2026-11-25T22:32+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3997,7 +3997,8 @@
   "title_test": {
    "result": "kept",
    "views": 2
-  }
+  },
+  "hook_done": true
  },
  {
   "date": "2026-11-23T13:31+00:00",
@@ -4042,7 +4043,8 @@
    "views_before": 0,
    "at": "2026-11-24T22:33+00:00",
    "thumb": true
-  }
+  },
+  "hook_done": true
  },
  {
   "date": "2026-11-24T01:31+00:00",
@@ -4129,6 +4131,10 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-25T09:33+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 3
   }
  },
  {
@@ -4165,6 +4171,16 @@
   "riddle": {
    "q": "সোনার থালা গোলগাল, রাতে জ্বলে সকাল হলে গায়েব! বলতো দেখি কী?",
    "a": "চাঁদ"
+  },
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 735,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-25T22:32+00:00"
   }
  },
  {
@@ -4195,5 +4211,44 @@
   "fb_reel": "1683254529911715",
   "fb_story": "29660618373546904",
   "yt_short": "iXGrC9d5DIo"
+ },
+ {
+  "date": "2026-11-26T01:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-26@7",
+  "pending_comments": [
+   {
+    "id": "1509557027739734",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2210770669856677"
+   },
+   {
+    "id": "1712061700433554",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2210770669856677"
+   }
+  ],
+  "category": "learn",
+  "idea": "consonants 6-10 (Bengali: চ ছ জ ঝ ঞ / Hindi: च छ ज झ ञ)",
+  "episode": 4,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "শিখি মজায় পর্ব ৪: চাঁদের আলোয় জাদুকরী বর্ণমালা! 🌙✨",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "গ",
+   "text": "ঞ"
+  },
+  "hook_style": "voice",
+  "moral": "শেখার আনন্দই সেরা আনন্দ!",
+  "title_b": "বর্ণমালার জাদুকরী রাত! চ ছ জ ঝ ঞ 🎨",
+  "question_post": null,
+  "facebook": "2210770669856677",
+  "youtube": "yYKstuPEoXQ",
+  "fb_reel": "1509557027739734",
+  "fb_story": "2278730756318596",
+  "fb_reel2": "1712061700433554",
+  "coloring": "122140617368735948"
  }
 ]

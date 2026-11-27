@@ -4270,6 +4270,12 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-26T22:33+00:00"
+  },
+  "title_test": {
+   "result": "swapped",
+   "views_before": 0,
+   "at": "2026-11-27T09:33+00:00",
+   "thumb": true
   }
  },
  {
@@ -4299,22 +4305,23 @@
   "youtube": "mHoxyNpT4JA",
   "fb_reel": "1144604088327317",
   "fb_story": "1116037141270030",
-  "yt_short": "1UQWvCZ1k0o"
+  "yt_short": "1UQWvCZ1k0o",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 5,
+   "length_s": 455,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-27T09:33+00:00"
+  }
  },
  {
   "date": "2026-11-27T01:31+00:00",
   "lang": "bn",
   "slot": "2026-11-27@7",
-  "pending_comments": [
-   {
-    "id": "1903998067259544",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=29267791062880637"
-   },
-   {
-    "id": "1156977840411789",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=29267791062880637"
-   }
-  ],
+  "pending_comments": [],
   "category": "jataka",
   "idea": "A quiet Bethlehem stable on a chilly winter night where a newborn infant brings a sudden, mysterious golden warmth that terrifies passing imperial guards. (told as a jataka story for children)",
   "episode": null,
@@ -4345,5 +4352,39 @@
    "q": "একপায়েতে দাঁড়িয়ে থাকে, মাথায় হাজার ছাতা, পাখির মতো ডানা নেই তার, সবুজ সবুজ পাতা! বলতো কী?",
    "a": "গাছ"
   }
+ },
+ {
+  "date": "2026-11-27T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-27@19",
+  "pending_comments": [
+   {
+    "id": "1719057286460250",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2127102068007372"
+   }
+  ],
+  "category": "jagannath",
+  "idea": "Vidyapati, Lalita and Vishvavasu - the hidden Nila Madhava",
+  "episode": 2,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "জগন্নাথের কথা পর্ব ২: চোখ বাঁধা ব্রাহ্মণ ও সর্ষে দানার গোপন রহস্য! 🕉️ | নীলমাধব",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "ক",
+   "text": "সর্ষের দানা"
+  },
+  "hook_style": "sound",
+  "moral": "ঈশ্বরের প্রতি অকৃত্রিম নিষ্ঠা ও প্রজ্ঞার সমন্বয় ঘটলে পরম সত্যের সন্ধান নিশ্চিত পাওয়া যায়।",
+  "title_b": "সর্ষে দানার অলৌকিক রহস্য! নীলমাধব দর্শন পর্ব ২ 🕉️",
+  "question_post": null,
+  "facebook": "2127102068007372",
+  "youtube": "ZD46V3ue4Eg",
+  "fb_reel": "1719057286460250",
+  "fb_story": "1163772746615062",
+  "yt_short": "xa3tVy3iXEU"
  }
 ]

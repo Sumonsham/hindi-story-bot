@@ -1121,6 +1121,354 @@
     ],
     "unlike_others": 99
    }
+  },
+  "lib_k_vidyapati_bbc75": {
+   "spec": {
+    "name_bn": "Vidyapati",
+    "name_en": "lib_k_vidyapati_bbc75",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.785,
+    "heads": 4.2,
+    "head": {
+     "shape": "square",
+     "w": 0.805,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.096,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "pointed",
+     "nose_size": 1.13,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "curly"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#e0aa82",
+     "hair": "#120e0c",
+     "tshirt": "#7a2a22",
+     "stripe": "#c5e1a5",
+     "shorts": "#f2f0e8",
+     "shoe": "#333333",
+     "lip": "#9a5040"
+    },
+    "accessories": [
+     "tilak",
+     "sacred_thread"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Vidyapati"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Devout young Brahmin scholar with fair skin, hair in a neat top knot, white dhoti with a red border, white sacred thread across chest, chandan tilak on forehead.",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "চোখ বাঁধা ব্রাহ্মণ ও সর্ষে দানার গোপন রহস্য! 🕉️ | নীলমাধব",
+   "key": "",
+   "made": "2026-11-27T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     43524,
+     28010
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_vishvavasu_d6095": {
+   "spec": {
+    "name_bn": "Vishvavasu",
+    "name_en": "lib_k_vishvavasu_d6095",
+    "category": "elderly_male",
+    "sample": false,
+    "age": 74,
+    "personality": "a wise, teasing grandfather and story-teller; slow, gentle, loves riddles",
+    "voice": "old male, slightly husky",
+    "height": 0.842,
+    "heads": 4.8,
+    "head": {
+     "shape": "heart",
+     "w": 0.783,
+     "ear": 1.2
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.068,
+     "eye_spacing": 0.42,
+     "iris": "#3a2a1a",
+     "nose": "round",
+     "nose_size": 1.13,
+     "mouth_w": 0.95,
+     "moustache": "bushy",
+     "brow_thick": 1.1,
+     "brow_col": "#efefef",
+     "wrinkles": true,
+     "eye_y": 0.52,
+     "beard": 1.0
+    },
+    "hair": {
+     "style": "curly"
+    },
+    "body": {
+     "shoulder": 0.7,
+     "chest": 0.64,
+     "waist": 0.56,
+     "hip": 0.56,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.44,
+     "arm": 0.42,
+     "stoop": 0.08,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#8e5e40",
+     "hair": "#c8c8c0",
+     "moustache": "#f4f4f2",
+     "kurta": "#2e6a3a",
+     "dhoti": "#3a3a3a",
+     "shoe": "#5a3a22",
+     "lip": "#8a5040",
+     "beard": "#a8a8a0",
+     "turban": "#efe6cf",
+     "shawl": "#7a1a2a"
+    },
+    "accessories": [
+     "shawl",
+     "jewel",
+     "turban"
+    ],
+    "cast": "story_lib"
+   },
+   "names": [
+    "Vishvavasu"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Dignified elderly Sabara tribal king with dark skin, curly grey hair and short beard, earth-toned cloth, wild flower garlands, carrying a wooden staff.",
+    "doing": [],
+    "gender": "male",
+    "age": "old",
+    "kind": "human"
+   },
+   "story": "চোখ বাঁধা ব্রাহ্মণ ও সর্ষে দানার গোপন রহস্য! 🕉️ | নীলমাধব",
+   "key": "",
+   "made": "2026-11-27T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     55320,
+     36783
+    ],
+    "unlike_others": 5
+   }
+  },
+  "lib_k_lalita_8352e": {
+   "spec": {
+    "name_bn": "Lalita",
+    "name_en": "lib_k_lalita_8352e",
+    "category": "adult_female",
+    "age": 34,
+    "cast": "story_lib",
+    "personality": "a village wife, practical and brave; lights the evening lamp, hears the knock at midnight",
+    "voice": "adult female, warm",
+    "height": 0.892,
+    "heads": 5.0,
+    "head": {
+     "shape": "square",
+     "w": 0.788,
+     "ear": 0.9
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.085,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "button",
+     "nose_size": 1.14,
+     "mouth_w": 0.95,
+     "lashes": true,
+     "brow_thick": 0.85,
+     "blush": true
+    },
+    "hair": {
+     "style": "braid_long"
+    },
+    "body": {
+     "shoulder": 0.66,
+     "chest": 0.68,
+     "waist": 0.6,
+     "hip": 0.72,
+     "belly": 0.05,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.45,
+     "arm": 0.41,
+     "shoe": "sandal",
+     "foot": 0.85
+    },
+    "costume": {
+     "type": "saree",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#cf9a72",
+     "hair": "#2a1a10",
+     "saree": "#f9c02a",
+     "border": "#c62828",
+     "blouse": "#2f3e5c",
+     "shoe": "#6a3a2a",
+     "lip": "#a0404a"
+    },
+    "accessories": [
+     "bindi",
+     "bangles",
+     "earrings"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Lalita"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Graceful young tribal maiden with glowing dusky complexion, long black braid adorned with wild jasmine, bright yellow-and-red cotton sari, simple shell necklaces and bangles.",
+    "doing": [],
+    "gender": "female",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "চোখ বাঁধা ব্রাহ্মণ ও সর্ষে দানার গোপন রহস্য! 🕉️ | নীলমাধব",
+   "key": "",
+   "made": "2026-11-27T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     73413,
+     41149
+    ],
+    "unlike_others": 3
+   }
+  },
+  "lib_k_lord_nila_madhav_d47bb": {
+   "spec": {
+    "name_bn": "Lord Nila Madhava",
+    "name_en": "lib_k_lord_nila_madhav_d47bb",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.769,
+    "heads": 4.2,
+    "head": {
+     "shape": "heart",
+     "w": 0.795,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.088,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "long",
+     "nose_size": 0.93,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "side_part"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#c48a62",
+     "hair": "#1e1410",
+     "tshirt": "#f9c02a",
+     "stripe": "#c5e1a5",
+     "shorts": "#a8862a",
+     "shoe": "#333333",
+     "lip": "#9a5040"
+    },
+    "accessories": [
+     "crown"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Lord Nila Madhava"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Four-armed divine deity carved of deep glowing blue sapphire, golden mukut, shining yellow pitambar silk, holding shankha, chakra, gada, padma, radiant golden aura, peaceful smiling face.",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "চোখ বাঁধা ব্রাহ্মণ ও সর্ষে দানার গোপন রহস্য! 🕉️ | নীলমাধব",
+   "key": "",
+   "made": "2026-11-27T09:58+00:00",
+   "check": {
+    "front_side_pixels": [
+     40942,
+     27774
+    ],
+    "unlike_others": 4
+   }
   }
  }
 }

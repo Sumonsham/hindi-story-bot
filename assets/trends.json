@@ -1,233 +1,167 @@
 {
  "cartoon_bn": {
-  "date": "2026-11-26",
+  "date": "2026-11-27",
   "topics": [
-   "A rural village bride during winter discovers her newlywed husband transforms into a mysterious entity every midnight, trapping her inside an old wooden palanqu",
-   "Two impoverished orphan siblings in a remote Bengal village find a glowing cursed amulet buried in the ruins that grants infinite wealth but demands a heavy sac",
-   "A foolish village thief breaks into an abandoned haunted mansion on a stormy night, only to find the ghosts are playing tricks to steal his remaining belongings",
-   "A hardworking ferryman crossing a misty river at dusk unknowingly gives a ride to a supernatural shapeshifter testing human kindness.",
-   "Twin sisters in a delta village experience drastically different fortunes when one accepts a mysterious gift from an elusive forest fox.",
-   "An elderly village watchman guarding the railway tracks on a foggy night encounters a spectral steam engine from the British era."
-  ],
-  "hashtags": [
-   "#BanglaCartoon",
-   "#BhuterGolpo",
-   "#BengaliHorror",
-   "#ThakurmarJhuli",
-   "#MoralStories",
-   "#BengaliFairyTales",
-   "#BanglaGolpo",
-   "#GhostStory",
-   "#AnimatedStories",
-   "#VillageStory"
-  ],
-  "keywords": [
-   "bangla bhuter cartoon",
-   "bengali horror story",
-   "bangla cartoon golpo",
-   "moral stories in bengali",
-   "bhoutik golpo animation",
-   "rupkothar golpo",
-   "bengali village story",
-   "vuter katun new"
-  ],
-  "style": {
-   "tags": [],
-   "hashtags": [],
-   "title_style": "The titles range from short punchy phrases to descriptive sentences, frequently using the vertical bar '|' or hashtags\n to separate emotional hooks from series names. They leverage patriotic elements, horror themes, and curiosity-driven phrases alongside relevant emojis to instantly maximize click-through rates.",
-   "thumb_style": "Thumbnails feature vibrant 2D cartoon artwork with dramatic lighting, ranging from bright daylight scenes to dark, eerie nighttime atmospheres with glowing lanterns or trains. Characters display exaggerated expressions of fear, surprise, or determination, placed centrally to draw immediate focus.",
-   "thumb_text_style": "Medium-sized bold Bengali text is placed centrally near the top in contrasting colors like white or red with dark shadows for high readability."
-  },
-  "real": [
-   {
-    "id": "5jgQzaqaZqo",
-    "title": "BSF Soldier Accidentally Crosses the Bangladesh Border! 🇮🇳❤️ | Emotional Story",
-    "views": 5004741,
-    "age": "7d ago"
-   },
-   {
-    "id": "Hp1AWCEg94s",
-    "title": "ধ্বংসাবশেষ অপসারণ | Gopal Bhar | New Episode 2026",
-    "views": 1055018,
-    "age": "6d ago"
-   },
-   {
-    "id": "r0uKy6bZ-MU",
-    "title": "শীতের রাতে পাত্রী দেখতে গিয়ে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna",
-    "views": 830208,
-    "age": "5d ago"
-   },
-   {
-    "id": "y0_ahBkb0Ss",
-    "title": "গোপাল ভাঁড়ের পিছনে পড়ল রেলগাড়ি | Gopal Bhar | New Episode 2026",
-    "views": 810612,
-    "age": "4d ago"
-   },
-   {
-    "id": "ytMTJ4YF_6A",
-    "title": "🦊 শিয়ালের ছানা হাঁস 🦆 | শিয়াল ও হাঁসের গল্প | Bangla Cartoon | বাংলা কার্টুন | Rupkothar Golpo",
-    "views": 766457,
-    "age": "7d ago"
-   },
-   {
-    "id": "uh7-MWEBP7g",
-    "title": "বোকা চোরের চুরি | The Foolish Thief | Bengali Animated Village Story | Bangla Cartoon Golpo",
-    "views": 698337,
-    "age": "5d ago"
-   },
-   {
-    "id": "GPULj-7dO7k",
-    "title": "সাপ ও ইঁদুরের গল্প: \"আমি তো আর না\" | বাংলা শিক্ষামূলক গল্প  #lifelessons",
-    "views": 658002,
-    "age": "7d ago"
-   },
-   {
-    "id": "x8eRwCxtVF8",
-    "title": "ধনী যমজ বনাম দরিদ্র যমজ | Rich Twin Vs. Poor Twin in Bengali | @BengaliFairyTales",
-    "views": 655606,
-    "age": "4d ago"
-   },
-   {
-    "id": "PaCZ9rL3rvE",
-    "title": "বউয়ের রূপে কে? | রহস্যময় পালকির ভয়ংকর ঘটনা | Bhoutik Golpo | Scary Animation | Horror Story",
-    "views": 629841,
-    "age": "7d ago"
-   },
-   {
-    "id": "9em7kUhDEFk",
-    "title": "রক্তকুয়া - Roktokuya | Bangla Bhuter Cartoon | Bengali Horror Stories | Bhuter Golpo | Vuter Katun",
-    "views": 570028,
-    "age": "5d ago"
-   },
-   {
-    "id": "rX-68vw7snM",
-    "title": "বাবা ভূতের ভালোবাসা | হায়রার ভূতের গল্প | Fox Cartoon | Rupkothar golpo | Hayra Bhuter Cartoon",
-    "views": 522784,
-    "age": "6d ago"
-   },
-   {
-    "id": "Al9NJh3GgI4",
-    "title": "The Greedy Butcher | Bengali Animated Story | Bangla Cartoon | Village Story | @Golpo-z7j",
-    "views": 489392,
-    "age": "6d ago"
-   },
-   {
-    "id": "PTXwyRjezcI",
-    "title": "অভিশপ্ত চুড়ি | Obhishapto Churi | ভৌতিক গল্প | Bhoutik Cartoon | Bengali Horror Story",
-    "views": 466066,
-    "age": "3d ago"
-   },
-   {
-    "id": "SVxaUc4b6mg",
-    "title": "শাঁখচুন্নির গল্প : ঘরে ফিরেছিল কে?😱 | Bengali Horror Animation #shorts #horror #bengali #MittiSeMyth",
-    "views": 461908,
-    "age": "4d ago"
-   },
-   {
-    "id": "aQYy1e81tX0",
-    "title": "সংসার কি শুধু স্বামীর কথায় চলবে? | একটি বাস্তব সামাজিক গল্প 💔 | Bangla Cartoon Story #animation",
-    "views": 458699,
-    "age": "6d ago"
-   }
-  ],
-  "youtube_top": [
-   "BSF Soldier Accidentally Crosses the Bangladesh Border! 🇮🇳❤️ | Emotional Story (5,004,741)",
-   "ধ্বংসাবশেষ অপসারণ | Gopal Bhar | New Episode 2026 (1,055,018)",
-   "শীতের রাতে পাত্রী দেখতে গিয়ে | Bhuter Cartoon | Bengali Horror Cartoon | Vuter Golpo | Sonar Ayna (830,208)",
-   "গোপাল ভাঁড়ের পিছনে পড়ল রেলগাড়ি | Gopal Bhar | New Episode 2026 (810,612)",
-   "🦊 শিয়ালের ছানা হাঁস 🦆 | শিয়াল ও হাঁসের গল্প | Bangla Cartoon | বাংলা কার্টুন | Rupkothar Golpo (766,457)",
-   "বোকা চোরের চুরি | The Foolish Thief | Bengali Animated Village Story | Bangla Cartoon Golpo (698,337)",
-   "সাপ ও ইঁদুরের গল্প: \"আমি তো আর না\" | বাংলা শিক্ষামূলক গল্প  #lifelessons (658,002)",
-   "ধনী যমজ বনাম দরিদ্র যমজ | Rich Twin Vs. Poor Twin in Bengali | @BengaliFairyTales (655,606)",
-   "বউয়ের রূপে কে? | রহস্যময় পালকির ভয়ংকর ঘটনা | Bhoutik Golpo | Scary Animation | Horror Story (629,841)",
-   "রক্তকুয়া - Roktokuya | Bangla Bhuter Cartoon | Bengali Horror Stories | Bhuter Golpo | Vuter Katun (570,028)"
-  ],
-  "from": "youtube"
- },
- "cartoon_bn_jataka": {
-  "date": "2026-11-20",
-  "topics": [
-   "A glowing shepherd boy in a quiet Bethlehem pasture discovers a stray lamb leading him to a starlit stable.",
-   "A wise forest hermit in ancient India shares a secret Jataka fable about a golden deer that saves a parched village.",
-   "A lonely carpenter in a snowy mountain village carves a wooden star that miraculously begins to guide lost travelers.",
-   "A clever young monkey near the holy Ganges river finds a magical tree whose sweet fruits only grow for the genuinely kind.",
-   "A humble innkeeper's daughter in ancient Jerusalem finds an abandoned glowing lantern that brings warmth to freezing animals.",
-   "A gentle elephant in a sacred royal garden teaches a proud prince the true meaning of compassion through a forgotten folk legend."
+   "A quiet Bethlehem stable on a chilly winter night where a newborn infant brings a sudden, mysterious golden warmth that terrifies passing imperial guards.",
+   "A lush ancient Indian banyan tree where a wise old tortoise forgets a crucial warning and opens his mouth mid-air, causing a village-wide panic.",
+   "A dry riverbank during a severe drought where a clever golden deer negotiates with a fearful human king to save a forest full of innocent animals.",
+   "A hidden Himalayan mountain cave where a curious young monkey learns a hard lesson about greed after stealing sparkling winter fruits from a hermit.",
+   "A snowy shepherds' pasture under a blazing new star where simple village youths drop their staffs in absolute awe as heavenly music fills the dark freezing sky.",
+   "A royal palace courtyard in ancient Varanasi where an arrogant prince learns humility from a talking forest bird during a heavy monsoon storm."
   ],
   "hashtags": [
    "#BengaliStories",
+   "#ThakurmarJhuli",
+   "#PanchatantraStories",
    "#MoralStories",
    "#KidsAnimation",
-   "#ThakurmarJhuli",
-   "#BibleStories",
-   "#JatakaTales",
-   "#AnimatedStories",
    "#BanglaCartoon",
-   "#ChildrenStories",
-   "#BedtimeStories"
+   "#BiblicalStories",
+   "#JatakaTales",
+   "#BedtimeStories",
+   "#AnimatedMoralStories"
   ],
   "keywords": [
    "bengali moral stories",
-   "biblical animated stories for kids",
-   "jataka tales in bengali",
-   "children animated cartoon bengali",
-   "jesus birth story for kids",
-   "moral kahini bangla",
-   "classic folk tales animation",
-   "kids bedtime stories bangla"
+   "kids animated stories",
+   "panchatantra stories in bengali",
+   "jataka tales bangla",
+   "biblical stories for kids",
+   "bengali cartoon story",
+   "thakurmar jhuli golpo",
+   "animated moral stories india"
   ],
   "style": {
    "tags": [],
    "hashtags": [],
-   "title_style": "Titles are moderately long and descriptive, leveraging vertical bars ('|') to combine an emotional hook with a series or brand identifier. They use engaging vocabulary focusing on wonder, sacred promises, and complete narratives to drive curiosity.",
-   "thumb_style": "Thumbnails feature warm, cinematic lighting with rich earthy tones or vibrant storybook illustrations depicting key religious characters and animals. The compositions are centered around pivotal emotional moments, often enhanced with glowing light effects and bold, highly readable overlay text.",
-   "thumb_text_style": "3 words of bold yellow or white text making a direct statement or question about the central story."
+   "title_style": "These titles are descriptive and moderate in length, targeting specific audiences like children and religious story enthusiasts. They frequently use vertical bars ('|') to combine distinct subtopics, emotional hooks, and target descriptors. Words like 'সম্পূর্ণ কাহিনী' (complete story) and 'সহজ ভাষায়' (in simple language) are used to promise clarity and depth.",
+   "thumb_style": "The thumbnails feature warm, cinematic illustrations with a strong emphasis on glowing, divine light emanating from central subjects like the baby Jesus or celestial beings. They use rich night-sky blues contrasted with golden illumination, featuring gentle, expressive character faces in traditional attire. The composition places the main narrative focus front and center, complemented by bold, readable text headers.",
+   "thumb_text_style": "3 to 6 words of large, bold, high-contrast text stating the main theme or title of the video."
   },
   "real": [
    {
-    "id": "6qJZfiLw0eI",
-    "title": "🌟 যে রাতে যিশুর জন্ম হয়েছিল! | বাচ্চাদের জন্য যিশুর জন্মকাহিনী | লিওর বাইবেল অভিযান",
-    "views": 1357,
-    "age": "1d ago"
+    "id": "DBStQDsTlTI",
+    "title": "শিশুদের জন্য যিশুর জন্ম | বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প",
+    "views": 339,
+    "age": "3d ago"
    },
    {
-    "id": "daHQ5S9WnKw",
-    "title": "বড়দিনের গল্প: যিশুর জন্ম (সম্পূর্ণ কাহিনী) | বাইবেল ক্লিপস",
-    "views": 185,
-    "age": "1d ago"
-   },
-   {
-    "id": "mLNmE9dmVaU",
-    "title": "What Are the Jataka Tales, Really? | 2,500-Year-Old History and the Mystery of Buddhism | GM Ente...",
-    "views": 182,
-    "age": "7d ago"
-   },
-   {
-    "id": "-tZoxwCFo0A",
-    "title": "যিশু খ্রিস্টের জন্ম: আশা, ঈশ্বরের প্রতিশ্রুতি ও পরিত্রাণের সর্বশ্রেষ্ঠ কাহিনী! | সম্পূর্ণ বাইবেল কাহিনী",
-    "views": 54,
-    "age": "4d ago"
-   },
-   {
-    "id": "TsFQp7Y5ljo",
-    "title": "EP 02 || How did the teachings of Buddha spread through stories? What are the Jataka tales? - GM ...",
-    "views": 32,
-    "age": "2d ago"
-   },
-   {
-    "id": "MgF9-_OHBMM",
-    "title": "শশক জাতক|জাতক কাহিনী| অ্যানিমেশন গল্প কাহিনী",
-    "views": 7,
+    "id": "kzL1vLBy9KY",
+    "title": "যিশুর জন্ম: বড়দিনের সম্পূর্ণ কাহিনী | বাইবেলের গল্প",
+    "views": 91,
     "age": "6d ago"
+   },
+   {
+    "id": "edY2YFsVGn8",
+    "title": "যিশুর জন্ম — বড়দিনের সম্পূর্ণ কাহিনী সহজ ভাষায় ব্যাখ্যা করা হলো",
+    "views": 40,
+    "age": "6d ago"
+   },
+   {
+    "id": "ubggxZXQIw8",
+    "title": "Jataka's story -The fall of the flying turtle is coming😄-#bengaliaudiostory #audiodrama",
+    "views": 31,
+    "age": "5d ago"
+   },
+   {
+    "id": "jZ8y20n6XX4",
+    "title": "Kuru Jataka|Jataka Story|Animation Story",
+    "views": 12,
+    "age": "1d ago"
+   },
+   {
+    "id": "0TTHYmk34RA",
+    "title": "নিরোধ মৃগ জাতক|জাতক কাহিনী| অ্যানিমেশন গল্প কাহিনী",
+    "views": 1,
+    "age": "7d ago"
+   }
+  ],
+  "from_cat": "jataka"
+ },
+ "cartoon_bn_jataka": {
+  "date": "2026-11-27",
+  "topics": [
+   "A quiet Bethlehem stable on a chilly winter night where a newborn infant brings a sudden, mysterious golden warmth that terrifies passing imperial guards.",
+   "A lush ancient Indian banyan tree where a wise old tortoise forgets a crucial warning and opens his mouth mid-air, causing a village-wide panic.",
+   "A dry riverbank during a severe drought where a clever golden deer negotiates with a fearful human king to save a forest full of innocent animals.",
+   "A hidden Himalayan mountain cave where a curious young monkey learns a hard lesson about greed after stealing sparkling winter fruits from a hermit.",
+   "A snowy shepherds' pasture under a blazing new star where simple village youths drop their staffs in absolute awe as heavenly music fills the dark freezing sky.",
+   "A royal palace courtyard in ancient Varanasi where an arrogant prince learns humility from a talking forest bird during a heavy monsoon storm."
+  ],
+  "hashtags": [
+   "#BengaliStories",
+   "#ThakurmarJhuli",
+   "#PanchatantraStories",
+   "#MoralStories",
+   "#KidsAnimation",
+   "#BanglaCartoon",
+   "#BiblicalStories",
+   "#JatakaTales",
+   "#BedtimeStories",
+   "#AnimatedMoralStories"
+  ],
+  "keywords": [
+   "bengali moral stories",
+   "kids animated stories",
+   "panchatantra stories in bengali",
+   "jataka tales bangla",
+   "biblical stories for kids",
+   "bengali cartoon story",
+   "thakurmar jhuli golpo",
+   "animated moral stories india"
+  ],
+  "style": {
+   "tags": [],
+   "hashtags": [],
+   "title_style": "These titles are descriptive and moderate in length, targeting specific audiences like children and religious story enthusiasts. They frequently use vertical bars ('|') to combine distinct subtopics, emotional hooks, and target descriptors. Words like 'সম্পূর্ণ কাহিনী' (complete story) and 'সহজ ভাষায়' (in simple language) are used to promise clarity and depth.",
+   "thumb_style": "The thumbnails feature warm, cinematic illustrations with a strong emphasis on glowing, divine light emanating from central subjects like the baby Jesus or celestial beings. They use rich night-sky blues contrasted with golden illumination, featuring gentle, expressive character faces in traditional attire. The composition places the main narrative focus front and center, complemented by bold, readable text headers.",
+   "thumb_text_style": "3 to 6 words of large, bold, high-contrast text stating the main theme or title of the video."
+  },
+  "real": [
+   {
+    "id": "DBStQDsTlTI",
+    "title": "শিশুদের জন্য যিশুর জন্ম | বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প",
+    "views": 339,
+    "age": "3d ago"
+   },
+   {
+    "id": "kzL1vLBy9KY",
+    "title": "যিশুর জন্ম: বড়দিনের সম্পূর্ণ কাহিনী | বাইবেলের গল্প",
+    "views": 91,
+    "age": "6d ago"
+   },
+   {
+    "id": "edY2YFsVGn8",
+    "title": "যিশুর জন্ম — বড়দিনের সম্পূর্ণ কাহিনী সহজ ভাষায় ব্যাখ্যা করা হলো",
+    "views": 40,
+    "age": "6d ago"
+   },
+   {
+    "id": "ubggxZXQIw8",
+    "title": "Jataka's story -The fall of the flying turtle is coming😄-#bengaliaudiostory #audiodrama",
+    "views": 31,
+    "age": "5d ago"
+   },
+   {
+    "id": "jZ8y20n6XX4",
+    "title": "Kuru Jataka|Jataka Story|Animation Story",
+    "views": 12,
+    "age": "1d ago"
+   },
+   {
+    "id": "0TTHYmk34RA",
+    "title": "নিরোধ মৃগ জাতক|জাতক কাহিনী| অ্যানিমেশন গল্প কাহিনী",
+    "views": 1,
+    "age": "7d ago"
    }
   ],
   "youtube_top": [
-   "🌟 যে রাতে যিশুর জন্ম হয়েছিল! | বাচ্চাদের জন্য যিশুর জন্মকাহিনী | লিওর বাইবেল অভিযান (1,357)",
-   "বড়দিনের গল্প: যিশুর জন্ম (সম্পূর্ণ কাহিনী) | বাইবেল ক্লিপস (185)",
-   "What Are the Jataka Tales, Really? | 2,500-Year-Old History and the Mystery of Buddhism | GM Ente... (182)",
-   "যিশু খ্রিস্টের জন্ম: আশা, ঈশ্বরের প্রতিশ্রুতি ও পরিত্রাণের সর্বশ্রেষ্ঠ কাহিনী! | সম্পূর্ণ বাইবেল কাহিনী (54)",
-   "EP 02 || How did the teachings of Buddha spread through stories? What are the Jataka tales? - GM ... (32)",
-   "শশক জাতক|জাতক কাহিনী| অ্যানিমেশন গল্প কাহিনী (7)"
+   "শিশুদের জন্য যিশুর জন্ম | বড়দিনের গল্প | শিশুদের জন্য বাইবেলের গল্প (339)",
+   "যিশুর জন্ম: বড়দিনের সম্পূর্ণ কাহিনী | বাইবেলের গল্প (91)",
+   "যিশুর জন্ম — বড়দিনের সম্পূর্ণ কাহিনী সহজ ভাষায় ব্যাখ্যা করা হলো (40)",
+   "Jataka's story -The fall of the flying turtle is coming😄-#bengaliaudiostory #audiodrama (31)",
+   "Kuru Jataka|Jataka Story|Animation Story (12)",
+   "নিরোধ মৃগ জাতক|জাতক কাহিনী| অ্যানিমেশন গল্প কাহিনী (1)"
   ],
   "from": "youtube"
  },

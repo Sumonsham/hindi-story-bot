@@ -999,6 +999,128 @@
     ],
     "unlike_others": 4
    }
+  },
+  "lib_k_marcus_0d14a": {
+   "spec": {
+    "name_bn": "Marcus",
+    "name_en": "lib_k_marcus_0d14a",
+    "category": "adult_male",
+    "age": 45,
+    "cast": "story_lib",
+    "personality": "the night watchman with a lantern and a whistle; brave voice, shaking knees",
+    "voice": "adult male, loud",
+    "height": 1.126,
+    "heads": 5.0,
+    "head": {
+     "shape": "egg",
+     "w": 0.775,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "round",
+     "eye_size": 0.065,
+     "eye_spacing": 0.43,
+     "iris": "#2a1a0a",
+     "nose": "button",
+     "nose_size": 1.05,
+     "mouth_w": 1.05,
+     "moustache": "thick",
+     "brow_thick": 1.3
+    },
+    "hair": {
+     "style": "curly"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.78,
+     "waist": 0.7,
+     "hip": 0.64,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.45,
+     "arm": 0.43,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "shirt_trousers",
+     "sleeve": "half"
+    },
+    "colours": {
+     "skin": "#b98060",
+     "hair": "#2a1a10",
+     "shirt": "#8a4a2a",
+     "trousers": "#a8862a",
+     "shoe": "#2a2018",
+     "lip": "#6a3a2a"
+    },
+    "accessories": [],
+    "sample": false
+   },
+   "names": [
+    "Marcus"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "tall stern imperial Roman-style army commander, sharp jawline, harsh dark eyes, wearing bronze polished chest armor, red velvet cape, iron helmet, holding a steel sword",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "শীতের রাতে জীর্ণ আস্তাবলে কেন ভয় পেল রাজপ্রহরীরা? | জাতক কথা ও অলৌকিক আলো 🌟",
+   "key": "",
+   "made": "2026-11-26T22:46+00:00",
+   "check": {
+    "front_side_pixels": [
+     91361,
+     54980
+    ],
+    "unlike_others": 5
+   }
+  },
+  "lib_k_wise_ox_ab679": {
+   "spec": {
+    "name_bn": "Wise Ox",
+    "category": "animal",
+    "cast": "story_lib",
+    "age": 30,
+    "animal": {
+     "species": "cow",
+     "size": 1.0
+    },
+    "colours": {
+     "body": "#8a5a32"
+    },
+    "accessories": [],
+    "gender": "male",
+    "look": "large gentle brown ox with large serene intelligent dark eyes, rounded curved horns, standing peacefully near a wooden manger filled with soft hay",
+    "sample": false
+   },
+   "names": [
+    "Wise Ox"
+   ],
+   "kind": "animal",
+   "bot": "kids",
+   "species": "cow",
+   "brief": {
+    "look": "large gentle brown ox with large serene intelligent dark eyes, rounded curved horns, standing peacefully near a wooden manger filled with soft hay",
+    "doing": [],
+    "gender": "male",
+    "age": "old",
+    "kind": "animal"
+   },
+   "story": "শীতের রাতে জীর্ণ আস্তাবলে কেন ভয় পেল রাজপ্রহরীরা? | জাতক কথা ও অলৌকিক আলো 🌟",
+   "key": "",
+   "made": "2026-11-26T22:46+00:00",
+   "check": {
+    "front_side_pixels": [
+     97736,
+     97736
+    ],
+    "unlike_others": 99
+   }
   }
  }
 }

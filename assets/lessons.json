@@ -1,25 +1,25 @@
 {
  "cartoon_bn": {
-  "made": "2026-11-24T22:34+00:00",
+  "made": "2026-11-26T22:34+00:00",
   "lessons": [
-   "Keep educational and science episodes concise and visually stimulating, as demonstrated by the strong retention on learning content.",
-   "Avoid overly long compilation videos or low-pacing mythologies if retention drops to zero early on.",
-   "Start mythological and historical stories directly with the core conflict rather than slow exposition to reduce early drop-offs.",
-   "Utilize relatable characters like Gopal Bhar or children in mysteries to maintain viewer engagement past the introduction.",
-   "Keep overall narrative arcs tightly edited to prevent audience fatigue in the middle chapters."
+   "Educational content like science mysteries and alphabet learning (e.g., 'Aakash Keno Neel') retain viewers remarkably well compared to slower mythology videos.",
+   "Keep introductions short and punchy; narrative videos struggle with retention when the opening hook takes too long to develop.",
+   "Format episodes as standalone, concise mysteries or lessons rather than sprawling multi-part epics to reduce viewer drop-off.",
+   "Utilize familiar characters like Gopal Bhar combined with bizarre, high-stakes curiosity hooks to improve initial click-through and engagement.",
+   "End videos with direct interactive questions or quizzes, which successfully drive the comment section engagement seen in recent uploads."
   ],
   "titles": [
-   "Titles featuring direct questions or urgent mysteries (e.g., about footprints or glowing objects) secure higher initial clicks.",
-   "Using Title B variants that emphasize character action and curiosity generally outperform passive descriptive titles.",
-   "Adding relevant emojis helps visually anchor the theme and improves click-through rates on mobile feeds."
+   "Titles featuring a direct, intriguing question (e.g., 'আকাশের রঙ নীল হল কেন?') significantly outperform descriptive statements.",
+   "Using emotional or high-stakes trigger words in the alternate title (title_b) like 'রহস্য', 'ফাঁদ', or 'ভুতুড়ে' drives better audience curiosity.",
+   "Keep titles concise and front-load the most bizarre or captivating element so it remains visible on mobile feeds."
   ],
   "requests": [
-   "Interactive quiz questions about the thief's identity in mystery episodes",
-   "Preferences on different forms of Goddess Durga and devotional stories",
-   "Favorite Bengali alphabet or learning characters from the kids' segments",
-   "Creative ideas and food-related solutions from Gopal Bhar stories",
-   "Reflections and moral lessons from Lord Mahadev's divine acts",
-   "Choices regarding navigating mystical doors and fantasy settings"
+   "Interactive quizzes and naming correct respondents in the following story",
+   "Voting options for choosing the next storyline via comments",
+   "Including viewer-submitted names for characters in upcoming episodes",
+   "Stories featuring mythological figures like Lord Krishna, Mahadev, and Lord Hanuman",
+   "Folk and fairy tales such as Thakumar Jhuli and mystery doors",
+   "Educational science and alphabet learning segments with characters like Sayan and Mithu"
   ]
  }
 }

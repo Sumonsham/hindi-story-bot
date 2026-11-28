@@ -1469,6 +1469,221 @@
     ],
     "unlike_others": 4
    }
+  },
+  "lib_k_chiku_b3b32": {
+   "spec": {
+    "name_bn": "Chiku",
+    "name_en": "lib_k_chiku_b3b32",
+    "category": "adult_male",
+    "age": 45,
+    "cast": "story_lib",
+    "personality": "the night watchman with a lantern and a whistle; brave voice, shaking knees",
+    "voice": "adult male, loud",
+    "height": 1.029,
+    "heads": 5.0,
+    "head": {
+     "shape": "square",
+     "w": 0.796,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.068,
+     "eye_spacing": 0.43,
+     "iris": "#2a1a0a",
+     "nose": "pointed",
+     "nose_size": 0.93,
+     "mouth_w": 1.05,
+     "moustache": "thick",
+     "brow_thick": 1.3
+    },
+    "hair": {
+     "style": "side_part"
+    },
+    "body": {
+     "shoulder": 0.84,
+     "chest": 0.78,
+     "waist": 0.7,
+     "hip": 0.64,
+     "arm_r": 0.11,
+     "leg_r": 0.13,
+     "leg": 0.45,
+     "arm": 0.43,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "shirt_trousers",
+     "sleeve": "half"
+    },
+    "colours": {
+     "skin": "#c48a62",
+     "hair": "#1e1410",
+     "shirt": "#f2f0e8",
+     "trousers": "#3a3a3a",
+     "shoe": "#2a2018",
+     "lip": "#6a3a2a"
+    },
+    "accessories": [],
+    "sample": false
+   },
+   "names": [
+    "Chiku"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "a cute energetic cartoon squirrel baker with fluffy reddish-brown tail, wearing a white baker chef hat and a tiny flour-dusted red apron, carrying a wooden spoon",
+    "doing": [],
+    "gender": "male",
+    "age": "adult",
+    "kind": "human"
+   },
+   "story": "মধ্যরাতে কেক দানবের ধাঁধা! 🎂👹 | মিষ্টির দোকানে ভূতুড়ে কাণ্ড | Bangla Cartoon Story ২০২৬",
+   "key": "",
+   "made": "2026-11-27T22:42+00:00",
+   "check": {
+    "front_side_pixels": [
+     76446,
+     45652
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_cake_monster_a5f65": {
+   "spec": {
+    "name_bn": "Cake Monster",
+    "name_en": "lib_k_cake_monster_a5f65",
+    "category": "boy",
+    "sample": false,
+    "age": 9,
+    "personality": "a naughty, curious boy who loves football and mangoes; brave in daylight, scared at night",
+    "voice": "boy",
+    "height": 0.623,
+    "heads": 3.3,
+    "head": {
+     "shape": "egg",
+     "w": 0.985,
+     "ear": 1.1
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.106,
+     "eye_spacing": 0.42,
+     "iris": "#c62828",
+     "nose": "broad",
+     "nose_size": 1.06,
+     "mouth_w": 0.95,
+     "brow_thick": 1.0,
+     "eye_y": 0.46,
+     "child": 1,
+     "mouth_y": 0.18,
+     "glow": "#ff6a5a",
+     "ghost_eyes": true
+    },
+    "hair": {
+     "style": "side_part"
+    },
+    "body": {
+     "shoulder": 0.62,
+     "chest": 0.6,
+     "waist": 0.56,
+     "hip": 0.56,
+     "arm_r": 0.085,
+     "leg_r": 0.1,
+     "leg": 0.38,
+     "arm": 0.4,
+     "neck": 0.025,
+     "shoe": "sandal",
+     "foot": 1.1
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#5a4a6a",
+     "hair": "#120e0c",
+     "tshirt": "#7a2a22",
+     "stripe": "#f4f1de",
+     "shorts": "#3a3a3a",
+     "shoe": "#333344",
+     "lip": "#9a5040",
+     "turban": "#efe6cf",
+     "shawl": "#7a1a2a"
+    },
+    "accessories": [
+     "shawl",
+     "jewel",
+     "turban"
+    ],
+    "cast": "story_lib"
+   },
+   "names": [
+    "Cake Monster"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "a huge funny monster shape covered entirely in thick white whipping cream, red cherry jam, and cake crumbs, with a furry tail poking out secretly behind",
+    "doing": [],
+    "gender": "male",
+    "age": "child",
+    "kind": "human"
+   },
+   "story": "মধ্যরাতে কেক দানবের ধাঁধা! 🎂👹 | মিষ্টির দোকানে ভূতুড়ে কাণ্ড | Bangla Cartoon Story ২০২৬",
+   "key": "",
+   "made": "2026-11-27T22:42+00:00",
+   "check": {
+    "front_side_pixels": [
+     38575,
+     29171
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_bhombol_3160f": {
+   "spec": {
+    "name_bn": "Bhombol",
+    "category": "animal",
+    "cast": "story_lib",
+    "age": 8,
+    "animal": {
+     "species": "bear",
+     "size": 0.75
+    },
+    "colours": {
+     "body": "#8a5a32"
+    },
+    "accessories": [],
+    "gender": "male",
+    "look": "a plump adorable otter-bear cub with soft dark-brown fur, black shiny nose, round curious eyes, white belly patch, wearing a small leafy flower garland",
+    "sample": false
+   },
+   "names": [
+    "Bhombol"
+   ],
+   "kind": "animal",
+   "bot": "kids",
+   "species": "bear",
+   "brief": {
+    "look": "a plump adorable otter-bear cub with soft dark-brown fur, black shiny nose, round curious eyes, white belly patch, wearing a small leafy flower garland",
+    "doing": [],
+    "gender": "male",
+    "age": "child",
+    "kind": "animal"
+   },
+   "story": "মধ্যরাতে কেক দানবের ধাঁধা! 🎂👹 | মিষ্টির দোকানে ভূতুড়ে কাণ্ড | Bangla Cartoon Story ২০২৬",
+   "key": "",
+   "made": "2026-11-27T22:42+00:00",
+   "check": {
+    "front_side_pixels": [
+     33039,
+     33039
+    ],
+    "unlike_others": 99
+   }
   }
  }
 }

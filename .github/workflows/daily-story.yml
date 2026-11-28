@@ -5,6 +5,11 @@ on:
   # compilation - its timed runs are often hours late.
   schedule:
     - cron: "30 4 * * 0"    # Sunday 10:00 AM India time: weekly long compilation video
+    # 28 Nov 2026 backups (cron-job.org had stopped sending the 8:30 AM / 11 PM / 2 AM jobs - no 1 PM video since 24 Nov,
+    # no night writing). A run that finds its slot already done stops at once, so a cron-job.org start as well is harmless.
+    - cron: "15 2 * * *"    # 7:45 AM India time: the 1 PM video
+    - cron: "30 17 * * *"   # 11:00 PM India time: write tomorrow's 3 stories (nothing posted)
+    - cron: "30 20 * * *"   # 2:00 AM India time: the new characters' assets (nothing posted)
     # v98: the YouTube Live 'গল্পের আসর' is started by cron-job.org on Saturday 21:50 India time (mode=live)
   workflow_dispatch:        # lets you press "Run workflow" to test any time
     inputs:
@@ -137,7 +142,7 @@ jobs:
           LANGUAGE: ${{ github.event.inputs.language }}
           CHANNEL_LANG: ${{ secrets.CHANNEL_LANG }}
           EVENT: ${{ github.event_name }}
-          MODE: ${{ github.event.inputs.mode || (github.event.schedule == '30 4 * * 0' && 'compilation') || '' }}
+          MODE: ${{ github.event.inputs.mode || (github.event.schedule == '30 4 * * 0' && 'compilation') || (github.event.schedule == '30 17 * * *' && 'write') || (github.event.schedule == '30 20 * * *' && 'assets') || (github.event.schedule == '15 2 * * *' && 'auto') || '' }}
           ANIM_MODE: ${{ vars.TVTOON_OFF == '1' && vars.ANIM_MODE || 'tvtoon' }}   # the new TV cartoon (repo variable TVTOON_OFF = 1: the old way)
           TVTOON_LOOK: ${{ vars.TVTOON_LOOK }}             # empty = bright kids' film look; flat = the plain TV cartoon
           TVTOON_PORTRAIT: ${{ vars.TVTOON_PORTRAIT }}     # 0 = no separate 9:16 cartoon render (faster)

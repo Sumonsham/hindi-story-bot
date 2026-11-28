@@ -347,25 +347,38 @@ OUT_PLACES = [  # a kids' place the horror words do not know -> the outdoor plac
 ]
 
 
-def kids_place(p):
+def kids_place(p, prev=None):
     """the place of a kids' story scene, said so the engine finds the right place (never an empty bedroom for 'under
-    the big tree')"""
+    the big tree'). prev = the place of the scene before: a place that names nothing we know ("In front of the True
+    Door") is still THERE (28 Nov 2026: it jumped from the palace corridor to a village courtyard full of villagers)"""
     low = str(p or "").lower()
-    if STY.place_of(p, outdoor_guess=False) != "ghar" or any(w in low for w in INSIDE_WORDS):
-        return p
+    if STY.place_of(p, outdoor_guess=False) != "ghar" or any(w in low for w in INSIDE_WORDS) or \
+            any(w in low for _k, ws in STY.ROOM_KINDS for w in ws):
+        return p                                            # (it names its place: a corridor IS a corridor)
     for words, to in OUT_PLACES:
         if any(w in low for w in words):
             return f"{to}, {p}"
+    if any(w in low for w in ("door", "corridor", "stair", "tower", "chamber", "window", "wall", "floor", "দরজা",
+                              "সিঁড়ি", "দরজার", "জানলা", "দেয়াল", "दरवाज", "सीढ़ी", "खिड़की")):
+        return f"{prev} - {p}" if prev else p              # (a part of a building: inside, the same building)
+    if prev:
+        return f"{prev} - {p}"
+    if STY.place_of(p) != "ghar":
+        return p                                            # (the outdoor words: road, field, path ...)
     return f"village courtyard, {p}"
 
 
 def plan(story, category=""):
     """the tvtoon episode of a kids' story, with the kids' cast"""
     st = copy.deepcopy(story)
+    prev = None
     for sc in st.get("scenes", []):                         # the kids' stories say little about time: daytime
-        sc["place"] = kids_place(sc.get("place", ""))
+        sc["place"] = kids_place(sc.get("place", ""), prev)
+        prev = re.sub(r", sunny day$", "", str(sc["place"]))[:120]
         p = str(sc.get("place", ""))
-        if not any(w in p.lower() for w in STY.NIGHT + STY.DUSK + ["morning", "noon", "day", "সকাল", "দুপুর"]):
+        first_ = " ".join(str(l_.get("text", "")) + " " + str(l_.get("en", "")) for l_ in (sc.get("lines") or [])[:2])
+        if not any(w in p.lower() for w in STY.NIGHT + STY.DUSK + ["morning", "noon", "day", "সকাল", "দুপুর"]) \
+                and STY.hours_of(first_, "", inherit=-1.0) < 0:     # (26 Nov 2026: "বিকেলবেলা ..." in the lines counts)
             sc["place"] = p + ", sunny day" if p else "a village, sunny day"
     return STY.episode_from_story(st, cast=kids_cast(st, category))
 

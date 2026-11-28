@@ -249,6 +249,10 @@ def align(audio_path, text=None, offset=0.0):
     for t, v in ev:                                        # monotonic, at least 2 frames (1/12 s) per shape
         if clean and t - clean[-1][0] < 1 / 12.0:
             if v == "X" and clean[-1][1] != "X":
+                # (25 Nov 2026, frame-by-frame test on a real Gemini line: this closing was DROPPED when the last
+                # syllable sat close to the end of its phrase - the mouth then stayed open through the whole pause
+                # after it, 1.2 s of 'talking' in silence). The mouth now closes right after that last shape.
+                clean.append((clean[-1][0] + 1 / 12.0, "X"))
                 continue
             clean[-1] = (clean[-1][0], v)
             continue

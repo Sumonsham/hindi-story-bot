@@ -212,7 +212,9 @@ class StoryScout:
                 species = "parrot" if kind == "bird" else "dog"
             brief = {"name": name, "name_local": ch.get("name_local") or name,
                      "gender": "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male",
-                     "age": ch.get("age"), "kind": "animal" if species else ("ghost" if any(w in kind for w in GHOST_KINDS) else "human"),
+                     "age": ch.get("age"), "kind": "animal" if species else (
+                "human" if _solid_demon(kind, str(ch.get("look", "") or "")) else "ghost" if any(w in kind for w in GHOST_KINDS)
+                else "human"),
                      "species": species, "look": str(ch.get("look", "") or ""), "doing": self._doing(story, name),
                      "story": story.get("title", "")}
             for k in ("clothes", "costume", "dress", "appearance", "description"):
@@ -470,6 +472,8 @@ class AssetBuilder:
                 s["costume"]["sleeve"] = "full"
             if has("shadow", "misty", "float", "smoke", "ghost", "spirit", "ছায়া", "भूत", "छाया"):
                 s["ghost"] = {"float": 0.06, "alpha": 0.93, "tint": "#c8b0ff"}
+        if has("huge", "giant", "enormous", "massive", "বিশাল", "দৈত্যাকার", "विशाल") or has(*SOLID_DEMON[:10]):
+            s["height"] = round(s["height"] * 1.2, 3)       # a rakshasa / giant towers over the others
         if has("tall", "লম্বা", "लंबा", "लंबी"):
             s["height"] = round(s["height"] * 1.08, 3)
         if has("short ", "বেঁটে", "नाटा", "छोटे कद"):
@@ -630,6 +634,20 @@ def cleanup(keep_days=4):
 
 
 # ===================================================================================================== at video time
+SOLID_DEMON = ("rakshas", "rakshasa", "rakshasi", "asura", "daitya", "danav", "monster", "giant", "demoness", "ogre",
+               "রাক্ষস", "রাক্ষসী", "অসুর", "দৈত্য", "দানব", "राक्षस", "राक्षसी", "असुर", "दैत्य", "दानव")
+
+
+def _solid_demon(kind, look):
+    """(28 Nov 2026: Tadaka the demoness came as a pale see-through ghost) a rakshasa / asura / monster of a
+    mythology or fairy tale is a SOLID, big, dark-skinned character with glowing eyes - not a ghost; only a
+    spirit / ghost / shadow floats see-through"""
+    t = f"{kind} {look}".lower()
+    if any(w in t for w in ("ghost", "spirit", "shadow-like", "shadowy", "misty", "ভূত", "প্রেত", "भूत")):
+        return False
+    return any(w in t for w in SOLID_DEMON) or kind.strip() == "demon"
+
+
 def brief_of(ch, bot, species=None, story_title=""):
     kind = str(ch.get("kind", "human")).lower()
     look = str(ch.get("look", "") or "")
@@ -638,7 +656,8 @@ def brief_of(ch, bot, species=None, story_title=""):
             look += " " + str(ch[k])
     return {"name": ch["name"], "name_local": ch.get("name_local") or ch["name"],
             "gender": "female" if str(ch.get("gender", "male")).lower().startswith("f") else "male",
-            "age": ch.get("age"), "kind": "animal" if species else ("ghost" if any(w in kind for w in GHOST_KINDS) else "human"),
+            "age": ch.get("age"), "kind": "animal" if species else (
+                "human" if _solid_demon(kind, look) else "ghost" if any(w in kind for w in GHOST_KINDS) else "human"),
             "species": species, "look": look, "doing": [], "story": story_title}
 
 

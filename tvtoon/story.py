@@ -38,7 +38,7 @@ PLACE_WORDS = [  # first match wins (inside a vehicle before the station / stree
                        "জমিদার", "রাজবাড়ি", "বাড়ি"]),
     ("village_courtyard", ["courtyard", "village", "উঠোন", "গ্রাম"]),
 ]
-NIGHT = ["night", "midnight", "dark", "moon", "lantern", "রাত", "অন্ধকার"]
+NIGHT = ["night", "midnight", "dark", "moon", "lantern", "bedtime", "bed time", "রাত", "অন্ধকার", "ঘুমের সময়"]
 DUSK = ["evening", "dusk", "sunset", "twilight", "সন্ধ্যা"]
 
 EMO = {"scared": "scared", "terrified": "scared", "scare": "scared", "choking": "scared", "panic": "scared",
@@ -160,7 +160,9 @@ ROOM_KINDS = [  # first match wins
     ("palki", PALKI),
     ("hold", HOLD),
     ("classroom", ["classroom", "class room", "ক্লাসঘর", "ক্লাসরুম"]),
-    ("kitchen", ["kitchen", "stove", "hearth", "রান্নাঘর", "হেঁশেল", "উনুন"]),
+    ("kitchen", ["kitchen", "stove", "hearth", "রান্নাঘর", "হেঁশেল", "উনুন", "sweet shop", "sweetshop", "bakery", "tea shop",
+                 "tea stall", "মিষ্টির দোকান", "ময়রা", "চায়ের দোকান", "मिठाई की दुकान", "हलवाई"]),
+    ("shed", ["grocery", "general store", "shop", "store", "দোকান", "दुकान"]),
     ("hospital", ["hospital", "ward", "clinic", "nursing", "হাসপাতাল"]),
     ("studio", ["studio", "radio", "recording", "tape"]),
     ("office", ["office", "study", "desk", "library", "police station", "thana", "অফিস", "থানা"]),
@@ -260,7 +262,7 @@ def hours_of(text, mood="", inherit=None):
         (21.5, ["রাত বারোটা", "মাঝরাত", "মধ্যরাত", "গভীর রাত", "midnight"]),
         (6.0, ["ভোর", "dawn", "daybreak", "sunrise", "সূর্যোদয়"]),
         (9.0, ["সকাল", "morning"]),
-        (13.0, ["দুপুর", "noon", "daytime", "sunlight"]),
+        (13.0, ["দুপুর", "noon", "daytime", "sunlight", "sunny", "sunshine", "daylight", "in the sun", "bright day"]),
         (16.5, ["বিকেল", "বিকাল", "afternoon"]),
         (18.2, DUSK),
         (21.5, NIGHT),
@@ -268,7 +270,11 @@ def hours_of(text, mood="", inherit=None):
     best = None
     for hour, words in groups:
         for w in words:
-            i = t.find(w)
+            if re.fullmatch(r"[ঀ-৿]{1,4}", w):          # a short Bengali word as a WORD ('রাত', 'রাতে' - not 'রাতারাতি')
+                m = re.search(r"(?<![ঀ-৿])" + re.escape(w) + r"(?:ে|ের|্রি|্রে|টা|ভর|ের|বেলা|বেলায়)?(?![ঀ-৿])", t)
+                i = m.start() if m else -1
+            else:
+                i = t.find(w)
             if i >= 0 and (best is None or i < best[0]):
                 best = (i, hour)
     if best is not None:
@@ -342,7 +348,11 @@ def episode_from_story(story, max_scenes=None, max_lines=None, aspect="16:9", ca
             if CH.SPECS.get(actor, {}).get("cast") not in (None, "kids", "horror", "library") or actor.startswith(("ka_", "kp_", "new_")):
                 cast_spec[-1]["spec"] = CH.SPECS[actor]           # (made for this story: its look travels with the plan)
             ids[sp] = actor
-        hour = hours_of(place, sc.get("mood", ""), inherit=hour)
+        # 26 Nov 2026 (the cartoon bot: "পরদিন সকালে" scenes were drawn at night): when the place says no time,
+        # the scene's own first lines are asked ("next morning ...") before the hour of the scene before is kept
+        _first = " ".join(str(l_.get("text", "")) + " " + str(l_.get("en", "")) for l_ in (sc.get("lines") or [])[:2])
+        _h_place = hours_of(place, "", inherit=-1.0)
+        hour = _h_place if _h_place >= 0 else hours_of(_first, sc.get("mood", ""), inherit=hour)
         world = {"hours": [[0, hour]], "wind": 0.5}
         pl = place.lower()
         indoor_loc = loc == "ghar" or loc.endswith("_inside")

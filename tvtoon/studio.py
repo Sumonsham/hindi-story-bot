@@ -1102,7 +1102,8 @@ class QualityControl(Agent):
         a = next((s for s in pr.get("streams", []) if s.get("codec_type") == "audio"), {})
         W, H = _frame(st)
         add("resolution", (v.get("width"), v.get("height")) == (W, H), f"{v.get('width')}x{v.get('height')}", "11b")
-        fps = eval(v.get("r_frame_rate", "0/1")) if v else 0
+        _fr = (v.get("r_frame_rate", "0/1") if v else "0/1").split("/")
+        fps = (float(_fr[0]) / max(1.0, float(_fr[1]))) if len(_fr) == 2 else float(_fr[0] or 0)
         add("frame rate", abs(fps - 24) < 0.01, fps, "11b")
         total = float(pr.get("format", {}).get("duration", 0))
         want = sum(rr[s["scene_id"]]["seconds"] for s in sb["scenes"]) + 6.0

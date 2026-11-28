@@ -76,7 +76,13 @@ class Scene:
         self.W, self.H = (1920, 1080) if self.aspect == "16:9" else (1080, 1920)
         if spec.get("size"):
             self.W, self.H = spec["size"]
-        self.wind = float(spec.get("wind", 0.4))
+        _wdict = spec.get("world") if isinstance(spec.get("world"), dict) else {}
+        self._base_wind = float(spec.get("wind") if "wind" in spec else _wdict.get("_wind", 0.4))
+        self.wind = self._base_wind
+        self._talk_view = spec.get("talk_view") or _wdict.get("_talk_view")
+        self._bg_image_path = spec.get("bg_image") or _wdict.get("_bg_image")
+        self.bg_surface = None
+        self.lean_out = set()
         self.perf, self.puppets, self.order = {}, {}, []
         self.depth = {}
         for c in spec["cast"]:
@@ -95,7 +101,9 @@ class Scene:
                 self.names[c["id"]] = c["name_bn"]              # the story's own name for this actor
             pf.scale = self.cscale(c["id"])
             pf.scene = self
-            pf.side_talk = c.get("view", spec.get("talk_view")) == "side"   # talk face to face in profile
+            if c.get("lean_out"):
+                self.lean_out.add(c["id"])
+            pf.side_talk = c.get("view", self._talk_view) == "side"          # talk face to face in profile
             if c.get("facing") in ("left", "right"):                         # standing in profile from the start
                 pf.facing_side = -1.0 if c["facing"] == "left" else 1.0
             self.perf[c["id"]] = pf
@@ -115,6 +123,34 @@ class Scene:
             self.vehicles[v["id"]] = veh
         if self.world is not None and hasattr(self.world, "draw_trains"):
             self.world.train_hook = self._draw_track_vehicles
+        if (
+            self._bg_image_path
+            and os.path.exists(str(self._bg_image_path))
+            and not any(getattr(v_, "lane", None) == "tracks" for v_ in self.vehicles.values())
+            and loc not in ("boat", "train_inside", "bus_inside", "tram_inside")
+        ):
+            try:
+                from PIL import Image as _PILImage
+                from tvtoon import paintbg as _PB
+                _bw, _bh = int(BG.WORLD_W + 1400), int(BG.WORLD_H + 620)
+                _src = _PILImage.open(str(self._bg_image_path)).convert("RGB")
+                # (26 Nov 2026) the painting keeps its shape: scaled to the height, the width continued (mirrored)
+                # instead of squeezed to 2.7:1; the strip under it in the painting's own ground colour
+                _im = _PB.strip(_src, _bw, _bh).convert("RGBA")
+                self._bg_ground = _PB.ground_colour(_src)
+                _arr = np.array(_im)
+                # Convert RGBA to Cairo ARGB32 (BGRA on little-endian)
+                _bgra = np.empty((_bh, _bw, 4), dtype=np.uint8)
+                _bgra[:, :, 0] = _arr[:, :, 2]
+                _bgra[:, :, 1] = _arr[:, :, 1]
+                _bgra[:, :, 2] = _arr[:, :, 0]
+                _bgra[:, :, 3] = 255
+                self._bg_buf = np.ascontiguousarray(_bgra)
+                self.bg_surface = cairo.ImageSurface.create_for_data(
+                    self._bg_buf, cairo.FORMAT_ARGB32, _bw, _bh, _bw * 4
+                )
+            except Exception:
+                self.bg_surface = None
         for pf in self.perf.values():
             pf.rides = []
         self.lines, self.props, self.shots = [], [], []
@@ -165,6 +201,12 @@ class Scene:
                     ev, info, loud, hop = [(0.0, "X")], {"method": "NO AUDIO - mouth stays closed"}, np.zeros(1), 0.01
                 t1 = t0 + dur
                 to = b.get("to")
+                if not to and len(self.order) >= 2:
+                    others = [c_ for c_ in self.order if c_ != who and not getattr(self.perf.get(c_), "extra", False)]
+                    if others:
+                        to = min(others, key=lambda c_: abs(self.perf[c_].x_at(t0) - pf.x_at(t0)))
+                if b.get("lean_out") and who:
+                    self.lean_out.add(who)
                 pf.speech.append((t0, t1, ev, loud, hop, emo, to))
                 if emo != "neutral":
                     pf.emotions.append((t0, t1 + 0.6, emo))
@@ -227,6 +269,8 @@ class Scene:
                 shot = {"type": "track", "who": b["vehicle"]}
                 who = b["vehicle"]
             elif "ride" in b:                                  # get on: the rider sits on the vehicle's seat
+                if b.get("lean_out") and who:
+                    self.lean_out.add(who)
                 pf.rides.append([0.0 if t0 <= 0.5 else t0, 1e9, b["ride"], int(b.get("seat", 0))])   # on it from frame 1
                 v = self.vehicles[b["ride"]]
                 if v.kind == "cycle" and int(b.get("seat", 0)) == 0:   # a cycle that fits the rider (a child gets a small one)
@@ -407,6 +451,9 @@ class Scene:
                         else:
                             continue
                     elif kind == "hold_breath":       # a frightened flinch: the scared face for a moment
+                        if any(l_["t0"] - 0.3 < t + 1.6 and t < l_["t1"] + 0.3 for l_ in self.lines
+                               if not l_.get("narrator")):
+                            continue                     # (not while someone speaks: an open mouth reads as talking)
                         pf.emotions.append((t, t + 1.6, "scared"))
                         sec = 1.6
                     elif kind == "bounce":
@@ -424,6 +471,18 @@ class Scene:
         for ln in self.lines:
             if ln["t0"] <= t < ln["t1"] and not ln.get("narrator"):
                 return ln["who"]
+        return None
+
+    def dialogue_partner(self, cid, t):
+        """Return the character id that `cid` is speaking to or listening to at time `t`, or None."""
+        for ln in self.lines:
+            if ln["t0"] - 0.15 <= t < ln["t1"] + 0.35 and not ln.get("narrator"):
+                if ln["who"] == cid and ln.get("to") in self.perf:
+                    return ln["to"]
+                if ln.get("to") == cid and ln["who"] in self.perf:
+                    return ln["who"]
+                if ln["who"] in self.perf and ln["who"] != cid:
+                    return ln["who"]
         return None
 
     # -------------------------------------------------------------- vehicles and riders
@@ -630,6 +689,10 @@ class Scene:
 
     # -------------------------------------------------------------- render
     def render_frame(self, t, bg=None, subtitles=None):
+        # Dynamic wind for natural spring-driven hair & cloth motion (boosted when riding or leaning out window)
+        active_ride = any(self.riding(c, t) is not None for c in self.order)
+        breeze = 0.25 * math.sin(t * 1.7) + 0.15 * math.cos(t * 2.9)
+        self.wind = (1.65 if (active_ride or self.lean_out) else max(0.75, self._base_wind)) + breeze
         surf = cairo.ImageSurface(cairo.FORMAT_RGB24, self.W, self.H)
         ctx = cairo.Context(surf)
         cam = self.camera(t)
@@ -638,7 +701,29 @@ class Scene:
         m.translate(self.W / 2, self.H / 2)
         m.scale(z, z)
         m.translate(-cx, -cy)
-        if self.world is not None:
+        if self.bg_surface is not None:
+            # 2.5D illustrated story background with 0.72x parallax depth relative to foreground characters
+            pm = cairo.Matrix()
+            pm.translate(self.W / 2, self.H / 2)
+            pm.scale(z * 1.04, z * 1.04)
+            pm.translate(-(CX0_DEFAULT + (cx - CX0_DEFAULT) * 0.72), -(cy * 0.88))
+            ctx.set_matrix(pm)
+            ctx.set_source_surface(self.bg_surface, -700, -400)
+            ctx.paint()
+            sh = self.shot_at(t)
+            blur = {"close": 3.0, "reaction": 3.0, "ecu": 4.5, "ots": 2.0, "medium": 1.2}.get(sh.get("type") if sh else "", 0)
+            if blur:
+                import cv2
+                surf.flush()
+                arr = np.ndarray((self.H, surf.get_stride() // 4, 4), np.uint8, surf.get_data())
+                k = blur * self.H / 1080.0
+                arr[:, : self.W] = cv2.GaussianBlur(arr[:, : self.W], (0, 0), k)
+                surf.mark_dirty()
+            ctx.set_matrix(m)
+            ctx.set_source_rgb(*getattr(self, "_bg_ground", G.rgb("#121218")))
+            ctx.rectangle(-5000, BG.WORLD_H + 190, 15000, 5000)
+            ctx.fill()
+        elif self.world is not None:
             self.world.draw_back(ctx, self.W, self.H, cam, t)
             sh = self.shot_at(t)
             blur = {"close": 3.0, "reaction": 3.0, "ecu": 4.5, "ots": 2.0, "medium": 1.2}.get(sh.get("type") if sh else "", 0)
@@ -650,7 +735,9 @@ class Scene:
                 arr[:, : self.W] = cv2.GaussianBlur(arr[:, : self.W], (0, 0), k)
                 surf.mark_dirty()
             ctx.set_matrix(m)
-            ctx.set_source_rgb(*G.rgb("#c9a172"))               # ground below the world picture (portrait)
+            _hr = self.world.hour(t) if self.world is not None else 12.0
+            _gcol = "#121218" if (_hr >= 19.0 or _hr < 5.5 or self.look() == "horror" or self.spec.get("location") in ("ghar", "boat", "train_inside", "bus_inside", "tram_inside")) else "#c9a172"
+            ctx.set_source_rgb(*G.rgb(_gcol))               # ground below the world picture (portrait)
             ctx.rectangle(-5000, BG.WORLD_H + 190, 15000, 5000)
             ctx.fill()
         else:
@@ -681,30 +768,44 @@ class Scene:
                     for c in inside:
                         self._draw_person(ctx, c, t, sun)
                     self._draw_vehicle(ctx, cid, t, part="front")
-                elif v.kind in ("bus", "tram") and inside:     # faces in the windows
+                elif v.kind in ("bus", "tram") and inside:     # faces in the windows (and leaning out if requested)
                     self._draw_vehicle(ctx, cid, t)
                     sc_v = self.vscale(cid)
                     rects = v.window_rects(v.x_at(t), self.vgy(cid), sc_v, t)
-                    ctx.save()
-                    ctx.new_path()
-                    for (rx, ry, rw, rh) in rects:
-                        ctx.rectangle(rx, ry, rw, rh)
-                    ctx.clip()
                     wy = min(r_[1] for r_ in rects)
                     wh = rects[0][3]
-                    for c in inside:                           # seated so the head and shoulders fill the window
-                        P_ = self.puppets[c].P
-                        sit_h = (P_["foot_h"] + P_["shin"] + P_["thigh"] * 0.34 + P_["pelvis_up"] + P_["torso"] + P_["neck"]
-                                 + P_["head_h"] * 1.05) * self.cscale(c)
-                        lift = self.gy(c) - (wy + 0.12 * wh) - sit_h
-                        self._draw_person(ctx, c, t, sun, lift=lift, shadow=False)
-                    ctx.restore()
-                    ctx.save()                                 # the glass over them
+                    in_glass = [c for c in inside if c not in self.lean_out]
+                    leaning = [c for c in inside if c in self.lean_out]
+                    if in_glass:
+                        ctx.save()
+                        ctx.new_path()
+                        for (rx, ry, rw, rh) in rects:
+                            ctx.rectangle(rx, ry, rw, rh)
+                        ctx.clip()
+                        for c in in_glass:                     # seated so the head and shoulders fill the window
+                            P_ = self.puppets[c].P
+                            sit_h = (P_["foot_h"] + P_["shin"] + P_["thigh"] * 0.34 + P_["pelvis_up"] + P_["torso"] + P_["neck"]
+                                     + P_["head_h"] * 1.05) * self.cscale(c)
+                            lift = self.gy(c) - (wy + 0.12 * wh) - sit_h
+                            self._draw_person(ctx, c, t, sun, lift=lift, shadow=False)
+                        ctx.restore()
+                    ctx.save()                                 # the glass over normal passengers
                     for (rx, ry, rw, rh) in rects:
                         ctx.rectangle(rx, ry, rw, rh)
                     ctx.set_source_rgba(0.75, 0.85, 0.95, 0.18)
                     ctx.fill()
                     ctx.restore()
+                    for c in leaning:                          # passenger leaning face out of the bus window
+                        P_ = self.puppets[c].P
+                        sit_h = (P_["foot_h"] + P_["shin"] + P_["thigh"] * 0.34 + P_["pelvis_up"] + P_["torso"] + P_["neck"]
+                                 + P_["head_h"] * 1.05) * self.cscale(c)
+                        lift = self.gy(c) - (wy + 0.08 * wh) - sit_h
+                        pf_c = self.perf[c]
+                        st_c, x_c = pf_c.state(t, self)
+                        d_bus = v.direction(t)
+                        st_c["head_tilt"] = float(st_c.get("head_tilt", 0.0)) + 0.22 * d_bus
+                        st_c["head_yaw"] = 0.55 * d_bus
+                        self._draw_person(ctx, c, t, sun, st=st_c, x=x_c + 16.0 * d_bus, lift=lift, shadow=False)
                 else:
                     self._draw_vehicle(ctx, cid, t)
                 continue
@@ -780,7 +881,10 @@ class Scene:
             bk = float(os.environ.get("TVTOON_BRIGHT") or 1.0)
         except ValueError:
             bk = 1.0
-        gain = 1.0 + bk * ({"horror": 0.16, "film": 0.12, "kids": 0.12}.get(look, 0.1) + (0.22 if night else 0.0))
+        # (28 Nov 2026: a children's night scene - the sweet shop at midnight - was nearly black: the kids' look
+        # lifts the night much more; night stays blue, but the faces and the room are always clearly seen)
+        gain = 1.0 + bk * ({"horror": 0.16, "film": 0.12, "kids": 0.12}.get(look, 0.1)
+                           + ((0.75 if look == "kids" else 0.22) if night else (0.25 if look == "kids" and dusk else 0.0)))
         xe = 1.0 - (1.0 - x) ** gain                                         # lifts darks and mids, keeps whites
         curve = xe + s_amt * (xe - 0.5) * (1 - np.abs(2 * xe - 1)) * 1.6      # contrast around the middle
         sh = np.clip(1 - x * 2.2, 0, 1)                                    # how much a value is a shadow
@@ -827,6 +931,15 @@ class Scene:
             pf = self.perf[cid]
             if st is None:
                 st, x = pf.state(t, self)
+            if pf.side_talk and not self.riding(cid, t) and not pf.moves:
+                partner = self.dialogue_partner(cid, t)
+                if partner and partner in self.perf:
+                    want_d = 1.0 if self.perf[partner].x_at(t) >= x else -1.0
+                    pf.facing_side = want_d
+                    if isinstance(st.get("side"), dict):
+                        st["side"]["d"] = want_d
+                    else:
+                        st["head_yaw"] = want_d * 0.72
             sc_, gy = self.cscale(cid), self.gy(cid) - lift
             props = {pr["behind"]: pr for pr in self.props}
             ghost = pf.pp.spec.get("ghost")

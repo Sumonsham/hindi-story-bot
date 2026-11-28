@@ -400,11 +400,16 @@ class BanshBon(WD.World):
         ctx.restore()
 
     def draw_fore(self, ctx, W, H, cam, t):
-        ctx.save()
-        ctx.set_matrix(self.layer_matrix(W, H, cam, self.LAYERS["bamboo_front"]))
-        for x, s in self.stalks["bamboo_front"]:              # big dark stalks right in front
-            self._bamboo(ctx, x, 1300, self.wind(t, x), t, G.rgb("#1e2e1a"), 46, base=1260)
-        ctx.restore()
+        zoom = cam[2] / max(1e-6, H / 1080.0)
+        if zoom < 1.45:                                       # (28 Nov 2026: in a close-up a stalk crossed the face)
+            ctx.save()
+            ctx.set_matrix(self.layer_matrix(W, H, cam, self.LAYERS["bamboo_front"]))
+            ctx.push_group()
+            for x, s in self.stalks["bamboo_front"]:          # big dark stalks right in front
+                self._bamboo(ctx, x, 1300, self.wind(t, x), t, G.rgb("#1e2e1a"), 46, base=1260)
+            ctx.pop_group_to_source()
+            ctx.paint_with_alpha(max(0.0, min(1.0, (1.45 - zoom) / 0.35)))
+            ctx.restore()
         ctx.save()                                           # drifting mist and blinking fireflies
         ctx.set_matrix(self.layer_matrix(W, H, cam, 0.95))
         for k in range(6):

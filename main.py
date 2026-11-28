@@ -5105,8 +5105,13 @@ def main():
     scene_lines = [[ln for ln in (s.get("lines") or []) if str(ln.get("text", "")).strip()] for s in scenes]
     total_lines = sum(len(x) for x in scene_lines) or 1
     imgs, shots_per_scene, last_ok, count = [], [], None, 0
+    painted = {}                                     # 26 Nov 2026: one painted set per place of the story
     for i, (s, lines) in enumerate(zip(scenes, scene_lines)):
         if tv_ep:                                    # the cartoon's own picture of the scene (no picture service)
+            try:
+                paint_set(tv_ep, i, s, story, painted, seed)
+            except Exception as e:
+                log(f"  painted set of scene {i + 1} skipped ({str(e)[:120]}) - our own drawn place is used")
             try:
                 p_ = tvk.still(tv_ep, i, os.path.join(WORK, f"tv_still_{i:02d}.jpg"), W, H)
                 shots_per_scene.append([p_] * max(1, len(lines)))
@@ -6495,6 +6500,75 @@ def mock_story(lang):
                 {"speaker": "Dadi", "text": "बच्चों, लालच बुरी बला है।", "emotion": "calm", "sfx": [], "shot": "elephant smiling"}]},
         ],
         "moral": "लालच बुरी बला है।"}
+
+
+PAINT_SKIP = ("boat", "train_inside", "bus_inside", "tram_inside")   # (their insides are drawn with the people)
+PAINT_INFO = {}                                  # painting key -> (location, room, time of day, place text)
+
+
+def paint_set(tv_ep, i, s, story, painted, seed):
+    """26 Nov 2026 (owner: the horror bot's 2.5D look for the cartoon's video, "logically"): the HYBRID 2.5D
+    cartoon. Behind our own LIVE characters (they still walk, act and talk - nothing of them becomes a picture) the
+    scene gets an illustrated, story-matched background: a bright children's picture-book painting of the story's
+    own place, time of day and weather, EMPTY (no people in it), from this bot's own Cloudflare account. The same
+    place in one story keeps the same painting; a scene whose painting fails (or the free limit is over, or
+    HYBRID_25D_BG=0) keeps our drawn place exactly as before. tvtoon/paintbg.py has the rules."""
+    from tvtoon import paintbg as PB
+    if env("HYBRID_25D_BG") == "0" or MOCK or CF_QUOTA_OUT:
+        return None
+    sc_tv = tv_ep["scenes"][min(i, len(tv_ep["scenes"]) - 1)]
+    if sc_tv.get("location") in PAINT_SKIP or any(v.get("lane") == "tracks" or v.get("kind") == "train"
+                                                  for v in sc_tv.get("vehicles") or []):
+        return None
+    world = sc_tv.setdefault("world", {})
+    hour = (world.get("hours") or [[0, 12.0]])[0][1]
+    room = world.get("kind", "") if sc_tv.get("location") == "ghar" else ""
+    k = PB.key(s.get("place", ""), sc_tv.get("location", ""), room, hour, story.get("title", ""))
+    tod = "night" if (float(hour) % 24) >= 19.5 or (float(hour) % 24) < 5 else "dusk" if (float(hour) % 24) >= 17.5 else "day"
+    for k_, v_ in painted.items():                   # the same place again: the same painting (continuity)
+        loc_, room_, tod_, place_ = PAINT_INFO.get(k_, ("", "", "", ""))
+        if k_ == k or (loc_ == sc_tv.get("location") and room_ == room and tod_ == tod
+                       and PB.same_place(place_, s.get("place", ""))):
+            if v_:
+                world["_bg_image"] = v_
+            return v_
+    PAINT_INFO[k] = (sc_tv.get("location"), room, tod, s.get("place", ""))
+    if len([v for v in painted.values() if v]) >= int(env("HYBRID_BG_MAX") or 8):
+        # (the free picture limit is shared by three videos a day) - no new painting: the painting of the same
+        # kind of place in this story, whatever its hour (the light of the hour is laid over it), else our drawn place
+        same = [v_ for k_, v_ in painted.items() if v_ and PAINT_INFO.get(k_, ("",))[0] == sc_tv.get("location")
+                and PAINT_INFO.get(k_, ("", ""))[1] == room]
+        if same:
+            world["_bg_image"] = same[0]
+            return same[0]
+        return None
+    ps_ = s.get("production_spec") if isinstance(s.get("production_spec"), dict) else {}
+    pr = PB.prompt(s.get("place", ""), story.get("setting", ""), ps_.get("props") or [], hour, "kids",
+                   sc_tv.get("location", ""), room, s.get("action", ""))
+    path = os.path.join(WORK, f"tv_paint_{len(painted):02d}.jpg")
+    log(f"  painted set {len(painted) + 1} (scene {i + 1}): {str(s.get('place', ''))[:70]}")
+    ok_path = None
+    for model, w_, h_ in ((CF_MODEL, 1344, 576), (CF_BACKUP, PIC_W, PIC_H)):
+        try:
+            data = cf_request(model, pr, None, w=w_, h=h_, seed=seed + 900 + len(painted))
+            with open(path + ".raw", "wb") as f_:
+                f_.write(data)
+            im = Image.open(path + ".raw").convert("RGB")
+            good, why = PB.usable(im)
+            if not good:
+                log(f"    painting not usable ({why})")
+                continue
+            im.save(path, quality=92)
+            ok_path = path
+            break
+        except Exception as e:
+            log(f"    painting failed ({model.split('/')[-1]}): {str(e)[:140]}")
+            if CF_QUOTA_OUT:
+                break
+    painted[k] = ok_path
+    if ok_path:
+        world["_bg_image"] = ok_path
+    return ok_path
 
 
 def mock_image(path, seed):

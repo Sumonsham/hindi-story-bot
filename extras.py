@@ -3282,7 +3282,26 @@ def _al_dtw(A, B):
     return last, float(D[n, m]) / (n + m)
 
 
-def _cut_plan(a, sr, plains, lang="bn", use_ref=True):
+def _limit_drop(drop, speech_mask, letters, ref_rate=None):
+    """(25 Nov 2026) of the stretches _cut_plan would leave out, only as much as the recording has MORE speech than its
+    letters need at this voice's pace (+15 %), the biggest first. Returns (drop, note)."""
+    total_sp = float(speech_mask.sum()) * 0.02
+    need_all = float(sum(letters)) * float(ref_rate or 0.085) * 1.15
+    allow = max(0.0, total_sp - need_all)
+    kept, used = [], 0.0
+    for ds, de in sorted(drop, key=lambda r: -(r[1] - r[0])):
+        ln_ = float(speech_mask[int(ds / 0.02):int(de / 0.02)].sum()) * 0.02
+        if used + ln_ <= allow + 0.5:
+            kept.append((ds, de))
+            used += ln_
+    note = ""
+    if len(kept) < len(drop):
+        note = (f"only {used:.1f} s left out (the recording has {allow:.1f} s more speech than its words need - the other "
+                f"{len(drop) - len(kept)} stretch(es) are story speech and stay)")
+    return sorted(kept), note
+
+
+def _cut_plan(a, sr, plains, lang="bn", use_ref=True, ref_rate=None):
     """Where the sentences of one recording end, and which stretches hold speech that is NOT in the text.
     Found three ways together (tuned on real Gemini recordings, 11 Nov 2026 - its pauses alone say nothing: it
     pauses after nearly every phrase, half of a recording is silence): (1) the recording is ALIGNED with a plain
@@ -3372,6 +3391,16 @@ def _cut_plan(a, sr, plains, lang="bn", use_ref=True):
         except Exception as ex:
             info.append(f"no machine reading ({str(ex)[:60]})")
             ref_t = None
+    # --- 25 Nov 2026 (forensic audit of the real recordings in assets/voice_samples): the stretches above were left
+    # out even when the WHOLE recording had no more speech than its words need - in one recording 85 s of 209 s were
+    # thrown away and what was left had 32 ms of speech per letter, where this voice never speaks faster than ~60:
+    # real story sentences were cut. Now only as much is left out as the recording really has TOO MUCH (its speech
+    # against what its letters need at this voice's own pace), the biggest stretch first; the rest stays, and the
+    # line is only reported (SUSPECT) so it can be made again
+    if drop:
+        drop, note_ = _limit_drop(drop, speech_mask, letters, ref_rate)
+        if note_:
+            info.append(note_)
     # --- the cuts: pauses whose speech time fits the letters, near where the machine reading says, long pauses first
     keepf = speech_mask.copy()
     for s, e in drop:
@@ -3534,10 +3563,10 @@ def tts_gemini_batch(items, lang_label, sr=44100, minutes=45, max_requests=None)
         how = "one"
         if len(g) > 1:
             try:
-                plan = _cut_plan(allv, rate, plains, lang, use_ref=env("TTS_ALIGN") != "0")
+                plan = _cut_plan(allv, rate, plains, lang, use_ref=env("TTS_ALIGN") != "0", ref_rate=SPK_VOICED.get(vk))
             except Exception as ex:
                 log(f"    alignment failed ({str(ex)[:80]}) - cut by the length of the words")
-                plan = _cut_plan(allv, rate, plains, lang, use_ref=False)
+                plan = _cut_plan(allv, rate, plains, lang, use_ref=False, ref_rate=SPK_VOICED.get(vk))
             how = "reading" if "no machine reading" not in plan["info"] and env("TTS_ALIGN") != "0" else "length"
             if plan["drop"]:
                 log(f"  voices: speech that is not in the story left out - {plan['info'][:260]}")

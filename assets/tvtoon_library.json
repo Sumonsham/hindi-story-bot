@@ -1684,6 +1684,353 @@
     ],
     "unlike_others": 99
    }
+  },
+  "lib_k_drona_bc0f6": {
+   "spec": {
+    "name_bn": "Drona",
+    "name_en": "lib_k_drona_bc0f6",
+    "category": "elderly_male",
+    "sample": false,
+    "age": 74,
+    "personality": "a wise, teasing grandfather and story-teller; slow, gentle, loves riddles",
+    "voice": "old male, slightly husky",
+    "height": 0.903,
+    "heads": 4.8,
+    "head": {
+     "shape": "heart",
+     "w": 0.774,
+     "ear": 1.2
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.072,
+     "eye_spacing": 0.42,
+     "iris": "#3a2a1a",
+     "nose": "button",
+     "nose_size": 0.92,
+     "mouth_w": 0.95,
+     "moustache": "bushy",
+     "brow_thick": 1.1,
+     "brow_col": "#efefef",
+     "wrinkles": true,
+     "eye_y": 0.52,
+     "beard": 1.0
+    },
+    "hair": {
+     "style": "bald_sides"
+    },
+    "body": {
+     "shoulder": 0.7,
+     "chest": 0.64,
+     "waist": 0.56,
+     "hip": 0.56,
+     "arm_r": 0.09,
+     "leg_r": 0.11,
+     "leg": 0.44,
+     "arm": 0.42,
+     "stoop": 0.08,
+     "shoe": "sandal"
+    },
+    "costume": {
+     "type": "kurta_dhoti",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#c48a62",
+     "hair": "#c8c8c0",
+     "moustache": "#f4f4f2",
+     "kurta": "#f08a1a",
+     "dhoti": "#f08a1a",
+     "shoe": "#5a3a22",
+     "lip": "#8a5040",
+     "beard": "#f2f0e8"
+    },
+    "accessories": [
+     "tilak",
+     "sacred_thread"
+    ],
+    "cast": "story_lib"
+   },
+   "names": [
+    "Drona"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Dignified elderly Brahmin guru, long white hair and thick white beard, serene yet stern face, simple saffron robes, rudraksha beads around neck and wrists, holds a wooden bow.",
+    "doing": [],
+    "gender": "male",
+    "age": "old",
+    "kind": "human"
+   },
+   "story": "পাখির চোখে কার তির বিদ্ধ হলো? 🏹 দ্রোণাচার্যের গোপন পরীক্ষা! | মহাভারত পর্ব ৩ | Bangla Cartoon Story 2026",
+   "key": "",
+   "made": "2026-11-28T09:51+00:00",
+   "check": {
+    "front_side_pixels": [
+     59205,
+     36934
+    ],
+    "unlike_others": 3
+   }
+  },
+  "lib_k_yudhishthira_e0eb4": {
+   "spec": {
+    "name_bn": "Yudhishthira",
+    "name_en": "lib_k_yudhishthira_e0eb4",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.719,
+    "heads": 4.2,
+    "head": {
+     "shape": "oval",
+     "w": 0.894,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.104,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "round",
+     "nose_size": 1.13,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5,
+     "beard": 1.0
+    },
+    "hair": {
+     "style": "crop"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#c48a62",
+     "hair": "#1e1410",
+     "tshirt": "#f2f0e8",
+     "stripe": "#e0b030",
+     "shorts": "#f2f0e8",
+     "shoe": "#333333",
+     "lip": "#9a5040",
+     "beard": "#1e1410",
+     "shawl": "#7a1a2a"
+    },
+    "accessories": [
+     "crown",
+     "shawl",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Yudhishthira"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Yudhishthira: calm righteous king, short beard, golden crown, white and gold royal robes",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "পাখির চোখে কার তির বিদ্ধ হলো? 🏹 দ্রোণাচার্যের গোপন পরীক্ষা! | মহাভারত পর্ব ৩ | Bangla Cartoon Story 2026",
+   "key": "",
+   "made": "2026-11-28T09:51+00:00",
+   "check": {
+    "front_side_pixels": [
+     37648,
+     26993
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_duryodhana_f83c2": {
+   "spec": {
+    "name_bn": "Duryodhana",
+    "name_en": "lib_k_duryodhana_f83c2",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.773,
+    "heads": 4.2,
+    "head": {
+     "shape": "long",
+     "w": 0.811,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "narrow",
+     "eye_size": 0.098,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "broad",
+     "nose_size": 1.14,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "spiky"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "full"
+    },
+    "colours": {
+     "skin": "#d9a07a",
+     "hair": "#120e0c",
+     "tshirt": "#6a3a8a",
+     "stripe": "#e0b030",
+     "shorts": "#6a3a8a",
+     "shoe": "#333333",
+     "lip": "#9a5040",
+     "moustache": "#120e0c"
+    },
+    "accessories": [
+     "crown",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Duryodhana"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Duryodhana: proud prince, thick moustache, dark purple and gold robes, golden crown, mace",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "পাখির চোখে কার তির বিদ্ধ হলো? 🏹 দ্রোণাচার্যের গোপন পরীক্ষা! | মহাভারত পর্ব ৩ | Bangla Cartoon Story 2026",
+   "key": "",
+   "made": "2026-11-28T09:51+00:00",
+   "check": {
+    "front_side_pixels": [
+     42095,
+     28405
+    ],
+    "unlike_others": 4
+   }
+  },
+  "lib_k_arjuna_c5a03": {
+   "spec": {
+    "name_bn": "Arjuna",
+    "name_en": "lib_k_arjuna_c5a03",
+    "category": "boy",
+    "age": 15,
+    "cast": "story_lib",
+    "personality": "Abhishek's younger cousin; believes every ghost story, sees things first, freezes with fear",
+    "voice": "teenage boy",
+    "height": 0.816,
+    "heads": 4.2,
+    "head": {
+     "shape": "round",
+     "w": 0.813,
+     "ear": 1.0
+    },
+    "face": {
+     "eye_style": "almond",
+     "eye_size": 0.101,
+     "eye_spacing": 0.43,
+     "iris": "#2a160c",
+     "nose": "long",
+     "nose_size": 1.08,
+     "mouth_w": 0.95,
+     "brow_thick": 0.95,
+     "child": 0.5
+    },
+    "hair": {
+     "style": "spiky"
+    },
+    "body": {
+     "shoulder": 0.64,
+     "chest": 0.6,
+     "waist": 0.54,
+     "hip": 0.54,
+     "arm_r": 0.08,
+     "leg_r": 0.1,
+     "leg": 0.45,
+     "arm": 0.42,
+     "shoe": "shoe"
+    },
+    "costume": {
+     "type": "tshirt_shorts",
+     "sleeve": "short"
+    },
+    "colours": {
+     "skin": "#e0aa82",
+     "hair": "#120e0c",
+     "tshirt": "#3a3a3a",
+     "stripe": "#c5e1a5",
+     "shorts": "#7a2a22",
+     "shoe": "#333333",
+     "lip": "#9a5040"
+    },
+    "accessories": [
+     "crown",
+     "jewel"
+    ],
+    "sample": false
+   },
+   "names": [
+    "Arjuna"
+   ],
+   "kind": "human",
+   "bot": "kids",
+   "species": null,
+   "brief": {
+    "look": "Arjuna: brave warrior prince, fair complexion, golden crown, white-and-gold armour, the Gandiva bow",
+    "doing": [],
+    "gender": "male",
+    "age": "young",
+    "kind": "human"
+   },
+   "story": "পাখির চোখে কার তির বিদ্ধ হলো? 🏹 দ্রোণাচার্যের গোপন পরীক্ষা! | মহাভারত পর্ব ৩ | Bangla Cartoon Story 2026",
+   "key": "",
+   "made": "2026-11-28T09:51+00:00",
+   "check": {
+    "front_side_pixels": [
+     47065,
+     31647
+    ],
+    "unlike_others": 4
+   }
   }
  }
 }

@@ -2373,12 +2373,12 @@
   "stats": {
    "likes": 0,
    "comments": 1,
-   "views": 10,
+   "views": 11,
    "length_s": 468,
-   "yt_views": 10,
+   "yt_views": 11,
    "yt_avg_s": 17,
    "yt_avg_pct": 3.7,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -2785,12 +2785,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 3,
+   "views": 10,
    "length_s": 504,
-   "yt_views": 3,
+   "yt_views": 4,
    "yt_avg_s": 164,
    "yt_avg_pct": 32.5,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -2835,7 +2835,7 @@
    "yt_views": 0,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3249,12 +3249,12 @@
   "stats": {
    "likes": 2,
    "comments": 1,
-   "views": 5,
+   "views": 6,
    "length_s": 519,
-   "yt_views": 5,
-   "yt_avg_s": 440,
-   "yt_avg_pct": 84.7,
-   "checked": "2026-11-25T09:33+00:00"
+   "yt_views": 6,
+   "yt_avg_s": 322,
+   "yt_avg_pct": 62.0,
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -3294,7 +3294,7 @@
    "yt_views": 2,
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3665,7 +3665,7 @@
    "yt_views": 3,
    "yt_avg_s": 18,
    "yt_avg_pct": 2,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "swapped",
@@ -3707,10 +3707,10 @@
    "comments": 1,
    "views": 6,
    "length_s": 707,
-   "yt_views": 5,
+   "yt_views": 6,
    "yt_avg_s": 173,
    "yt_avg_pct": 24.4,
-   "checked": "2026-11-25T09:33+00:00"
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -4125,12 +4125,12 @@
   "stats": {
    "likes": 1,
    "comments": 1,
-   "views": 4,
+   "views": 5,
    "length_s": 935,
-   "yt_views": 0,
-   "yt_avg_s": 0,
-   "yt_avg_pct": 0,
-   "checked": "2026-11-25T09:33+00:00"
+   "yt_views": 4,
+   "yt_avg_s": 86,
+   "yt_avg_pct": 9.2,
+   "checked": "2026-11-28T09:34+00:00"
   },
   "title_test": {
    "result": "kept",
@@ -4365,6 +4365,10 @@
    "yt_avg_s": 0,
    "yt_avg_pct": 0,
    "checked": "2026-11-27T22:33+00:00"
+  },
+  "title_test": {
+   "result": "kept",
+   "views": 3
   }
  },
  {
@@ -4394,22 +4398,23 @@
   "youtube": "ZD46V3ue4Eg",
   "fb_reel": "1719057286460250",
   "fb_story": "1163772746615062",
-  "yt_short": "xa3tVy3iXEU"
+  "yt_short": "xa3tVy3iXEU",
+  "stats": {
+   "likes": 0,
+   "comments": 1,
+   "views": 0,
+   "length_s": 975,
+   "yt_views": 0,
+   "yt_avg_s": 0,
+   "yt_avg_pct": 0,
+   "checked": "2026-11-28T09:34+00:00"
+  }
  },
  {
   "date": "2026-11-28T01:31+00:00",
   "lang": "bn",
   "slot": "2026-11-28@7",
-  "pending_comments": [
-   {
-    "id": "3941685012840635",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1683653689888039"
-   },
-   {
-    "id": "1131185416405755",
-    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=1683653689888039"
-   }
-  ],
+  "pending_comments": [],
   "category": "animal",
   "idea": "A mysterious cake monster appears in a quiet village bakery at midnight, threatening to eat all the sweets unless the local baker solves its riddles. (told as a animal story for children)",
   "episode": null,
@@ -4436,5 +4441,39 @@
    "q": "কোন জিনিসে কামড় বসালে কোনো দাগ পড়ে না, অথচ সেটা সবার তৃষ্ণা মেটায়?",
    "a": "জল বা পানি"
   }
+ },
+ {
+  "date": "2026-11-28T13:31+00:00",
+  "lang": "bn",
+  "slot": "2026-11-28@19",
+  "pending_comments": [
+   {
+    "id": "2296422591239167",
+    "text": "👉 পুরো গল্প শুনতে ক্লিক করুন এই লিংকে: https://www.facebook.com/watch/?v=2159800191297909"
+   }
+  ],
+  "category": "mahabharat",
+  "idea": "Guru Drona's test - Arjuna sees only the bird's eye",
+  "episode": 3,
+  "part": 0,
+  "continues": false,
+  "series_id": null,
+  "title": "মহাভারত পর্ব ৩: পাখির চোখে কার তির বিদ্ধ হলো? 🏹 দ্রোণাচার্যের গোপন পরীক্ষা! Bangla",
+  "festival": null,
+  "vote": null,
+  "viewer_names": [],
+  "quiz": {
+   "label": "খ",
+   "text": "কালো চোখের মণি"
+  },
+  "hook_style": "sound",
+  "moral": "একাগ্রতা ও লক্ষ্যবোধই হলো সাফল্যের আসল চাবিকাঠি।",
+  "title_b": "দ্রোণাচার্যের অলৌকিক পরীক্ষা! 🎯 অর্জুনের তির কি লক্ষ্যভেদ করবে? | মহাভারত পর্ব ৩",
+  "question_post": null,
+  "facebook": "2159800191297909",
+  "youtube": "8qxjuF7yK7c",
+  "fb_reel": "2296422591239167",
+  "fb_story": "1820410172587429",
+  "yt_short": "1wj2p36m_AQ"
  }
 ]
